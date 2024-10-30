@@ -8,5 +8,6 @@ const (
 	TransferRequestModelName     = "transfer_request"
 	TransferTransactionModelName = "transfer_transaction"
 	TransactionLogModelName      = "transaction_logs"
+	UserAuthModelName            = "user_auths"
 	UserModelName                = "users"
 )
