@@ -1,4 +1,4 @@
-package database
+package db
 
 import (
 	"context"
@@ -21,7 +21,7 @@ var (
 // ConnectMongo initializes MongoDB client once
 func ConnectMongo() *mongo.Client {
 	clientOnce.Do(func() {
-		clientOptions := options.Client().ApplyURI("mongodb://127.0.0.1:27017")
+		clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
 		var err error
 		clientInstance, err = mongo.Connect(context.TODO(), clientOptions)
 		if err != nil {
