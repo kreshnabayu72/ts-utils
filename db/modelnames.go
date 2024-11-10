@@ -2,6 +2,10 @@ package db
 
 const (
 	AssetModelName               = "assets"
+	AssetNameModelName           = "asset_names"
+	BrandModelName               = "brands"
+	CategoryModelName            = "categories"
+	CustomFieldModelName         = "custom_fields"
 	GroupModelName               = "groups"
 	IOTReaderModelName           = "iot_readers"
 	TransferRequestModelName     = "transfer_request"
