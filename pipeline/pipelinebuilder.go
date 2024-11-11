@@ -94,6 +94,16 @@ type PaginationQuery struct {
 func (pb *PipelineBuilder) Pagination(query PaginationQuery) *PipelineBuilder {
 
 	var skip int32 = 0
+	var sortBy = "name"
+	var sortOrder int32 = 1
+
+	if query.SortBy != "" {
+		sortBy = query.SortBy
+	}
+
+	if query.SortOrder != 0 {
+		sortOrder = query.SortOrder
+	}
 
 	if query.Page > 0 && query.Limit > 0 {
 		skip = (query.Page - 1) * query.Limit
@@ -102,7 +112,7 @@ func (pb *PipelineBuilder) Pagination(query PaginationQuery) *PipelineBuilder {
 	pb.pipelines = append(pb.pipelines, bson.D{
 		{Key: "$facet", Value: bson.M{
 			"data": bson.A{
-				bson.D{{Key: "$skip", Value: skip}}, bson.D{{Key: "$limit", Value: query.Limit}}, // Limit to 4 documents
+				bson.D{{Key: sortBy, Value: sortOrder}}, bson.D{{Key: "$skip", Value: skip}}, bson.D{{Key: "$limit", Value: query.Limit}}, // Limit to 4 documents
 			},
 			"totalRecords": bson.A{
 				bson.D{{Key: "$count", Value: "total"}},
