@@ -112,7 +112,7 @@ func (pb *PipelineBuilder) Pagination(query PaginationQuery) *PipelineBuilder {
 	pb.pipelines = append(pb.pipelines, bson.D{
 		{Key: "$facet", Value: bson.M{
 			"data": bson.A{
-				bson.D{{Key: sortBy, Value: sortOrder}}, bson.D{{Key: "$skip", Value: skip}}, bson.D{{Key: "$limit", Value: query.Limit}}, // Limit to 4 documents
+				bson.D{{Key: "$sort", Value: bson.D{{Key: sortBy, Value: sortOrder}}}}, bson.D{{Key: "$skip", Value: skip}}, bson.D{{Key: "$limit", Value: query.Limit}}, // Limit to 4 documents
 			},
 			"totalRecords": bson.A{
 				bson.D{{Key: "$count", Value: "total"}},
