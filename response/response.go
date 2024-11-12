@@ -1,18 +1,13 @@
 package response
 
-import (
-	"encoding/json"
-	"net/http"
-)
+import "github.com/gofiber/fiber/v2"
 
-// sendResponse is a helper to send JSON responses
-func SendResponse(w http.ResponseWriter, statusCode int, data interface{}, message string) {
-	response := map[string]interface{}{
+// SendResponse is a helper to send JSON responses in Fiber
+func SendResponse(c *fiber.Ctx, statusCode int, data interface{}, message string) error {
+	response := fiber.Map{
 		"statusCode": statusCode,
 		"data":       data,
 		"message":    message,
 	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
-	json.NewEncoder(w).Encode(response)
+	return c.Status(statusCode).JSON(response)
 }
