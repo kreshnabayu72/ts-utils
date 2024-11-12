@@ -1,6 +1,8 @@
 package pipeline
 
 import (
+	"math"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -96,6 +98,7 @@ func (pb *PipelineBuilder) Pagination(query PaginationQuery) *PipelineBuilder {
 	var skip int32 = 0
 	var sortBy = "name"
 	var sortOrder int32 = 1
+	var limit int32 = math.MaxInt32
 
 	if query.SortBy != "" {
 		sortBy = query.SortBy
@@ -107,12 +110,13 @@ func (pb *PipelineBuilder) Pagination(query PaginationQuery) *PipelineBuilder {
 
 	if query.Page > 0 && query.Limit > 0 {
 		skip = (query.Page - 1) * query.Limit
+		limit = query.Limit
 	}
 
 	pb.pipelines = append(pb.pipelines, bson.D{
 		{Key: "$facet", Value: bson.M{
 			"data": bson.A{
-				bson.D{{Key: "$sort", Value: bson.D{{Key: sortBy, Value: sortOrder}}}}, bson.D{{Key: "$skip", Value: skip}}, bson.D{{Key: "$limit", Value: query.Limit}}, // Limit to 4 documents
+				bson.D{{Key: "$sort", Value: bson.D{{Key: sortBy, Value: sortOrder}}}}, bson.D{{Key: "$skip", Value: skip}}, bson.D{{Key: "$limit", Value: limit}},
 			},
 			"totalRecords": bson.A{
 				bson.D{{Key: "$count", Value: "total"}},
@@ -121,7 +125,7 @@ func (pb *PipelineBuilder) Pagination(query PaginationQuery) *PipelineBuilder {
 	})
 	pb.pipelines = append(pb.pipelines, bson.D{
 		{Key: "$set", Value: bson.M{
-			"totalRecords": bson.D{{Key: "$first", Value: "$totalRecords.total"}}, // Limit to 4 documents
+			"totalRecords": bson.D{{Key: "$first", Value: "$totalRecords.total"}},
 		}},
 	})
 	return pb
