@@ -67,6 +67,26 @@ func (pb *PipelineBuilder) Addfields(setData bson.M) *PipelineBuilder {
 	return pb
 }
 
+// Project adds a $project stage to the pipeline
+func (pb *PipelineBuilder) Project(projectData bson.M) *PipelineBuilder {
+	if projectData != nil {
+		pb.pipelines = append(pb.pipelines, bson.D{
+			{Key: "$project", Value: projectData},
+		})
+	}
+	return pb
+}
+
+// Adds a $unwind stage to the pipeline
+func (pb *PipelineBuilder) Unwind(data bson.M) *PipelineBuilder {
+	if data != nil {
+		pb.pipelines = append(pb.pipelines, bson.D{
+			{Key: "$unwind", Value: data},
+		})
+	}
+	return pb
+}
+
 // limit adds a $limit stage to the pipeline
 func (pb *PipelineBuilder) Limit(limit int) *PipelineBuilder {
 
