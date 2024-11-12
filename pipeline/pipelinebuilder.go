@@ -96,6 +96,16 @@ func (pb *PipelineBuilder) Limit(limit int) *PipelineBuilder {
 	return pb
 }
 
+// Sort adds a $sort stage to the pipeline
+func (pb *PipelineBuilder) Sort(field bson.M) *PipelineBuilder {
+	if field == nil {
+		pb.pipelines = append(pb.pipelines, bson.D{
+			{Key: "$sort", Value: field},
+		})
+	}
+	return pb
+}
+
 // Facet adds a $facet stage to the pipeline
 func (pb *PipelineBuilder) Facet(facets bson.M) *PipelineBuilder {
 
