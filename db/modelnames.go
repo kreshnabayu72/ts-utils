@@ -5,6 +5,7 @@ const (
 	AssetNameModelName           = "asset_names"
 	BrandModelName               = "brands"
 	CategoryModelName            = "categories"
+	ChangelogModelName           = "change_logs"
 	CustomFieldModelName         = "custom_fields"
 	GroupModelName               = "groups"
 	IOTReaderModelName           = "iot_readers"
