@@ -40,7 +40,7 @@ func GenerateSearchCondition(search string) primitive.M {
 	}
 }
 
-func SetDateQuery(requestDate []int) primitive.M {
+func GenerateDateFilter(requestDate []int) primitive.M {
 	if requestDate[0] >= 0 && requestDate[1] >= 0 {
 		start := time.UnixMilli(int64(requestDate[0]))
 		end := time.UnixMilli(int64(requestDate[1]))
