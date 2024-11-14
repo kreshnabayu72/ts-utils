@@ -1,6 +1,8 @@
 package pipeline
 
 import (
+	"time"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -36,4 +38,31 @@ func GenerateSearchCondition(search string) primitive.M {
 	} else {
 		return bson.M{"$ne": false}
 	}
+}
+
+func SetDateQuery(requestDate []int) primitive.M {
+	if requestDate[0] >= 0 && requestDate[1] >= 0 {
+		start := time.UnixMilli(int64(requestDate[0]))
+		end := time.UnixMilli(int64(requestDate[1]))
+
+		// Add 24 hours minus 1 millisecond to end time
+		end = end.Add(24*60*60*1000 - 1)
+
+		return bson.M{
+			"$gte": start,
+			"$lte": end,
+		}
+	}
+	if requestDate[0] >= 0 {
+		start := time.UnixMilli(int64(requestDate[0]))
+		start2 := time.UnixMilli(int64(requestDate[0]))
+		start2 = start2.Add(24*60*60*1000 - 1)
+
+		return bson.M{
+			"$gte": start,
+			"$lt":  start2,
+		}
+	}
+
+	return bson.M{"$ne": "g#*a,Jvb&U.Bg"}
 }
