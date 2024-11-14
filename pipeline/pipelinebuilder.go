@@ -98,7 +98,7 @@ func (pb *PipelineBuilder) Limit(limit int) *PipelineBuilder {
 
 // Sort adds a $sort stage to the pipeline
 func (pb *PipelineBuilder) Sort(field bson.M) *PipelineBuilder {
-	if field == nil {
+	if field != nil {
 		pb.pipelines = append(pb.pipelines, bson.D{
 			{Key: "$sort", Value: field},
 		})
