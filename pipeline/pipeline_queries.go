@@ -13,6 +13,15 @@ func GenerateExactFilter[T comparable](condition bool, filter T) primitive.M {
 	}
 }
 
+func GenerateObjectIdFilter(filter string) primitive.M {
+	objId, _ := primitive.ObjectIDFromHex(filter)
+	if filter != "" {
+		return bson.M{"$eq": objId}
+	} else {
+		return bson.M{"$ne": "vdjfPyv7ijO5vQeLIZmQHuzPO"} //random string so its always true
+	}
+}
+
 func GenerateArrayFilter[T comparable](filter []T) primitive.M {
 	if len(filter) > 0 {
 		return bson.M{"$in": filter}
@@ -20,6 +29,7 @@ func GenerateArrayFilter[T comparable](filter []T) primitive.M {
 		return bson.M{"$ne": "vdjfPyv7ijO5vQeLIZmQHuzPO"} //random string so its always true
 	}
 }
+
 func GenerateSearchCondition(search string) primitive.M {
 	if search != "" {
 		return bson.M{"$regex": search, "$options": "i"}
