@@ -123,13 +123,16 @@ type PaginationQuery struct {
 }
 
 // Pagination adds a $facet stage to the pipeline, with additional limit & skip stage
-func (pb *PipelineBuilder) Pagination(query PaginationQuery) *PipelineBuilder {
+func (pb *PipelineBuilder) Pagination(query PaginationQuery, defaultSort *string) *PipelineBuilder {
 
 	var skip int32 = 0
 	var sortBy = "name"
 	var sortOrder int32 = 1
 	var limit int32 = math.MaxInt32
 
+	if defaultSort != nil {
+		sortBy = *defaultSort
+	}
 	if query.SortBy != "" {
 		sortBy = query.SortBy
 	}
