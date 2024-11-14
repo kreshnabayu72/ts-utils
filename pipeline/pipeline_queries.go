@@ -41,22 +41,27 @@ func GenerateSearchCondition(search string) primitive.M {
 }
 
 func GenerateDateFilter(requestDate []int) primitive.M {
-	if requestDate[0] >= 0 && requestDate[1] >= 0 {
+	if len(requestDate) < 1 {
+		return bson.M{"$ne": "g#*a,Jvb&U.Bg"}
+	}
+
+	if len(requestDate) == 2 && requestDate[0] >= 0 && requestDate[1] >= 0 {
 		start := time.UnixMilli(int64(requestDate[0]))
 		end := time.UnixMilli(int64(requestDate[1]))
 
 		// Add 24 hours minus 1 millisecond to end time
-		end = end.Add(24*60*60*1000 - 1)
+		end = end.Add(24*time.Hour - time.Second)
 
 		return bson.M{
 			"$gte": start,
 			"$lte": end,
 		}
 	}
-	if requestDate[0] >= 0 {
+	if len(requestDate) == 1 && requestDate[0] >= 0 {
 		start := time.UnixMilli(int64(requestDate[0]))
 		start2 := time.UnixMilli(int64(requestDate[0]))
-		start2 = start2.Add(24*60*60*1000 - 1)
+
+		start2 = start2.Add(24*time.Hour - time.Second)
 
 		return bson.M{
 			"$gte": start,
