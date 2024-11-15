@@ -10,6 +10,7 @@ const (
 	GroupModelName               = "groups"
 	NotificationModelName        = "notifications"
 	IOTReaderModelName           = "iot_readers"
+	SessionLogModelName          = "session_logs"
 	TransferRequestModelName     = "transfer_request"
 	TransferTransactionModelName = "transfer_transaction"
 	TransactionLogModelName      = "transaction_logs"
