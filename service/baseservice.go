@@ -28,7 +28,7 @@ type BaseService struct {
 	collection *mongo.Collection
 }
 
-func MakeService(companyCode string, collaction string) *BaseService {
+func MakeService(companyCode string, collection string) *BaseService {
 	db.ConnectToCompanyDb(companyCode)
 	coll := db.GetCollection(db.UserModelName)
 
@@ -37,7 +37,7 @@ func MakeService(companyCode string, collaction string) *BaseService {
 	}
 }
 
-// Deprecated: Use MakeService instead with company code and collection name
+// Deprecated: Use `MakeService` instead with company code and collection name.
 func NewBaseService(collection *mongo.Collection) *BaseService {
 	return &BaseService{
 		collection: collection,
