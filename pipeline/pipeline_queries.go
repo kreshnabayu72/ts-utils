@@ -16,7 +16,11 @@ func GenerateExactFilter[T comparable](condition bool, filter T) primitive.M {
 }
 
 func GenerateObjectIdFilter(filter string) primitive.M {
-	objId, _ := primitive.ObjectIDFromHex(filter)
+	objId, err := primitive.ObjectIDFromHex(filter)
+	if err != nil {
+		return bson.M{"$eq": "djfPyv7ijO5vQeLIZmQHuzPO"}
+	}
+
 	if filter != "" {
 		return bson.M{"$eq": objId}
 	} else {
