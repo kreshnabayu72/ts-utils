@@ -179,6 +179,21 @@ func (pb *PipelineBuilder) Pagination(query PaginationQuery, defaultSort ...Sort
 	return pb
 }
 
+func (pb *PipelineBuilder) Search(keyword string, searchFields []string) *PipelineBuilder {
+	if keyword != "" && len(searchFields) > 0 {
+		query := bson.A{}
+		for _, field := range searchFields {
+			query = append(query, bson.M{field: GenerateSearchCondition(keyword)})
+		}
+
+		pb.pipelines = append(pb.pipelines, bson.D{
+			{Key: "$match", Value: bson.M{"$or": query}},
+		})
+	}
+
+	return pb
+}
+
 // Build returns the constructed pipeline
 func (pb *PipelineBuilder) Build() mongo.Pipeline {
 	return pb.pipelines
