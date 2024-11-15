@@ -14,4 +14,5 @@ const (
 	TransferTransactionModelName = "transfer_transaction"
 	TransactionLogModelName      = "transaction_logs"
 	UserModelName                = "users"
+	MeasurementModelName         = "measurements"
 )

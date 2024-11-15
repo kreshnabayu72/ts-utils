@@ -2,8 +2,6 @@ package service
 
 import (
 	"context"
-	"go.mongodb.org/mongo-driver/bson"
-
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -21,7 +19,7 @@ type Service interface {
 	DeleteOne(context.Context, interface{}, ...*options.DeleteOptions) (int64, error)
 	DeleteMany(context.Context, interface{}, ...*options.DeleteOptions) (int64, error)
 	Aggregate(any, context.Context, mongo.Pipeline) error
-	MakeUnique(context.Context, string) error
+	MakeUnique(context.Context, interface{}) error
 }
 
 type BaseService struct {
@@ -171,9 +169,9 @@ func (s *BaseService) Aggregate(v any, ctx context.Context, pipeline mongo.Pipel
 	return nil
 }
 
-func (s *BaseService) MakeUnique(ctx context.Context, field string) error {
+func (s *BaseService) MakeUnique(ctx context.Context, filter interface{}) error {
 	indexModel := mongo.IndexModel{
-		Keys:    bson.M{field: 1},
+		Keys:    filter,
 		Options: options.Index().SetUnique(true),
 	}
 
