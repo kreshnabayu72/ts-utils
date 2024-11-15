@@ -8,6 +8,7 @@ const (
 	ChangelogModelName           = "change_logs"
 	CustomFieldModelName         = "custom_fields"
 	GroupModelName               = "groups"
+	NotificationModelName        = "notifications"
 	IOTReaderModelName           = "iot_readers"
 	TransferRequestModelName     = "transfer_request"
 	TransferTransactionModelName = "transfer_transaction"
