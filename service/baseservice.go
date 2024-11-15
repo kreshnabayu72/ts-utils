@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"go.mongodb.org/mongo-driver/bson"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -162,6 +163,20 @@ func (s *BaseService) Aggregate(v any, ctx context.Context, pipeline mongo.Pipel
 	defer cursor.Close(ctx)
 
 	err = cursor.All(ctx, v)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *BaseService) MakeUnique(ctx context.Context, field string) error {
+	indexModel := mongo.IndexModel{
+		Keys:    bson.M{field: 1},
+		Options: options.Index().SetUnique(true),
+	}
+
+	_, err := s.collection.Indexes().CreateOne(ctx, indexModel)
 	if err != nil {
 		return err
 	}
