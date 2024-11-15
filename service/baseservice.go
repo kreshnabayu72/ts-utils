@@ -21,6 +21,7 @@ type Service interface {
 	DeleteOne(context.Context, interface{}, ...*options.DeleteOptions) (int64, error)
 	DeleteMany(context.Context, interface{}, ...*options.DeleteOptions) (int64, error)
 	Aggregate(any, context.Context, mongo.Pipeline) error
+	MakeUnique(context.Context, string) error
 }
 
 type BaseService struct {
