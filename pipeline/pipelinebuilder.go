@@ -121,9 +121,13 @@ type PaginationQuery struct {
 	SortBy    string `bson:"sortBy" json:"sortBy"`
 	SortOrder int32  `bson:"sortOrder" json:"sortOrder"`
 }
+type Sort struct {
+	SortBy    string `bson:"sortBy" json:"sortBy"`
+	SortOrder int32  `bson:"sortOrder" json:"sortOrder"`
+}
 
 // Pagination adds a $facet stage to the pipeline, with additional limit & skip stage
-func (pb *PipelineBuilder) Pagination(query PaginationQuery, defaultSort ...string) *PipelineBuilder {
+func (pb *PipelineBuilder) Pagination(query PaginationQuery, defaultSort ...Sort) *PipelineBuilder {
 
 	var skip int32 = 0
 	var sortBy = "name"
@@ -131,7 +135,8 @@ func (pb *PipelineBuilder) Pagination(query PaginationQuery, defaultSort ...stri
 	var limit int32 = math.MaxInt32
 
 	if len(defaultSort) > 0 {
-		sortBy = defaultSort[0]
+		sortBy = defaultSort[0].SortBy
+		sortOrder = defaultSort[0].SortOrder
 	}
 	if query.SortBy != "" {
 		sortBy = query.SortBy
