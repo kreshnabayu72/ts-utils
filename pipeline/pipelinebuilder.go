@@ -77,6 +77,16 @@ func (pb *PipelineBuilder) Project(projectData bson.M) *PipelineBuilder {
 	return pb
 }
 
+// Adds a $lookup stage to the pipeline
+func (pb *PipelineBuilder) Lookup(data bson.M) *PipelineBuilder {
+	if data != nil {
+		pb.pipelines = append(pb.pipelines, bson.D{
+			{Key: "$lookup", Value: data},
+		})
+	}
+	return pb
+}
+
 // Adds a $unwind stage to the pipeline
 func (pb *PipelineBuilder) Unwind(data bson.M) *PipelineBuilder {
 	if data != nil {
@@ -166,6 +176,21 @@ func (pb *PipelineBuilder) Pagination(query PaginationQuery, defaultSort ...Sort
 			"totalRecords": bson.D{{Key: "$first", Value: "$totalRecords.total"}},
 		}},
 	})
+	return pb
+}
+
+func (pb *PipelineBuilder) Search(keyword string, searchFields []string) *PipelineBuilder {
+	if keyword != "" && len(searchFields) > 0 {
+		query := bson.A{}
+		for _, field := range searchFields {
+			query = append(query, bson.M{field: GenerateSearchCondition(keyword)})
+		}
+
+		pb.pipelines = append(pb.pipelines, bson.D{
+			{Key: "$match", Value: bson.M{"$or": query}},
+		})
+	}
+
 	return pb
 }
 
