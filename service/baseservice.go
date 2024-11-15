@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 
+	"github.com/betsv2/tsv2-go-utils/db"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -27,6 +28,16 @@ type BaseService struct {
 	collection *mongo.Collection
 }
 
+func MakeService(companyCode string, collaction string) *BaseService {
+	db.ConnectToCompanyDb(companyCode)
+	coll := db.GetCollection(db.UserModelName)
+
+	return &BaseService{
+		collection: coll,
+	}
+}
+
+// Deprecated: Use MakeService instead with company code and collection name
 func NewBaseService(collection *mongo.Collection) *BaseService {
 	return &BaseService{
 		collection: collection,
