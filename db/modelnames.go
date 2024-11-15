@@ -17,4 +17,5 @@ const (
 	TransactionLogModelName      = "transaction_logs"
 	UserModelName                = "users"
 	UserSystemRoleModelName      = "user_system_roles"
+	ServiceCenterModelName       = "service_centers"
 )

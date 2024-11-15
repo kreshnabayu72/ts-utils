@@ -10,7 +10,6 @@ type Category struct {
 	ID                   primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
 	Name                 string             `json:"name" bson:"name"`
 	Parent               primitive.ObjectID `json:"parent" bson:"parent"`
-	FullPath             string             `json:"fullPath" bson:"fullPath"`
 	IsDefault            bool               `json:"isDefault" bson:"isDefault"`
 	IsDeleted            bool               `json:"isDeleted" bson:"isDeleted"`
 	Key                  int32              `json:"key" bson:"key"`
