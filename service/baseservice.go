@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -18,7 +19,7 @@ type Service interface {
 	FindOneAndDelete(any, context.Context, interface{}, ...*options.FindOneAndDeleteOptions) error
 	DeleteOne(context.Context, interface{}, ...*options.DeleteOptions) (int64, error)
 	DeleteMany(context.Context, interface{}, ...*options.DeleteOptions) (int64, error)
-	Aggregate(any, context.Context, mongo.Pipeline) error
+	Aggregate(any, context.Context, mongo.Pipeline, ...*options.AggregateOptions) error
 	MakeUnique(context.Context, interface{}) error
 }
 
@@ -154,8 +155,8 @@ func (s *BaseService) DeleteMany(ctx context.Context, filter interface{},
 	return result.DeletedCount, nil
 }
 
-func (s *BaseService) Aggregate(v any, ctx context.Context, pipeline mongo.Pipeline) error {
-	cursor, err := s.collection.Aggregate(ctx, pipeline)
+func (s *BaseService) Aggregate(v any, ctx context.Context, pipeline mongo.Pipeline, opts ...*options.AggregateOptions) error {
+	cursor, err := s.collection.Aggregate(ctx, pipeline, opts...)
 	if err != nil {
 		return err
 	}
