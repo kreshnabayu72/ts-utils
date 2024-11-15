@@ -30,7 +30,7 @@ type BaseService struct {
 
 func MakeService(companyCode string, collection string) *BaseService {
 	db.ConnectToCompanyDb(companyCode)
-	coll := db.GetCollection(db.UserModelName)
+	coll := db.GetCollection(collection)
 
 	return &BaseService{
 		collection: coll,
