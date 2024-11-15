@@ -30,7 +30,7 @@ type User struct {
 	IsActive             bool                `json:"isActive" bson:"isActive"`
 	IsTemporary          bool                `json:"isTemporary" bson:"isTemporary"`
 	ExpiryDate           *time.Time          `json:"expiryDate" bson:"expiryDate"`
-	IsAdmin              bool                `json:"isAdmin" bson:"isTemporary"`
+	IsAdmin              bool                `json:"isAdmin" bson:"isAdmin"`
 	PendingEmailChange   string              `json:"pendingEmailChange" bson:"pendingEmailChange"`
 	ModifiedBy           *UserEmbedded       `json:"modifiedBy" bson:"modifiedBy"`
 	Parent               *primitive.ObjectID `json:"parent" bson:"parent"`
