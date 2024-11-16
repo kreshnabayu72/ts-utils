@@ -16,6 +16,14 @@ type AttributeEmbedded struct {
 	Key  *int32              `json:"key" bson:"key"`
 }
 
+type NameEmbedded struct {
+	ID               primitive.ObjectID `bson:"_id" json:"_id"`
+	NameWithSequence string             `bson:"nameWithSequence" json:"nameWithSequence"`
+	Name             string             `bson:"name" json:"name"`
+	Key              int                `bson:"key" json:"key"`
+	NameNumber       int                `bson:"nameNumber" json:"nameNumber"`
+}
+
 type RoleType string
 
 const (
