@@ -1,6 +1,7 @@
 package pipeline
 
 import (
+	"strings"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -74,4 +75,45 @@ func GenerateDateFilter(requestDate []int) primitive.M {
 	}
 
 	return bson.M{"$ne": "g#*a,Jvb&U.Bg"}
+}
+
+func GenerateOptionFacet(
+	fieldName string,
+	optionsQuery bool,
+	labelKey string,
+	valueKey string,
+) primitive.A {
+	lk := labelKey
+	if !strings.HasPrefix(lk, "$") {
+		lk = "$" + lk
+	}
+
+	vk := valueKey
+	if !strings.HasPrefix(vk, "$") {
+		vk = "$" + vk
+	}
+
+	return bson.A{
+		bson.M{
+			"$match": bson.M{
+				fieldName: bson.M{"$ne": nil},
+				"$expr": bson.M{
+					"$eq": bson.A{optionsQuery, true},
+				},
+			},
+		},
+		bson.M{
+			"$group": bson.M{
+				"_id": bson.M{
+					"label": lk,
+					"value": vk,
+				},
+			},
+		},
+		bson.M{
+			"$sort": bson.M{
+				"_id.label": 1,
+			},
+		},
+	}
 }
