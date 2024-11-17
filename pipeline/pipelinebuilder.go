@@ -120,7 +120,16 @@ func (pb *PipelineBuilder) Sort(field bson.M) *PipelineBuilder {
 func (pb *PipelineBuilder) Facet(facets bson.M) *PipelineBuilder {
 
 	pb.pipelines = append(pb.pipelines, bson.D{
-		{Key: "$facet", Value: facets}, // $facet should be a single object with stages as its values
+		{Key: "$facet", Value: facets},
+	})
+	return pb
+}
+
+// ReplaceRoot adds a $replaceRoo stage to the pipeline
+func (pb *PipelineBuilder) ReplaceRoot(data bson.M) *PipelineBuilder {
+
+	pb.pipelines = append(pb.pipelines, bson.D{
+		{Key: "$replaceRoot", Value: data},
 	})
 	return pb
 }
