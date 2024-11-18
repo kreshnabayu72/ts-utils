@@ -10,18 +10,18 @@ import (
 
 // Base Service Interface
 type Service interface {
-	Find(any, context.Context, interface{}, ...*options.FindOptions) error
-	FindOne(any, context.Context, interface{}, ...*options.FindOneOptions) error
-	InsertOne(context.Context, interface{}, ...*options.InsertOneOptions) (interface{}, error)
-	InsertMany(context.Context, []interface{}, ...*options.InsertManyOptions) ([]interface{}, error)
-	FindOneAndUpdate(any, context.Context, interface{}, interface{}, ...*options.FindOneAndUpdateOptions) error
-	UpdateOne(context.Context, interface{}, interface{}, ...*options.UpdateOptions) (int64, error)
-	UpdateMany(context.Context, interface{}, interface{}, ...*options.UpdateOptions) (int64, error)
-	FindOneAndDelete(any, context.Context, interface{}, ...*options.FindOneAndDeleteOptions) error
-	DeleteOne(context.Context, interface{}, ...*options.DeleteOptions) (int64, error)
-	DeleteMany(context.Context, interface{}, ...*options.DeleteOptions) (int64, error)
-	Aggregate(any, context.Context, mongo.Pipeline, ...*options.AggregateOptions) error
-	MakeUnique(context.Context, interface{}) error
+	Find(v any, ctx context.Context, filter interface{}, options ...*options.FindOptions) error
+	FindOne(v any, ctx context.Context, filter interface{}, options ...*options.FindOneOptions) error
+	InsertOne(ctx context.Context, data interface{}, options ...*options.InsertOneOptions) (interface{}, error)
+	InsertMany(ctx context.Context, data []interface{}, options ...*options.InsertManyOptions) ([]interface{}, error)
+	FindOneAndUpdate(v any, ctx context.Context, filter interface{}, updateData interface{}, options ...*options.FindOneAndUpdateOptions) error
+	UpdateOne(ctx context.Context, filter interface{}, updateData interface{}, options ...*options.UpdateOptions) (int64, error)
+	UpdateMany(ctx context.Context, fitler interface{}, updateData interface{}, options ...*options.UpdateOptions) (int64, error)
+	FindOneAndDelete(v any, ctx context.Context, filter interface{}, options ...*options.FindOneAndDeleteOptions) error
+	DeleteOne(ctx context.Context, filter interface{}, options ...*options.DeleteOptions) (int64, error)
+	DeleteMany(ctx context.Context, filter interface{}, options ...*options.DeleteOptions) (int64, error)
+	Aggregate(v any, ctx context.Context, pipeline mongo.Pipeline, options ...*options.AggregateOptions) error
+	MakeUnique(ctx context.Context, filter interface{}) error
 }
 
 type BaseService struct {
