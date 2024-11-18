@@ -14,10 +14,10 @@ const (
 	MeasurementModelName         = "measurements"
 	NotificationModelName        = "notifications"
 	SessionLogModelName          = "session_logs"
+	ServiceCenterModelName       = "service_centers"
 	TransferRequestModelName     = "transfer_request"
 	TransferTransactionModelName = "transfer_transaction"
 	TransactionLogModelName      = "transaction_logs"
 	UserModelName                = "users"
 	UserSystemRoleModelName      = "user_system_roles"
-	ServiceCenterModelName       = "service_centers"
 )

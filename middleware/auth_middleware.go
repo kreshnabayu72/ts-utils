@@ -42,9 +42,14 @@ func ValidateJWT() fiber.Handler {
 
 			companyCode := claims["companyCode"].(string)
 			userId, _ := primitive.ObjectIDFromHex(claims["id"].(string))
+			session, err := primitive.ObjectIDFromHex(claims["session"].(string))
 
 			ctx.Locals(UserKey, userId)
 			ctx.Locals(CompanyCodeKey, companyCode)
+
+			if err != nil {
+				ctx.Locals(SessionKey, session)
+			}
 		} else {
 			return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
 		}

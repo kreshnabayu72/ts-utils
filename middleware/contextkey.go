@@ -6,4 +6,5 @@ type ContextKey string
 const (
 	UserKey        = ContextKey("user")
 	CompanyCodeKey = ContextKey("companyCode")
+	SessionKey     = ContextKey("session")
 )
