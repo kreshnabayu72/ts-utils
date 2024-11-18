@@ -9,6 +9,7 @@ const (
 	CustomFieldModelName         = "custom_fields"
 	GroupModelName               = "groups"
 	IOTActivityLogModelName      = "iot_activity_logs"
+	IOTAntennaModelName          = "iot_antennas"
 	IOTReaderModelName           = "iot_readers"
 	MeasurementModelName         = "measurements"
 	NotificationModelName        = "notifications"
