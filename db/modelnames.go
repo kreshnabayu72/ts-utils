@@ -3,6 +3,7 @@ package db
 const (
 	AssetModelName               = "assets"
 	AssetNameModelName           = "asset_names"
+	AuditTaskModelName           = "audit_tasks"
 	BrandModelName               = "brands"
 	CategoryModelName            = "categories"
 	ChangelogModelName           = "change_logs"
