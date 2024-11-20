@@ -9,7 +9,6 @@ type AccountCode struct {
 	ID                   primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
 	Code                 string             `json:"code" bson:"code"`
 	Name                 string             `json:"name" bson:"name"`
-	TotalAssets          int                `json:"totalAssets" bson:"totalAssets"`
 	IsDeleted            bool               `json:"isDeleted" bson:"isDeleted"`
 	Key                  int                `json:"key" bson:"key"`
 	DeleteFromDatabaseAt *time.Time         `json:"deleteFromDatabaseAt" bson:"deleteFromDatabaseAt"`
