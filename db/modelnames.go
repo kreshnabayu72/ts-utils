@@ -1,6 +1,7 @@
 package db
 
 const (
+	AccountCodeModelName         = "account_codes"
 	AssetModelName               = "assets"
 	AssetNameModelName           = "asset_names"
 	AuditTaskModelName           = "audit_tasks"
