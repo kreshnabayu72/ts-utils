@@ -1,8 +1,9 @@
 package model
 
 import (
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type DepreciationGroup struct {
@@ -10,7 +11,7 @@ type DepreciationGroup struct {
 	Name                 string             `json:"name" bson:"name"`
 	UsefulLife           uint               `json:"usefulLife" bson:"usefulLife"`
 	StraightLineRate     float32            `json:"straightLineRate" bson:"straightLineRate"`
-	DoubleDecreaseRate   float32            `json:"doubleDecreaseRate" bson:"doubleDecreaseRate"`
+	DoubleDecreasedRate  float32            `json:"doubleDecreasedRate" bson:"doubleDecreasedRate"`
 	IsDeleted            bool               `json:"isDeleted" bson:"isDeleted"`
 	Key                  int                `json:"key" bson:"key"`
 	DeleteFromDatabaseAt *time.Time         `json:"deleteFromDatabaseAt" bson:"deleteFromDatabaseAt"`
