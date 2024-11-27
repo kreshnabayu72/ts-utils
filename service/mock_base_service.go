@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"reflect"
 
 	"github.com/stretchr/testify/mock"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -64,7 +65,12 @@ func (m *MockBaseService) DeleteMany(ctx context.Context, filter interface{}, op
 
 func (m *MockBaseService) Aggregate(v any, ctx context.Context, pipeline mongo.Pipeline, opts ...*options.AggregateOptions) error {
 	args := m.Called(v, ctx, pipeline, opts)
-	return args.Error(0)
+
+	// Set the output to v (assuming v is a pointer to a slice or struct)
+	if out := args.Get(0); out != nil {
+		reflect.ValueOf(v).Elem().Set(reflect.ValueOf(out))
+	}
+	return args.Error(1)
 }
 
 func (m *MockBaseService) MakeUnique(ctx context.Context, filter interface{}) error {
