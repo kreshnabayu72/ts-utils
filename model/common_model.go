@@ -3,7 +3,7 @@ package model
 import "go.mongodb.org/mongo-driver/bson/primitive"
 
 type UserEmbedded struct {
-	ID        *primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
+	ID        *primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
 	FullName  *string             `json:"fullName" bson:"fullName"`
 	Key       *int32              `json:"key" bson:"key"`
 	Position  *string             `json:"position,omitempty" bson:"position,omitempty"`
@@ -11,7 +11,7 @@ type UserEmbedded struct {
 	IsDefault *bool               `json:"isDefault,omitempty" bson:"isDefault,omitempty"`
 }
 type AttributeEmbedded struct {
-	ID   *primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
+	ID   *primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
 	Name *string             `json:"name" bson:"name"`
 	Key  *int32              `json:"key" bson:"key"`
 }
