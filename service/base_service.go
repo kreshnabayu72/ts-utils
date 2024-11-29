@@ -37,6 +37,15 @@ func MakeService(companyCode string, collection string) *BaseService {
 	}
 }
 
+func MakeAdminService(collection string) *BaseService {
+	db.ConnectToAdminDb()
+	coll := db.GetCollection("clients")
+
+	return &BaseService{
+		collection: coll,
+	}
+}
+
 // Deprecated: Use `MakeService` instead with company code and collection name.
 func NewBaseService(collection *mongo.Collection) *BaseService {
 	return &BaseService{
