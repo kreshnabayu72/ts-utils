@@ -180,9 +180,11 @@ func (pb *PipelineBuilder) Pagination(query PaginationQuery, defaultSort ...Sort
 			},
 		}},
 	})
+
 	pb.pipelines = append(pb.pipelines, bson.D{
+		{Key: "$unwind", Value: "$totalRecords"},
 		{Key: "$addFields", Value: bson.M{
-			"totalRecords": bson.D{{Key: "$first", Value: "$totalRecords.total"}},
+			"totalRecords": "$totalRecords.total",
 		}},
 	})
 	return pb
