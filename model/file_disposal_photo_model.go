@@ -16,7 +16,7 @@ type FileDisposalPhoto struct {
 	FilePath         string             `bson:"filePath" json:"filePath"`
 	FileFormat       string             `bson:"fileFormat" json:"fileFormat"`
 	FileSize         string             `bson:"fileSize" json:"fileSize"`
-	FileSizeKb       int                `bson:"fileSizeKb" json:"fileSizeKb"`
+	FileSizeKb       float64            `bson:"fileSizeKb" json:"fileSizeKb"`
 	IsDeleted        bool               `bson:"isDeleted" json:"isDeleted"`
 	ModifiedBy       ModifiedBy         `bson:"modifiedBy" json:"modifiedBy"`
 	DeletedAt        time.Time          `bson:"deletedAt" json:"deletedAt"`
