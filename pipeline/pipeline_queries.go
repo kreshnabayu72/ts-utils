@@ -6,6 +6,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func GenerateExactFilter[T comparable](condition bool, filter T) primitive.M {
@@ -82,7 +83,7 @@ func GenerateOptionFacet(
 	optionsQuery bool,
 	labelKey string,
 	valueKey string,
-) primitive.A {
+) mongo.Pipeline {
 	lk := labelKey
 	if !strings.HasPrefix(lk, "$") {
 		lk = "$" + lk
@@ -93,27 +94,13 @@ func GenerateOptionFacet(
 		vk = "$" + vk
 	}
 
-	return bson.A{
-		bson.M{
-			"$match": bson.M{
-				fieldName: bson.M{"$ne": nil},
-				"$expr": bson.M{
-					"$eq": bson.A{optionsQuery, true},
-				},
-			},
-		},
-		bson.M{
-			"$group": bson.M{
-				"_id": bson.M{
-					"label": lk,
-					"value": vk,
-				},
-			},
-		},
-		bson.M{
-			"$sort": bson.M{
-				"_id.label": 1,
-			},
-		},
-	}
+	return NewPipelineBuilder().
+		Match(bson.M{
+			fieldName: bson.M{"$ne": primitive.Null{}},
+			"$expr":   bson.M{"$eq": bson.A{optionsQuery, true}}}).
+		Group(bson.D{
+			{Key: "_id", Value: bson.M{"label": lk, "value": vk}},
+		}).
+		Sort(bson.M{"_id.label": 1}).
+		Build()
 }
