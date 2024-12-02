@@ -29,4 +29,5 @@ const (
 	FileMaintenanceDocumentModelName = "file_maintenance_documents"
 	FileMaintenancePhotoModelName    = "file_maintenance_photos"
 	FileRepairTicketingModelName     = "file_repair_ticketings"
+	ClientModelName                  = "clients"
 )
