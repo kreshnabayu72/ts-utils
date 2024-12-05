@@ -9,6 +9,7 @@ import (
 type Category struct {
 	ID                   primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
 	Name                 string             `json:"name" bson:"name"`
+	FullPath             string             `json:"fullPath" bson:"fullPath"`
 	Parent               primitive.ObjectID `json:"parent" bson:"parent"`
 	IsDefault            bool               `json:"isDefault" bson:"isDefault"`
 	IsDeleted            bool               `json:"isDeleted" bson:"isDeleted"`
