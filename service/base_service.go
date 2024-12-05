@@ -22,6 +22,7 @@ type Service interface {
 	DeleteMany(ctx context.Context, filter interface{}, options ...*options.DeleteOptions) (int64, error)
 	Aggregate(v any, ctx context.Context, pipeline mongo.Pipeline, options ...*options.AggregateOptions) error
 	MakeUnique(ctx context.Context, filter interface{}) error
+	CountDocuments(ctx context.Context, filter interface{}) (int64, error)
 }
 
 type BaseService struct {
@@ -202,4 +203,14 @@ func (s *BaseService) MakeUnique(ctx context.Context, filter interface{}) error 
 	}
 
 	return nil
+}
+
+func (s *BaseService) CountDocuments(ctx context.Context, filter interface{}) (int64, error) {
+	documentCounts, err := s.collection.CountDocuments(ctx, filter)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return documentCounts, nil
 }
