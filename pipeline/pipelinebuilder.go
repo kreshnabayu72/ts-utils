@@ -77,6 +77,16 @@ func (pb *PipelineBuilder) Project(projectData bson.M) *PipelineBuilder {
 	return pb
 }
 
+// GraphLookup adds a $graphLookup stage to the pipeline
+func (pb *PipelineBuilder) GraphLookup(data bson.M) *PipelineBuilder {
+	if data != nil {
+		pb.pipelines = append(pb.pipelines, bson.D{
+			{Key: "$graphLookup", Value: data},
+		})
+	}
+	return pb
+}
+
 // Adds a $lookup stage to the pipeline
 func (pb *PipelineBuilder) Lookup(data bson.M) *PipelineBuilder {
 	if data != nil {
