@@ -10,7 +10,7 @@ import (
 )
 
 // parseXlsx reads and parses the Excel file
-func parseXlsx(file *multipart.FileHeader, columns []string) ([]map[string]interface{}, error) {
+func ParseXlsxToJson(file *multipart.FileHeader, columns []string) ([]map[string]interface{}, error) {
 	// Buka file
 	rows, err := getExcelRows(file)
 	if err != nil {
