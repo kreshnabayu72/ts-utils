@@ -1,5 +1,7 @@
 package model
 
+import "go.mongodb.org/mongo-driver/bson/primitive"
+
 // Struct for the auditAttrs
 type TransactionSettingAuditAttrs struct {
 	MaxGracePeriod int `json:"maxGracePeriod" bson:"maxGracePeriod"`
@@ -23,8 +25,8 @@ type TransactionSettingDisposalAttrs struct {
 	TransactionTimeout int `json:"transactionTimeout" bson:"transactionTimeout"`
 }
 
-// Struct to represent the request body
 type TransactionSetting struct {
+	ID             primitive.ObjectID               `json:"_id" bson:"_id"`
 	AuditAttrs     TransactionSettingAuditAttrs     `json:"auditAttrs" bson:"auditAttrs"`
 	BorrowingAttrs TransactionSettingBorrowingAttrs `json:"borrowingAttrs" bson:"borrowingAttrs"`
 	TransferAttrs  TransactionSettingTransferAttrs  `json:"transferAttrs" bson:"transferAttrs"`
