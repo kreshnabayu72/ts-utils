@@ -77,3 +77,13 @@ func (m *MockBaseService) MakeUnique(ctx context.Context, filter interface{}) er
 	args := m.Called(ctx, filter)
 	return args.Error(0)
 }
+
+func (m *MockBaseService) CountDocuments(ctx context.Context, filter interface{}) (int64, error) {
+	args := m.Mock.Called(ctx, filter)
+
+	if args.Get(0) == nil {
+		return 0, nil
+	}
+
+	return args.Get(1).(int64), nil
+}
