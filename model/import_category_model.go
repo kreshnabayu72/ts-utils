@@ -11,4 +11,5 @@ type ImportCategory struct {
 	Name      string             `bson:"name,omitempty" json:"name,omitempty"`
 	Key       int                `bson:"key,omitempty" json:"key,omitempty"`
 	CreatedAt time.Time          `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
+	UpdatedAt time.Time          `bson:"updatedAt,omitempty" json:"updatedAt,omitempty"`
 }

@@ -145,10 +145,10 @@ func (pb *PipelineBuilder) ReplaceRoot(data bson.M) *PipelineBuilder {
 }
 
 type PaginationQuery struct {
-	Page      int32  `bson:"page" json:"page"`
-	Limit     int32  `bson:"limit" json:"limit"`
-	SortBy    string `bson:"sortBy" json:"sortBy"`
-	SortOrder int32  `bson:"sortOrder" json:"sortOrder"`
+	Page      int32  `bson:"page" json:"page" transform:"int"`
+	Limit     int32  `bson:"limit" json:"limit" transform:"int"`
+	SortBy    string `bson:"sortBy" json:"sortBy" transform:"string"`
+	SortOrder int32  `bson:"sortOrder" json:"sortOrder" transform:"int"`
 }
 type Sort struct {
 	SortBy    string `bson:"sortBy" json:"sortBy"`
