@@ -30,6 +30,6 @@ const (
 	FileMaintenancePhotoModelName    = "file_maintenance_photos"
 	FileRepairTicketingModelName     = "file_repair_ticketings"
 	ClientModelName                  = "clients"
-	ImportCategoryModelName          = "import_category"
-	ImportAssetNameModelName         = "import_asset_name"
+	ImportCategoryModelName          = "import_categories"
+	ImportAssetNameModelName         = "import_asset_names"
 )
