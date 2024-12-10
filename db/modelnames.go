@@ -31,4 +31,5 @@ const (
 	FileRepairTicketingModelName     = "file_repair_ticketings"
 	ClientModelName                  = "clients"
 	ImportCategoryModelName          = "import_category"
+	ImportAssetNameModelName         = "import_asset_name"
 )
