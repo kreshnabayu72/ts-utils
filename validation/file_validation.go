@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func ValidateFile(file *multipart.FileHeader, allowedTypes []string, maxSize int64) error {
+func (v *DefaultValidator) ValidateFile(file *multipart.FileHeader, allowedTypes []string, maxSize int64) error {
 	// Validasi ukuran file
 	if file.Size > maxSize {
 		return fmt.Errorf("file size exceeds %d bytes", maxSize)

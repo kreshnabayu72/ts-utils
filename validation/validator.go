@@ -2,12 +2,20 @@ package validation
 
 import (
 	"fmt"
+	"mime/multipart"
 	"reflect"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
+
+type Validator interface {
+	ValidateFile(file *multipart.FileHeader, allowedTypes []string, maxSize int64) error
+	ValidateStruct(c *fiber.Ctx, payload interface{}) error
+}
+
+type DefaultValidator struct{}
 
 var validate *validator.Validate
 
@@ -29,7 +37,7 @@ func RegisterCustomValidators(validate *validator.Validate) {
 }
 
 // ValidateStruct parses and validates the payload
-func ValidateStruct(c *fiber.Ctx, payload interface{}) error {
+func (v *DefaultValidator) ValidateStruct(c *fiber.Ctx, payload interface{}) error {
 	// Parse the request body
 	if err := c.BodyParser(payload); err != nil {
 		return fmt.Errorf("invalid request payload: %w", err)
