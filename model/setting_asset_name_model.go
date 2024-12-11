@@ -87,7 +87,7 @@ type transactions struct {
 type category struct {
 	ID   *primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
 	Name *string             `bson:"name,omitempty" json:"name,omitempty"`
-	Key  *int                `bson:"key,omitempty" json:"key,omitempty"`
+	Key  *int32              `bson:"key,omitempty" json:"key,omitempty"`
 }
 
 type measurement struct {
