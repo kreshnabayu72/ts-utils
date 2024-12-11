@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/betsv2/tsv2-go-utils/db"
 	"github.com/betsv2/tsv2-go-utils/service"
 	"github.com/go-co-op/gocron/v2"
 	"go.mongodb.org/mongo-driver/bson"
@@ -32,15 +33,29 @@ type Schedule struct {
 }
 
 type Agenda struct {
-	Service   service.Service //Base Service. Use MakeGlobalService function
-	Scheduler gocron.Scheduler
-	Tasks     Task
-	Schedules []Schedule
+	service   service.Service //Base Service. Use MakeGlobalService function
+	scheduler gocron.Scheduler
+	tasks     Task
+	schedules []Schedule
+}
+
+func NewAgenda() *Agenda {
+	scheduler, err := gocron.NewScheduler()
+
+	if err != nil {
+		panic(err.Error())
+	}
+
+	return &Agenda{
+		service:   service.MakeGlobalService(db.FileManagerAgendaModelName),
+		scheduler: scheduler,
+		tasks:     Task{},
+	}
 }
 
 func (u Agenda) Listen() {
 
-	u.Scheduler.Start()
+	u.scheduler.Start()
 	fmt.Println("Agenda is running")
 }
 
@@ -53,7 +68,7 @@ func (u Agenda) retrieveAndRunSchedules(ctx context.Context) {
 		panic("Something went wrong")
 	}
 
-	for _, schedule := range u.Schedules {
+	for _, schedule := range u.schedules {
 		u.createJob(ctx, schedule)
 	}
 }
@@ -67,7 +82,7 @@ func (u Agenda) RunSchedule(ctx context.Context, taskName string, runAt time.Tim
 		Data:   data.Metadata,
 	}
 
-	result, err := u.Service.InsertOne(ctx, newSchedule)
+	result, err := u.service.InsertOne(ctx, newSchedule)
 
 	if err != nil {
 		return err
@@ -82,27 +97,27 @@ func (u Agenda) RunSchedule(ctx context.Context, taskName string, runAt time.Tim
 
 // Define your task that will be called at the scheduled time
 func (u Agenda) DefineTask(name string, action func(data any)) {
-	u.Tasks[name] = action
+	u.tasks[name] = action
 }
 
 // Get all waiting schedules from database
 func (u *Agenda) retrieveSchedules(ctx context.Context) error {
 
 	var result []Schedule
-	err := u.Service.Find(&result, ctx, bson.M{"status": StatusScheduleWaiting})
+	err := u.service.Find(&result, ctx, bson.M{"status": StatusScheduleWaiting})
 
 	if err != nil {
 		return err
 	}
 
-	u.Schedules = result
+	u.schedules = result
 
 	return err
 }
 
 // Set the Scheduled Task into finished
 func (u Agenda) setScheduleToFinished(ctx context.Context, scheduleId primitive.ObjectID) {
-	u.Service.UpdateOne(ctx, bson.M{"_id": scheduleId}, bson.M{"$set": bson.M{"status": StatusScheduleFinished}})
+	u.service.UpdateOne(ctx, bson.M{"_id": scheduleId}, bson.M{"$set": bson.M{"status": StatusScheduleFinished}})
 }
 
 // Change the agenda state into ready.
@@ -120,11 +135,11 @@ func (u Agenda) createJob(ctx context.Context, schedule Schedule) {
 	}
 
 	//run a new job
-	_, err := u.Scheduler.NewJob(
+	_, err := u.scheduler.NewJob(
 		job,
 		gocron.NewTask(
 			func(metadata TaskMetadata) {
-				u.Tasks[schedule.Name](metadata.Metadata)
+				u.tasks[schedule.Name](metadata.Metadata)
 				u.setScheduleToFinished(ctx, schedule.ID)
 			}, TaskMetadata{Metadata: schedule.Data}),
 		gocron.WithTags(schedule.ID.String()),
@@ -141,17 +156,17 @@ func (u Agenda) CancelSchedule(ctx context.Context, metadata TaskMetadata) error
 	var schedule Schedule
 
 	//find one of the schedules with provided metadata that are still have status waiting
-	err := u.Service.FindOne(&schedule, ctx, bson.M{"data": metadata.Metadata, "status": StatusScheduleWaiting})
+	err := u.service.FindOne(&schedule, ctx, bson.M{"data": metadata.Metadata, "status": StatusScheduleWaiting})
 
 	if err != nil {
 		return err
 	}
 
 	//Remove the running schedule by the tag its given, which is the mongoId
-	u.Scheduler.RemoveByTags(schedule.ID.String())
+	u.scheduler.RemoveByTags(schedule.ID.String())
 
 	//Update the schedule status to canceled
-	_, err = u.Service.UpdateOne(ctx, bson.M{"_id": schedule.ID}, bson.M{"$set": bson.M{"status": StatusScheduleCanceled}})
+	_, err = u.service.UpdateOne(ctx, bson.M{"_id": schedule.ID}, bson.M{"$set": bson.M{"status": StatusScheduleCanceled}})
 
 	return err
 }
