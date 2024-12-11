@@ -47,6 +47,15 @@ func MakeAdminService(collection string) *BaseService {
 	}
 }
 
+func MakeGlobalService(collection string) *BaseService {
+	db.ConnectToGlobalDb()
+	coll := db.GetCollection(collection)
+
+	return &BaseService{
+		collection: coll,
+	}
+}
+
 // Deprecated: Use `MakeService` instead with company code and collection name.
 func NewBaseService(collection *mongo.Collection) *BaseService {
 	return &BaseService{
