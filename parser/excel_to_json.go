@@ -6,11 +6,20 @@ import (
 	"mime/multipart"
 	"strconv"
 
+	"github.com/stretchr/testify/mock"
 	"github.com/xuri/excelize/v2"
 )
 
+// Parser defines the interface for parsing Excel files.
+type Parser interface {
+	ParseXlsxToJson(file *multipart.FileHeader, columns []string) ([]map[string]interface{}, error)
+}
+
+// DefaultParser is the default implementation of the Parser interface.
+type DefaultParser struct{}
+
 // parseXlsx reads and parses the Excel file
-func ParseXlsxToJson(file *multipart.FileHeader, columns []string) ([]map[string]interface{}, error) {
+func (p *DefaultParser) ParseXlsxToJson(file *multipart.FileHeader, columns []string) ([]map[string]interface{}, error) {
 	// Buka file
 	rows, err := getExcelRows(file)
 	if err != nil {
@@ -114,4 +123,13 @@ func contains(slice []string, item string) bool {
 		}
 	}
 	return false
+}
+
+type MockParser struct {
+	mock.Mock
+}
+
+func (m *MockParser) ParseXlsxToJson(file *multipart.FileHeader, columns []string) ([]map[string]interface{}, error) {
+	args := m.Called(file, columns)
+	return args.Get(0).([]map[string]interface{}), args.Error(1)
 }
