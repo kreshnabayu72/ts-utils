@@ -2,40 +2,76 @@ package validation
 
 import (
 	"github.com/betsv2/tsv2-go-utils/entity"
+	"github.com/betsv2/tsv2-go-utils/parser"
 	"github.com/betsv2/tsv2-go-utils/validation/v2/custom_validator"
 	"github.com/gofiber/fiber/v2"
 	"github.com/kittipat1413/go-common/framework/validator"
 )
 
 // EXAMPLE USAGE:
-// body, validationErr := validation.MakeAndValidate[dto.MyDTO](ctx)
+// body, err := validation.ParseAndValidateBody[dto.MyDTO](ctx)
+// OR
+// query, err := validation.ParseAndValidateQuery[dto.MyQueryDTO](ctx)
 
-// if validationErr != nil {
-// 	return response.SendResponse(ctx, validationErr.Code, nil, validationErr.Message)
+// if err != nil {
+// 	return response.SendResponse(ctx, err.Code, nil, err.Message)
 // }
 
-// Compacted common validation to reduce repeated code.
-// Intended to be used in controller
-func MakeAndValidate[T any](ctx *fiber.Ctx) (T, *entity.HttpError) {
-	var body T
-	if err := ctx.BodyParser(&body); err != nil {
-		return body, entity.InternalServerError(err.Error())
-	}
-
-	// Register the validator
+func RawValidate[T any](data T) *entity.HttpError {
 	v, validatorErr := validator.NewValidator(
 		validator.WithTagNameFunc(validator.JSONTagNameFunc),
 		validator.WithCustomValidator(new(custom_validator.NotBlankValidator)),
 	)
 
+	// Return if there is an error when creating the validator
 	if validatorErr != nil {
-		return body, entity.InternalServerError(validatorErr.Error())
+		return entity.InternalServerError(validatorErr.Error())
 	}
 
-	// Validate the body
-	if validateErr := v.ValidateStruct(body); validateErr != nil {
-		return body, entity.BadRequest(validateErr.Error())
+	// Validate the data and return if there is an error
+	if validateErr := v.ValidateStruct(data); validateErr != nil {
+		return entity.BadRequest(validateErr.Error())
 	}
 
-	return body, nil
+	return nil
+}
+
+// Compacted common validation to reduce repeated code.
+// Intended to be used in controller
+func ParseAndValidateBody[T any](ctx *fiber.Ctx) (*T, *entity.HttpError) {
+	// Parse the body
+	var body T
+	if err := ctx.BodyParser(&body); err != nil {
+		return nil, entity.InternalServerError(err.Error())
+	}
+
+	// Validate the body and return error if there is any
+	validationErr := RawValidate(body)
+	if validationErr != nil {
+		return nil, validationErr
+	}
+
+	// Return the parsed and validated body
+	return &body, validationErr
+
+}
+
+func ParseAndValidateQuery[T any](ctx *fiber.Ctx) (*T, *entity.HttpError) {
+	// Parse the query
+	rawQuery := ctx.Queries()
+	parsedQuery, err := parser.ParseQuery[T](rawQuery)
+
+	// Return if there is an error when parsing the query
+	if err != nil {
+		return nil, entity.BadRequest(err.Error())
+	}
+
+	// Validate the query and return if there is an error
+	validationErr := RawValidate(parsedQuery)
+	if validationErr != nil {
+		return nil, validationErr
+	}
+
+	// Return the parsed and validated query
+	return parsedQuery, nil
 }
