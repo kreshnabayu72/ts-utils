@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/betsv2/tsv2-go-utils/db"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -23,6 +24,7 @@ type Service interface {
 	Aggregate(v any, ctx context.Context, pipeline mongo.Pipeline, options ...*options.AggregateOptions) error
 	MakeUnique(ctx context.Context, filter interface{}) error
 	CountDocuments(ctx context.Context, filter interface{}) (int64, error)
+	CreateIndex(ctx context.Context, fields bson.M, index *options.IndexOptions) error
 }
 
 type BaseService struct {
@@ -222,4 +224,15 @@ func (s *BaseService) CountDocuments(ctx context.Context, filter interface{}) (i
 	}
 
 	return documentCounts, nil
+}
+
+func (s *BaseService) CreateIndex(ctx context.Context, fields bson.M, index *options.IndexOptions) error {
+	indexModel := mongo.IndexModel{
+		Keys:    fields,
+		Options: index,
+	}
+
+	_, err := s.collection.Indexes().CreateOne(ctx, indexModel)
+
+	return err
 }
