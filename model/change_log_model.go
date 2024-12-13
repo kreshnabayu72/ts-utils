@@ -9,7 +9,7 @@ import (
 type Changelog struct {
 	ID           primitive.ObjectID  `json:"_id,omitempty" bson:"_id,omitempty"`
 	Action       string              `json:"action" bson:"action"`
-	Field        string              `json:"field" bson:"field"`
+	Field        *string             `json:"field" bson:"field"`
 	OldValue     string              `json:"oldValue" bson:"oldValue"`
 	NewValue     string              `json:"newValue" bson:"newValue"`
 	Value        string              `json:"value" bson:"value"`
