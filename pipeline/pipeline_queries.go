@@ -96,7 +96,7 @@ func GenerateOptionFacet(
 
 	return NewPipelineBuilder().
 		Match(bson.M{
-			fieldName: bson.M{"$ne": primitive.Null{}},
+			fieldName: bson.M{"$ne": nil},
 			"$expr":   bson.M{"$eq": bson.A{optionsQuery, true}}}).
 		Group(bson.D{
 			{Key: "_id", Value: bson.M{"label": lk, "value": vk}},
