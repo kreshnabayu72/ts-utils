@@ -86,7 +86,7 @@ func (m *MockBaseService) CountDocuments(ctx context.Context, filter interface{}
 		return 0, nil
 	}
 
-	return args.Get(1).(int64), nil
+	return args.Get(0).(int64), args.Error(1)
 }
 
 func (m *MockBaseService) CreateIndex(ctx context.Context, fields bson.M, index *options.IndexOptions) error {
