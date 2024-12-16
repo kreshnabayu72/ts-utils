@@ -2,19 +2,25 @@ package service
 
 import (
 	"context"
+	"time"
+
 	"github.com/betsv2/tsv2-go-utils/db"
 	"github.com/betsv2/tsv2-go-utils/model"
+	"github.com/stretchr/testify/mock"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"time"
 )
+
+type IChangelogUseCase interface {
+	CreateChangelog(ctx context.Context, data model.Changelog, userId primitive.ObjectID) error
+}
 
 type ChangelogUseCase struct {
 	ChangelogService Service
 	UserService      Service
 }
 
-func MakeChangelogUseCase(companyCode string, user Service) *ChangelogUseCase {
+func MakeChangelogUseCase(companyCode string, user Service) IChangelogUseCase {
 	changelogService := MakeService(companyCode, db.ChangelogModelName)
 	userService := user
 
@@ -56,4 +62,13 @@ func (u *ChangelogUseCase) CreateChangelog(ctx context.Context, data model.Chang
 	}
 
 	return nil
+}
+
+type MockChangelogUseCase struct {
+	mock.Mock
+}
+
+func (m *MockChangelogUseCase) CreateChangelog(ctx context.Context, data model.Changelog, userId primitive.ObjectID) error {
+	args := m.Called(ctx, data, userId)
+	return args.Error(0)
 }
