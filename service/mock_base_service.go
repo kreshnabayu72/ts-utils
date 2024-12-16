@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"github.com/stretchr/testify/mock"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -86,4 +87,9 @@ func (m *MockBaseService) CountDocuments(ctx context.Context, filter interface{}
 	}
 
 	return args.Get(1).(int64), nil
+}
+
+func (m *MockBaseService) CreateIndex(ctx context.Context, fields bson.M, index *options.IndexOptions) error {
+	args := m.Called(ctx, fields, index)
+	return args.Error(0)
 }

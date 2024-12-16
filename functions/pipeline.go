@@ -1,6 +1,8 @@
 package functions
 
-import "github.com/betsv2/tsv2-go-utils/dto"
+import (
+	"github.com/betsv2/tsv2-go-utils/dto"
+)
 
 func FormatPaginationResult[T any](
 	data []dto.PaginationResult[T],
@@ -12,5 +14,15 @@ func FormatPaginationResult[T any](
 		}
 	} else {
 		return data[0]
+	}
+}
+
+func FormatListResult[T any](
+	data []T,
+) []T {
+	if len(data) == 0 {
+		return []T{}
+	} else {
+		return data
 	}
 }
