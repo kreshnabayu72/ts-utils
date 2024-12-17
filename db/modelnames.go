@@ -40,4 +40,5 @@ const (
 	ImportCategoryModelName          = "import_categories"
 	ImportAssetNameModelName         = "import_asset_names"
 	FileManagerAgendaModelName       = "file_manager_agenda"
+	ImportBrandModelName             = "import_brands"
 )
