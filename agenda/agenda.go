@@ -53,7 +53,7 @@ func NewAgenda() *Agenda {
 	}
 }
 
-func (u Agenda) Listen() {
+func (u *Agenda) Listen() {
 
 	u.scheduler.Start()
 	fmt.Println("Agenda is running")
@@ -61,7 +61,7 @@ func (u Agenda) Listen() {
 
 // Get all incompleted schedules from database and run all the schedules.
 // This will be called every time the agenda set to ready
-func (u Agenda) retrieveAndRunSchedules(ctx context.Context) {
+func (u *Agenda) retrieveAndRunSchedules(ctx context.Context) {
 	err := u.retrieveSchedules(ctx)
 
 	if err != nil {
@@ -74,7 +74,7 @@ func (u Agenda) retrieveAndRunSchedules(ctx context.Context) {
 }
 
 // Run your schedule and save it in database
-func (u Agenda) RunSchedule(ctx context.Context, taskName string, runAt time.Time, data TaskMetadata) error {
+func (u *Agenda) RunSchedule(ctx context.Context, taskName string, runAt time.Time, data TaskMetadata) error {
 	newSchedule := Schedule{
 		Name:   taskName,
 		RunAt:  runAt,
@@ -96,7 +96,7 @@ func (u Agenda) RunSchedule(ctx context.Context, taskName string, runAt time.Tim
 }
 
 // Define your task that will be called at the scheduled time
-func (u Agenda) DefineTask(name string, action func(data any)) {
+func (u *Agenda) DefineTask(name string, action func(data any)) {
 	u.tasks[name] = action
 }
 
@@ -116,17 +116,17 @@ func (u *Agenda) retrieveSchedules(ctx context.Context) error {
 }
 
 // Set the Scheduled Task into finished
-func (u Agenda) setScheduleToFinished(ctx context.Context, scheduleId primitive.ObjectID) {
+func (u *Agenda) setScheduleToFinished(ctx context.Context, scheduleId primitive.ObjectID) {
 	u.service.UpdateOne(ctx, bson.M{"_id": scheduleId}, bson.M{"$set": bson.M{"status": StatusScheduleFinished}})
 }
 
 // Change the agenda state into ready.
 // Call this method when you finished defining all of your task
-func (u Agenda) Ready(ctx context.Context) {
+func (u *Agenda) Ready(ctx context.Context) {
 	u.retrieveAndRunSchedules(ctx)
 }
 
-func (u Agenda) createJob(ctx context.Context, schedule Schedule) {
+func (u *Agenda) createJob(ctx context.Context, schedule Schedule) {
 	job := gocron.OneTimeJob(gocron.OneTimeJobStartDateTime(schedule.RunAt))
 
 	//check if the scheduled time is in the past
@@ -152,7 +152,7 @@ func (u Agenda) createJob(ctx context.Context, schedule Schedule) {
 
 // Cancel running schedule.
 // Use provided metadata as the identifier
-func (u Agenda) CancelSchedule(ctx context.Context, metadata TaskMetadata) error {
+func (u *Agenda) CancelSchedule(ctx context.Context, metadata TaskMetadata) error {
 	var schedule Schedule
 
 	//find one of the schedules with provided metadata that are still have status waiting
