@@ -78,6 +78,7 @@ func GenerateDateFilter(requestDate []int) primitive.M {
 	return bson.M{"$ne": "g#*a,Jvb&U.Bg"}
 }
 
+// Deprecated: use GenerateFacetOption func instead, so you no longer project the option with "$option._id"
 func GenerateOptionFacet(
 	fieldName string,
 	optionsQuery bool,
@@ -102,5 +103,33 @@ func GenerateOptionFacet(
 			{Key: "_id", Value: bson.M{"label": lk, "value": vk}},
 		}).
 		Sort(bson.M{"_id.label": 1}).
+		Build()
+}
+
+func GenerateFacetOption(
+	fieldName string,
+	optionsQuery bool,
+	labelKey string,
+	valueKey string,
+) mongo.Pipeline {
+	lk := labelKey
+	if !strings.HasPrefix(lk, "$") {
+		lk = "$" + lk
+	}
+
+	vk := valueKey
+	if !strings.HasPrefix(vk, "$") {
+		vk = "$" + vk
+	}
+
+	return NewPipelineBuilder().
+		Match(bson.M{
+			fieldName: bson.M{"$ne": nil},
+			"$expr":   bson.M{"$eq": bson.A{optionsQuery, true}}}).
+		Group(bson.D{
+			{Key: "_id", Value: bson.M{"label": lk, "value": vk}},
+		}).
+		Sort(bson.M{"_id.label": 1}).
+		ReplaceRoot(bson.M{"newRoot": "$_id"}).
 		Build()
 }

@@ -38,13 +38,17 @@ type AssetNameAddOnAttr struct {
 	Audit           bool `json:"audit" bson:"audit"`
 }
 
-type AssetNameAssetStatusAttr struct {
+type AssetNameLicenseStatusAttr struct {
 	Status  string     `json:"status" bson:"status"`
 	AddedAt *time.Time `json:"addedAt" bson:"addedAt"`
 }
 
 type AssetNameLicenseAttr struct {
-	FixedAsset AssetNameAssetStatusAttr `json:"fixedAsset" bson:"fixedAsset"`
+	FixedAsset      AssetNameLicenseStatusAttr `json:"fixedAsset" bson:"fixedAsset"`
+	Maintenance     AssetNameLicenseStatusAttr `json:"maintenance" bson:"maintenance"`
+	Tracking        AssetNameLicenseStatusAttr `json:"tracking" bson:"tracking"`
+	Audit           AssetNameLicenseStatusAttr `json:"audit" bson:"audit"`
+	RepairTicketing AssetNameLicenseStatusAttr `json:"repairTicketing" bson:"repairTicketing"`
 }
 
 type AssetNameDepreciationGroupAttr = AssetNameCategoryAttr
@@ -65,10 +69,6 @@ type AssetName struct {
 	AccountCode          *AssetNameAccountCodeAttr       `json:"accountCode" bson:"accountCode"`
 	AddOn                *AssetNameAddOnAttr             `json:"addOn" bson:"addOn"`
 	License              AssetNameLicenseAttr            `json:"license" bson:"license"`
-	Maintenance          AssetNameAssetStatusAttr        `json:"maintenance" bson:"maintenance"`
-	Tracking             AssetNameAssetStatusAttr        `json:"tracking" bson:"tracking"`
-	Audit                AssetNameAssetStatusAttr        `json:"audit" bson:"audit"`
-	RepairTicketing      AssetNameAssetStatusAttr        `json:"repairTicketing" bson:"repairTicketing"`
 	CreatedAt            time.Time                       `json:"createdAt" bson:"createdAt"`
 	UpdatedAt            time.Time                       `json:"updatedAt" bson:"updatedAt"`
 }
