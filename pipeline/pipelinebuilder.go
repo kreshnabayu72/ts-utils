@@ -145,34 +145,55 @@ func (pb *PipelineBuilder) ReplaceRoot(data bson.M) *PipelineBuilder {
 }
 
 type PaginationQuery struct {
-	Page      int32  `bson:"page" json:"page" transform:"int"`
-	Limit     int32  `bson:"limit" json:"limit" transform:"int"`
-	SortBy    string `bson:"sortBy" json:"sortBy" transform:"string"`
+	Page      int32  `bson:"page"      json:"page"      transform:"int"`
+	Limit     int32  `bson:"limit"     json:"limit"     transform:"int"`
+	SortBy    string `bson:"sortBy"    json:"sortBy"    transform:"string"`
 	SortOrder int32  `bson:"sortOrder" json:"sortOrder" transform:"int"`
 }
 type Sort struct {
-	SortBy    string `bson:"sortBy" json:"sortBy"`
+	SortBy    string `bson:"sortBy"    json:"sortBy"`
 	SortOrder int32  `bson:"sortOrder" json:"sortOrder"`
 }
 
 // Pagination adds a $facet stage to the pipeline, with additional limit & skip stage
-func (pb *PipelineBuilder) Pagination(query PaginationQuery, defaultSort ...Sort) *PipelineBuilder {
-
+// Custom sort can be used as a default sort
+//
+// Priority order:
+// 1. query.SortBy
+// 2. customSort
+// 3. internal SortBy & SortOrder
+//
+// For some complex sorting logic, set query.SortBy to "" and use customSort
+func (pb *PipelineBuilder) Pagination(query PaginationQuery, customSort ...Sort) *PipelineBuilder {
 	var skip int32 = 0
 	var sortBy = "name"
 	var sortOrder int32 = 1
 	var limit int32 = math.MaxInt32
 
-	if len(defaultSort) > 0 {
-		sortBy = defaultSort[0].SortBy
-		sortOrder = defaultSort[0].SortOrder
+	// Override the default values if provided by query
+	if query.SortOrder != 0 {
+		sortOrder = query.SortOrder
 	}
 	if query.SortBy != "" {
 		sortBy = query.SortBy
 	}
 
-	if query.SortOrder != 0 {
-		sortOrder = query.SortOrder
+	// Use default sort or by query
+	formattedSort := bson.D{
+		{Key: sortBy, Value: sortOrder},
+	}
+
+	// Only use customSort if provided AND query.SortBy is empty
+	// Meaning the default (sortby and sortOrder) will get ignored
+	if len(customSort) > 0 && query.SortBy == "" {
+		formattedSort = bson.D{}
+
+		for _, sort := range customSort {
+			formattedSort = append(
+				formattedSort,
+				bson.E{Key: sort.SortBy, Value: sort.SortOrder},
+			)
+		}
 	}
 
 	if query.Page > 0 && query.Limit > 0 {
@@ -183,7 +204,9 @@ func (pb *PipelineBuilder) Pagination(query PaginationQuery, defaultSort ...Sort
 	pb.pipelines = append(pb.pipelines, bson.D{
 		{Key: "$facet", Value: bson.M{
 			"data": bson.A{
-				bson.D{{Key: "$sort", Value: bson.D{{Key: sortBy, Value: sortOrder}}}}, bson.D{{Key: "$skip", Value: skip}}, bson.D{{Key: "$limit", Value: limit}},
+				bson.D{{Key: "$sort", Value: formattedSort}},
+				bson.D{{Key: "$skip", Value: skip}},
+				bson.D{{Key: "$limit", Value: limit}},
 			},
 			"totalRecords": bson.A{
 				bson.D{{Key: "$count", Value: "total"}},
