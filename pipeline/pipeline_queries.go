@@ -106,6 +106,7 @@ func GenerateOptionFacet(
 		Build()
 }
 
+// Generate option facet
 func GenerateFacetOption(
 	fieldName string,
 	optionsQuery bool,
