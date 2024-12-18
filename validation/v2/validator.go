@@ -14,7 +14,7 @@ import (
 // query, err := validation.ParseAndValidateQuery[dto.MyQueryDTO](ctx)
 
 // if err != nil {
-// 	return response.SendResponse(ctx, err.Code, nil, err.Message)
+// 	return err.SendResponse(ctx)
 // }
 
 func RawValidate[T any](data T) *entity.HttpError {
