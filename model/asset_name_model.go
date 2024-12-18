@@ -6,6 +6,54 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+func NewAssetName() AssetName {
+	activeStatus := "Active"
+	return AssetName{
+		Transactions: AssetNameTransactionAttr{
+			Borrow:      false,
+			Assign:      false,
+			Transfer:    false,
+			SelfService: false,
+		},
+		AddOn: &AssetNameAddOnAttr{
+			RepairTicketing: false,
+			Maintenance:     false,
+			Tracking:        false,
+			Audit:           false,
+		},
+		IsDeleted:   false,
+		TotalAssets: 0,
+		UpdatedAt:   time.Now(),
+		CreatedAt:   time.Now(),
+		TagType:     nil,
+		AccountCode: nil,
+		Measurement: nil,
+		Category:    nil,
+		License: AssetNameLicenseAttr{
+			FixedAsset: AssetNameLicenseStatusAttr{
+				Status:  activeStatus,
+				AddedAt: nil,
+			},
+			Maintenance: AssetNameLicenseStatusAttr{
+				Status:  activeStatus,
+				AddedAt: nil,
+			},
+			Tracking: AssetNameLicenseStatusAttr{
+				Status:  activeStatus,
+				AddedAt: nil,
+			},
+			Audit: AssetNameLicenseStatusAttr{
+				Status:  activeStatus,
+				AddedAt: nil,
+			},
+			RepairTicketing: AssetNameLicenseStatusAttr{
+				Status:  activeStatus,
+				AddedAt: nil,
+			},
+		},
+	}
+}
+
 type AssetNameTransactionAttr struct {
 	Borrow      bool `json:"borrow" bson:"borrow"`
 	Assign      bool `json:"assign" bson:"assign"`
