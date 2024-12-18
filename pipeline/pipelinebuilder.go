@@ -97,6 +97,45 @@ func (pb *PipelineBuilder) Lookup(data bson.M) *PipelineBuilder {
 	return pb
 }
 
+type LookupData struct {
+	From         string
+	LocalField   string
+	ForeignField string
+	As           string
+	Let          bson.M
+	Pipeline     mongo.Pipeline
+}
+
+// Adds a $lookup stage to the pipeline
+func (pb *PipelineBuilder) LookupStr(rawData LookupData) *PipelineBuilder {
+	data := bson.M{}
+
+	if rawData.From != "" {
+		data["from"] = rawData.From
+	}
+	if rawData.LocalField != "" {
+		data["localField"] = rawData.LocalField
+	}
+	if rawData.ForeignField != "" {
+		data["foreignField"] = rawData.ForeignField
+	}
+	if rawData.As != "" {
+		data["as"] = rawData.As
+	}
+	if rawData.Let != nil {
+		data["let"] = rawData.Let
+	}
+	if rawData.Pipeline != nil {
+		data["pipeline"] = rawData.Pipeline
+	}
+
+	pb.pipelines = append(pb.pipelines, bson.D{
+		{Key: "$lookup", Value: data},
+	})
+
+	return pb
+}
+
 // Adds a $unwind stage to the pipeline
 func (pb *PipelineBuilder) Unwind(data bson.M) *PipelineBuilder {
 	if data != nil {
