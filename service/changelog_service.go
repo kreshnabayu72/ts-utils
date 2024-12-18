@@ -20,6 +20,7 @@ type ChangelogUseCase struct {
 	UserService      Service
 }
 
+// Deprecated: user service is manually created outside
 func MakeChangelogUseCase(companyCode string, user Service) IChangelogUseCase {
 	changelogService := MakeService(companyCode, db.ChangelogModelName)
 	userService := user
@@ -27,6 +28,13 @@ func MakeChangelogUseCase(companyCode string, user Service) IChangelogUseCase {
 	return &ChangelogUseCase{
 		ChangelogService: changelogService,
 		UserService:      userService,
+	}
+}
+
+func NewChangelogUseCase(companyCode string) IChangelogUseCase {
+	return &ChangelogUseCase{
+		ChangelogService: MakeService(companyCode, db.ChangelogModelName),
+		UserService:      MakeService(companyCode, db.UserModelName),
 	}
 }
 
