@@ -29,6 +29,7 @@ const (
 	TransferTransactionModelName     = "transfer_transactions"
 	TransactionLogModelName          = "transaction_logs"
 	UserModelName                    = "users"
+	UserAuthModelName                = "user_auths"
 	UserSystemRoleModelName          = "user_system_roles"
 	UserTransactionRoleModelName     = "user_transaction_roles"
 	FileDamageModelName              = "file_damages"
