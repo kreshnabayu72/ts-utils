@@ -26,10 +26,10 @@ type TaskMetadata struct {
 
 type Schedule struct {
 	ID     primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
-	Name   string             `json:"name" bson:"name"`
-	RunAt  time.Time          `json:"runAt" bson:"runAt"`
-	Data   any                `json:"data" bson:"data"`
-	Status string             `json:"status" bson:"status"`
+	Name   string             `json:"name"          bson:"name"`
+	RunAt  time.Time          `json:"runAt"         bson:"runAt"`
+	Data   any                `json:"data"          bson:"data"`
+	Status string             `json:"status"        bson:"status"`
 }
 
 type Agenda struct {
@@ -74,7 +74,12 @@ func (u *Agenda) retrieveAndRunSchedules(ctx context.Context) {
 }
 
 // Run your schedule and save it in database
-func (u *Agenda) RunSchedule(ctx context.Context, taskName string, runAt time.Time, data TaskMetadata) error {
+func (u *Agenda) RunSchedule(
+	ctx context.Context,
+	taskName string,
+	runAt time.Time,
+	data TaskMetadata,
+) error {
 	newSchedule := Schedule{
 		Name:   taskName,
 		RunAt:  runAt,
@@ -117,7 +122,11 @@ func (u *Agenda) retrieveSchedules(ctx context.Context) error {
 
 // Set the Scheduled Task into finished
 func (u *Agenda) setScheduleToFinished(ctx context.Context, scheduleId primitive.ObjectID) {
-	u.service.UpdateOne(ctx, bson.M{"_id": scheduleId}, bson.M{"$set": bson.M{"status": StatusScheduleFinished}})
+	u.service.UpdateOne(
+		ctx,
+		bson.M{"_id": scheduleId},
+		bson.M{"$set": bson.M{"status": StatusScheduleFinished}},
+	)
 }
 
 // Change the agenda state into ready.
@@ -156,7 +165,11 @@ func (u *Agenda) CancelSchedule(ctx context.Context, metadata TaskMetadata) erro
 	var schedule Schedule
 
 	//find one of the schedules with provided metadata that are still have status waiting
-	err := u.service.FindOne(&schedule, ctx, bson.M{"data": metadata.Metadata, "status": StatusScheduleWaiting})
+	err := u.service.FindOne(
+		&schedule,
+		ctx,
+		bson.M{"data": metadata.Metadata, "status": StatusScheduleWaiting},
+	)
 
 	if err != nil {
 		return err
@@ -166,7 +179,11 @@ func (u *Agenda) CancelSchedule(ctx context.Context, metadata TaskMetadata) erro
 	u.scheduler.RemoveByTags(schedule.ID.String())
 
 	//Update the schedule status to canceled
-	_, err = u.service.UpdateOne(ctx, bson.M{"_id": schedule.ID}, bson.M{"$set": bson.M{"status": StatusScheduleCanceled}})
+	_, err = u.service.UpdateOne(
+		ctx,
+		bson.M{"_id": schedule.ID},
+		bson.M{"$set": bson.M{"status": StatusScheduleCanceled}},
+	)
 
 	return err
 }

@@ -56,16 +56,25 @@ func SplitImageMiddleware(folderName string, attribute string) fiber.Handler {
 
 			absPath, _ := filepath.Abs(fmt.Sprintf("../tsv2-files/%s/%s", companyCode, folderName))
 			// Save the resized image to disk
-			outputFilePath := filepath.Join(absPath, fmt.Sprintf("%s.jpg", strconv.FormatInt(time.Now().Unix(), 10)+"-"+size.name))
+			outputFilePath := filepath.Join(
+				absPath,
+				fmt.Sprintf("%s.jpg", strconv.FormatInt(time.Now().Unix(), 10)+"-"+size.name),
+			)
 
 			// Create the directory if it doesn't exist
 			if err := os.MkdirAll(absPath, os.ModePerm); err != nil {
-				return fiber.NewError(fiber.StatusInternalServerError, "Error creating directory: "+err.Error())
+				return fiber.NewError(
+					fiber.StatusInternalServerError,
+					"Error creating directory: "+err.Error(),
+				)
 			}
 
 			err := imaging.Save(resizedImg, outputFilePath)
 			if err != nil {
-				return fiber.NewError(fiber.StatusInternalServerError, "Error saving resized image: "+err.Error())
+				return fiber.NewError(
+					fiber.StatusInternalServerError,
+					"Error saving resized image: "+err.Error(),
+				)
 			}
 
 			key := ContextKey(size.name)

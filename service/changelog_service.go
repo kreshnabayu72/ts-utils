@@ -30,7 +30,11 @@ func MakeChangelogUseCase(companyCode string, user Service) IChangelogUseCase {
 	}
 }
 
-func (u *ChangelogUseCase) CreateChangelog(ctx context.Context, data model.Changelog, userId primitive.ObjectID) error {
+func (u *ChangelogUseCase) CreateChangelog(
+	ctx context.Context,
+	data model.Changelog,
+	userId primitive.ObjectID,
+) error {
 	var loggedInUser model.User
 	loggedInErr := u.UserService.FindOne(&loggedInUser, ctx, bson.M{"_id": userId})
 	if loggedInErr != nil {
@@ -68,7 +72,11 @@ type MockChangelogUseCase struct {
 	mock.Mock
 }
 
-func (m *MockChangelogUseCase) CreateChangelog(ctx context.Context, data model.Changelog, userId primitive.ObjectID) error {
+func (m *MockChangelogUseCase) CreateChangelog(
+	ctx context.Context,
+	data model.Changelog,
+	userId primitive.ObjectID,
+) error {
 	args := m.Called(ctx, data, userId)
 	return args.Error(0)
 }
