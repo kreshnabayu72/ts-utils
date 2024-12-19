@@ -22,6 +22,7 @@ const (
 	RepairModelName                  = "repairs"
 	RepairApprovalModelName          = "repair_approvals"
 	RfidTagModelName                 = "rfids"
+	ReaderAuthModelName              = "reader_auths"
 	SessionLogModelName              = "session_logs"
 	ServiceCenterModelName           = "service_centers"
 	TransferRequestModelName         = "transfer_requests"
