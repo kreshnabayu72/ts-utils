@@ -94,3 +94,47 @@ type ManagePermission struct {
 	TagType             Permission `json:"tagType"             bson:"tagType"`
 	OpenApi             Permission `json:"openApi"             bson:"openApi"`
 }
+
+type TransactionType string
+
+const (
+	TTBorrowingAssignment TransactionType = "Borrowing/Assignment"
+	TTDisposal            TransactionType = "Disposal"
+	TTTransfer            TransactionType = "Tranfer"
+	TTAudit               TransactionType = "Audit"
+	TTMaintenanceRoutine  TransactionType = "Maintenance Routine"
+	TTRepairTicketing     TransactionType = "Repair Ticketing"
+	TTTracking            TransactionType = "Tracking"
+	TTDamaged             TransactionType = "Damaged"
+	TTMissing             TransactionType = "Missing"
+)
+
+type TransactionGroupAttribute string
+
+const (
+	TGABorrowingRole   TransactionGroupAttribute = "borrowingRole"
+	TGADisposalRole    TransactionGroupAttribute = "disposalRole"
+	TGATransferRole    TransactionGroupAttribute = "transferRole"
+	TGAAuditRole       TransactionGroupAttribute = "auditRole"
+	TGAMaintenanceRole TransactionGroupAttribute = "maintenanceRole"
+	TGARepairRole      TransactionGroupAttribute = "repairRole"
+	TGATrackingRole    TransactionGroupAttribute = "trackingRole"
+	TGADamagedRole     TransactionGroupAttribute = "damagedRole"
+	TGAMissingRole     TransactionGroupAttribute = "missingRole"
+)
+
+type TransactionRoleType string
+
+const (
+	TRTManager    TransactionRoleType = "Manager"
+	TRTMonitoring TransactionRoleType = "Monitoring"
+	TRTApproval   TransactionRoleType = "Approval"
+	TRTStaff      TransactionRoleType = "Staff"
+)
+
+type ApprovalType string
+
+const (
+	ApprovalTypeOr  ApprovalType = "Or"
+	ApprovalTypeAnd ApprovalType = "And"
+)
