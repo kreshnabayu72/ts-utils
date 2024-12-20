@@ -138,3 +138,12 @@ const (
 	ApprovalTypeOr  ApprovalType = "Or"
 	ApprovalTypeAnd ApprovalType = "And"
 )
+
+type TagType string
+
+const (
+	TagTypeNonTag TagType = "Non TAG"
+	TagTypeQR     TagType = "QR"
+	TagTypeRFID   TagType = "RFID"
+	TagTypeRFIDQR TagType = "RFID & QR"
+)
