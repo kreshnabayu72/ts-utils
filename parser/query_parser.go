@@ -5,26 +5,32 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type QueryTransform string
 
 const (
-	TransformString  QueryTransform = "string"
-	TransformInt     QueryTransform = "int"
-	TransformFloat32 QueryTransform = "float32"
-	TransformFloat64 QueryTransform = "float64"
-	TransformBool    QueryTransform = "bool"
-	TransformArray   QueryTransform = "array"
+	TransformString        QueryTransform = "string"
+	TransformInt           QueryTransform = "int"
+	TransformFloat32       QueryTransform = "float32"
+	TransformFloat64       QueryTransform = "float64"
+	TransformBool          QueryTransform = "bool"
+	TransformArray         QueryTransform = "array"
+	TransformObjectID      QueryTransform = "objectId"
+	TransformObjectIDArray QueryTransform = "objectIdArray"
 )
 
 var queryTransformMap = map[string]QueryTransform{
-	"string":  TransformString,
-	"int":     TransformInt,
-	"float32": TransformFloat32,
-	"float64": TransformFloat64,
-	"bool":    TransformBool,
-	"array":   TransformArray,
+	"string":        TransformString,
+	"int":           TransformInt,
+	"float32":       TransformFloat32,
+	"float64":       TransformFloat64,
+	"bool":          TransformBool,
+	"array":         TransformArray,
+	"objectId":      TransformObjectID,
+	"objectIdArray": TransformObjectIDArray,
 }
 
 func getQueryTransform(transform string) (QueryTransform, error) {
@@ -59,6 +65,25 @@ func transformQueryValue(value string, transform string) interface{} {
 		var v []interface{}
 		json.Unmarshal([]byte(value), &v)
 		return v
+	case TransformObjectID:
+		var v, _ = primitive.ObjectIDFromHex(value)
+		return v
+	case TransformObjectIDArray:
+		var v []interface{}
+		var objectIdArr []primitive.ObjectID
+
+		json.Unmarshal([]byte(value), &v)
+
+		for _, val := range v {
+			objectId, err := primitive.ObjectIDFromHex(val.(string))
+			if err != nil {
+				return v
+			}
+
+			objectIdArr = append(objectIdArr, objectId)
+		}
+
+		return objectIdArr
 	default:
 		return value
 	}
