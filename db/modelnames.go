@@ -46,4 +46,5 @@ const (
 	ModelModelName                   = "models"
 	PendingTagChangesModelName       = "pending_tag_changes"
 	ImportAccountCodeModelName       = "import_account_codes"
+	PairTagPrelistModelName          = "pair_tag_prelists"
 )
