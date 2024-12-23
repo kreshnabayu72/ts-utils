@@ -7,11 +7,11 @@ import (
 )
 
 type Model struct {
-	ID        primitive.ObjectID  `json:"_id,omitempty" bson:"_id,omitempty"`           // MongoDB ObjectID
-	Name      string              `bson:"name" json:"name"`                             // Field `name` wajib
-	Key       int                 `bson:"key" json:"key"`                               // Field `key` wajib
-	Brand     *primitive.ObjectID `bson:"brand,omitempty" json:"brand,omitempty"`       // Default null, indexed
-	Category  *primitive.ObjectID `bson:"category,omitempty" json:"category,omitempty"` // Default null
-	CreatedAt time.Time           `bson:"createdAt" json:"createdAt"`                   // Otomatis disimpan MongoDB
-	UpdatedAt time.Time           `bson:"updatedAt" json:"updatedAt"`                   // Otomatis disimpan MongoDB
+	ID        primitive.ObjectID  `json:"_id,omitempty"      bson:"_id,omitempty"`      // MongoDB ObjectID
+	Name      string              `json:"name"               bson:"name"`               // Field `name` wajib
+	Key       int                 `json:"key"                bson:"key"`                // Field `key` wajib
+	Brand     *primitive.ObjectID `json:"brand,omitempty"    bson:"brand,omitempty"`    // Default null, indexed
+	Category  *primitive.ObjectID `json:"category,omitempty" bson:"category,omitempty"` // Default null
+	CreatedAt time.Time           `json:"createdAt"          bson:"createdAt"`          // Otomatis disimpan MongoDB
+	UpdatedAt time.Time           `json:"updatedAt"          bson:"updatedAt"`          // Otomatis disimpan MongoDB
 }

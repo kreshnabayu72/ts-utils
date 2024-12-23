@@ -12,16 +12,63 @@ import (
 // Base Service Interface
 type Service interface {
 	Find(v any, ctx context.Context, filter interface{}, options ...*options.FindOptions) error
-	FindOne(v any, ctx context.Context, filter interface{}, options ...*options.FindOneOptions) error
-	InsertOne(ctx context.Context, data interface{}, options ...*options.InsertOneOptions) (interface{}, error)
-	InsertMany(ctx context.Context, data []interface{}, options ...*options.InsertManyOptions) ([]interface{}, error)
-	FindOneAndUpdate(v any, ctx context.Context, filter interface{}, updateData interface{}, options ...*options.FindOneAndUpdateOptions) error
-	UpdateOne(ctx context.Context, filter interface{}, updateData interface{}, options ...*options.UpdateOptions) (int64, error)
-	UpdateMany(ctx context.Context, fitler interface{}, updateData interface{}, options ...*options.UpdateOptions) (int64, error)
-	FindOneAndDelete(v any, ctx context.Context, filter interface{}, options ...*options.FindOneAndDeleteOptions) error
-	DeleteOne(ctx context.Context, filter interface{}, options ...*options.DeleteOptions) (int64, error)
-	DeleteMany(ctx context.Context, filter interface{}, options ...*options.DeleteOptions) (int64, error)
-	Aggregate(v any, ctx context.Context, pipeline mongo.Pipeline, options ...*options.AggregateOptions) error
+	FindOne(
+		v any,
+		ctx context.Context,
+		filter interface{},
+		options ...*options.FindOneOptions,
+	) error
+	InsertOne(
+		ctx context.Context,
+		data interface{},
+		options ...*options.InsertOneOptions,
+	) (interface{}, error)
+	InsertMany(
+		ctx context.Context,
+		data []interface{},
+		options ...*options.InsertManyOptions,
+	) ([]interface{}, error)
+	FindOneAndUpdate(
+		v any,
+		ctx context.Context,
+		filter interface{},
+		updateData interface{},
+		options ...*options.FindOneAndUpdateOptions,
+	) error
+	UpdateOne(
+		ctx context.Context,
+		filter interface{},
+		updateData interface{},
+		options ...*options.UpdateOptions,
+	) (int64, error)
+	UpdateMany(
+		ctx context.Context,
+		fitler interface{},
+		updateData interface{},
+		options ...*options.UpdateOptions,
+	) (int64, error)
+	FindOneAndDelete(
+		v any,
+		ctx context.Context,
+		filter interface{},
+		options ...*options.FindOneAndDeleteOptions,
+	) error
+	DeleteOne(
+		ctx context.Context,
+		filter interface{},
+		options ...*options.DeleteOptions,
+	) (int64, error)
+	DeleteMany(
+		ctx context.Context,
+		filter interface{},
+		options ...*options.DeleteOptions,
+	) (int64, error)
+	Aggregate(
+		v any,
+		ctx context.Context,
+		pipeline mongo.Pipeline,
+		options ...*options.AggregateOptions,
+	) error
 	MakeUnique(ctx context.Context, filter interface{}) error
 	CountDocuments(ctx context.Context, filter interface{}) (int64, error)
 	CreateIndex(ctx context.Context, fields bson.M, index *options.IndexOptions) error
@@ -117,8 +164,13 @@ func (s *BaseService) InsertMany(ctx context.Context, data []interface{},
 	return result.InsertedIDs, nil
 }
 
-func (s *BaseService) FindOneAndUpdate(v any, ctx context.Context, filter interface{}, data interface{},
-	opts ...*options.FindOneAndUpdateOptions) error {
+func (s *BaseService) FindOneAndUpdate(
+	v any,
+	ctx context.Context,
+	filter interface{},
+	data interface{},
+	opts ...*options.FindOneAndUpdateOptions,
+) error {
 	result := s.collection.FindOneAndUpdate(ctx, filter, data, opts...)
 	if result.Err() != nil {
 		return result.Err()
@@ -187,7 +239,12 @@ func (s *BaseService) DeleteMany(ctx context.Context, filter interface{},
 	return result.DeletedCount, nil
 }
 
-func (s *BaseService) Aggregate(v any, ctx context.Context, pipeline mongo.Pipeline, opts ...*options.AggregateOptions) error {
+func (s *BaseService) Aggregate(
+	v any,
+	ctx context.Context,
+	pipeline mongo.Pipeline,
+	opts ...*options.AggregateOptions,
+) error {
 	cursor, err := s.collection.Aggregate(ctx, pipeline, opts...)
 	if err != nil {
 		return err
@@ -226,7 +283,11 @@ func (s *BaseService) CountDocuments(ctx context.Context, filter interface{}) (i
 	return documentCounts, nil
 }
 
-func (s *BaseService) CreateIndex(ctx context.Context, fields bson.M, index *options.IndexOptions) error {
+func (s *BaseService) CreateIndex(
+	ctx context.Context,
+	fields bson.M,
+	index *options.IndexOptions,
+) error {
 	indexModel := mongo.IndexModel{
 		Keys:    fields,
 		Options: index,

@@ -9,10 +9,10 @@ type TransactionSettingAuditAttrs struct {
 
 // Struct for the borrowingAttrs
 type TransactionSettingBorrowingAttrs struct {
-	MaxBorrowingTime     int `json:"maxBorrowingTime" bson:"maxBorrowingTime"`
-	TransactionTimeout   int `json:"transactionTimeout" bson:"transactionTimeout"`
+	MaxBorrowingTime     int `json:"maxBorrowingTime"     bson:"maxBorrowingTime"`
+	TransactionTimeout   int `json:"transactionTimeout"   bson:"transactionTimeout"`
 	DefaultBorrowingTime int `json:"defaultBorrowingTime" bson:"defaultBorrowingTime"`
-	ConfirmationTimeout  int `json:"confirmationTimeout" bson:"confirmationTimeout"`
+	ConfirmationTimeout  int `json:"confirmationTimeout"  bson:"confirmationTimeout"`
 }
 
 // Struct for the transferAttrs
@@ -26,9 +26,9 @@ type TransactionSettingDisposalAttrs struct {
 }
 
 type TransactionSetting struct {
-	ID             primitive.ObjectID               `json:"_id" bson:"_id"`
-	AuditAttrs     TransactionSettingAuditAttrs     `json:"auditAttrs" bson:"auditAttrs"`
+	ID             primitive.ObjectID               `json:"_id"            bson:"_id"`
+	AuditAttrs     TransactionSettingAuditAttrs     `json:"auditAttrs"     bson:"auditAttrs"`
 	BorrowingAttrs TransactionSettingBorrowingAttrs `json:"borrowingAttrs" bson:"borrowingAttrs"`
-	TransferAttrs  TransactionSettingTransferAttrs  `json:"transferAttrs" bson:"transferAttrs"`
-	DisposalAttrs  TransactionSettingDisposalAttrs  `json:"disposalAttrs" bson:"disposalAttrs"`
+	TransferAttrs  TransactionSettingTransferAttrs  `json:"transferAttrs"  bson:"transferAttrs"`
+	DisposalAttrs  TransactionSettingDisposalAttrs  `json:"disposalAttrs"  bson:"disposalAttrs"`
 }

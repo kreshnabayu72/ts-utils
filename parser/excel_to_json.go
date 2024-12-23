@@ -19,7 +19,10 @@ type Parser interface {
 type DefaultParser struct{}
 
 // parseXlsx reads and parses the Excel file
-func (p *DefaultParser) ParseXlsxToJson(file *multipart.FileHeader, columns []string) ([]map[string]interface{}, error) {
+func (p *DefaultParser) ParseXlsxToJson(
+	file *multipart.FileHeader,
+	columns []string,
+) ([]map[string]interface{}, error) {
 	// Buka file
 	rows, err := getExcelRows(file)
 	if err != nil {
@@ -73,7 +76,12 @@ func findHeader(rows [][]string, columns []string) ([]string, int) {
 }
 
 // parseRows mengonversi baris menjadi slice JSON berdasarkan header
-func parseRows(rows [][]string, header []string, headerRowIndex int, columns []string) []map[string]interface{} {
+func parseRows(
+	rows [][]string,
+	header []string,
+	headerRowIndex int,
+	columns []string,
+) []map[string]interface{} {
 	var result []map[string]interface{}
 	for _, row := range rows[headerRowIndex+1:] { // Mulai dari baris setelah header
 		rowData := make(map[string]interface{})
@@ -129,7 +137,10 @@ type MockParser struct {
 	mock.Mock
 }
 
-func (m *MockParser) ParseXlsxToJson(file *multipart.FileHeader, columns []string) ([]map[string]interface{}, error) {
+func (m *MockParser) ParseXlsxToJson(
+	file *multipart.FileHeader,
+	columns []string,
+) ([]map[string]interface{}, error) {
 	args := m.Called(file, columns)
 	return args.Get(0).([]map[string]interface{}), args.Error(1)
 }
