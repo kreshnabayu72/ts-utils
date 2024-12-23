@@ -20,6 +20,7 @@ type PendingTagTypeAssetName struct {
 }
 
 type PendingTagChange struct {
+	ID                     primitive.ObjectID      `json:"_id,omitempty" bson:"_id,omitempty"`
 	Type                   string                  `json:"type" bson:"type"`
 	TagType                string                  `json:"tagType" bson:"tagType"`
 	RFID                   string                  `json:"rfid" bson:"rfid"`
