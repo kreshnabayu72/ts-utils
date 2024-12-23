@@ -155,6 +155,15 @@ func (pb *PipelineBuilder) Limit(limit int) *PipelineBuilder {
 	return pb
 }
 
+// Skip adds a $skip stage to the pipeline
+func (pb *PipelineBuilder) Skip(skip int) *PipelineBuilder {
+	pb.pipelines = append(pb.pipelines, bson.D{
+		{Key: "$skip", Value: skip},
+	})
+
+	return pb
+}
+
 // Sort adds a $sort stage to the pipeline
 func (pb *PipelineBuilder) Sort(field bson.M) *PipelineBuilder {
 	if field != nil {
