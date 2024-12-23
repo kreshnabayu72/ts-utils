@@ -42,4 +42,5 @@ const (
 	FileManagerAgendaModelName       = "file_manager_agenda"
 	ImportBrandModelName             = "import_brands"
 	ModelModelName                   = "models"
+	PendingTagChangesModelName       = "pending_tag_changes"
 )
