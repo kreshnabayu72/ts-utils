@@ -44,4 +44,5 @@ const (
 	FileManagerAgendaModelName       = "file_manager_agenda"
 	ImportBrandModelName             = "import_brands"
 	ModelModelName                   = "models"
+	ImportAccountCodeModelName = "import_account_codes"
 )
