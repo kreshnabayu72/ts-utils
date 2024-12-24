@@ -36,7 +36,7 @@ type User struct {
 	Parent               *primitive.ObjectID `json:"parent"               bson:"parent"`
 	ProfilePictureSmall  *string             `json:"profilePictureSmall"  bson:"profilePictureSmall"`
 	ProfilePictureMedium *string             `json:"profilePictureMedium" bson:"profilePictureMedium"`
-	ProfilePictureLarge  *string             `json:"profilePictureLarge"  bson:"profilePictureLarge"`
+	ProfilePictureBig    *string             `json:"profilePictureBig"  bson:"profilePictureBig"`
 	IsDeleted            bool                `json:"isDeleted"            bson:"isDeleted"`
 	IsSubUser            bool                `json:"isSubUser"            bson:"isSubUser"`
 	IsConfirmed          bool                `json:"isConfirmed"          bson:"isConfirmed"`
