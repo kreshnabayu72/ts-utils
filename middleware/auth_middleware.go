@@ -57,3 +57,49 @@ func ValidateJWT() fiber.Handler {
 		return ctx.Next()
 	}
 }
+
+/*
+Only for asset-control module
+*/
+func ValidateReaderJWT() fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+		var jwtKey = []byte(os.Getenv("JWT_KEY"))
+		tokenStr := ctx.Get("Authorization", "NOT_FOUND")
+		if tokenStr == "NOT_FOUND" {
+			return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+		}
+
+		// Extract the actual token by removing "Bearer " prefix
+		tokenStr = strings.Replace(tokenStr, "Bearer ", "", 1)
+
+		// Parse and validate the JWT
+		token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+			// Validate the algorithm used
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+			}
+			return jwtKey, nil
+		})
+
+		if err != nil {
+			return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+		}
+
+		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+			if claims["readerId"] == nil || claims["companyCode"] == nil {
+				return fiber.NewError(fiber.StatusUnauthorized, "Invalid token")
+			}
+
+			companyCode := claims["companyCode"].(string)
+			readerId, _ := primitive.ObjectIDFromHex(claims["readerId"].(string))
+
+			ctx.Locals(CompanyCodeKey, companyCode)
+			ctx.Locals(ReaderId, readerId)
+
+		} else {
+			return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+		}
+
+		return ctx.Next()
+	}
+}
