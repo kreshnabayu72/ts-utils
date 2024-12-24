@@ -91,7 +91,7 @@ func ValidateReaderJWT() fiber.Handler {
 			}
 
 			companyCode := claims["companyCode"].(string)
-			readerId, _ := primitive.ObjectIDFromHex(claims["readerId"].(string))
+			readerId := claims["readerId"].(string)
 
 			ctx.Locals(CompanyCodeKey, companyCode)
 			ctx.Locals(ReaderId, readerId)
