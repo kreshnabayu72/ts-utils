@@ -13,7 +13,7 @@ type TransferTransaction struct {
 	OriginGroup      AttributeEmbedded  `json:"originGroup" bson:"originGroup"`
 	DestinationGroup AttributeEmbedded  `json:"destinationGroup" bson:"destinationGroup"`
 	TotalAssets      int                `json:"totalAssets" bson:"totalAssets"`
-	Status           int                `json:"status" bson:"status"`
+	Status           string             `json:"status" bson:"status"`
 	CreatedAt        time.Time          `json:"createdAt" bson:"createdAt"`
 	UpdatedAt        time.Time          `json:"updatedAt" bson:"updatedAt"`
 }
