@@ -15,7 +15,7 @@ type userAttribute struct {
 
 type UserTransactionRole struct {
 	ID                        primitive.ObjectID        `json:"_id,omitempty"             bson:"_id,omitempty"`
-	User                      userAttribute             `json:"user" 					  bson: "user"`
+	User                      userAttribute             `json:"user" bson:"user"`
 	TransactionGroupAttribute TransactionGroupAttribute `json:"transactionGroupAttribute" bson:"transactionGroupAttribute"`
 	Transaction               TransactionType           `json:"transaction"               bson:"transaction"`
 	RoleType                  RoleType                  `json:"roleType"                  bson:"roleType"`

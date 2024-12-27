@@ -18,7 +18,7 @@ type FileMaintenancePhoto struct {
 	FileSize         string             `bson:"fileSize"         json:"fileSize"`
 	FileSizeKb       float64            `bson:"fileSizeKb"       json:"fileSizeKb"`
 	IsDeleted        bool               `bson:"isDeleted"        json:"isDeleted"`
-	ModifiedBy       ModifiedBy         `bson:"modifiedBy"       json:"modifiedBy"`
+	ModifiedBy       UserEmbedded         `bson:"modifiedBy"       json:"modifiedBy"`
 	DeletedAt        *time.Time         `bson:"deletedAt"        json:"deletedAt"`
 	Group            GroupAttribute     `bson:"group"            json:"group"`
 	CreatedAt        time.Time          `bson:"createdAt"        json:"createdAt"`
