@@ -47,4 +47,9 @@ const (
 	PendingTagChangesModelName       = "pending_tag_changes"
 	ImportAccountCodeModelName       = "import_account_codes"
 	PairTagPrelistModelName          = "pair_tag_prelists"
+	AuditScheduleModelName           = "audit_schedule"
+	AuditScheduledAssetModelName     = "audit_scheduled_asset"
+	AuditAssetModelName              = "audit_asset"
+	TrackingModelName                = "tracking"
+	RoutineTaskModelName             = "routine_task"
 )

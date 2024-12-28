@@ -54,6 +54,14 @@ func NewAssetName() AssetName {
 	}
 }
 
+type AssetNameEmbedAttr struct {
+	ID               primitive.ObjectID `json:"_id" bson:"_id"`
+	Name             string             `json:"name" bson:"name"`
+	Key              int                `json:"key" bson:"key"`
+	NameWithSequence string             `json:"nameWithSequence" bson:"nameWithSequence"`
+	AliasCode        string             `json:"aliasCode" bson:"aliasCode"`
+}
+
 type AssetNameTransactionAttr struct {
 	Borrow      bool `json:"borrow"      bson:"borrow"`
 	Assign      bool `json:"assign"      bson:"assign"`

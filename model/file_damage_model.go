@@ -18,7 +18,7 @@ type FileDamage struct {
 	FileSize         string             `bson:"fileSize"         json:"fileSize"`
 	FileSizeKb       float64            `bson:"fileSizeKb"       json:"fileSizeKb"`
 	IsDeleted        bool               `bson:"isDeleted"        json:"isDeleted"`
-	ModifiedBy       ModifiedBy         `bson:"modifiedBy"       json:"modifiedBy"`
+	ModifiedBy       UserEmbedded       `bson:"modifiedBy"       json:"modifiedBy"`
 	DeletedAt        *time.Time         `bson:"deletedAt"        json:"deletedAt"`
 	Group            GroupAttribute     `bson:"group"            json:"group"`
 	CreatedAt        time.Time          `bson:"createdAt"        json:"createdAt"`
@@ -30,12 +30,6 @@ type AssetNameAttribute struct {
 	Name             string             `bson:"name"             json:"name"`
 	NameWithSequence string             `bson:"nameWithSequence" json:"nameWithSequence"`
 	Key              int                `bson:"key,omitempty"    json:"key,omitempty"`
-}
-
-type ModifiedBy struct {
-	ID       primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
-	FullName string             `bson:"fullName"      json:"fullName"`
-	Key      int                `bson:"key,omitempty" json:"key,omitempty"`
 }
 
 type GroupAttribute struct {

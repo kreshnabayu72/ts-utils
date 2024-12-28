@@ -7,6 +7,7 @@ import (
 )
 
 type AuditTask struct {
+	ID              primitive.ObjectID  `bson:"_id,omitempty" json:"_id,omitempty"`
 	TransactionID   string              `bson:"transactionId,omitempty"   json:"transactionId,omitempty"`
 	Schedule        primitive.ObjectID  `bson:"schedule"                  json:"schedule"                  validate:"required"`
 	TaskName        string              `bson:"taskName,omitempty"        json:"taskName,omitempty"`
