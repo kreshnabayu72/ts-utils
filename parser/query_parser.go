@@ -59,7 +59,10 @@ func transformQueryValue(value string, transform string) interface{} {
 		var v, _ = strconv.ParseFloat(value, 64)
 		return v
 	case TransformBool:
-		var v, _ = strconv.ParseBool(value)
+		var v, err = strconv.ParseBool(value)
+		if err != nil {
+			return nil //if value isnt string "false", (example: nil) it should return nil (case: optionally filtering boolean)
+		}
 		return v
 	case TransformArray:
 		var v []interface{}
