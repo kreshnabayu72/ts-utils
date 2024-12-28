@@ -1,6 +1,7 @@
 package pipeline
 
 import (
+	"reflect"
 	"strings"
 	"time"
 
@@ -31,7 +32,10 @@ func GenerateObjectIdFilter(filter string) primitive.M {
 }
 
 func GenerateArrayFilter[T comparable](filter []T) primitive.M {
-	if len(filter) > 0 {
+	var varType = reflect.TypeOf(filter).Kind()
+
+	//check if variable type is slice
+	if varType == reflect.Slice {
 		return bson.M{"$in": filter}
 	} else {
 		return bson.M{"$ne": "vdjfPyv7ijO5vQeLIZmQHuzPO"} //random string so its always true
