@@ -10,6 +10,31 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+func GenerateRangeQuery(filter []int) bson.M {
+	if len(filter) == 2 && filter[0] >= 0 && filter[1] >= 0 {
+		return bson.M{
+			"$gte": filter[0],
+			"lte":  filter[1],
+		}
+	}
+
+	if len(filter) == 2 && filter[1] >= 0 {
+		return bson.M{
+			"lte": filter[1],
+		}
+	}
+
+	if len(filter) == 1 && filter[0] >= 0 {
+		return bson.M{
+			"gte": filter[0],
+		}
+	}
+
+	return bson.M{
+		"$ne": "vdjfPyv7ijO5vQeLIZmQHuzPO",
+	}
+}
+
 func GenerateExactFilter[T comparable](condition bool, filter T) primitive.M {
 	if condition {
 		return bson.M{"$eq": filter}
