@@ -123,7 +123,7 @@ func (m *MockBaseService) Aggregate(
 	if out := args.Get(0); out != nil {
 		reflect.ValueOf(v).Elem().Set(reflect.ValueOf(out))
 	}
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *MockBaseService) MakeUnique(ctx context.Context, filter interface{}) error {
