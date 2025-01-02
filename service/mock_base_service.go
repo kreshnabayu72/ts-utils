@@ -2,8 +2,6 @@ package service
 
 import (
 	"context"
-	"reflect"
-
 	"github.com/stretchr/testify/mock"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -118,11 +116,6 @@ func (m *MockBaseService) Aggregate(
 	opts ...*options.AggregateOptions,
 ) error {
 	args := m.Called(v, ctx, pipeline, opts)
-
-	// Set the output to v (assuming v is a pointer to a slice or struct)
-	if out := args.Get(0); out != nil {
-		reflect.ValueOf(v).Elem().Set(reflect.ValueOf(out))
-	}
 	return args.Error(0)
 }
 
