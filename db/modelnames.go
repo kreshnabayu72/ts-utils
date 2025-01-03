@@ -52,6 +52,6 @@ const (
 	AuditAssetModelName              = "audit_asset"
 	TrackingModelName                = "tracking"
 	RoutineTaskModelName             = "routine_task"
-	AssetControlTransaction          = "asset_control_transaction"
-	AssetControlRequest              = "asset_control_request"
+	AssetControlTransactionModelName = "asset_control_transaction"
+	AssetControlRequestModelName     = "asset_control_request"
 )
