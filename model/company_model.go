@@ -35,6 +35,9 @@ type TransferAttrs struct {
 type DisposalAttrs struct {
 	TransactionTimeout int `json:"transactionTimeout"            bson:"transactionTimeout"`
 }
+type AssetControlAttrs struct {
+	Pin int `json:"pin"            bson:"pin"`
+}
 
 type Company struct {
 	ID                        primitive.ObjectID `json:"_id"                       bson:"_id"`
@@ -45,6 +48,7 @@ type Company struct {
 	BorrowingAttrs            BorrowingAttrs     `json:"borrowingAttrs"               bson:"borrowingAttrs"`
 	TransferAttrs             TransferAttrs      `json:"transferAttrs"               bson:"transferAttrs"`
 	DisposalAttrs             DisposalAttrs      `json:"disposalAttrs"               bson:"disposalAttrs"`
+	AssetControlAttrs         AssetControlAttrs  `json:"assetControlAttrs"               bson:"assetControlAttrs"`
 	CreatedAt                 time.Time          `json:"createdAt"                 bson:"createdAt"`
 	UpdatedAt                 time.Time          `json:"updatedAt"                 bson:"updatedAt"`
 }
