@@ -19,11 +19,32 @@ type FileStorage struct {
 	RoutineKB         float64 `json:"routineKB"         bson:"routineKB"`
 }
 
+type AuditAttrs struct {
+	MaxGracePeriod int `json:"maxGracePeriod"            bson:"maxGracePeriod"`
+}
+type BorrowingAttrs struct {
+	MaxBorrowingTime     int `json:"maxBorrowingTime"            bson:"maxBorrowingTime"`
+	DefaultBorrowingTime int `json:"defaultBorrowingTime"            bson:"defaultBorrowingTime"`
+	ConfirmationTimeout  int `json:"confirmationTimeout"            bson:"confirmationTimeout"`
+	TransactionTimeout   int `json:"transactionTimeout"            bson:"transactionTimeout"`
+}
+type TransferAttrs struct {
+	TransactionTimeout    int `json:"transactionTimeout"            bson:"transactionTimeout"`
+	AssetControlToMissing int `json:"assetControlToMissing"            bson:"assetControlToMissing"`
+}
+type DisposalAttrs struct {
+	TransactionTimeout int `json:"transactionTimeout"            bson:"transactionTimeout"`
+}
+
 type Company struct {
 	ID                        primitive.ObjectID `json:"_id"                       bson:"_id"`
 	DepreciationMethod        DepreciationMethod `json:"depreciationMethod"        bson:"depreciationMethod"`
 	PendingDepreciationMethod DepreciationMethod `json:"pendingDepreciationMethod" bson:"pendingDepreciationMethod"`
 	FileStorage               FileStorage        `json:"fileStorage"               bson:"fileStorage"`
+	AuditAttrs                AuditAttrs         `json:"auditAttrs"               bson:"auditAttrs"`
+	BorrowingAttrs            BorrowingAttrs     `json:"borrowingAttrs"               bson:"borrowingAttrs"`
+	TransferAttrs             TransferAttrs      `json:"transferAttrs"               bson:"transferAttrs"`
+	DisposalAttrs             DisposalAttrs      `json:"disposalAttrs"               bson:"disposalAttrs"`
 	CreatedAt                 time.Time          `json:"createdAt"                 bson:"createdAt"`
 	UpdatedAt                 time.Time          `json:"updatedAt"                 bson:"updatedAt"`
 }
