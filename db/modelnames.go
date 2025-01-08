@@ -13,6 +13,7 @@ const (
 	CustomFieldModelName             = "custom_fields"
 	DepreciationGroupModelName       = "depreciation_groups"
 	GroupModelName                   = "groups"
+	RoleModelName                    = "roles"
 	IOTActivityLogModelName          = "iot_activity_logs"
 	IOTAntennaModelName              = "iot_antennas"
 	IOTReaderModelName               = "iot_readers"
