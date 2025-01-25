@@ -20,6 +20,7 @@ type Changelog struct {
 	ObjectName   string              `json:"objectName"    bson:"objectName"`
 	AssetName    string              `json:"assetName"     bson:"assetName"`
 	GroupId      *primitive.ObjectID `json:"groupId"       bson:"groupId"`
+	Module       string              `json:"module" bson:"mmodule"`
 	CreatedAt    time.Time           `json:"createdAt"     bson:"createdAt"`
 	UpdatedAt    time.Time           `json:"updatedAt"     bson:"updatedAt"`
 }
