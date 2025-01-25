@@ -2,12 +2,18 @@ package response
 
 import "github.com/gofiber/fiber/v2"
 
+type HttpResponse struct {
+	Status  int         `json:"status"`
+	Message string      `json:"message"`
+	Data    interface{} `json:"data,omitempty"`
+}
+
 // SendResponse is a helper to send JSON responses in Fiber
 func SendResponse(c *fiber.Ctx, statusCode int, data interface{}, message string) error {
-	response := fiber.Map{
-		"status":  statusCode, //changed attribute from "statusCode" to "status" (following TS nestjs app)
-		"message": message,
-		"data":    data,
+	response := HttpResponse{
+		Status:  statusCode,
+		Message: message,
+		Data:    data,
 	}
 	return c.Status(statusCode).JSON(response)
 }
