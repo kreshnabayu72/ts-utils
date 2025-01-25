@@ -52,3 +52,11 @@ func NotFound(message string) *HttpError {
 		Message: message,
 	}
 }
+
+func ToHttpError(err error) *HttpError {
+	if httpErr, ok := err.(*HttpError); ok {
+		return httpErr
+	}
+
+	return InternalServerError(err.Error())
+}
