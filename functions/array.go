@@ -336,3 +336,34 @@ func Reduce[T any, R any](
 
 	return value
 }
+
+// Contains checks whether a given value exists in a slice of comparable elements.
+// It iterates through the slice and returns true if the value is found, otherwise false.
+//
+// Parameters:
+// - src: A slice of elements of type T to be searched. The type T must be comparable.
+// - value: The value of type T to search for within the slice.
+//
+// Returns:
+// - bool: true if the value exists in the slice, false otherwise.
+//
+// Example usage:
+//
+//	numbers := []int{1, 2, 3, 4, 5}
+//	fmt.Println(Contains(numbers, 3)) // Output: true
+//	fmt.Println(Contains(numbers, 6)) // Output: false
+//
+//	fruits := []string{"apple", "banana", "cherry"}
+//	fmt.Println(Contains(fruits, "banana")) // Output: true
+//	fmt.Println(Contains(fruits, "grape"))  // Output: false
+func Contains[T comparable](src []T, value T) bool {
+	contain := false
+	for _, v := range src {
+		contain = v == value
+		if contain {
+			break
+		}
+	}
+
+	return contain
+}
