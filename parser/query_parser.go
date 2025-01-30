@@ -5,23 +5,28 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// QueryTransform is a type alias for string, representing the type of transformation to be applied to a query value.
 type QueryTransform string
 
+// Constants defining the supported query transformations.
 const (
-	TransformString        QueryTransform = "string"
-	TransformInt           QueryTransform = "int"
-	TransformFloat32       QueryTransform = "float32"
-	TransformFloat64       QueryTransform = "float64"
-	TransformBool          QueryTransform = "bool"
-	TransformArray         QueryTransform = "array"
-	TransformObjectID      QueryTransform = "objectId"
-	TransformObjectIDArray QueryTransform = "objectIdArray"
+	TransformString        QueryTransform = "string"        // Transform value to string
+	TransformInt           QueryTransform = "int"           // Transform value to int
+	TransformFloat32       QueryTransform = "float32"       // Transform value to float32
+	TransformFloat64       QueryTransform = "float64"       // Transform value to float64
+	TransformBool          QueryTransform = "bool"          // Transform value to bool
+	TransformArray         QueryTransform = "array"         // Transform value to array
+	TransformObjectID      QueryTransform = "objectId"      // Transform value to MongoDB ObjectID
+	TransformObjectIDArray QueryTransform = "objectIdArray" // Transform value to array of MongoDB ObjectIDs
+	TransformDate          QueryTransform = "date"          // Transform value to time.Time
 )
 
+// queryTransformMap maps string representations of transformations to their corresponding QueryTransform constants.
 var queryTransformMap = map[string]QueryTransform{
 	"string":        TransformString,
 	"int":           TransformInt,
@@ -31,8 +36,11 @@ var queryTransformMap = map[string]QueryTransform{
 	"array":         TransformArray,
 	"objectId":      TransformObjectID,
 	"objectIdArray": TransformObjectIDArray,
+	"date":          TransformDate,
 }
 
+// getQueryTransform returns the QueryTransform constant corresponding to the given transform string.
+// If the transform string is invalid, it returns an error.
 func getQueryTransform(transform string) (QueryTransform, error) {
 	transformType, exist := queryTransformMap[transform]
 	if !exist {
@@ -41,6 +49,8 @@ func getQueryTransform(transform string) (QueryTransform, error) {
 	return transformType, nil
 }
 
+// transformQueryValue transforms the given string value based on the specified transform type.
+// It returns the transformed value as an interface{}.
 func transformQueryValue(value string, transform string) interface{} {
 	transformType, err := getQueryTransform(transform)
 	if err != nil {
@@ -50,18 +60,18 @@ func transformQueryValue(value string, transform string) interface{} {
 
 	switch transformType {
 	case TransformInt:
-		var v, _ = strconv.Atoi(value)
+		v, _ := strconv.Atoi(value)
 		return v
 	case TransformFloat32:
-		var v, _ = strconv.ParseFloat(value, 32)
+		v, _ := strconv.ParseFloat(value, 32)
 		return v
 	case TransformFloat64:
-		var v, _ = strconv.ParseFloat(value, 64)
+		v, _ := strconv.ParseFloat(value, 64)
 		return v
 	case TransformBool:
-		var v, err = strconv.ParseBool(value)
+		v, err := strconv.ParseBool(value)
 		if err != nil {
-			return nil //if value isnt string "false", (example: nil) it should return nil (case: optionally filtering boolean)
+			return nil // if value isn't a valid boolean string, return nil
 		}
 		return v
 	case TransformArray:
@@ -69,7 +79,7 @@ func transformQueryValue(value string, transform string) interface{} {
 		json.Unmarshal([]byte(value), &v)
 		return v
 	case TransformObjectID:
-		var v, _ = primitive.ObjectIDFromHex(value)
+		v, _ := primitive.ObjectIDFromHex(value)
 		return v
 	case TransformObjectIDArray:
 		var v []interface{}
@@ -87,11 +97,25 @@ func transformQueryValue(value string, transform string) interface{} {
 		}
 
 		return objectIdArr
+	case TransformDate:
+		v, err := strconv.Atoi(value)
+		if err != nil {
+			v = 0
+		}
+
+		seconds := int64(v / 1000)             // Convert milliseconds to seconds
+		nanoseconds := int64((v % 1000) * 1e6) // Convert remainder to nanoseconds
+		t := time.Unix(seconds, nanoseconds)
+
+		return t
 	default:
 		return value
 	}
 }
 
+// ParseQuery parses a map of string key-value pairs into a struct of type T.
+// It uses the struct's field tags to determine how to transform each value.
+// Returns a pointer to the parsed struct and an error if any occurs.
 func ParseQuery[T any](query map[string]string) (*T, error) {
 	t := reflect.TypeFor[T]()
 
