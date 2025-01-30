@@ -45,6 +45,7 @@ type User struct {
 	ParentName           *string             `json:"parentName"           bson:"parentName"`
 	TotalControl         *UserEmbeddedRole   `json:"totalControl"         bson:"totalControl"`
 	ReadOnly             *UserEmbeddedRole   `json:"readOnly"             bson:"readOnly"`
+	Access               []string            `json:"access" bson:"access"`
 	CreatedAt            time.Time           `json:"createdAt"            bson:"createdAt"`
 	UpdatedAt            time.Time           `json:"updatedAt"            bson:"updatedAt"`
 }
