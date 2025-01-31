@@ -10,7 +10,6 @@ import (
 
 	"github.com/disintegration/imaging"
 	"github.com/gofiber/fiber/v2"
-	"github.com/valyala/fasthttp"
 )
 
 // uploadHandler handles image upload and resizing
@@ -30,14 +29,10 @@ func SplitImageMiddleware(folderName string, attribute string) fiber.Handler {
 		// Get the uploaded file, FormFile attribute
 		fileHeader, err := ctx.FormFile(attribute)
 		if err != nil {
-			if err == fasthttp.ErrMissingFile {
-				for _, size := range sizes {
-					ctx.Locals(size.name, "")
-				}
-				return ctx.Next()
+			for _, size := range sizes {
+				ctx.Locals(size.name, "")
 			}
-
-			return fiber.NewError(fiber.StatusBadRequest, "Error retrieving the file: "+err.Error())
+			return ctx.Next()
 		}
 
 		file, err := fileHeader.Open()
