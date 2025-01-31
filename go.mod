@@ -1,4 +1,4 @@
-module github.com/betsv2/tsv2-go-utils
+module gitea.qwertysystem.net/BETS/ts-utils
 
 go 1.23.2
 
