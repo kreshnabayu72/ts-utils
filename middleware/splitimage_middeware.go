@@ -17,10 +17,23 @@ import (
 // splitImageMiddleware handles image uploads, resizes the images, and saves them to disk.
 func SplitImageMiddleware(folderName string, attribute string) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
+		// Define sizes for resizing the image
+		sizes := []struct {
+			name          string
+			width, height int
+		}{
+			{"small", 300, 300},
+			{"medium", 600, 600},
+			{"large", 1200, 1200},
+		}
+
 		// Get the uploaded file, FormFile attribute
 		fileHeader, err := ctx.FormFile(attribute)
 		if err != nil {
 			if err == fasthttp.ErrMissingFile {
+				for _, size := range sizes {
+					ctx.Locals(size.name, "")
+				}
 				ctx.Next()
 			}
 
@@ -38,16 +51,6 @@ func SplitImageMiddleware(folderName string, attribute string) fiber.Handler {
 		img, _, err := image.Decode(file)
 		if err != nil {
 			return fiber.NewError(fiber.StatusBadRequest, "Error decoding image: "+err.Error())
-		}
-
-		// Define sizes for resizing the image
-		sizes := []struct {
-			name          string
-			width, height int
-		}{
-			{"small", 300, 300},
-			{"medium", 600, 600},
-			{"large", 1200, 1200},
 		}
 
 		// Process and save resized images
