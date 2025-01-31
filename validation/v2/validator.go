@@ -1,9 +1,9 @@
 package validation
 
 import (
-	"github.com/betsv2/tsv2-go-utils/entity"
-	"github.com/betsv2/tsv2-go-utils/parser"
-	"github.com/betsv2/tsv2-go-utils/validation/v2/custom_validator"
+	"gitea.qwertysystem.net/BETS/ts-utils/entity"
+	"gitea.qwertysystem.net/BETS/ts-utils/parser"
+	"gitea.qwertysystem.net/BETS/ts-utils/validation/v2/custom_validator"
 	"github.com/gofiber/fiber/v2"
 	"github.com/kittipat1413/go-common/framework/validator"
 )
@@ -53,14 +53,12 @@ func ParseAndValidateBody[T any](ctx *fiber.Ctx) (*T, *entity.HttpError) {
 
 	// Return the parsed and validated body
 	return &body, validationErr
-
 }
 
 func ParseAndValidateQuery[T any](ctx *fiber.Ctx) (*T, *entity.HttpError) {
 	// Parse the query
 	rawQuery := ctx.Queries()
 	parsedQuery, err := parser.ParseQuery[T](rawQuery)
-
 	// Return if there is an error when parsing the query
 	if err != nil {
 		return nil, entity.BadRequest(err.Error())

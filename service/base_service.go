@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	"github.com/betsv2/tsv2-go-utils/db"
+	"gitea.qwertysystem.net/BETS/ts-utils/db"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -113,7 +113,8 @@ func NewBaseService(collection *mongo.Collection) *BaseService {
 }
 
 func (s *BaseService) Find(v any, ctx context.Context, filter interface{},
-	opts ...*options.FindOptions) error {
+	opts ...*options.FindOptions,
+) error {
 	cursor, err := s.collection.Find(ctx, filter, opts...)
 	if err != nil {
 		return err
@@ -129,7 +130,8 @@ func (s *BaseService) Find(v any, ctx context.Context, filter interface{},
 }
 
 func (s *BaseService) FindOne(v any, ctx context.Context, filter interface{},
-	opts ...*options.FindOneOptions) error {
+	opts ...*options.FindOneOptions,
+) error {
 	result := s.collection.FindOne(ctx, filter, opts...)
 	if result.Err() != nil {
 		return result.Err()
@@ -144,7 +146,8 @@ func (s *BaseService) FindOne(v any, ctx context.Context, filter interface{},
 }
 
 func (s *BaseService) InsertOne(ctx context.Context, data interface{},
-	opts ...*options.InsertOneOptions) (interface{}, error) {
+	opts ...*options.InsertOneOptions,
+) (interface{}, error) {
 	result, err := s.collection.InsertOne(ctx, data, opts...)
 	if err != nil {
 		return "", err
@@ -154,9 +157,9 @@ func (s *BaseService) InsertOne(ctx context.Context, data interface{},
 }
 
 func (s *BaseService) InsertMany(ctx context.Context, data []interface{},
-	opts ...*options.InsertManyOptions) ([]interface{}, error) {
+	opts ...*options.InsertManyOptions,
+) ([]interface{}, error) {
 	result, err := s.collection.InsertMany(ctx, data, opts...)
-
 	if err != nil {
 		return nil, err
 	}
@@ -185,7 +188,8 @@ func (s *BaseService) FindOneAndUpdate(
 }
 
 func (s *BaseService) UpdateOne(ctx context.Context, filter interface{}, data interface{},
-	opts ...*options.UpdateOptions) (int64, error) {
+	opts ...*options.UpdateOptions,
+) (int64, error) {
 	result, err := s.collection.UpdateOne(ctx, filter, data, opts...)
 	if err != nil {
 		return 0, err
@@ -195,7 +199,8 @@ func (s *BaseService) UpdateOne(ctx context.Context, filter interface{}, data in
 }
 
 func (s *BaseService) UpdateMany(ctx context.Context, filter interface{}, data interface{},
-	opts ...*options.UpdateOptions) (int64, error) {
+	opts ...*options.UpdateOptions,
+) (int64, error) {
 	result, err := s.collection.UpdateMany(ctx, filter, data, opts...)
 	if err != nil {
 		return 0, err
@@ -205,7 +210,8 @@ func (s *BaseService) UpdateMany(ctx context.Context, filter interface{}, data i
 }
 
 func (s *BaseService) FindOneAndDelete(v any, ctx context.Context, filter interface{},
-	opts ...*options.FindOneAndDeleteOptions) error {
+	opts ...*options.FindOneAndDeleteOptions,
+) error {
 	result := s.collection.FindOneAndDelete(ctx, filter, opts...)
 	if result.Err() != nil {
 		return result.Err()
@@ -220,7 +226,8 @@ func (s *BaseService) FindOneAndDelete(v any, ctx context.Context, filter interf
 }
 
 func (s *BaseService) DeleteOne(ctx context.Context, filter interface{},
-	opts ...*options.DeleteOptions) (int64, error) {
+	opts ...*options.DeleteOptions,
+) (int64, error) {
 	result, err := s.collection.DeleteOne(ctx, filter, opts...)
 	if err != nil {
 		return 0, err
@@ -230,7 +237,8 @@ func (s *BaseService) DeleteOne(ctx context.Context, filter interface{},
 }
 
 func (s *BaseService) DeleteMany(ctx context.Context, filter interface{},
-	opts ...*options.DeleteOptions) (int64, error) {
+	opts ...*options.DeleteOptions,
+) (int64, error) {
 	result, err := s.collection.DeleteMany(ctx, filter, opts...)
 	if err != nil {
 		return 0, err
@@ -275,7 +283,6 @@ func (s *BaseService) MakeUnique(ctx context.Context, filter interface{}) error 
 
 func (s *BaseService) CountDocuments(ctx context.Context, filter interface{}) (int64, error) {
 	documentCounts, err := s.collection.CountDocuments(ctx, filter)
-
 	if err != nil {
 		return 0, err
 	}

@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/betsv2/tsv2-go-utils/db"
-	"github.com/betsv2/tsv2-go-utils/model"
+	"gitea.qwertysystem.net/BETS/ts-utils/db"
+	"gitea.qwertysystem.net/BETS/ts-utils/model"
 	"github.com/stretchr/testify/mock"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -68,7 +68,6 @@ func (u *ChangelogUseCase) CreateChangelog(
 	}
 
 	_, err := u.ChangelogService.InsertOne(ctx, changelog)
-
 	if err != nil {
 		return err
 	}

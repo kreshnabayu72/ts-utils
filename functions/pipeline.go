@@ -1,7 +1,7 @@
 package functions
 
 import (
-	"github.com/betsv2/tsv2-go-utils/dto"
+	"gitea.qwertysystem.net/BETS/ts-utils/dto"
 )
 
 func FormatPaginationResult[T any](

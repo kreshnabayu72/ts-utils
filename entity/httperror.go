@@ -1,7 +1,7 @@
 package entity
 
 import (
-	"github.com/betsv2/tsv2-go-utils/response"
+	"gitea.qwertysystem.net/BETS/ts-utils/response"
 	"github.com/gofiber/fiber/v2"
 )
 
