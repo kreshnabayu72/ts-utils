@@ -34,7 +34,7 @@ func SplitImageMiddleware(folderName string, attribute string) fiber.Handler {
 				for _, size := range sizes {
 					ctx.Locals(size.name, "")
 				}
-				ctx.Next()
+				return ctx.Next()
 			}
 
 			return fiber.NewError(fiber.StatusBadRequest, "Error retrieving the file: "+err.Error())
