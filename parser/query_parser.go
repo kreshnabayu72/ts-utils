@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"gitea.qwertysystem.net/BETS/ts-utils/functions"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -124,10 +125,13 @@ func ParseQuery[T any](query map[string]string) (*T, error) {
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
 
-		key := field.Tag.Get("json")
-		key = strings.ReplaceAll(key, ",omitempty", "")
+		rawKey := field.Tag.Get("json")
+		key := strings.ReplaceAll(rawKey, ",omitempty", "")
 		transform := field.Tag.Get("transform")
-		parsedQuery[key] = transformQueryValue(query[key], transform)
+		transformValue := transformQueryValue(query[key], transform)
+		if !strings.Contains(rawKey, "omitempty") || !functions.IsZeroValue(transformValue) {
+			parsedQuery[key] = transformValue
+		}
 	}
 
 	jsonData, err := json.Marshal(parsedQuery)
