@@ -129,7 +129,11 @@ func ParseQuery[T any](query map[string]string) (*T, error) {
 		key := strings.ReplaceAll(rawKey, ",omitempty", "")
 		transform := field.Tag.Get("transform")
 		transformValue := transformQueryValue(query[key], transform)
-		if !strings.Contains(rawKey, "omitempty") || !functions.IsZeroValue(transformValue) {
+		isZeroValue := transformValue == nil
+		if transformValue != nil {
+			isZeroValue = functions.IsZeroValue(transformValue)
+		}
+		if !strings.Contains(rawKey, "omitempty") || !isZeroValue {
 			parsedQuery[key] = transformValue
 		}
 	}
