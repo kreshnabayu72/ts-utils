@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"strings"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -124,6 +125,7 @@ func ParseQuery[T any](query map[string]string) (*T, error) {
 		field := t.Field(i)
 
 		key := field.Tag.Get("json")
+		key = strings.ReplaceAll(key, ",omitempty", "")
 		transform := field.Tag.Get("transform")
 		parsedQuery[key] = transformQueryValue(query[key], transform)
 	}
