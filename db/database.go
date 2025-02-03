@@ -11,8 +11,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var Client *mongo.Client
-var dbName string
+var (
+	Client *mongo.Client
+	dbName DBName
+)
 
 var (
 	clientInstance *mongo.Client
@@ -46,21 +48,11 @@ func ConnectMongo() *mongo.Client {
 	return clientInstance
 }
 
-func ConnectToCompanyDb(companyCode string) {
+func ConnectToDB(db DBName) {
 	Client = ConnectMongo()
-	dbName = fmt.Sprintf("%s_tagsamurai", companyCode)
-}
-
-func ConnectToGlobalDb() {
-	Client = ConnectMongo()
-	dbName = "tagsamurai"
-}
-
-func ConnectToAdminDb() {
-	Client = ConnectMongo()
-	dbName = "admin_tagsamurai"
+	dbName = db
 }
 
 func GetCollection(collection string) *mongo.Collection {
-	return Client.Database(dbName).Collection(collection)
+	return Client.Database(string(dbName)).Collection(collection)
 }

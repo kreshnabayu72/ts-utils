@@ -46,7 +46,7 @@ func NewAgenda() *Agenda {
 	}
 
 	return &Agenda{
-		service:   service.MakeGlobalService(db.FileManagerAgendaModelName),
+		service:   service.MakeService(db.RootDBName, "agenda"),
 		scheduler: scheduler,
 		tasks:     Task{},
 	}

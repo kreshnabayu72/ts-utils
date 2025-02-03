@@ -78,26 +78,8 @@ type BaseService struct {
 	collection *mongo.Collection
 }
 
-func MakeService(companyCode string, collection string) *BaseService {
-	db.ConnectToCompanyDb(companyCode)
-	coll := db.GetCollection(collection)
-
-	return &BaseService{
-		collection: coll,
-	}
-}
-
-func MakeAdminService(collection string) *BaseService {
-	db.ConnectToAdminDb()
-	coll := db.GetCollection("clients")
-
-	return &BaseService{
-		collection: coll,
-	}
-}
-
-func MakeGlobalService(collection string) *BaseService {
-	db.ConnectToGlobalDb()
+func MakeService(dbName db.DBName, collection string) *BaseService {
+	db.ConnectToDB(dbName)
 	coll := db.GetCollection(collection)
 
 	return &BaseService{
