@@ -5,5 +5,4 @@ const (
 	DivisionModelName  = "divisions"
 	PositionModelName  = "positions"
 	UserModelName      = "users"
-	UserTokenModelName = "user_tokens"
 )
