@@ -57,9 +57,13 @@ func SplitImageMiddleware(folderName string, attribute string) fiber.Handler {
 
 			absPath, _ := filepath.Abs(fmt.Sprintf("../tsv2-files/%s/%s", companyCode, folderName))
 			// Save the resized image to disk
+			filename := fmt.Sprintf(
+				"%s.jpg",
+				strconv.FormatInt(time.Now().Unix(), 10)+"-"+size.name,
+			)
 			outputFilePath := filepath.Join(
 				absPath,
-				fmt.Sprintf("%s.jpg", strconv.FormatInt(time.Now().Unix(), 10)+"-"+size.name),
+				filename,
 			)
 
 			// Create the directory if it doesn't exist
@@ -79,8 +83,9 @@ func SplitImageMiddleware(folderName string, attribute string) fiber.Handler {
 			}
 
 			key := ContextKey(size.name)
+			path := fmt.Sprintf("%s/%s/%s", companyCode, folderName, filename)
 
-			ctx.Locals(key, outputFilePath)
+			ctx.Locals(key, path)
 		}
 
 		return ctx.Next()
