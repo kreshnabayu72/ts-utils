@@ -30,7 +30,7 @@ func SplitImageMiddleware(folderName string, attribute string) fiber.Handler {
 		fileHeader, err := ctx.FormFile(attribute)
 		if err != nil {
 			for _, size := range sizes {
-				ctx.Locals(size.name, "")
+				ctx.Locals(ContextKey(size.name), "")
 			}
 			return ctx.Next()
 		}
