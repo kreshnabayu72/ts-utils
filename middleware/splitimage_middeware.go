@@ -55,7 +55,9 @@ func SplitImageMiddleware(folderName string, attribute string) fiber.Handler {
 
 			companyCode := ctx.Locals(ContextKey("companyCode")).(string)
 
-			absPath, _ := filepath.Abs(fmt.Sprintf("../tsv2-files/%s/%s", companyCode, folderName))
+			absPath, _ := filepath.Abs(
+				fmt.Sprintf("../../../../tsv2-files/%s/%s", companyCode, folderName),
+			)
 			// Save the resized image to disk
 			filename := fmt.Sprintf(
 				"%s.jpg",
