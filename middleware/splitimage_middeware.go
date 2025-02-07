@@ -86,9 +86,8 @@ func SplitImageMiddleware(folderName string, attribute string) fiber.Handler {
 
 			key := ContextKey(size.name)
 			path := fmt.Sprintf("/%s/%s/%s", companyCode, folderName, filename)
-			fmt.Println(path)
 
-			ctx.Locals(key, outputFilePath)
+			ctx.Locals(key, path)
 		}
 
 		return ctx.Next()
