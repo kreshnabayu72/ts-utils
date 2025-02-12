@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/db"
-	globaldb "gitea.qwertysystem.net/BETS/ts-utils/module/global/db"
 	"gitea.qwertysystem.net/BETS/ts-utils/module/global/model"
 	"gitea.qwertysystem.net/BETS/ts-utils/service"
 	"github.com/stretchr/testify/mock"
@@ -25,7 +24,7 @@ type ChangelogUseCase struct {
 // Deprecated: user service is manually created outside
 func MakeChangelogUseCase(companyCode string, user service.Service) IChangelogUseCase {
 	dbName := db.GlobalDBName.CompanyDBName(companyCode)
-	changelogService := service.MakeService(dbName, globaldb.ChangelogModelName)
+	changelogService := service.MakeService(dbName, db.ChangelogModelName)
 	userService := user
 
 	return &ChangelogUseCase{
@@ -37,8 +36,8 @@ func MakeChangelogUseCase(companyCode string, user service.Service) IChangelogUs
 func NewChangelogUseCase(companyCode string) IChangelogUseCase {
 	dbName := db.GlobalDBName.CompanyDBName(companyCode)
 	return &ChangelogUseCase{
-		ChangelogService: service.MakeService(dbName, globaldb.ChangelogModelName),
-		UserService:      service.MakeService(dbName, globaldb.UserModelName),
+		ChangelogService: service.MakeService(dbName, db.ChangelogModelName),
+		UserService:      service.MakeService(dbName, db.UserModelName),
 	}
 }
 
