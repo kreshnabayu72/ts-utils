@@ -2,6 +2,7 @@ package db
 
 const (
 	AccountCodeModelName             = "account_codes"
+	AliasCodeModelName               = "alias_codes"
 	AssetControlRequestModelName     = "asset_control_request"
 	AssetControlTransactionModelName = "asset_control_transaction"
 	AssetModelName                   = "assets"
