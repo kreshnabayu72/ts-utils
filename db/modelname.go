@@ -36,6 +36,7 @@ const (
 	IOTActivityLogModelName          = "iot_activity_logs"
 	IOTAntennaModelName              = "iot_antennas"
 	IOTReaderModelName               = "iot_readers"
+	ReaderModelName                  = "readers"
 	MeasurementModelName             = "measurements"
 	ModelModelName                   = "models"
 	NotificationModelName            = "notifications"
