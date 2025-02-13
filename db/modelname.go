@@ -61,4 +61,6 @@ const (
 	UserSystemRoleModelName          = "user_system_roles"
 	UserTokenModelName               = "user_tokens"
 	UserTransactionRoleModelName     = "user_transaction_roles"
+	SupplierModelName                = "suppliers"
+	SupplierActivityModelName        = "supplier_activities"
 )
