@@ -91,4 +91,5 @@ type Group struct {
 	Key                    int                 `bson:"key"                              json:"key"`
 	CreatedAt              time.Time           `bson:"createdAt"                        json:"createdAt"`
 	UpdatedAt              time.Time           `bson:"updatedAt"                        json:"updatedAt"`
+	Code                   string              `bson:"code"                             json:"code"`
 }

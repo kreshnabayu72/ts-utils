@@ -17,4 +17,5 @@ type Category struct {
 	DeleteFromDatabaseAt *time.Time          `json:"deleteFromDatabaseAt" bson:"deleteFromDatabaseAt"`
 	CreatedAt            time.Time           `json:"createdAt"            bson:"createdAt"`
 	UpdatedAt            time.Time           `json:"updatedAt"            bson:"updatedAt"`
+	Code                 string              `json:"code"                 bson:"code"`
 }
