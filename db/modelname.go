@@ -63,4 +63,5 @@ const (
 	UserTransactionRoleModelName     = "user_transaction_roles"
 	SupplierModelName                = "suppliers"
 	SupplierActivityModelName        = "supplier_activities"
+	ConsoleSettingsModelName         = "console_settings"
 )
