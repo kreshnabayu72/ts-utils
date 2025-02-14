@@ -6,6 +6,7 @@ type DBName string
 
 const (
 	RootDBName        DBName = "tagsamurai"
+	AdminDBName       DBName = "admin_tagsamurai"
 	FixedAssetDBName  DBName = "tagsamurai_fixed_asset"
 	SupplyAssetDBName DBName = "tagsamurai_supply_asset"
 	GlobalDBName      DBName = "tagsamurai_global"
