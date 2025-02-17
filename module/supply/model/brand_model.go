@@ -11,9 +11,9 @@ type Brand struct {
 	Key                int                  `bson:"key"                  json:"key"`
 	Name               string               `bson:"name"                 json:"name"`
 	Category           []primitive.ObjectID `bson:"category"             json:"category"`
-	TotalAssets        int                  `bson:"totalAssets"          json:"totalAssets"`
 	IsDeleted          bool                 `bson:"isDeleted"            json:"isDeleted"`
 	DeleteFromDatabase *time.Time           `bson:"deleteFromDatabaseAt" json:"deleteFromDatabaseAt"`
-	CreatedAt          time.Time            `bson:"createdAt"            json:"createdAt"`
+	ModifiedBy         primitive.ObjectID   `bson:"modifiedBy"           json:"modifiedBy"`
 	UpdatedAt          time.Time            `bson:"updatedAt"            json:"updatedAt"`
+	CreatedAt          time.Time            `bson:"createdAt"            json:"createdAt"`
 }
