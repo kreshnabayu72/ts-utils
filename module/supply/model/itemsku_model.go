@@ -4,6 +4,8 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
+
+	"gitea.qwertysystem.net/BETS/ts-utils/module/common/model"
 )
 
 type TransactionalPolicy struct {
@@ -25,7 +27,7 @@ type ItemSKU struct {
 	MinimumStock                  int                  `json:"minimumStock"                  bson:"minimumStock"`
 	SafetyStock                   int                  `json:"safetyStock"                   bson:"safetyStock"`
 	MinimumAndSafetyStockSettings string               `json:"minimumAndSafetyStockSettings" bson:"minimumAndSafetyStockSettings"`
-	TagType                       TagType              `json:"tagType"                       bson:"tagType"`
+	TagType                       model.TagType        `json:"tagType"                       bson:"tagType"`
 	ProductionDateRequired        bool                 `json:"productionDateRequired"        bson:"productionDateRequired"`
 	ExpiredDateRequired           bool                 `json:"expiredDateRequired"           bson:"expiredDateRequired"`
 	Barcode                       *string              `json:"barcode"                       bson:"barcode"`
