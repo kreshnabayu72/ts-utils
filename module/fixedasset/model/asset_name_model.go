@@ -72,7 +72,7 @@ type AssetNameTransactionAttr struct {
 type AssetNameCategoryAttr struct {
 	ID   primitive.ObjectID `json:"_id"  bson:"_id"`
 	Name string             `json:"name" bson:"name"`
-	Key  int32              `json:"key"  bson:"key"`
+	Key  int                `json:"key"  bson:"key"`
 }
 
 type AssetNameMeasurementAttr struct {
@@ -83,7 +83,7 @@ type AssetNameMeasurementAttr struct {
 type AssetNameAccountCodeAttr struct {
 	ID   primitive.ObjectID `json:"_id"  bson:"_id"`
 	Name string             `json:"name" bson:"name"`
-	Key  int32              `json:"key"  bson:"key"`
+	Key  int                `json:"key"  bson:"key"`
 	Code string             `json:"code" bson:"code"`
 }
 
@@ -111,10 +111,10 @@ type AssetNameDepreciationGroupAttr = AssetNameCategoryAttr
 
 type AssetName struct {
 	ID                   primitive.ObjectID              `json:"_id,omitempty"        bson:"_id,omitempty"`
-	Key                  int32                           `json:"key"                  bson:"key"`
+	Key                  int                             `json:"key"                  bson:"key"`
 	Name                 string                          `json:"name"                 bson:"name"`
 	AliasCode            string                          `json:"aliasCode"            bson:"aliasCode"`
-	TotalAssets          int32                           `json:"totalAssets"          bson:"totalAssets"`
+	TotalAssets          int                             `json:"totalAssets"          bson:"totalAssets"`
 	IsDeleted            bool                            `json:"isDeleted"            bson:"isDeleted"`
 	TagType              *string                         `json:"tagType"              bson:"tagType"`
 	DeleteFromDatabaseAt *time.Time                      `json:"deleteFromDatabaseAt" bson:"deleteFromDatabaseAt"`

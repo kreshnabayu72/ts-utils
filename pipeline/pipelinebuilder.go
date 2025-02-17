@@ -193,14 +193,14 @@ func (pb *PipelineBuilder) ReplaceRoot(data bson.M) *PipelineBuilder {
 }
 
 type PaginationQuery struct {
-	Page      int32  `bson:"page"      json:"page"      transform:"int"`
-	Limit     int32  `bson:"limit"     json:"limit"     transform:"int"`
+	Page      int    `bson:"page"      json:"page"      transform:"int"`
+	Limit     int    `bson:"limit"     json:"limit"     transform:"int"`
 	SortBy    string `bson:"sortBy"    json:"sortBy"    transform:"string"`
-	SortOrder int32  `bson:"sortOrder" json:"sortOrder" transform:"int"`
+	SortOrder int    `bson:"sortOrder" json:"sortOrder" transform:"int"`
 }
 type Sort struct {
 	SortBy    string `bson:"sortBy"    json:"sortBy"`
-	SortOrder int32  `bson:"sortOrder" json:"sortOrder"`
+	SortOrder int    `bson:"sortOrder" json:"sortOrder"`
 }
 
 // Pagination adds a $facet stage to the pipeline, with additional limit & skip stage
@@ -213,10 +213,10 @@ type Sort struct {
 //
 // For some complex sorting logic, set query.SortBy to "" and use customSort
 func (pb *PipelineBuilder) Pagination(query PaginationQuery, customSort ...Sort) *PipelineBuilder {
-	var skip int32 = 0
+	var skip int = 0
 	var sortBy = "name"
-	var sortOrder int32 = 1
-	var limit int32 = math.MaxInt32
+	var sortOrder int = 1
+	var limit int = math.MaxInt
 
 	// Override the default values if provided by query
 	if query.SortOrder != 0 {
