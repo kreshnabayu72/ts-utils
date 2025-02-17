@@ -20,6 +20,7 @@ type Group struct {
 	FullPath              string              `json:"fullPath"              bson:"fullPath"`
 	AliasCode             *string             `json:"aliasCode"             bson:"aliasCode"`
 	Parent                *primitive.ObjectID `json:"parent"                bson:"parent"`
+	Level                 int                 `json:"level"                 bson:"level"`
 	Items                 []PlacedItem        `json:"items"                 bson:"items"`
 	TagType               model.TagType       `json:"tagType"               bson:"tagType"`
 	IsAdministrativeGroup bool                `json:"isAdministrativeGroup" bson:"isAdministrativeGroup"`
