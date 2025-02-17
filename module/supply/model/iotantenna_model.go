@@ -14,6 +14,8 @@ type IotAntenna struct {
 	ImageMedium      *string                 `bson:"imageMedium,omitempty"      json:"imageMedium,omitempty"`
 	ImageBig         *string                 `bson:"imageBig,omitempty"         json:"imageBig,omitempty"`
 	Name             model.NameEmbedded      `bson:"name"                       json:"name"`
+	SKU              string                  `bson:"sku"                        json:"sku"`
+	Key              int                     `bson:"key"                        json:"key"`
 	SerialNumber     string                  `bson:"serialNumber"               json:"serialNumber"               validate:"required"`
 	UniqueIdentifier *string                 `bson:"uniqueIdentifier,omitempty" json:"uniqueIdentifier,omitempty"`
 	Brand            model.AttributeEmbedded `bson:"brand"                      json:"brand"`

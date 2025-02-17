@@ -11,10 +11,13 @@ type Reader struct {
 	ImageSmall       *string                 `json:"imageSmall"       bson:"imageSmall"`
 	ImageMedium      *string                 `json:"imageMedium"      bson:"imageMedium"`
 	ImageBig         *string                 `json:"imageBig"         bson:"imageBig"`
+	AliasName        *string                 `json:"aliasName"        bson:"aliasName"`
 	SerialNumber     string                  `json:"serialNumber"     bson:"serialNumber"`
 	Name             model.NameEmbedded      `json:"name"             bson:"name"`
 	Group            model.AttributeEmbedded `json:"group"            bson:"group"`
 	Manager          model.UserEmbedded      `json:"manager"          bson:"manager"`
+	Type             string                  `json:"type"             bson:"type"`
+	Key              int                     `json:"key"              bson:"key"`
 	Status           string                  `json:"status"           bson:"status"`           // Available, Damaged, Missing
 	LastReportReason string                  `json:"lastReportReason" bson:"lastReportReason"` // Damaged, Missing
 	NameNumber       int                     `json:"nameNumber"       bson:"nameNumber"`
