@@ -1,9 +1,11 @@
 package model
 
 import (
-	"gitea.qwertysystem.net/BETS/ts-utils/module/common/model"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+
+	"gitea.qwertysystem.net/BETS/ts-utils/module/common/model"
 )
 
 type Reader struct {
