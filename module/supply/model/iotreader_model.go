@@ -29,6 +29,7 @@ type IotReader struct {
 	ImageBig         *string                  `bson:"imageBig,omitempty"         json:"imageBig,omitempty"`
 	AliasName        *string                  `bson:"aliasName,omitempty"        json:"aliasName,omitempty"`
 	Name             model.NameEmbedded       `bson:"name"                       json:"name"`
+	Type             string                   `json:"type"                       bson:"type"`
 	SerialNumber     string                   `bson:"serialNumber"               json:"serialNumber"`
 	TotalPort        int                      `bson:"totalPort"                  json:"totalPort"`
 	InputTopic       *string                  `bson:"inputTopic,omitempty"       json:"inputTopic,omitempty"`
