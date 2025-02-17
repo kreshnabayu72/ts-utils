@@ -21,8 +21,9 @@ type IotAntenna struct {
 	Brand            model.AttributeEmbedded `bson:"brand"                      json:"brand"`
 	Model            model.AttributeEmbedded `bson:"model"                      json:"model"`
 	Manager          model.UserEmbedded      `bson:"manager"                    json:"manager"`
-	ReportedDate     *time.Time              `bson:"reportedDate,omitempty"     json:"reportedDate,omitempty"`
 	Status           string                  `bson:"status"                     json:"status"                     validate:"oneof=Available Damaged Missing"`
+	ReportedBy       *model.UserEmbedded     `bson:"reportedBy"                 json:"reportedBy"`
+	ReportedAt       *time.Time              `bson:"reportedAt"                 json:"reportedAt"`
 	CreatedAt        time.Time               `bson:"createdAt"                  json:"createdAt"`
 	UpdatedAt        time.Time               `bson:"updatedAt"                  json:"updatedAt"`
 }
