@@ -23,6 +23,7 @@ type TransactionLog struct {
 	ReaderId              primitive.ObjectID     `json:"readerId" bson:"readerId"`
 	ReaderName            string                 `json:"readerName" bson:"readerName"`
 	ReaderType            string                 `json:"readerType" bson:"readerType"`
+	Module                string                 `json:"module"     bson:"module"`
 	CreatedAt             time.Time              `json:"createdAt" bson:"createdAt"`
 	UpdatedAt             time.Time              `json:"updatedAt" bson:"updatedAt"`
 }
