@@ -216,7 +216,7 @@ func (pb *PipelineBuilder) Pagination(query PaginationQuery, customSort ...Sort)
 	var skip int = 0
 	var sortBy = "name"
 	var sortOrder int = 1
-	var limit int = math.Maxint
+	var limit int = math.MaxInt
 
 	// Override the default values if provided by query
 	if query.SortOrder != 0 {
