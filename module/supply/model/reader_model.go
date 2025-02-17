@@ -1,0 +1,24 @@
+package model
+
+import (
+	"gitea.qwertysystem.net/BETS/ts-utils/module/common/model"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"time"
+)
+
+type Reader struct {
+	ID               primitive.ObjectID      `json:"_id,omitempty"    bson:"_id,omitempty"`
+	ImageSmall       *string                 `json:"imageSmall"       bson:"imageSmall"`
+	ImageMedium      *string                 `json:"imageMedium"      bson:"imageMedium"`
+	ImageBig         *string                 `json:"imageBig"         bson:"imageBig"`
+	SerialNumber     string                  `json:"serialNumber"     bson:"serialNumber"`
+	Name             model.NameEmbedded      `json:"name"             bson:"name"`
+	Group            model.AttributeEmbedded `json:"group"            bson:"group"`
+	Manager          model.UserEmbedded      `json:"manager"          bson:"manager"`
+	Status           string                  `json:"status"           bson:"status"`           // Available, Damaged, Missing
+	LastReportReason string                  `json:"lastReportReason" bson:"lastReportReason"` // Damaged, Missing
+	NameNumber       int                     `json:"nameNumber"       bson:"nameNumber"`
+	QRCode           string                  `json:"qrCode"           bson:"qrCode"`
+	CreatedAt        time.Time               `json:"createdAt"        bson:"createdAt"`
+	UpdatedAt        time.Time               `json:"updatedAt"        bson:"updatedAt"`
+}

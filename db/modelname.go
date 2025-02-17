@@ -64,4 +64,6 @@ const (
 	SupplierModelName                = "suppliers"
 	SupplierActivityModelName        = "supplier_activities"
 	ConsoleSettingsModelName         = "console_settings"
+	ItemNameModelName                = "item_names"
+	ItemSKUModelName                 = "item_skus"
 )

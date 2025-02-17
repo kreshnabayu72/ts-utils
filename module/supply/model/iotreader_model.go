@@ -39,10 +39,10 @@ type IotReader struct {
 	Model            model.AttributeEmbedded  `bson:"model"                      json:"model"`
 	Manager          model.AttributeEmbedded  `bson:"manager"                    json:"manager"`
 	ReportedDate     *time.Time               `bson:"reportedDate,omitempty"     json:"reportedDate,omitempty"`
-	Status           string                   `bson:"status"                     json:"status"`
+	Status           string                   `bson:"status"                     json:"status"` // Available, Damaged, Missing
 	Key              int                      `bson:"key"                        json:"key"`
 	Ports            []Port                   `bson:"ports"                      json:"ports"`
-	NetworkStatus    string                   `bson:"networkStatus"              json:"networkStatus"`
+	NetworkStatus    string                   `bson:"networkStatus"              json:"networkStatus"` // Online, Offline
 	ResponseID       *string                  `bson:"responseId,omitempty"       json:"responseId,omitempty"`
 	AssetControl     *AssetControl            `bson:"assetControl,omitempty"     json:"assetControl,omitempty"`
 	CreatedAt        time.Time                `bson:"createdAt"                  json:"createdAt"`
