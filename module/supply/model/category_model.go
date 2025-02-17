@@ -13,7 +13,7 @@ type Category struct {
 	Parent               *primitive.ObjectID `json:"parent"               bson:"parent"`
 	IsDefault            bool                `json:"isDefault"            bson:"isDefault"`
 	IsDeleted            bool                `json:"isDeleted"            bson:"isDeleted"`
-	Key                  int32               `json:"key"                  bson:"key"`
+	Key                  int                 `json:"key"                  bson:"key"`
 	DeleteFromDatabaseAt *time.Time          `json:"deleteFromDatabaseAt" bson:"deleteFromDatabaseAt"`
 	CreatedAt            time.Time           `json:"createdAt"            bson:"createdAt"`
 	UpdatedAt            time.Time           `json:"updatedAt"            bson:"updatedAt"`
