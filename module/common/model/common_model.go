@@ -5,7 +5,7 @@ import "go.mongodb.org/mongo-driver/bson/primitive"
 type UserEmbedded struct {
 	ID        *primitive.ObjectID `json:"_id,omitempty"       bson:"_id,omitempty"`
 	FullName  *string             `json:"fullName"            bson:"fullName"`
-	Key       *int32              `json:"key"                 bson:"key"`
+	Key       *int                `json:"key"                 bson:"key"`
 	Position  *string             `json:"position,omitempty"  bson:"position,omitempty"`
 	Division  *string             `json:"division,omitempty"  bson:"division,omitempty"`
 	IsDefault *bool               `json:"isDefault,omitempty" bson:"isDefault,omitempty"`
@@ -13,7 +13,7 @@ type UserEmbedded struct {
 type AttributeEmbedded struct {
 	ID   *primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
 	Name *string             `json:"name"          bson:"name"`
-	Key  *int32              `json:"key"           bson:"key"`
+	Key  *int                `json:"key"           bson:"key"`
 }
 
 type NameEmbedded struct {

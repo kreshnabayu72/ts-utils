@@ -14,7 +14,7 @@ type UserEmbeddedRole struct {
 
 type User struct {
 	ID          primitive.ObjectID `json:"id,omitempty"         bson:"_id,omitempty"`
-	Key         int32              `json:"key"                  bson:"key"`
+	Key         int                `json:"key"                  bson:"key"`
 	FirstName   string             `json:"firstName"            bson:"firstName"`
 	LastName    string             `json:"lastName"             bson:"lastName"`
 	Division    string             `json:"division"             bson:"division"`
