@@ -17,6 +17,7 @@ type TransactionLog struct {
 	AssetName                 string                 `json:"assetName" bson:"assetName"`
 	AssetId                   primitive.ObjectID     `json:"assetId" bson:"assetId"`
 	AssetNameWithSequence     string                 `json:"assetNameWithSequence" bson:"assetNameWithSequence"`
+	ObjectName                string                 `json:"objectName" bson:"objectName"`
 	Action                    string                 `json:"action" bson:"action"`
 	UserId                    *primitive.ObjectID    `json:"userId" bson:"userId"`
 	UserFullName              *string                `json:"userFullName" bson:"userFullName"`
