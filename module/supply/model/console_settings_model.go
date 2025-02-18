@@ -8,11 +8,11 @@ type DefaultCurrency struct {
 }
 
 type DateFormat struct {
-	Locale  string `json:"locale"  bson:"locale"`
-	Year    string `json:"year"    bson:"year"`
-	Month   string `json:"month"   bson:"month"`
-	Day     string `json:"day"     bson:"day"`
-	Weekday string `json:"weekday" bson:"weekday"`
+	Locale  string  `json:"locale"  bson:"locale"`
+	Year    string  `json:"year"    bson:"year"`
+	Month   string  `json:"month"   bson:"month"`
+	Day     string  `json:"day"     bson:"day"`
+	Weekday *string `json:"weekday" bson:"weekday"`
 }
 
 type ReceptionAttrs struct {
