@@ -25,7 +25,7 @@ type ItemSKU struct {
 	SKU                           string               `json:"sku"                           bson:"sku"`
 	SKUAlias                      *string              `json:"skuAlias"                      bson:"skuAlias"`
 	MinimumStock                  int                  `json:"minimumStock"                  bson:"minimumStock"`
-	SafetyStock                   int                  `json:"safetyStock"                   bson:"safetyStock"`
+	SafetyStock                   *int                 `json:"safetyStock"                   bson:"safetyStock"`
 	MinimumAndSafetyStockSettings string               `json:"minimumAndSafetyStockSettings" bson:"minimumAndSafetyStockSettings"`
 	TagType                       model.TagType        `json:"tagType"                       bson:"tagType"`
 	HasProductionDate             bool                 `json:"hasProductionDate"             bson:"hasProductionDate"`
