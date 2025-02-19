@@ -30,13 +30,15 @@ type IotReader struct {
 	ImageBig         *string                  `bson:"imageBig,omitempty"         json:"imageBig,omitempty"`
 	AliasName        *string                  `bson:"aliasName,omitempty"        json:"aliasName,omitempty"`
 	Name             model.NameEmbedded       `bson:"name"                       json:"name"`
+	Type             string                   `json:"type"                       bson:"type"`
+	SKU              string                   `json:"sku"                        bson:"sku"`
 	SerialNumber     string                   `bson:"serialNumber"               json:"serialNumber"`
 	TotalPort        int                      `bson:"totalPort"                  json:"totalPort"`
 	InputTopic       *string                  `bson:"inputTopic,omitempty"       json:"inputTopic,omitempty"`
 	OutputTopic      *string                  `bson:"outputTopic,omitempty"      json:"outputTopic,omitempty"`
 	UniqueIdentifier *string                  `bson:"uniqueIdentifier,omitempty" json:"uniqueIdentifier,omitempty"`
-	FixedAssetGroup  *model.AttributeEmbedded `bson:"fixedAssetGroup,omitempty"            json:"fixedAssetGroup,omitempty"`
-	SupplyAssetGroup *model.AttributeEmbedded `bson:"supplyAssetGroup,omitempty"            json:"supplyAssetGroup,omitempty"`
+	FixedAssetGroup  *model.AttributeEmbedded `bson:"fixedAssetGroup,omitempty"  json:"fixedAssetGroup,omitempty"`
+	SupplyAssetGroup *model.AttributeEmbedded `bson:"supplyAssetGroup,omitempty" json:"supplyAssetGroup,omitempty"`
 	Brand            model.AttributeEmbedded  `bson:"brand"                      json:"brand"`
 	Model            model.AttributeEmbedded  `bson:"model"                      json:"model"`
 	Manager          model.AttributeEmbedded  `bson:"manager"                    json:"manager"`
@@ -47,6 +49,7 @@ type IotReader struct {
 	NetworkStatus    string                   `bson:"networkStatus"              json:"networkStatus"`
 	ResponseID       *string                  `bson:"responseId,omitempty"       json:"responseId,omitempty"`
 	AssetControl     *AssetControl            `bson:"assetControl,omitempty"     json:"assetControl,omitempty"`
+	ReportedBy       *model.UserEmbedded      `bson:"reportedBy"                 json:"reportedBy"`
 	CreatedAt        time.Time                `bson:"createdAt"                  json:"createdAt"`
 	UpdatedAt        time.Time                `bson:"updatedAt"                  json:"updatedAt"`
 }
