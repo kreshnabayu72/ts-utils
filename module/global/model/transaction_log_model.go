@@ -29,6 +29,7 @@ type TransactionLog struct {
 	ReaderName                string                 `json:"readerName" bson:"readerName"`
 	ReaderNameWithoutSequence string                 `json:"readerNameWithoutSequence" bson:"readerNameWithoutSequence"`
 	ReaderType                string                 `json:"readerType" bson:"readerType"`
+	Sku                       string                 `json:"sku" bson:"sku"`
 	Module                    string                 `json:"module"     bson:"module"`
 	CreatedAt                 time.Time              `json:"createdAt" bson:"createdAt"`
 	UpdatedAt                 time.Time              `json:"updatedAt" bson:"updatedAt"`
