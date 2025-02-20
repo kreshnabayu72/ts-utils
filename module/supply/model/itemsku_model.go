@@ -32,7 +32,9 @@ type ItemSKU struct {
 	HasExpiredDate                bool                 `json:"hasExpiredDate"                bson:"hasExpiredDate"`
 	HasBarcode                    bool                 `json:"hasBarcode"                    bson:"hasBarcode"`
 	Barcode                       *string              `json:"barcode"                       bson:"barcode"`
-	Image                         *string              `json:"image"                         bson:"image"`
+	DefaultImage                  *string              `json:"defaultImage"                  bson:"defaultImage"` // Possible Values: "firstImage", "secondImage"
+	FirstImage                    *string              `json:"firstImage"                    bson:"firstImage"`
+	SecondImage                   *string              `json:"secondImage"                   bson:"secondImage"`
 	CustomFields                  []CustomField        `json:"customFields"                  bson:"customFields"`
 	TransactionalPolicy           TransactionalPolicy  `json:"transactionalPolicy"           bson:"transactionalPolicy"`
 	ModifiedBy                    primitive.ObjectID   `json:"modifiedBy"                    bson:"modifiedBy"`
