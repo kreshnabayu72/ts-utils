@@ -9,9 +9,9 @@ import (
 
 type Port struct {
 	Antenna          *primitive.ObjectID      `bson:"antenna,omitempty" json:"antenna,omitempty"`
-	Group            *model.AttributeEmbedded `bson:"group,omitempty"   json:"group,omitempty"`
-	FixedAssetGroup  *model.AttributeEmbedded `bson:"fixedAssetGroup,omitempty"            json:"fixedAssetGroup,omitempty"`
-	SupplyAssetGroup *model.AttributeEmbedded `bson:"supplyAssetGroup,omitempty"            json:"supplyAssetGroup,omitempty"`
+	Group            *model.AttributeEmbedded `bson:"group"   json:"group"`
+	FixedAssetGroup  *model.AttributeEmbedded `bson:"fixedAssetGroup"            json:"fixedAssetGroup"`
+	SupplyAssetGroup *model.AttributeEmbedded `bson:"supplyAssetGroup"            json:"supplyAssetGroup"`
 	Power            int                      `bson:"power"             json:"power"`
 	IsActive         bool                     `bson:"isActive"          json:"isActive"`
 }
