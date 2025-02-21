@@ -33,10 +33,11 @@ type User struct {
 	ModifiedBy           *model.UserEmbedded `json:"modifiedBy"           bson:"modifiedBy"`
 	ProfilePictureSmall  *string             `json:"profilePictureSmall"  bson:"profilePictureSmall"`
 	ProfilePictureMedium *string             `json:"profilePictureMedium" bson:"profilePictureMedium"`
-	ProfilePictureBig    *string             `json:"profilePictureBig"  bson:"profilePictureBig"`
+	ProfilePictureBig    *string             `json:"profilePictureBig"    bson:"profilePictureBig"`
 	IsConfirmed          bool                `json:"isConfirmed"          bson:"isConfirmed"`
 	IsDefault            bool                `json:"isDefault"            bson:"isDefault"`
-	Access               []string            `json:"access" bson:"access"`
+	IsDeleted            bool                `json:"isDeleted"            bson:"isDeleted"`
+	Access               []string            `json:"access"               bson:"access"`
 	CreatedAt            time.Time           `json:"createdAt"            bson:"createdAt"`
 	UpdatedAt            time.Time           `json:"updatedAt"            bson:"updatedAt"`
 }
