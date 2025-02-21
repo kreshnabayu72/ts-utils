@@ -23,6 +23,7 @@ type ItemSKU struct {
 	Brand                         primitive.ObjectID  `json:"brand"                         bson:"brand"`
 	Model                         primitive.ObjectID  `json:"model"                         bson:"model"`
 	SKU                           string              `json:"sku"                           bson:"sku"`
+	ItemNameWithSKU               string              `json:"itemNameWithSKU"               bson:"itemNameWithSKU"`
 	SKUAlias                      *string             `json:"skuAlias"                      bson:"skuAlias"`
 	MinimumStock                  int                 `json:"minimumStock"                  bson:"minimumStock"`
 	SafetyStock                   *int                `json:"safetyStock"                   bson:"safetyStock"`
