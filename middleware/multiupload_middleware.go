@@ -10,27 +10,22 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// uploadHandler handles image upload and resizing
-// multiImageMiddleware handles multi image uploads and saves them to disk.
-func MultiImageMiddleware(folderName string, attributes []string) fiber.Handler {
+// MultiUploadMiddleware handles multi uploads and saves them to disk.
+func MultiUploadMiddleware(folderName string, attributes []string) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-
 		// Get the uploaded file, FormFile attribute
 		for _, attribute := range attributes {
 			fileHeader, err := ctx.FormFile(attribute)
 			if err != nil {
-				for _, attributeErr := range attributes {
-					ctx.Locals(ContextKey(attributeErr), "")
-				}
-				return ctx.Next()
+				return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 			}
 
 			file, err := fileHeader.Open()
 			if err != nil {
+				file.Close()
+
 				return fiber.NewError(fiber.StatusBadRequest, "Error retrieving the file: "+err.Error())
 			}
-
-			defer file.Close()
 
 			companyCode := ctx.Locals(ContextKey("companyCode")).(string)
 
@@ -48,7 +43,9 @@ func MultiImageMiddleware(folderName string, attributes []string) fiber.Handler 
 			)
 
 			// Create the directory if it doesn't exist
-			if err := os.MkdirAll(absPath, os.ModePerm); err != nil {
+			if err = os.MkdirAll(absPath, os.ModePerm); err != nil {
+				file.Close()
+
 				return fiber.NewError(
 					fiber.StatusInternalServerError,
 					"Error creating directory: "+err.Error(),
@@ -57,6 +54,8 @@ func MultiImageMiddleware(folderName string, attributes []string) fiber.Handler 
 
 			err = ctx.SaveFile(fileHeader, outputFilePath)
 			if err != nil {
+				file.Close()
+
 				return fiber.NewError(
 					fiber.StatusInternalServerError,
 					"Error saving resized image: "+err.Error(),
@@ -68,6 +67,7 @@ func MultiImageMiddleware(folderName string, attributes []string) fiber.Handler 
 
 			ctx.Locals(key, path)
 
+			file.Close()
 		}
 
 		return ctx.Next()
