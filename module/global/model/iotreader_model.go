@@ -20,6 +20,7 @@ type Port struct {
 	FixedAssetGroup  *AntennaGroup            `bson:"fixedAssetGroup"            json:"fixedAssetGroup"`
 	SupplyAssetGroup *AntennaGroup            `bson:"supplyAssetGroup"            json:"supplyAssetGroup"`
 	Power            int                      `bson:"power"             json:"power"`
+	PortNumber       int                      `bson:"portNumber"             json:"portNumber"`
 	IsActive         bool                     `bson:"isActive"          json:"isActive"`
 }
 
