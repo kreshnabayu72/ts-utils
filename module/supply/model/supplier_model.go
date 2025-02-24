@@ -8,7 +8,7 @@ import (
 
 type SuppliedItem struct {
 	ItemName primitive.ObjectID   `json:"itemName" bson:"itemName"`
-	ItemSKU  []primitive.ObjectID `json:"itemSKU" bson:"itemSKU"`
+	ItemSKU  []primitive.ObjectID `json:"itemSKU"  bson:"itemSKU"`
 }
 
 type Supplier struct {
@@ -27,6 +27,7 @@ type Supplier struct {
 	PICEmail           *string             `json:"picEmail"           bson:"picEmail"`
 	PICContactNumber   *string             `json:"picContactNumber"   bson:"picContactNumber"`
 	ModifiedBy         *primitive.ObjectID `json:"modifiedBy"         bson:"modifiedBy"`
+	IsDeleted          bool                `json:"isDeleted"          bson:"isDeleted"`
 	UpdatedAt          time.Time           `json:"updatedAt"          bson:"updatedAt"`
 	CreatedAt          time.Time           `json:"createdAt"          bson:"createdAt"`
 }
