@@ -1,7 +1,9 @@
 package middleware
 
 import (
+	"errors"
 	"fmt"
+	"github.com/valyala/fasthttp"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -16,8 +18,10 @@ func MultiUploadMiddleware(folderName string, attributes []string) fiber.Handler
 		// Get the uploaded file, FormFile attribute
 		for _, attribute := range attributes {
 			fileHeader, err := ctx.FormFile(attribute)
-			if err != nil {
-				return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+			if errors.Is(err, fasthttp.ErrMissingFile) {
+				continue
+			} else if err != nil {
+				return err
 			}
 
 			file, err := fileHeader.Open()
@@ -34,8 +38,9 @@ func MultiUploadMiddleware(folderName string, attributes []string) fiber.Handler
 			)
 			// Save the resized image to disk
 			filename := fmt.Sprintf(
-				"%s.jpg",
+				"%s.%s",
 				strconv.FormatInt(time.Now().Unix(), 10)+"-"+attribute,
+				fileHeader.Filename,
 			)
 			outputFilePath := filepath.Join(
 				absPath,
