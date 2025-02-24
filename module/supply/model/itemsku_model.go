@@ -35,6 +35,7 @@ type ItemSKU struct {
 	Image                         *string              `json:"image"                         bson:"image"`
 	CustomFields                  []CustomField        `json:"customFields"                  bson:"customFields"`
 	TransactionalPolicy           TransactionalPolicy  `json:"transactionalPolicy"           bson:"transactionalPolicy"`
+	IsDeleted                     bool                 `json:"isDeleted"                    bson:"isDeleted"`
 	ModifiedBy                    primitive.ObjectID   `json:"modifiedBy"                    bson:"modifiedBy"`
 	CreatedAt                     time.Time            `json:"createdAt"                     bson:"createdAt"`
 	UpdatedAt                     time.Time            `json:"updatedAt"                     bson:"updatedAt"`
