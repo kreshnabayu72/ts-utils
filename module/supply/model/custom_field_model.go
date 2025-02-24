@@ -12,8 +12,8 @@ type CustomField struct {
 	Type                 string               `json:"type"                 bson:"type"` // Global, Specific
 	DataType             string               `json:"dataType"             bson:"dataType"`
 	IsRequired           bool                 `json:"isRequired"           bson:"isRequired"`
-	OptionValue          []string             `json:"optionValue"          bson:"optionValue"`
-	Value                any                  `json:"value"                bson:"value"`
+	OptionValue          *[]string            `json:"optionValue"          bson:"optionValue"`
+	Value                *any                 `json:"value"                bson:"value"`
 	ItemName             []primitive.ObjectID `json:"itemName"             bson:"itemName"`
 	IsActive             bool                 `json:"isActive"             bson:"isActive"`
 	IsDeleted            bool                 `json:"isDeleted"            bson:"isDeleted"`
