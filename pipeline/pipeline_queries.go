@@ -164,3 +164,40 @@ func GenerateFacetOption(
 		ReplaceRoot(bson.M{"newRoot": "$_id"}).
 		Build()
 }
+
+// GenerateFacetOptionWithUnwind generates a facet option with hardcoded unwind.
+func GenerateFacetOptionWithUnwind(
+	fieldName string,
+	optionsQuery bool,
+	labelKey string,
+	valueKey string,
+	unwindPath string,
+) mongo.Pipeline {
+	lk := labelKey
+	if !strings.HasPrefix(lk, "$") {
+		lk = "$" + lk
+	}
+
+	vk := valueKey
+	if !strings.HasPrefix(vk, "$") {
+		vk = "$" + vk
+	}
+
+	if !strings.HasPrefix(unwindPath, "$") {
+		unwindPath = "$" + unwindPath
+	}
+
+	return NewPipelineBuilder().
+		Match(bson.M{
+			fieldName: bson.M{"$ne": nil},
+			"$expr":   bson.M{"$eq": bson.A{optionsQuery, true}}}).
+		Unwind(bson.M{
+			"path": unwindPath,
+		}).
+		Group(bson.D{
+			{Key: "_id", Value: bson.M{"label": lk, "value": vk}},
+		}).
+		Sort(bson.M{"_id.label": 1}).
+		ReplaceRoot(bson.M{"newRoot": "$_id"}).
+		Build()
+}
