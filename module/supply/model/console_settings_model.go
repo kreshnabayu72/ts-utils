@@ -7,14 +7,6 @@ type DefaultCurrency struct {
 	Label    string `json:"label"    bson:"label"`
 }
 
-type DateFormat struct {
-	Locale  string  `json:"locale"  bson:"locale"`
-	Year    string  `json:"year"    bson:"year"`
-	Month   string  `json:"month"   bson:"month"`
-	Day     string  `json:"day"     bson:"day"`
-	Weekday *string `json:"weekday" bson:"weekday"`
-}
-
 type ReceptionAttrs struct {
 	TransactionTimeout int `json:"transactionTimeout" bson:"transactionTimeout"`
 }
@@ -41,8 +33,8 @@ type ConsoleSettings struct {
 	// General Settings
 	DefaultCurrency DefaultCurrency `json:"defaultCurrency" bson:"defaultCurrency"`
 	Timezone        string          `json:"timezone"        bson:"timezone"`
-	DateFormat      DateFormat      `json:"dateFormat"      bson:"dateFormat"`
-	TimeFormat      bool            `json:"timeFormat"      bson:"timeFormat"`
+	DateFormat      string          `json:"dateFormat"      bson:"dateFormat"`
+	TimeFormat      string          `json:"timeFormat"      bson:"timeFormat"`
 	Geolocation     bool            `json:"geolocation"     bson:"geolocation"`
 
 	// Transaction Settings
