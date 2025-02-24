@@ -67,4 +67,5 @@ const (
 	ItemNameModelName                = "item_names"
 	ItemSKUModelName                 = "item_skus"
 	LoginSessionModelName            = "login_sessions"
+	StockModelName                   = "stocks"
 )
