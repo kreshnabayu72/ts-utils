@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/tsv2-go-utils.iml" filepath="$PROJECT_DIR$/.idea/tsv2-go-utils.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/ts-utils.iml" filepath="$PROJECT_DIR$/.idea/ts-utils.iml" />
     </modules>
   </component>
 </project>

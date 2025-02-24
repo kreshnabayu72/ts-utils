@@ -7,12 +7,20 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+type AntennaGroup struct {
+	ID     primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
+	Name   string             `json:"name"          bson:"name"`
+	Key    int                `json:"key"           bson:"key"`
+	Module string             `json:"module"           bson:"module"`
+}
+
 type Port struct {
 	Antenna          *primitive.ObjectID      `bson:"antenna,omitempty" json:"antenna,omitempty"`
 	Group            *model.AttributeEmbedded `bson:"group"   json:"group"`
-	FixedAssetGroup  *model.AttributeEmbedded `bson:"fixedAssetGroup"            json:"fixedAssetGroup"`
-	SupplyAssetGroup *model.AttributeEmbedded `bson:"supplyAssetGroup"            json:"supplyAssetGroup"`
+	FixedAssetGroup  *AntennaGroup            `bson:"fixedAssetGroup"            json:"fixedAssetGroup"`
+	SupplyAssetGroup *AntennaGroup            `bson:"supplyAssetGroup"            json:"supplyAssetGroup"`
 	Power            int                      `bson:"power"             json:"power"`
+	PortNumber       int                      `bson:"portNumber"             json:"portNumber"`
 	IsActive         bool                     `bson:"isActive"          json:"isActive"`
 }
 
