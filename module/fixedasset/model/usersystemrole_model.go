@@ -12,6 +12,7 @@ type UserSystemRole struct {
 	Role             model.AttributeEmbedded   `json:"role"             bson:"role"`
 	RoleName         RoleName                  `json:"roleName"         bson:"roleName"`
 	Type             RoleType                  `json:"type"             bson:"type"`
+	RoleType         *string                   `json:"roleType,omitempty"             bson:"roleType,omitempty"` //"Global"|"Group"
 	ManagePermission ManagePermission          `json:"managePermission" bson:"managePermission"`
 	User             model.UserEmbedded        `json:"user"             bson:"user"`
 	Group            []model.AttributeEmbedded `json:"group"            bson:"group"`
