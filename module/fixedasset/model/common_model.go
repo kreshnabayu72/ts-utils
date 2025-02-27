@@ -44,6 +44,16 @@ var RoleNameMap = map[RoleType]RoleName{
 	RTOpenApi:             "Open API",
 }
 
+// Group/Global
+func GetRoleType(role RoleType) string {
+	switch role {
+	case RTImportData, RTAssetAttribute, RTAssetPolicies, RTTagType, RTDepreciationGroup, RTDepreciationMethod, RTOpenApi:
+		return "Global"
+	default:
+		return "Group"
+	}
+}
+
 type Permission struct {
 	Create bool `json:"create" bson:"create"`
 	View   bool `json:"view"   bson:"view"`
