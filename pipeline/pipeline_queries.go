@@ -68,6 +68,35 @@ func GenerateArrayFilter[T comparable](filter []T) primitive.M {
 	}
 }
 
+// Use filter ["Yes","No"] to filter attribute
+func GenerateExistFilter(attribute string, filter []string) bson.M {
+	var varType = reflect.TypeOf(filter).Kind()
+
+	// Check if variable type is slice AND the variable has length.
+	// Providing an empty slice will result in an error. (probably because it resolves as a zero value <nil>)
+	if varType == reflect.Slice && len(filter) > 0 {
+		filterConditions := bson.A{}
+
+		for _, v := range filter {
+			switch reflect.TypeOf(v).Kind() {
+			case reflect.String:
+				if v == "Yes" {
+					filterConditions = append(filterConditions, bson.M{attribute: bson.M{"$ne": nil}})
+				} else if v == "No" {
+					filterConditions = append(filterConditions, bson.M{attribute: bson.M{"$eq": nil}})
+				}
+			default:
+				continue
+			}
+		}
+
+		if len(filterConditions) > 0 {
+			return bson.M{"$or": filterConditions}
+		}
+	}
+
+	return bson.M{attribute: bson.M{"$ne": "vdjfPyv7ijO5vQeLIZmQHuzPO"}}
+}
 func GenerateSearchCondition(search string) primitive.M {
 	if search != "" {
 		return bson.M{"$regex": search, "$options": "i"}
