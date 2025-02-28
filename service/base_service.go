@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"time"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/db"
 	"go.mongodb.org/mongo-driver/bson"
@@ -131,15 +130,6 @@ func (s *BaseService) FindOne(v any, ctx context.Context, filter interface{},
 func (s *BaseService) InsertOne(ctx context.Context, data interface{},
 	opts ...*options.InsertOneOptions,
 ) (interface{}, error) {
-	now := time.Now()
-
-	// Convert data to a map to inject timestamps
-	doc, ok := data.(bson.M)
-	if ok {
-		// Add timestamps
-		doc["createdAt"] = now
-		doc["updatedAt"] = now
-	}
 
 	result, err := s.collection.InsertOne(ctx, data, opts...)
 	if err != nil {
@@ -167,14 +157,6 @@ func (s *BaseService) FindOneAndUpdate(
 	data interface{},
 	opts ...*options.FindOneAndUpdateOptions,
 ) error {
-	now := time.Now()
-
-	// Convert data to a map to inject timestamps
-	doc, ok := data.(bson.M)
-	if ok {
-		// Add timestamps
-		doc["updatedAt"] = now
-	}
 
 	result := s.collection.FindOneAndUpdate(ctx, filter, data, opts...)
 	if result.Err() != nil {
@@ -192,14 +174,6 @@ func (s *BaseService) FindOneAndUpdate(
 func (s *BaseService) UpdateOne(ctx context.Context, filter interface{}, data interface{},
 	opts ...*options.UpdateOptions,
 ) (int64, error) {
-	now := time.Now()
-
-	// Convert data to a map to inject timestamps
-	doc, ok := data.(bson.M)
-	if ok {
-		// Add timestamps
-		doc["updatedAt"] = now
-	}
 
 	result, err := s.collection.UpdateOne(ctx, filter, data, opts...)
 	if err != nil {
