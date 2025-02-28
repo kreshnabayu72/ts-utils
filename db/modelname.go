@@ -52,6 +52,7 @@ const (
 	RoutineTaskModelName             = "routine_task"
 	ServiceCenterModelName           = "service_centers"
 	SessionLogModelName              = "session_logs"
+	SigninTokenModelName             = "signin_tokens"
 	TrackingModelName                = "tracking"
 	TransactionLogModelName          = "transaction_logs"
 	TransferRequestModelName         = "transfer_requests"
