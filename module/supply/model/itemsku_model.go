@@ -8,6 +8,7 @@ import (
 	"gitea.qwertysystem.net/BETS/ts-utils/module/common/model"
 )
 
+// TransactionalPolicy represents the transactional policy of individual item sku
 type TransactionalPolicy struct {
 	AdminOnlyCheckout bool     `json:"adminOnlyCheckout" bson:"adminOnlyCheckout"`
 	Returnable        bool     `json:"returnable"        bson:"returnable"`
@@ -15,6 +16,18 @@ type TransactionalPolicy struct {
 	ReturnReason      []string `json:"returnReason"      bson:"returnReason"`
 }
 
+// SafetyStockSettings represents possible safety stock settings values
+type SafetyStockSettings string
+
+const (
+	SafetyStockSettingsGlobally       SafetyStockSettings = "Set globally"
+	SafetyStockSettingsEachAdminGroup SafetyStockSettings = "Set for each administrative group"
+	SafetyStockSettingsEachGroup      SafetyStockSettings = "Set for each group"
+)
+
+// ItemSKU represents the schema for a single item sku data
+//
+// ItemSKU are meant to group stocks under the same settings set in the sku for the stock
 type ItemSKU struct {
 	ID                            primitive.ObjectID  `json:"_id,omitempty"                 bson:"_id,omitempty"`
 	Key                           int                 `json:"key"                           bson:"key"`
@@ -27,7 +40,7 @@ type ItemSKU struct {
 	SKUAlias                      *string             `json:"skuAlias"                      bson:"skuAlias"`
 	MinimumStock                  int                 `json:"minimumStock"                  bson:"minimumStock"`
 	SafetyStock                   *int                `json:"safetyStock"                   bson:"safetyStock"`
-	MinimumAndSafetyStockSettings string              `json:"minimumAndSafetyStockSettings" bson:"minimumAndSafetyStockSettings"`
+	MinimumAndSafetyStockSettings SafetyStockSettings `json:"minimumAndSafetyStockSettings" bson:"minimumAndSafetyStockSettings"`
 	TagType                       model.TagType       `json:"tagType"                       bson:"tagType"`
 	HasProductionDate             bool                `json:"hasProductionDate"             bson:"hasProductionDate"`
 	HasExpiredDate                bool                `json:"hasExpiredDate"                bson:"hasExpiredDate"`
@@ -38,7 +51,9 @@ type ItemSKU struct {
 	SecondImage                   *string             `json:"secondImage"                   bson:"secondImage"`
 	CustomFields                  []CustomField       `json:"customFields"                  bson:"customFields"`
 	TransactionalPolicy           TransactionalPolicy `json:"transactionalPolicy"           bson:"transactionalPolicy"`
-	IsDeleted                     bool                `json:"isDeleted"                    bson:"isDeleted"`
+	TotalStock                    int                 `json:"totalStock"                    bson:"totalStock"`
+	AvailableStock                int                 `json:"availableStock"                bson:"availableStock"`
+	HasBeenInitialized            bool                `json:"hasBeenInitialized"            bson:"hasBeenInitialized"`
 	ModifiedBy                    primitive.ObjectID  `json:"modifiedBy"                    bson:"modifiedBy"`
 	CreatedAt                     time.Time           `json:"createdAt"                     bson:"createdAt"`
 	UpdatedAt                     time.Time           `json:"updatedAt"                     bson:"updatedAt"`

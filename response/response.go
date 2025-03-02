@@ -6,6 +6,7 @@ type HttpResponse struct {
 	Status  int         `json:"status"`
 	Message string      `json:"message"`
 	Data    interface{} `json:"data,omitempty"`
+	Err     interface{} `json:"error,omitempty"`
 }
 
 // SendResponse is a helper to send JSON responses in Fiber
@@ -14,6 +15,17 @@ func SendResponse(c *fiber.Ctx, statusCode int, data interface{}, message string
 		Status:  statusCode,
 		Message: message,
 		Data:    data,
+	}
+	return c.Status(statusCode).JSON(response)
+}
+
+// SendResponseWithError is a helper to send JSON responses in Fiber, with additional error field
+func SendResponseWithError(c *fiber.Ctx, statusCode int, data interface{}, message string, err interface{}) error {
+	response := HttpResponse{
+		Status:  statusCode,
+		Message: message,
+		Data:    data,
+		Err:     err,
 	}
 	return c.Status(statusCode).JSON(response)
 }
