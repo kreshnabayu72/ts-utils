@@ -130,6 +130,7 @@ func (s *BaseService) FindOne(v any, ctx context.Context, filter interface{},
 func (s *BaseService) InsertOne(ctx context.Context, data interface{},
 	opts ...*options.InsertOneOptions,
 ) (interface{}, error) {
+
 	result, err := s.collection.InsertOne(ctx, data, opts...)
 	if err != nil {
 		return "", err
@@ -156,6 +157,7 @@ func (s *BaseService) FindOneAndUpdate(
 	data interface{},
 	opts ...*options.FindOneAndUpdateOptions,
 ) error {
+
 	result := s.collection.FindOneAndUpdate(ctx, filter, data, opts...)
 	if result.Err() != nil {
 		return result.Err()
@@ -172,6 +174,7 @@ func (s *BaseService) FindOneAndUpdate(
 func (s *BaseService) UpdateOne(ctx context.Context, filter interface{}, data interface{},
 	opts ...*options.UpdateOptions,
 ) (int64, error) {
+
 	result, err := s.collection.UpdateOne(ctx, filter, data, opts...)
 	if err != nil {
 		return 0, err
