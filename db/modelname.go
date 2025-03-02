@@ -53,6 +53,7 @@ const (
 	ServiceCenterModelName           = "service_centers"
 	SessionLogModelName              = "session_logs"
 	SigninTokenModelName             = "signin_tokens"
+	TagEventLogsModelName            = "tag_event_logs"
 	TrackingModelName                = "tracking"
 	TransactionLogModelName          = "transaction_logs"
 	TransferRequestModelName         = "transfer_requests"
