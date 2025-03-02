@@ -10,10 +10,13 @@ import (
 type Nfc struct {
 	ID primitive.ObjectID `json:"_id,omitempty"        bson:"_id,omitempty"`
 
-	Group *common.AttributeEmbedded `json:"group"        bson:"group"`
-	Asset *primitive.ObjectID       `json:"asset"        bson:"asset"`
+	Group            *common.AttributeEmbedded `json:"group"        bson:"group"`
+	FixedAssetGroup  *common.AttributeEmbedded `bson:"fixedAssetGroup,omitempty"            json:"fixedAssetGroup,omitempty"`
+	SupplyAssetGroup *common.AttributeEmbedded `bson:"supplyAssetGroup,omitempty"            json:"supplyAssetGroup,omitempty"`
+	Asset            *primitive.ObjectID       `json:"asset"        bson:"asset"`
 
 	Status string `json:"status"        bson:"status"`
+	Module string `json:"module"        bson:"module"`
 
 	RfidCode      string `json:"rfidCode"        bson:"rfidCode"`
 	RfidShortCode string `json:"rfidShortCode"        bson:"rfidShortCode"`
