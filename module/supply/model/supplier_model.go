@@ -6,11 +6,15 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// SuppliedItem represents which item name and item sku(s) can the supplier provides.
 type SuppliedItem struct {
 	ItemName primitive.ObjectID   `json:"itemName" bson:"itemName"`
 	ItemSKU  []primitive.ObjectID `json:"itemSKU"  bson:"itemSKU"`
 }
 
+// Supplier represents the schema for individual supplier data
+//
+// Each supplier can supply stock based on the item(s) they are able to supply
 type Supplier struct {
 	ID                 primitive.ObjectID  `json:"_id"                bson:"_id,omitempty"`
 	IsActive           bool                `json:"isActive"           bson:"isActive"`
