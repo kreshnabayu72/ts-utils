@@ -39,6 +39,7 @@ const (
 	ReaderModelName                  = "readers"
 	MeasurementModelName             = "measurements"
 	ModelModelName                   = "models"
+	NfcModelName                     = "nfcs"
 	NotificationModelName            = "notifications"
 	PairTagPrelistModelName          = "pair_tag_prelists"
 	PendingTagChangesModelName       = "pending_tag_changes"
