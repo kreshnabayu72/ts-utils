@@ -18,7 +18,8 @@ type LogDetail struct {
 	GroupName string `json:"groupName,omitempty"        bson:"groupName,omitempty"`
 }
 type TagEventLog struct {
-	ID primitive.ObjectID `json:"_id,omitempty"        bson:"_id,omitempty"`
+	ID   primitive.ObjectID `json:"_id,omitempty"        bson:"_id,omitempty"`
+	Type string             `json:"type"        bson:"type"`
 
 	Status          string      `json:"status"        bson:"status"`
 	TotalTagScanned int         `json:"totalTagScanned"        bson:"totalTagScanned"`
