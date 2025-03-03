@@ -32,7 +32,7 @@ type User struct {
 	ExpiryDate         *time.Time               `json:"expiryDate"           bson:"expiryDate"`
 	IsAdmin            bool                     `json:"isAdmin"              bson:"isAdmin"`
 	PendingEmailChange string                   `json:"pendingEmailChange"   bson:"pendingEmailChange"`
-	ModifiedBy         *model.UserEmbedded      `json:"modifiedBy"           bson:"modifiedBy"`
+	ModifiedBy         *primitive.ObjectID      `json:"modifiedBy"           bson:"modifiedBy"`
 	Parent             *primitive.ObjectID      `json:"parent"               bson:"parent"`
 	ProfilePicture     *string                  `json:"profilePicture"  bson:"profilePicture"`
 	IsDeleted          bool                     `json:"isDeleted"            bson:"isDeleted"`
