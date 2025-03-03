@@ -13,6 +13,7 @@ type LogDetail struct {
 	RfidNfc   int `json:"rfidNfc"        bson:"rfidNfc"`
 	RfidQr    int `json:"rfidQr"        bson:"rfidQr"`
 	RfidNfcQr int `json:"rfidNfcQr"        bson:"rfidNfcQr"`
+	Total     int `json:"total"        bson:"total"`
 
 	IsChecked bool   `json:"isChecked,omitempty"        bson:"isChecked,omitempty"`
 	GroupName string `json:"groupName,omitempty"        bson:"groupName,omitempty"`
