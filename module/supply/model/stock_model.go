@@ -58,6 +58,7 @@ type Stock struct {
 	Sequence                     int                 `json:"sequence"                     bson:"sequence"`
 	Status                       []StockStatus       `json:"status"                       bson:"status"`
 	Source                       StockSource         `json:"source"                       bson:"source"`
+	SourceTransactionLogId       primitive.ObjectID  `json:"sourceTransactionLogId"       bson:"sourceTransactionLogId"`
 	ReceptionDate                time.Time           `json:"receptionDate"                bson:"receptionDate"`
 	ProductionDate               *time.Time          `json:"productionDate"               bson:"productionDate"`
 	ExpiredDate                  *time.Time          `json:"expiredDate"                  bson:"expiredDate"`
