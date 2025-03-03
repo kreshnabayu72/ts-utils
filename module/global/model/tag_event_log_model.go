@@ -9,10 +9,10 @@ import (
 type LogDetail struct {
 	Type string `json:"type"        bson:"type"`
 
-	Rfid      int `json:"rfid,omitempty"        bson:"rfid,omitempty"`
-	RfidNfc   int `json:"rfidNfc,omitempty"        bson:"rfidNfc,omitempty"`
-	RfidQr    int `json:"rfidQr,omitempty"        bson:"rfidQr,omitempty"`
-	RfidNfcQr int `json:"rfidNfcQr,omitempty"        bson:"rfidNfcQr,omitempty"`
+	Rfid      int `json:"rfid"        bson:"rfid"`
+	RfidNfc   int `json:"rfidNfc"        bson:"rfidNfc"`
+	RfidQr    int `json:"rfidQr"        bson:"rfidQr"`
+	RfidNfcQr int `json:"rfidNfcQr"        bson:"rfidNfcQr"`
 
 	IsChecked bool   `json:"isChecked,omitempty"        bson:"isChecked,omitempty"`
 	GroupName string `json:"groupName,omitempty"        bson:"groupName,omitempty"`
