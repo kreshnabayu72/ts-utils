@@ -49,9 +49,9 @@ type Stock struct {
 	Model                        primitive.ObjectID  `json:"model"                        bson:"model"`
 	Category                     primitive.ObjectID  `json:"category"                     bson:"category"`
 	PlacementAdministrativeGroup *primitive.ObjectID `json:"placementAdministrativeGroup" bson:"placementAdministrativeGroup"`
-	ReceivingAdministrativeGroup primitive.ObjectID  `json:"ReceivingAdministrativeGroup" bson:"ReceivingAdministrativeGroup"`
+	ReceivingAdministrativeGroup primitive.ObjectID  `json:"receivingAdministrativeGroup" bson:"receivingAdministrativeGroup"`
 	PlacementGroup               *primitive.ObjectID `json:"placementGroup"               bson:"placementGroup"`
-	ReceivingGroup               primitive.ObjectID  `json:"ReceivingGroup"               bson:"receivingGroup"`
+	ReceivingGroup               primitive.ObjectID  `json:"receivingGroup"               bson:"receivingGroup"`
 	TagType                      model.TagType       `json:"tagType"                      bson:"tagType"`
 	Tag                          model.Tag           `json:"tag"                          bson:"tag"`
 	NameWithSequence             string              `json:"nameWithSequence"             bson:"nameWithSequence"`
