@@ -1,0 +1,22 @@
+{
+  "data": {
+    "_id": "string,objectId",
+    "isActive": "boolean",
+    "key": "number",
+    "firstName": "string",
+    "lastName": "string",
+    "fullName": "string",
+    "employeeId": "string,nullable",
+    "position": "string,nullable",
+    "division": "string,",
+    "phoneNumber": "string",
+    "email": "string",
+    "pendingChangeEmail": "string,nullable",
+    "userType": "string",
+    "expiryDate": "string,Date,nullable",
+    "isTagPaired": "boolean",
+    "isPendingChangeEmail": "boolean"
+  },
+  "message": "string",
+  "status": "number"
+}

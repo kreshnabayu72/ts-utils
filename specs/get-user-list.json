@@ -1,0 +1,43 @@
+{
+  "data": {
+    "data": [
+      {
+        "_id": "string,objectId",
+        "isActive": "string,objectId",
+        "key": "number",
+        "profilePicture": "string,nullable",
+        "firstName": "string",
+        "lastName": "string",
+        "fullName": "string",
+        "userType": "string",
+        "totalSystemRole": "number",
+        "totalTransactionRole": "number",
+        "transactionRoles": {
+          "reception": "boolean",
+          "checkout": "boolean",
+          "transfer": "boolean",
+          "disposal": "boolean",
+          "stockOpname": "boolean",
+          "tracking": "boolean"
+        },
+        "position": "string,nullable",
+        "division": "string",
+        "email": "string",
+        "pendingChangeEmail": "string,nullable",
+        "isActivated": "boolean",
+        "isPendingChangeEmail": "boolean",
+        "modifiedBy": {
+          "_id": "string",
+          "fullName": "string",
+          "profilePicture": "string,nullable",
+          "key": "number"
+        },
+        "updatedAt": "string,Date",
+        "createdAt": "string,Date"
+      }
+    ],
+    "totalRecords": "number"
+  },
+  "message": "string",
+  "status": "number"
+}
