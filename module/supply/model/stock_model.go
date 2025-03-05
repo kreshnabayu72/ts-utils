@@ -48,6 +48,7 @@ type Stock struct {
 	Brand                        primitive.ObjectID  `json:"brand"                        bson:"brand"`
 	Model                        primitive.ObjectID  `json:"model"                        bson:"model"`
 	Category                     primitive.ObjectID  `json:"category"                     bson:"category"`
+	Supplier                     *primitive.ObjectID `json:"supplier"                     bson:"supplier"`
 	PlacementAdministrativeGroup *primitive.ObjectID `json:"placementAdministrativeGroup" bson:"placementAdministrativeGroup"`
 	ReceivingAdministrativeGroup primitive.ObjectID  `json:"receivingAdministrativeGroup" bson:"receivingAdministrativeGroup"`
 	PlacementGroup               *primitive.ObjectID `json:"placementGroup"               bson:"placementGroup"`
@@ -55,11 +56,14 @@ type Stock struct {
 	TagType                      model.TagType       `json:"tagType"                      bson:"tagType"`
 	Tag                          model.Tag           `json:"tag"                          bson:"tag"`
 	NameWithSequence             string              `json:"nameWithSequence"             bson:"nameWithSequence"`
+	AliasCode                    string              `json:"aliasCode"                    bson:"aliasCode"`
 	Sequence                     int                 `json:"sequence"                     bson:"sequence"`
 	Status                       []StockStatus       `json:"status"                       bson:"status"`
 	Source                       StockSource         `json:"source"                       bson:"source"`
 	SourceTransactionLogId       primitive.ObjectID  `json:"sourceTransactionLogId"       bson:"sourceTransactionLogId"`
+	ModifiedBy                   primitive.ObjectID  `json:"modifiedBy"                   bson:"modifiedBy"`
 	ReceptionDate                time.Time           `json:"receptionDate"                bson:"receptionDate"`
+	PlacementDate                *time.Time          `json:"placementDate"                bson:"placementDate"`
 	ProductionDate               *time.Time          `json:"productionDate"               bson:"productionDate"`
 	ExpiredDate                  *time.Time          `json:"expiredDate"                  bson:"expiredDate"`
 	CustomFields                 []CustomField       `json:"customFields"                 bson:"customFields"`

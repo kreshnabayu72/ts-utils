@@ -32,6 +32,8 @@ type User struct {
 	ProfilePictureBig    *string            `json:"profilePictureBig"    bson:"profilePictureBig"`
 	IsConfirmed          bool               `json:"isConfirmed"          bson:"isConfirmed"`
 	IsDefault            bool               `json:"isDefault"            bson:"isDefault"`
+	IsTotalControl       bool               `json:"isTotalControl"       bson:"isTotalControl"`
+	IsReadOnly           bool               `json:"isReadOnly"           bson:"isReadOnly"`
 	IsDeleted            bool               `json:"isDeleted"            bson:"isDeleted"`
 	CreatedAt            time.Time          `json:"createdAt"            bson:"createdAt"`
 	UpdatedAt            time.Time          `json:"updatedAt"            bson:"updatedAt"`
