@@ -35,6 +35,9 @@ func SplitImageMiddleware(folderName string, attribute string) fiber.Handler {
 			return ctx.Next()
 		}
 
+		fmt.Println("Uploaded file size:", fileHeader.Size)
+		fmt.Println("Uploaded file type:", fileHeader.Header.Get("Content-Type"))
+
 		file, err := fileHeader.Open()
 		if err != nil {
 			return fiber.NewError(fiber.StatusBadRequest, "Error retrieving the file: "+err.Error())

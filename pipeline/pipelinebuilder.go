@@ -7,22 +7,22 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-// PipelineBuilder is a class for building pipelines
+// PipelineBuilder is a class for building Pipelines
 type PipelineBuilder struct {
-	pipelines mongo.Pipeline
+	Pipelines mongo.Pipeline
 }
 
 // NewPipelineBuilder is a constructor to initialize PipelineBuilder
 func NewPipelineBuilder() *PipelineBuilder {
 	return &PipelineBuilder{
-		pipelines: mongo.Pipeline{},
+		Pipelines: mongo.Pipeline{},
 	}
 }
 
 // Group adds a $group stage to the pipeline
 func (pb *PipelineBuilder) Group(groupData bson.D) *PipelineBuilder {
 	if groupData != nil {
-		pb.pipelines = append(pb.pipelines, bson.D{{Key: "$group", Value: groupData}})
+		pb.Pipelines = append(pb.Pipelines, bson.D{{Key: "$group", Value: groupData}})
 	}
 	return pb
 }
@@ -30,7 +30,7 @@ func (pb *PipelineBuilder) Group(groupData bson.D) *PipelineBuilder {
 // Match adds a $match stage to the pipeline
 func (pb *PipelineBuilder) Match(matchData bson.M) *PipelineBuilder {
 	if matchData != nil {
-		pb.pipelines = append(pb.pipelines, bson.D{
+		pb.Pipelines = append(pb.Pipelines, bson.D{
 			{Key: "$match", Value: matchData},
 		})
 	}
@@ -40,7 +40,7 @@ func (pb *PipelineBuilder) Match(matchData bson.M) *PipelineBuilder {
 // OptionalMatch optionally adds a $match stage to the pipeline
 func (pb *PipelineBuilder) OptionalMatch(matchData bson.M, isMatch bool) *PipelineBuilder {
 	if matchData != nil && isMatch {
-		pb.pipelines = append(pb.pipelines, bson.D{
+		pb.Pipelines = append(pb.Pipelines, bson.D{
 			{Key: "$match", Value: matchData},
 		})
 	}
@@ -50,7 +50,7 @@ func (pb *PipelineBuilder) OptionalMatch(matchData bson.M, isMatch bool) *Pipeli
 // Set adds a $set stage to the pipeline
 func (pb *PipelineBuilder) Set(setData bson.M) *PipelineBuilder {
 	if setData != nil {
-		pb.pipelines = append(pb.pipelines, bson.D{
+		pb.Pipelines = append(pb.Pipelines, bson.D{
 			{Key: "$set", Value: setData},
 		})
 	}
@@ -60,7 +60,7 @@ func (pb *PipelineBuilder) Set(setData bson.M) *PipelineBuilder {
 // Addfields adds a $addFields stage to the pipeline
 func (pb *PipelineBuilder) Addfields(setData bson.M) *PipelineBuilder {
 	if setData != nil {
-		pb.pipelines = append(pb.pipelines, bson.D{
+		pb.Pipelines = append(pb.Pipelines, bson.D{
 			{Key: "$addFields", Value: setData},
 		})
 	}
@@ -70,7 +70,7 @@ func (pb *PipelineBuilder) Addfields(setData bson.M) *PipelineBuilder {
 // Project adds a $project stage to the pipeline
 func (pb *PipelineBuilder) Project(projectData bson.M) *PipelineBuilder {
 	if projectData != nil {
-		pb.pipelines = append(pb.pipelines, bson.D{
+		pb.Pipelines = append(pb.Pipelines, bson.D{
 			{Key: "$project", Value: projectData},
 		})
 	}
@@ -80,7 +80,7 @@ func (pb *PipelineBuilder) Project(projectData bson.M) *PipelineBuilder {
 // GraphLookup adds a $graphLookup stage to the pipeline
 func (pb *PipelineBuilder) GraphLookup(data bson.M) *PipelineBuilder {
 	if data != nil {
-		pb.pipelines = append(pb.pipelines, bson.D{
+		pb.Pipelines = append(pb.Pipelines, bson.D{
 			{Key: "$graphLookup", Value: data},
 		})
 	}
@@ -90,7 +90,7 @@ func (pb *PipelineBuilder) GraphLookup(data bson.M) *PipelineBuilder {
 // Adds a $lookup stage to the pipeline
 func (pb *PipelineBuilder) Lookup(data bson.M) *PipelineBuilder {
 	if data != nil {
-		pb.pipelines = append(pb.pipelines, bson.D{
+		pb.Pipelines = append(pb.Pipelines, bson.D{
 			{Key: "$lookup", Value: data},
 		})
 	}
@@ -129,7 +129,7 @@ func (pb *PipelineBuilder) LookupStr(rawData LookupData) *PipelineBuilder {
 		data["pipeline"] = rawData.Pipeline
 	}
 
-	pb.pipelines = append(pb.pipelines, bson.D{
+	pb.Pipelines = append(pb.Pipelines, bson.D{
 		{Key: "$lookup", Value: data},
 	})
 
@@ -139,7 +139,7 @@ func (pb *PipelineBuilder) LookupStr(rawData LookupData) *PipelineBuilder {
 // Adds a $unwind stage to the pipeline
 func (pb *PipelineBuilder) Unwind(data bson.M) *PipelineBuilder {
 	if data != nil {
-		pb.pipelines = append(pb.pipelines, bson.D{
+		pb.Pipelines = append(pb.Pipelines, bson.D{
 			{Key: "$unwind", Value: data},
 		})
 	}
@@ -149,7 +149,7 @@ func (pb *PipelineBuilder) Unwind(data bson.M) *PipelineBuilder {
 // limit adds a $limit stage to the pipeline
 func (pb *PipelineBuilder) Limit(limit int) *PipelineBuilder {
 
-	pb.pipelines = append(pb.pipelines, bson.D{
+	pb.Pipelines = append(pb.Pipelines, bson.D{
 		{Key: "$limit", Value: limit},
 	})
 	return pb
@@ -157,7 +157,7 @@ func (pb *PipelineBuilder) Limit(limit int) *PipelineBuilder {
 
 // Skip adds a $skip stage to the pipeline
 func (pb *PipelineBuilder) Skip(skip int) *PipelineBuilder {
-	pb.pipelines = append(pb.pipelines, bson.D{
+	pb.Pipelines = append(pb.Pipelines, bson.D{
 		{Key: "$skip", Value: skip},
 	})
 
@@ -167,7 +167,7 @@ func (pb *PipelineBuilder) Skip(skip int) *PipelineBuilder {
 // Sort adds a $sort stage to the pipeline
 func (pb *PipelineBuilder) Sort(field bson.M) *PipelineBuilder {
 	if field != nil {
-		pb.pipelines = append(pb.pipelines, bson.D{
+		pb.Pipelines = append(pb.Pipelines, bson.D{
 			{Key: "$sort", Value: field},
 		})
 	}
@@ -177,7 +177,7 @@ func (pb *PipelineBuilder) Sort(field bson.M) *PipelineBuilder {
 // Facet adds a $facet stage to the pipeline
 func (pb *PipelineBuilder) Facet(facets bson.M) *PipelineBuilder {
 
-	pb.pipelines = append(pb.pipelines, bson.D{
+	pb.Pipelines = append(pb.Pipelines, bson.D{
 		{Key: "$facet", Value: facets},
 	})
 	return pb
@@ -186,7 +186,7 @@ func (pb *PipelineBuilder) Facet(facets bson.M) *PipelineBuilder {
 // ReplaceRoot adds a $replaceRoo stage to the pipeline
 func (pb *PipelineBuilder) ReplaceRoot(data bson.M) *PipelineBuilder {
 
-	pb.pipelines = append(pb.pipelines, bson.D{
+	pb.Pipelines = append(pb.Pipelines, bson.D{
 		{Key: "$replaceRoot", Value: data},
 	})
 	return pb
@@ -249,7 +249,7 @@ func (pb *PipelineBuilder) Pagination(query PaginationQuery, customSort ...Sort)
 		limit = query.Limit
 	}
 
-	pb.pipelines = append(pb.pipelines, bson.D{
+	pb.Pipelines = append(pb.Pipelines, bson.D{
 		{Key: "$facet", Value: bson.M{
 			"data": bson.A{
 				bson.D{{Key: "$sort", Value: formattedSort}},
@@ -262,9 +262,9 @@ func (pb *PipelineBuilder) Pagination(query PaginationQuery, customSort ...Sort)
 		}},
 	})
 
-	pb.pipelines = append(pb.pipelines, bson.D{{Key: "$unwind", Value: "$totalRecords"}})
+	pb.Pipelines = append(pb.Pipelines, bson.D{{Key: "$unwind", Value: "$totalRecords"}})
 
-	pb.pipelines = append(pb.pipelines, bson.D{
+	pb.Pipelines = append(pb.Pipelines, bson.D{
 		{Key: "$addFields", Value: bson.M{
 			"totalRecords": "$totalRecords.total",
 		}},
@@ -279,7 +279,7 @@ func (pb *PipelineBuilder) Search(keyword string, searchFields []string) *Pipeli
 			query = append(query, bson.M{field: GenerateSearchCondition(keyword)})
 		}
 
-		pb.pipelines = append(pb.pipelines, bson.D{
+		pb.Pipelines = append(pb.Pipelines, bson.D{
 			{Key: "$match", Value: bson.M{"$or": query}},
 		})
 	}
@@ -289,5 +289,5 @@ func (pb *PipelineBuilder) Search(keyword string, searchFields []string) *Pipeli
 
 // Build returns the constructed pipeline
 func (pb *PipelineBuilder) Build() mongo.Pipeline {
-	return pb.pipelines
+	return pb.Pipelines
 }

@@ -12,20 +12,22 @@ type UserEmbeddedRole struct {
 	IsAssigned bool `json:"isAssigned" bson:"isAssigned"`
 }
 
+type UserTag struct {
+	Code      string `json:"code" bson:"code"`
+	ShortCode string `json:"shortCode" bson:"shortCode"`
+}
+
 type User struct {
-	ID          primitive.ObjectID `json:"id,omitempty"         bson:"_id,omitempty"`
-	Key         int                `json:"key"                  bson:"key"`
-	FirstName   string             `json:"firstName"            bson:"firstName"`
-	LastName    string             `json:"lastName"             bson:"lastName"`
-	Division    string             `json:"division"             bson:"division"`
-	Position    *string            `json:"position"             bson:"position"`
-	EmployeeID  *string            `json:"employeeId"           bson:"employeeId"`
-	PhoneNumber string             `json:"phoneNumber"          bson:"phoneNumber"`
-	Email       string             `json:"email"                bson:"email"`
-	RFID        *struct {
-		Code      string `json:"code" bson:"code"`
-		ShortCode string `json:"shortCode" bson:"shortCode"`
-	} `json:"rfid"                 bson:"rfid"`
+	ID                   primitive.ObjectID  `json:"id,omitempty"         bson:"_id,omitempty"`
+	Key                  int                 `json:"key"                  bson:"key"`
+	FirstName            string              `json:"firstName"            bson:"firstName"`
+	LastName             string              `json:"lastName"             bson:"lastName"`
+	Division             string              `json:"division"             bson:"division"`
+	Position             *string             `json:"position"             bson:"position"`
+	EmployeeID           *string             `json:"employeeId"           bson:"employeeId"`
+	PhoneNumber          string              `json:"phoneNumber"          bson:"phoneNumber"`
+	Email                string              `json:"email"                bson:"email"`
+	RFID                 *UserTag            `json:"rfid"                 bson:"rfid"`
 	IsActive             bool                `json:"isActive"             bson:"isActive"`
 	IsTemporary          bool                `json:"isTemporary"          bson:"isTemporary"`
 	ExpiryDate           *time.Time          `json:"expiryDate"           bson:"expiryDate"`

@@ -100,4 +100,23 @@ type Client struct {
 	DeleteFromDatabaseAt      *time.Time          `json:"deleteFromDatabaseAt"      bson:"deleteFromDatabaseAt"`
 	CreatedAt                 time.Time           `json:"createdAt"                 bson:"createdAt"`
 	UpdatedAt                 time.Time           `json:"updatedAt"                 bson:"updatedAt"`
+
+	DateFormat DateFormat `json:"dateFormat" bson:"dateFormat"`
+	TimeFormat bool       `json:"timeFormat" bson:"timeFormat"`
+	TimeZone   string     `json:"timezone" bson:"timezone"`
+	Currency   Currency   `json:"currency" bson:"currency"`
+}
+
+type DateFormat struct {
+	Locale  string `json:"locale" bson:"locale"`
+	Year    string `json:"year" bson:"year"`
+	Month   string `json:"month" bson:"month"`
+	Day     string `json:"day" bson:"day"`
+	Weekday string `json:"weekday" bson:"weekday"`
+}
+type Currency struct {
+	Currency string `json:"currency" bson:"currency"`
+	Symbol   string `json:"symbol" bson:"symbol"`
+	Locale   string `json:"locale" bson:"locale"`
+	Label    string `json:"label" bson:"label"`
 }
