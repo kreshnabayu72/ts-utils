@@ -39,7 +39,7 @@ const (
 // SystemRoleName represents the name of the system role's SystemRoleType
 type SystemRoleName string
 
-var RoleNameMap = map[SystemRoleType]SystemRoleName{
+var SystemRoleNameMap = map[SystemRoleType]SystemRoleName{
 	SystemRoleTypeImportData:       "Import data",
 	SystemRoleTypeItemAttribute:    "Manage item names, item SKUs, brands, categories and custom fields",
 	SystemRoleTypeItemPolicy:       "Manage item policy",
