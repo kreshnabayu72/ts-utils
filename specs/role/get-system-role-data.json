@@ -1,0 +1,18 @@
+{
+  "data": {
+    "globalPermissions": [
+      {
+        "assignedUser": "number",
+        "permission": "string"
+      }
+    ],
+    "groupPermissions": [
+      {
+        "assignedUser": "number",
+        "permission": "string"
+      }
+    ]
+  },
+  "message": "string",
+  "status": "number"
+}
