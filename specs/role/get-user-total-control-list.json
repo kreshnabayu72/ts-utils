@@ -1,0 +1,18 @@
+{
+  "data": {
+    "data": [
+      {
+        "_id": "string,objectId",
+        "firstName": "string",
+        "lastName": "string",
+        "fullName": "string",
+        "profilePicture": "string,nullable",
+        "position": "string",
+        "division": "string"
+      }
+    ],
+    "totalRecords": "number"
+  },
+  "message": "string",
+  "status": "number"
+}

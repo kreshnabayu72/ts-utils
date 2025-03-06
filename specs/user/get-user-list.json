@@ -26,6 +26,7 @@
         "pendingChangeEmail": "string,nullable",
         "isActivated": "boolean",
         "isPendingChangeEmail": "boolean",
+        "isDefault": "boolean",
         "modifiedBy": {
           "_id": "string",
           "fullName": "string",
