@@ -1,0 +1,30 @@
+{
+  "data": {
+    "transactionRoleOptions": [
+      {
+        "label": "string",
+        "value": "any"
+      }
+    ],
+    "positionOptions": [
+      {
+        "label": "string",
+        "value": "any"
+      }
+    ],
+    "divisionOptions": [
+      {
+        "label": "string",
+        "value": "any"
+      }
+    ],
+    "modifiedByOptions": [
+      {
+        "label": "string",
+        "value": "any"
+      }
+    ]
+  },
+  "message": "string",
+  "status": "number"
+}
