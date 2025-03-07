@@ -58,6 +58,13 @@ func NotFound(message string) *HttpError {
 	}
 }
 
+func Conflict(message string) *HttpError {
+	return &HttpError{
+		Code:    fiber.StatusConflict,
+		Message: message,
+	}
+}
+
 func ToHttpError(err error) *HttpError {
 	if httpErr, ok := err.(*HttpError); ok {
 		return httpErr
