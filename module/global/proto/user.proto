@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "/user";
+
+service User {
+  rpc ResendActivationEmail (ResendActivationEmailRequest) returns (ResendActivationEmailResponse) {}
+}
+
+message ResendActivationEmailRequest {
+  repeated string userIds = 1;
+}
+
+message ResendActivationEmailResponse {
+  bool ok = 1;
+}
