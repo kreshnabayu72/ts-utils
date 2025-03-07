@@ -1,0 +1,6 @@
+{
+  "action": "string",
+  "approvalLevel": "number,nullable",
+  "manageType": "string",
+  "users": "string,objectId[]"
+}

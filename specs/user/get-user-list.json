@@ -24,8 +24,9 @@
         "division": "string",
         "email": "string",
         "pendingChangeEmail": "string,nullable",
-        "isActivated": "boolean",
+        "isConfirmed": "boolean",
         "isPendingChangeEmail": "boolean",
+        "isDefault": "boolean",
         "modifiedBy": {
           "_id": "string",
           "fullName": "string",

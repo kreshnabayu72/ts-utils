@@ -1,0 +1,18 @@
+{
+  "data": {
+    "positionOptions": [
+      {
+        "label": "string",
+        "value": "any"
+      }
+    ],
+    "divisionOptions": [
+      {
+        "label": "string",
+        "value": "any"
+      }
+    ]
+  },
+  "message": "string",
+  "status": "number"
+}
