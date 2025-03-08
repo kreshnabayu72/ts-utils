@@ -1,0 +1,4 @@
+{
+  "groupIds": "string,objectId[]",
+  "capacity": "number,nullable"
+}

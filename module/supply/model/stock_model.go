@@ -1,9 +1,8 @@
 package model
 
 import (
-	"time"
-
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"time"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/module/common/model"
 )
@@ -60,6 +59,7 @@ type Stock struct {
 	Sequence                     int                 `json:"sequence"                     bson:"sequence"`
 	Status                       []StockStatus       `json:"status"                       bson:"status"`
 	Source                       StockSource         `json:"source"                       bson:"source"`
+	SourceTransactionId          primitive.ObjectID  `json:"sourceTransactionId"          bson:"sourceTransactionId"`
 	SourceTransactionLogId       primitive.ObjectID  `json:"sourceTransactionLogId"       bson:"sourceTransactionLogId"`
 	ModifiedBy                   primitive.ObjectID  `json:"modifiedBy"                   bson:"modifiedBy"`
 	ReceptionDate                time.Time           `json:"receptionDate"                bson:"receptionDate"`

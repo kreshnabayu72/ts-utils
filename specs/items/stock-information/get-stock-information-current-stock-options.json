@@ -1,0 +1,18 @@
+{
+  "data": {
+    "tagTypeOptions": [
+      {
+        "label": "string",
+        "value": "string"
+      }
+    ],
+    "statusOptions": [
+      {
+        "label": "string",
+        "value": "string"
+      }
+    ]
+  },
+  "message": "string",
+  "status": "number"
+}
