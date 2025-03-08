@@ -9,7 +9,7 @@ service User {
 }
 
 message ResendActivationEmailRequest {
-  repeated string userIds = 1;
+  repeated string email = 1;
 }
 
 message ResendActivationEmailResponse {
