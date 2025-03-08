@@ -1,0 +1,8 @@
+{
+  "items": [
+    {
+      "itemSKU": "string,objectId",
+      "capacity": "number,nullable"
+    }
+  ]
+}

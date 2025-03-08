@@ -1,0 +1,22 @@
+{
+  "data": {
+    "totalRecords": "number",
+    "data": [
+      {
+        "_id": "string,objectId",
+        "nameWithSequence": "string",
+        "tagType": "string",
+        "group": {
+          "_id": "string,objectId",
+          "name": "string",
+          "key": "number"
+        },
+        "receptionDate": "string,Date",
+        "productionDate": "string,Date,nullable",
+        "expiredDate": "string,Date,nullable"
+      }
+    ]
+  },
+  "message": "string",
+  "status": "number"
+}
