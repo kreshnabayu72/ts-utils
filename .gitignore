@@ -1,3 +1,6 @@
 # Ignore temporary folder and file(s)
 temp
 temp.*
+
+# Ignore IDE artifacts
+.idea
