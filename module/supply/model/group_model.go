@@ -10,8 +10,10 @@ import (
 
 // PlacedItem represents the possible item sku that stock can be placed in a group, along with its capacity
 type PlacedItem struct {
-	ItemSKU  primitive.ObjectID `json:"itemSKU"  bson:"itemSKU"`
-	Capacity int                `json:"capacity" bson:"capacity"`
+	ItemSKU        primitive.ObjectID `json:"itemSKU"        bson:"itemSKU"`
+	Capacity       int                `json:"capacity"       bson:"capacity"`
+	TotalStock     int                `json:"totalStock"     bson:"totalStock"`
+	AvailableStock int                `json:"availableStock" bson:"availableStock"`
 }
 
 // Group represents the schema for individual group data
