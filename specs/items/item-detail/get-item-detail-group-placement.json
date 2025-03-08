@@ -1,0 +1,18 @@
+{
+  "data": {
+    "totalRecords": "number",
+    "data": [
+      {
+        "_id": "string,objectId",
+        "name": "string",
+        "image": "string,nullable",
+        "key": "number",
+        "totalStock": "number",
+        "capacity": "number",
+        "tagType": "string"
+      }
+    ]
+  },
+  "message": "string",
+  "status": "number"
+}

@@ -19,7 +19,7 @@ type PlacedItem struct {
 
 // Group represents the schema for individual group data
 //
-// It's meant to group other data into to be used in transactions, presentations, etc.
+// It's meant to group other data to be used in transactions, presentations, etc.
 type Group struct {
 	ID                    primitive.ObjectID  `json:"_id,omitempty"         bson:"_id,omitempty"`
 	Key                   int                 `json:"key"                   bson:"key"`
