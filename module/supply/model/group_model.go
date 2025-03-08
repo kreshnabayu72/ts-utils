@@ -13,6 +13,7 @@ type PlacedItem struct {
 	ItemSKU        primitive.ObjectID `json:"itemSKU"        bson:"itemSKU"`
 	Capacity       int                `json:"capacity"       bson:"capacity"`
 	TotalStock     int                `json:"totalStock"     bson:"totalStock"`
+	UnplacedStock  int                `json:"unplacedStock"  bson:"unplacedStock"`
 	AvailableStock int                `json:"availableStock" bson:"availableStock"`
 }
 
