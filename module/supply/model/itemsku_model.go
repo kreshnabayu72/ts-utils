@@ -52,6 +52,7 @@ type ItemSKU struct {
 	CustomFields                  []CustomField       `json:"customFields"                  bson:"customFields"`
 	TransactionalPolicy           TransactionalPolicy `json:"transactionalPolicy"           bson:"transactionalPolicy"`
 	TotalStock                    int                 `json:"totalStock"                    bson:"totalStock"`
+	UnplacedStock                 int                 `json:"unplacedStock"                 bson:"unplacedStock"`
 	AvailableStock                int                 `json:"availableStock"                bson:"availableStock"`
 	HasBeenInitialized            bool                `json:"hasBeenInitialized"            bson:"hasBeenInitialized"`
 	ModifiedBy                    primitive.ObjectID  `json:"modifiedBy"                    bson:"modifiedBy"`
