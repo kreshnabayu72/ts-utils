@@ -1,0 +1,21 @@
+{
+  "supplier": "string,objectId",
+  "receivingGroup": "string,objectId",
+  "document": "file,binary",
+  "note": "string,optional",
+  "photo": "file,binary,optional",
+  "sku": [
+    {
+      "_id": "string,objectId",
+      "quantity": "number",
+      "_nullable": true
+    }
+  ],
+  "request": [
+    {
+      "_id": "string,objectId",
+      "quantity": "number",
+      "_nullable": true
+    }
+  ]
+}
