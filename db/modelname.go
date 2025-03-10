@@ -75,4 +75,8 @@ const (
 	ReceptionTransactionHistoryModelName = "reception_transaction_histories"
 	ReceptionRequestModelName            = "reception_requests"
 	ReceptionRequestHistoryModelName     = "reception_request_histories"
+	ExpiredTransactionModelName          = "expired_transactions"
+	ExpiredTransactionHistoryModelName   = "expired_transaction_histories"
+	ExpiredRequestModelName              = "expired_requests"
+	ExpiredRequestHistoryModelName       = "expired_request_histories"
 )
