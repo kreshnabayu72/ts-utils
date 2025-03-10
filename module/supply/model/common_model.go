@@ -23,8 +23,9 @@ type UserAttributeEmbedded struct {
 }
 
 type SKUAttributeEmbedded struct {
-	ID    primitive.ObjectID `json:"_id,omitempty"  bson:"_id,omitempty"`
-	SKU   string             `json:"sku"            bson:"sku"`
-	Image *string            `json:"image"          bson:"image"`
-	Key   int                `json:"key"            bson:"key"`
+	ID       primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
+	SKU      string             `json:"sku"           bson:"sku"`
+	SKUAlias *string            `json:"skuAlias"      bson:"skuAlias"`
+	Image    *string            `json:"image"         bson:"image"`
+	Key      int                `json:"key"           bson:"key"`
 }

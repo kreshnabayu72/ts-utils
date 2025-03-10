@@ -1,0 +1,28 @@
+{
+  "data": [
+    {
+      "_id": "string,objectId",
+      "name": "string",
+      "key": "number",
+      "parent": "string,objectId,optional",
+      "administrativeGroup": "string,objectId",
+      "totalStock": "number",
+      "totalAvailableStock": "number",
+      "totalUnplacedStock": "number",
+      "totalCapacity": "number",
+      "itemTotalStock": "number,nullable",
+      "itemTotalAvailableStock": "number,nullable",
+      "itemTotalUnplacedStock": "number,nullable",
+      "itemTotalCapacity": "number,nullable",
+      "isDisposalGroup": "boolean",
+      "isAdministrativeGroup": "boolean",
+      "isDeletable": "boolean",
+      "children": [
+        ...
+      ],
+      "createdAt": "string,Date"
+    }
+  ],
+  "message": "string",
+  "status": "number"
+}
