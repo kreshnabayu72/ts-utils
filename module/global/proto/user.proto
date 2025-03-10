@@ -10,8 +10,6 @@ service User {
 
 message ResendActivationEmailRequest {
   repeated string email = 1;
-  string loggedInUserId = 2;
-  string companyCode = 3;
 }
 
 message ResendActivationEmailResponse {

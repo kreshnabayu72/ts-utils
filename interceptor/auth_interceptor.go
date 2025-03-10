@@ -3,7 +3,6 @@ package interceptor
 import (
 	"context"
 	"fmt"
-	"gitea.qwertysystem.net/BETS/ts-utils/middleware"
 	"os"
 	"strings"
 
@@ -56,10 +55,10 @@ func ValidateJWT(
 		session, _ := claims["session"].(string)
 		company, _ := claims["company"].(string)
 
-		md.Append(string(middleware.UserKey), userId)
-		md.Append(string(middleware.SessionKey), session)
-		md.Append(string(middleware.CompanyCodeKey), companyCode)
-		md.Append(string(middleware.Company), company)
+		md.Append(string(UserKey), userId)
+		md.Append(string(SessionKey), session)
+		md.Append(string(CompanyCodeKey), companyCode)
+		md.Append(string(Company), company)
 
 		ctx = metadata.NewIncomingContext(ctx, md)
 	} else {
