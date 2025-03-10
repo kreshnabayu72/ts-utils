@@ -18,7 +18,7 @@ type ReceptionRequest struct {
 	Model          primitive.ObjectID `json:"model"          bson:"model"`
 	ReceivingGroup primitive.ObjectID `json:"receivingGroup" bson:"receivingGroup"`
 	PIC            primitive.ObjectID `json:"pic"            bson:"pic"`
-	TagType        string             `json:"tagType"        bson:"tagType"`
+	TagType        model.TagType      `json:"tagType"        bson:"tagType"`
 	Quantity       int                `json:"quantity"       bson:"quantity"`
 	UpdatedAt      time.Time          `json:"updatedAt"      bson:"updatedAt"`
 	CreatedAt      time.Time          `json:"createdAt"      bson:"createdAt"`
