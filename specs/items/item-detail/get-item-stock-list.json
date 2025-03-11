@@ -4,7 +4,20 @@
     "data": [
       {
         "_id": "string,objectId",
+        "itemName": {
+          "_id": "string,objectId",
+          "name": "string",
+          "key": "number"
+        },
+        "itemSKU": {
+          "_id": "string,objectId",
+          "image": "string,nullable",
+          "sku": "string",
+          "skuAlias": "string,nullable",
+          "key": "number"
+        },
         "nameWithSequence": "string",
+        "status": "string[]",
         "tagType": "string",
         "group": {
           "_id": "string,objectId",

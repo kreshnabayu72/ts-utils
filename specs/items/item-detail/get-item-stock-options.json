@@ -1,0 +1,30 @@
+{
+  "data": {
+    "itemNameOptions": [
+      {
+        "label": "string",
+        "value": "any"
+      }
+    ],
+    "itemSKUOptions": [
+      {
+        "label": "string",
+        "value": "any"
+      }
+    ],
+    "tagTypeOptions": [
+      {
+        "label": "string",
+        "value": "any"
+      }
+    ],
+    "statusOptions": [
+      {
+        "label": "string",
+        "value": "any"
+      }
+    ]
+  },
+  "message": "string",
+  "status": "number"
+}

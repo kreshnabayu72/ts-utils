@@ -2,8 +2,8 @@
   "stocks": [
     {
       "_id": "string,objectId",
-      "productionDate": "string,Date,nullable",
-      "expiredDate": "string,Date,nullable"
+      "productionDate": "number,nullable",
+      "expiredDate": "number,nullable"
     }
   ]
 }

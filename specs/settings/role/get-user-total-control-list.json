@@ -7,7 +7,7 @@
         "lastName": "string",
         "fullName": "string",
         "profilePicture": "string,nullable",
-        "position": "string",
+        "position": "string,nullable",
         "division": "string"
       }
     ],

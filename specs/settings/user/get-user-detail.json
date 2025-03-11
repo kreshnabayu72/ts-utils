@@ -3,6 +3,7 @@
     "_id": "string,objectId",
     "isActive": "boolean",
     "key": "number",
+    "profilePicture": "string,nullable",
     "firstName": "string",
     "lastName": "string",
     "fullName": "string",
