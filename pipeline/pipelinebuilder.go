@@ -97,6 +97,16 @@ func (pb *PipelineBuilder) Lookup(data bson.M) *PipelineBuilder {
 	return pb
 }
 
+// OptionalLookup Adds a $lookup stage to the pipeline if the condition is met
+func (pb *PipelineBuilder) OptionalLookup(data bson.M, isMatch bool) *PipelineBuilder {
+	if data != nil && isMatch {
+		pb.Pipelines = append(pb.Pipelines, bson.D{
+			{Key: "$lookup", Value: data},
+		})
+	}
+	return pb
+}
+
 type LookupData struct {
 	From         string
 	LocalField   string
