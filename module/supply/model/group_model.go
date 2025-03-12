@@ -35,6 +35,7 @@ type Group struct {
 	IsAdministrativeGroup bool                `json:"isAdministrativeGroup" bson:"isAdministrativeGroup"`
 	IsDisposalGroup       bool                `json:"isDisposalGroup"       bson:"isDisposalGroup"`
 	Image                 *string             `json:"image"                 bson:"image"`
+	IsDeleted             bool                `json:"isDeleted"             bson:"isDeleted"`
 	CreatedAt             time.Time           `json:"createdAt"             bson:"createdAt"`
 	UpdatedAt             time.Time           `json:"updatedAt"             bson:"updatedAt"`
 }
