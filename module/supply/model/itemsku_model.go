@@ -56,6 +56,7 @@ type ItemSKU struct {
 	AvailableStock                int                 `json:"availableStock"                bson:"availableStock"`
 	HasBeenInitialized            bool                `json:"hasBeenInitialized"            bson:"hasBeenInitialized"`
 	ModifiedBy                    primitive.ObjectID  `json:"modifiedBy"                    bson:"modifiedBy"`
+	IsDeleted                     bool                `json:"isDeleted"                     bson:"isDeleted"`
 	CreatedAt                     time.Time           `json:"createdAt"                     bson:"createdAt"`
 	UpdatedAt                     time.Time           `json:"updatedAt"                     bson:"updatedAt"`
 }
