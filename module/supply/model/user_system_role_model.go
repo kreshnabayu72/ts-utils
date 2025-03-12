@@ -36,6 +36,16 @@ const (
 	SystemRoleItemStock            SystemRoleType = "itemStock"
 )
 
+// GetAccessType gets the SystemRoleAccessType of the SystemRoleType
+func (roleType SystemRoleType) GetAccessType() SystemRoleAccessType {
+	switch roleType {
+	case SystemRoleTypeImportData, SystemRoleTypeItemAttribute, SystemRoleTypeItemPolicy, SystemRoleTypeOpenAPI:
+		return SystemRoleAccessTypeGlobal
+	default:
+		return SystemRoleAccessTypeGroup
+	}
+}
+
 // SystemRoleName represents the name of the system role's SystemRoleType
 type SystemRoleName string
 
