@@ -73,16 +73,16 @@ type SystemRolePermission struct {
 
 // UserSystemRole represents the user's individual system role data
 type UserSystemRole struct {
-	ID                  primitive.ObjectID     `json:"_id,omitempty"       bson:"_id,omitempty"`
-	User                primitive.ObjectID     `json:"user"                bson:"user"`
-	IsActive            bool                   `json:"isActive"            bson:"isActive"`
-	IsTotalControl      bool                   `json:"isTotalControl"      bson:"isTotalControl"`
-	IsReadOnly          bool                   `json:"isReadOnly"          bson:"isReadOnly"`
-	AdministrativeGroup primitive.ObjectID     `json:"administrativeGroup" bson:"administrativeGroup"`
-	RoleName            SystemRoleName         `json:"roleName"            bson:"roleName"`
-	RoleType            SystemRoleType         `json:"roleType"            bson:"roleType"`
-	AccessType          SystemRoleAccessType   `json:"accessType"          bson:"accessType"`
-	Permissions         []SystemRolePermission `json:"permissions"         bson:"permissions"`
-	UpdatedAt           time.Time              `json:"updatedAt"           bson:"updatedAt"`
-	CreatedAt           time.Time              `json:"createdAt"           bson:"createdAt"`
+	ID                  primitive.ObjectID   `json:"_id,omitempty"       bson:"_id,omitempty"`
+	User                primitive.ObjectID   `json:"user"                bson:"user"`
+	IsActive            bool                 `json:"isActive"            bson:"isActive"`
+	IsTotalControl      bool                 `json:"isTotalControl"      bson:"isTotalControl"`
+	IsReadOnly          bool                 `json:"isReadOnly"          bson:"isReadOnly"`
+	AdministrativeGroup primitive.ObjectID   `json:"administrativeGroup" bson:"administrativeGroup"`
+	RoleName            SystemRoleName       `json:"roleName"            bson:"roleName"`
+	RoleType            SystemRoleType       `json:"roleType"            bson:"roleType"`
+	AccessType          SystemRoleAccessType `json:"accessType"          bson:"accessType"`
+	Permissions         SystemRolePermission `json:"permissions"         bson:"permissions"`
+	UpdatedAt           time.Time            `json:"updatedAt"           bson:"updatedAt"`
+	CreatedAt           time.Time            `json:"createdAt"           bson:"createdAt"`
 }
