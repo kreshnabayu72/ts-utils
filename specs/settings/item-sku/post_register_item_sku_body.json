@@ -8,6 +8,7 @@
   "minimumStock": "number",
   "safetyStock": "number,optional",
   "minimumAndSafetyStockSettings": "string", // Possible values: "Set globally", "Set for each administrative group", "Set for each group".
+  "allowMinimumAndSafetyStock": "boolean",
   "tagType": "string",
   "hasProductionDate": "boolean",
   "hasExpiredDate": "boolean",
