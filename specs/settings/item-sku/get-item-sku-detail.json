@@ -1,0 +1,58 @@
+{
+  "data": {
+    "_id": "string,objectId",
+    "key": "number",
+    "name": {
+      "_id": "string,objectId",
+      "name": "string",
+      "key": "number"
+    },
+    "defaultImage": "string,nullable",
+    "firstImage": "string,nullable",
+    "secondImage": "string,nullable",
+    "sku": "string",
+    "skuAlias": "string,nullable",
+    "category": {
+      "_id": "string,objectId",
+      "name": "string",
+      "key": "number"
+    },
+    "brand": {
+      "_id": "string,objectId",
+      "name": "string",
+      "key": "number"
+    },
+    "model": {
+      "_id": "string,objectId",
+      "name": "string",
+      "key": "number"
+    },
+    "tagType": "string",
+    "totalStock": "number",
+    "minimumStock": "number",
+    "safetyStock": "number",
+    "hasBarcode": "boolean",
+    "hasExpiredDate": "boolean",
+    "hasProductionDate": "boolean",
+    "barcode": "string,nullable",
+    "modifiedBy": {
+      "_id": "string,objectId",
+      "fullName": "string",
+      "key": "number"
+    },
+    "customField": [
+      {
+        "_id": "string,objectId",
+        "name": "string",
+        "dataType": "string",
+        "optionValue": "string[],nullable",
+        "isRequired": "boolean",
+        "value": "any,nullable"
+      }
+    ],
+    "updatedAt": "string,Date",
+    "createdAt": "string,Date"
+  },
+  "message": "string",
+  "status": "number"
+}

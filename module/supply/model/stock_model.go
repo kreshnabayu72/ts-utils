@@ -58,7 +58,7 @@ type Stock struct {
 	AliasCode                    string              `json:"aliasCode"                    bson:"aliasCode"`
 	Sequence                     int                 `json:"sequence"                     bson:"sequence"`
 	Status                       []StockStatus       `json:"status"                       bson:"status"`
-	Source                       StockSource         `json:"source"                       bson:"source"`
+	Source                       *StockSource        `json:"source"                       bson:"source"`
 	ModifiedBy                   primitive.ObjectID  `json:"modifiedBy"                   bson:"modifiedBy"`
 	ReceptionDate                time.Time           `json:"receptionDate"                bson:"receptionDate"`
 	PlacementDate                *time.Time          `json:"placementDate"                bson:"placementDate"`

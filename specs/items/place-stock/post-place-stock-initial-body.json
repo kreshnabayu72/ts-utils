@@ -5,7 +5,6 @@
       "sku": "string,objectId",
       "itemName": "string,objectId",
       "sequence": "number",
-      "nameWithSequence": "number",
       "receptionDate": "number,epoch",
       "productionDate": "number,epoch",
       "expiredDate": "number,epoch",
