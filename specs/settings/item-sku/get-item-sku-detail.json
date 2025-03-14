@@ -31,6 +31,7 @@
     "totalStock": "number",
     "minimumStock": "number",
     "safetyStock": "number",
+    "allowMinimumAndSafetyStock": "boolean",
     "hasBarcode": "boolean",
     "hasExpiredDate": "boolean",
     "hasProductionDate": "boolean",

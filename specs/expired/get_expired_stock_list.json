@@ -1,0 +1,33 @@
+{
+  "data": {
+    "totalRecords": "number",
+    "data": [
+      {
+        "_id": "string,objectId",
+        "stock": {
+          "_id": "string,objectId",
+          "nameWithSequence": "string",
+          "sequence": "number",
+          "key": "number"
+        },
+        "group": {
+          "_id": "string,objectId",
+          "name": "string",
+          "fullPath": "string",
+          "key": "number"
+        },
+        "status": "string[]",
+        "productionDate": "string,Date,nullable",
+        "expiredDate": "string,Date,nullable",
+        "reportedDate": "string,Date",
+        "reportedBy": {
+          "_id": "string,objectId",
+          "fullName": "string",
+          "key": "number"
+        }
+      }
+    ]
+  },
+  "message": "string",
+  "status": "number"
+}

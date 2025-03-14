@@ -22,6 +22,8 @@
         },
         "position": "string,nullable",
         "division": "string",
+        "employeeId": "string,nullable",
+        "phoneNumber": "string",
         "email": "string",
         "pendingChangeEmail": "string,nullable",
         "isConfirmed": "boolean",
