@@ -1,0 +1,30 @@
+{
+  "data": {
+    "itemNameOptions": [
+      {
+        "label": "string",
+        "value": "number"
+      }
+    ],
+    "brandOptions": [
+      {
+        "label": "string",
+        "value": "number"
+      }
+    ],
+    "modelOptions": [
+      {
+        "label": "string",
+        "value": "number"
+      }
+    ],
+    "administrativeGroupOptions": [
+      {
+        "label": "string",
+        "value": "number"
+      }
+    ]
+  },
+  "message": "string",
+  "status": "number"
+}

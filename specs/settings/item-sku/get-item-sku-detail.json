@@ -30,7 +30,7 @@
     "tagType": "string",
     "totalStock": "number",
     "minimumStock": "number",
-    "safetyStock": "number",
+    "safetyStock": "number,nullable",
     "allowMinimumAndSafetyStock": "boolean",
     "hasBarcode": "boolean",
     "hasExpiredDate": "boolean",
