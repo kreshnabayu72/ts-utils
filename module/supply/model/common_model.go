@@ -29,3 +29,10 @@ type SKUAttributeEmbedded struct {
 	Image    *string            `json:"image"         bson:"image"`
 	Key      int                `json:"key"           bson:"key"`
 }
+
+type StockAttributeEmbedded struct {
+	ID               primitive.ObjectID `json:"_id,omitempty"    bson:"_id,omitempty"`
+	NameWithSequence string             `json:"nameWithSequence" bson:"nameWithSequence"`
+	Sequence         int                `json:"sequence"         bson:"sequence"`
+	Key              int                `json:"key"              bson:"key"`
+}

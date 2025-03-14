@@ -20,6 +20,7 @@ const (
 // ExpiredRequest represents the individual request of a stock reported as expired
 type ExpiredRequest struct {
 	ID           primitive.ObjectID   `json:"_id,omitempty" bson:"_id,omitempty"`
+	BatchId      primitive.ObjectID   `json:"batchId"       bson:"BatchId"`
 	Status       ExpiredRequestStatus `json:"status"        bson:"status"`
 	ItemName     primitive.ObjectID   `json:"itemName"      bson:"itemName"`
 	ItemSKU      primitive.ObjectID   `json:"itemSKU"       bson:"itemSKU"`
@@ -38,6 +39,7 @@ type ExpiredRequest struct {
 // ExpiredRequestHistory represents the completed request of ExpiredRequest
 type ExpiredRequestHistory struct {
 	ID           primitive.ObjectID    `json:"_id,omitempty" bson:"_id,omitempty"`
+	BatchId      primitive.ObjectID    `json:"batchId"       bson:"batchId"`
 	Status       ExpiredRequestStatus  `json:"status"        bson:"status"`
 	ItemName     AttributeEmbedded     `json:"itemName"      bson:"itemName"`
 	ItemSKU      SKUAttributeEmbedded  `json:"itemSKU"       bson:"itemSKU"`
