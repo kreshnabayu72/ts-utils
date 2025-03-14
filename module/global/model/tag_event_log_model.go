@@ -20,6 +20,7 @@ type LogDetail struct {
 }
 type TagEventLog struct {
 	ID     primitive.ObjectID `json:"_id,omitempty"        bson:"_id,omitempty"`
+	Type   string             `json:"type"        bson:"type"`
 	Module string             `json:"module"        bson:"module"`
 
 	Status          string      `json:"status"        bson:"status"`
