@@ -1,0 +1,37 @@
+{
+  "data": {
+    "_id": "string,objectId",
+    "itemName": {
+      "_id": "string,objectId",
+      "name": "string",
+      "key": "number"
+    },
+    "itemSKU": {
+      "_id": "string,objectId",
+      "sku": "string",
+      "skuAlias": "string,nullable",
+      "image": "string,nullable",
+      "key": "number"
+    },
+    "brand": {
+      "_id": "string,objectId",
+      "name": "string",
+      "key": "number"
+    },
+    "model": {
+      "_id": "string,objectId",
+      "name": "string",
+      "key": "number"
+    },
+    "tagType": "string",
+    "administrativeGroup": {
+      "_id": "string,objectId",
+      "name": "string",
+      "fullPath": "string",
+      "key": "number"
+    },
+    "updatedAt": "date"
+  },
+  "message": "string",
+  "status": "number"
+}

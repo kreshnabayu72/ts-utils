@@ -19,6 +19,7 @@ type ReceptionRequest struct {
 	Model          primitive.ObjectID         `json:"model"          bson:"model"`
 	ReceivingGroup primitive.ObjectID         `json:"receivingGroup" bson:"receivingGroup"`
 	PIC            primitive.ObjectID         `json:"pic"            bson:"pic"`
+	Stocks         []primitive.ObjectID       `json:"stocks"         bson:"stocks"`
 	TagType        model.TagType              `json:"tagType"        bson:"tagType"`
 	Quantity       int                        `json:"quantity"       bson:"quantity"`
 	UpdatedAt      time.Time                  `json:"updatedAt"      bson:"updatedAt"`
@@ -36,6 +37,7 @@ type ReceptionRequestHistory struct {
 	Model          AttributeEmbedded          `json:"model"          bson:"model"`
 	ReceivingGroup TreeAttributeEmbedded      `json:"receivingGroup" bson:"receivingGroup"`
 	PIC            UserAttributeEmbedded      `json:"pic"            bson:"pic"`
+	Stocks         []StockAttributeEmbedded   `json:"stocks"         bson:"stocks"`
 	TagType        model.TagType              `json:"tagType"        bson:"tagType"`
 	Quantity       int                        `json:"quantity"       bson:"quantity"`
 	UpdatedAt      time.Time                  `json:"updatedAt"      bson:"updatedAt"`
