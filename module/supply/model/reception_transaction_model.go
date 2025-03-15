@@ -30,6 +30,7 @@ type ReceptionTransaction struct {
 	PIC            primitive.ObjectID         `json:"pic"            bson:"pic"`
 	TotalItem      int                        `json:"totalItem"      bson:"totalItem"`
 	TotalStock     int                        `json:"totalStock"     bson:"totalStock"`
+	ApprovalNote   *string                    `json:"approvalNote"   bson:"approvalNote"`
 	UpdatedAt      time.Time                  `json:"updatedAt"      bson:"updatedAt"`
 	CreatedAt      time.Time                  `json:"createdAt"      bson:"createdAt"`
 }
@@ -47,6 +48,7 @@ type ReceptionTransactionHistory struct {
 	PIC            UserAttributeEmbedded      `json:"pic"            bson:"pic"`
 	TotalItem      int                        `json:"totalItem"      bson:"totalItem"`
 	TotalStock     int                        `json:"totalStock"     bson:"totalStock"`
+	ApprovalNote   *string                    `json:"approvalNote"   bson:"approvalNote"`
 	UpdatedAt      time.Time                  `json:"updatedAt"      bson:"updatedAt"`
 	CreatedAt      time.Time                  `json:"createdAt"      bson:"createdAt"`
 }
