@@ -1,0 +1,48 @@
+{
+  "data": {
+    "itemNameOptions": [
+      {
+        "label": "string",
+        "value": "number"
+      }
+    ],
+    "brandOptions": [
+      {
+        "label": "string",
+        "value": "number"
+      }
+    ],
+    "modelOptions": [
+      {
+        "label": "string",
+        "value": "number"
+      }
+    ],
+    "receivingGroupOptions": [
+      {
+        "label": "string",
+        "value": "number"
+      }
+    ],
+    "picOptions": [
+      {
+        "label": "string",
+        "value": "number"
+      }
+    ],
+    "supplierOptions": [
+      {
+        "label": "string",
+        "value": "number"
+      }
+    ],
+    "tagTypeOptions": [
+      {
+        "label": "string",
+        "value": "string"
+      }
+    ]
+  },
+  "message": "string",
+  "status": "number"
+}

@@ -1,0 +1,39 @@
+{
+  "data": {
+    "_id": "string,objectId",
+    "transaction": "string,objectId",
+    "transactionId": "string",
+    "itemName": {
+      "_id": "string,objectId",
+      "name": "string",
+      "key": "number"
+    },
+    "itemSKU": {
+      "_id": "string,objectId",
+      "sku": "string",
+      "skuAlias": "string,nullable",
+      "image": "string,nullable",
+      "key": "number"
+    },
+    "tagType": "string",
+    "brand": {
+      "_id": "string,objectId",
+      "name": "string",
+      "key": "number"
+    },
+    "model": {
+      "_id": "string,objectId",
+      "name": "string",
+      "key": "number"
+    },
+    "status": "string",
+    "stocks": [
+      {
+        "_id": "string,objectId",
+        "nameWithSequence": "string"
+      }
+    ]
+  },
+  "message": "string",
+  "status": "number"
+}
