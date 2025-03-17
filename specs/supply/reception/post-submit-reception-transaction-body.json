@@ -7,15 +7,8 @@
   "sku": [
     {
       "_id": "string,objectId",
-      "quantity": "number",
-      "_nullable": true
+      "quantity": "number"
     }
   ],
-  "request": [
-    {
-      "_id": "string,objectId",
-      "quantity": "number",
-      "_nullable": true
-    }
-  ]
+  "transactionId": "string,objectId,optional"
 }
