@@ -1,4 +1,8 @@
 {
-  "groupIds": "string,objectId[]",
-  "capacity": "number,nullable"
+  "groups": [
+    {
+      "_id": "string,objectId",
+      "capacity": "number,nullable"
+    }
+  ]
 }

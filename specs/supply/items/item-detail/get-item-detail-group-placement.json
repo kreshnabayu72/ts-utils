@@ -9,7 +9,8 @@
         "key": "number",
         "totalStock": "number",
         "capacity": "number",
-        "tagType": "string"
+        "tagType": "string",
+        "hasBeenInitialized": "boolean"
       }
     ]
   },

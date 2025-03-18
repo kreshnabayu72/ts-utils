@@ -1,3 +1,4 @@
 {
-  "userIds": "string[]"
+  "userIds": "string,objectId[]",
+  "groupId": "string,objectId"
 }
