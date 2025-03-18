@@ -16,6 +16,7 @@ type Rfid struct {
 	Asset            *primitive.ObjectID       `json:"asset"        bson:"asset"`
 
 	Status string `json:"status"        bson:"status"`
+	Type   string `json:"type"        bson:"type"`
 	Module string `json:"module"        bson:"module"`
 
 	Code         string `json:"code"        bson:"code"`
