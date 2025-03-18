@@ -40,11 +40,21 @@ var TransactionRoleNameMap = map[TransactionRoleType]TransactionRoleName{
 type TransactionManageType string
 
 const (
-	TransactionManageTypeAdmin            TransactionManageType = "Admin"
-	TransactionManageTypeMonitoringReport TransactionManageType = "Monitoring & Report"
-	TransactionManageTypeStaff            TransactionManageType = "Staff"
-	TransactionManageTypeApprover         TransactionManageType = "Approver"
+	TransactionManageTypeAdmin      TransactionManageType = "admin"
+	TransactionManageTypeMonitoring TransactionManageType = "monitoring"
+	TransactionManageTypeStaff      TransactionManageType = "staff"
+	TransactionManageTypeApprover   TransactionManageType = "approver"
 )
+
+// TransactionManageName represents the name of the transaction role's TransactionManageType
+type TransactionManageName string
+
+var TransactionManageNameMap = map[TransactionManageType]TransactionManageName{
+	TransactionManageTypeAdmin:      "Admin",
+	TransactionManageTypeMonitoring: "Monitoring & Report",
+	TransactionManageTypeStaff:      "Staff",
+	TransactionManageTypeApprover:   "Approver",
+}
 
 // UserTransactionRole represents the user's individual transaction role data
 type UserTransactionRole struct {
@@ -57,6 +67,7 @@ type UserTransactionRole struct {
 	RoleName            TransactionRoleName      `json:"roleName"            bson:"roleName"`
 	RoleType            TransactionRoleType      `json:"roleType"            bson:"roleType"`
 	ManageType          TransactionManageType    `json:"manageType"          bson:"manageType"`
+	ManageName          TransactionManageName    `json:"manageName"          bson:"manageName"`
 	ApprovalLevel       *int                     `json:"approvalLevel"       bson:"approvalLevel"`
 	ApprovalType        *TransactionApprovalType `json:"approvalType"        bson:"approvalType"`
 	UpdatedAt           time.Time                `json:"updatedAt"           bson:"updatedAt"`

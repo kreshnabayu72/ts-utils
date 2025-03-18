@@ -1,8 +1,9 @@
 {
+  "groupId": "string,objectId",
   "permissions": {
     "create": "boolean",
     "view": "boolean",
-    "edit": "boolean",
+    "update": "boolean",
     "delete": "boolean"
   }
 }
