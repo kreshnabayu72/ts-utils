@@ -8,7 +8,15 @@
         "fullName": "string",
         "profilePicture": "string,nullable",
         "position": "string",
-        "division": "string"
+        "division": "string",
+        "permissions": {
+          "create": "boolean",
+          "view": "boolean",
+          "update": "boolean",
+          "delete": "boolean"
+        },
+        "isTotalControl": "boolean",
+        "isReadOnly": "boolean"
       }
     ],
     "totalRecords": "number"
