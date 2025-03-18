@@ -1,0 +1,30 @@
+{
+  "data": {
+    "itemNameOptions": [
+      {
+        "label": "string",
+        "value": "number"
+      }
+    ],
+    "brandOptions": [
+      {
+        "label": "string",
+        "value": "number"
+      }
+    ],
+    "modelOptions": [
+      {
+        "label": "string",
+        "value": "number"
+      }
+    ],
+    "tagTypeOptions": [
+      {
+        "label": "string",
+        "value": "string"
+      }
+    ]
+  },
+  "message": "string",
+  "status": "number"
+}

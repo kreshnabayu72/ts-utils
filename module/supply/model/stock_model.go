@@ -21,7 +21,7 @@ const (
 	StockStatusUnplaced                StockStatus = "Unplaced"
 	StockStatusTAGReported             StockStatus = "TAG Reported"
 	StockStatusNotPairedYet            StockStatus = "Not Paired Yet"
-	StockStatusWaitingForApproval      StockStatus = "Waiting For Approval"
+	StockStatusWaitingForApproval      StockStatus = "Waiting for Approval"
 	StockStatusInSupplierReturnProcess StockStatus = "In Supplier Return Process"
 	StockStatusOnDisposalProcess       StockStatus = "On Disposal Process"
 	StockStatusDisposed                StockStatus = "Disposed"
@@ -29,6 +29,28 @@ const (
 	StockStatusExchanged               StockStatus = "Exchanged"
 	StockStatusReturned                StockStatus = "Returned"
 )
+
+// AddStockStatus adds a new stock status to an existing stock statuses,
+// validate the transition according to the rules and returns the result
+func AddStockStatus(s []StockStatus, statuses ...StockStatus) ([]StockStatus, error) {
+	// TODO(refan): Programmatically adds status based on the transition rules
+	s = append(s, s...)
+	return s, nil
+}
+
+// SetStockStatus sets a new stock status,
+// validate the transition according to the rules based from the existing stock statuses and returns the result
+func SetStockStatus(s []StockStatus, statuses ...StockStatus) ([]StockStatus, error) {
+	// TODO(refan): Programmatically sets status ONLY if the transition rules allows it
+	return statuses, nil
+}
+
+// RemoveStockStatus removes a stock status,
+// validate the transition according to the rules based from the existing stock statuses and returns the result
+func RemoveStockStatus(s []StockStatus, statuses ...StockStatus) ([]StockStatus, error) {
+	// TODO(refan): Programmatically removes status based on the transition rules
+	return s, nil
+}
 
 // StockSource represents stock source values.
 type StockSource string

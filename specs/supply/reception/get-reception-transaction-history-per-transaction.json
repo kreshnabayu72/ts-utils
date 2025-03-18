@@ -1,0 +1,35 @@
+{
+  "data": {
+    "totalRecords": "number",
+    "data": [
+      {
+        "_id": "string,objectId",
+        "transactionId": "string",
+        "supplier": {
+          "_id": "string,objectId",
+          "name": "string",
+          "key": "number"
+        },
+        "status": "string",
+        "receivingGroup": {
+          "_id": "string,objectId",
+          "name": "string",
+          "fullPath": "string",
+          "key": "number"
+        },
+        "pic": {
+          "_id": "string,objectId",
+          "fullName": "string",
+          "image": "string,nullable",
+          "key": "number"
+        },
+        "totalItem": "number",
+        "totalStock": "number",
+        "updatedAt": "string,Date",
+        "createdAt": "string,Date"
+      }
+    ]
+  },
+  "message": "string",
+  "status": "number"
+}

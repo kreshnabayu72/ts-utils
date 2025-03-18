@@ -31,6 +31,8 @@ type ExpiredRequest struct {
 	Note         *string              `json:"note"          bson:"note"`
 	ReportedBy   primitive.ObjectID   `json:"reportedBy"    bson:"reportedBy"`
 	ReportedDate time.Time            `json:"reportedDate"  bson:"reportedDate"`
+	ApprovalNote *string              `json:"approvalNote"  bson:"approvalNote"`
+	ApprovedDate *time.Time           `json:"approvedDate"  bson:"approvedDate"`
 	UpdatedDate  *time.Time           `json:"updatedDate"   bson:"updatedDate"`
 	UpdatedAt    time.Time            `json:"updatedAt"     bson:"updatedAt"`
 	CreatedAt    time.Time            `json:"createdAt"     bson:"createdAt"`
@@ -50,6 +52,8 @@ type ExpiredRequestHistory struct {
 	Note         *string               `json:"note"          bson:"note"`
 	ReportedBy   UserAttributeEmbedded `json:"reportedBy"    bson:"reportedBy"`
 	ReportedDate time.Time             `json:"reportedDate"  bson:"reportedDate"`
+	ApprovalNote *string               `json:"approvalNote"  bson:"approvalNote"`
+	ApprovedDate *time.Time            `json:"approvedDate"  bson:"approvedDate"`
 	UpdatedDate  *time.Time            `json:"updatedDate"   bson:"updatedDate"`
 	UpdatedAt    time.Time             `json:"updatedAt"     bson:"updatedAt"`
 	CreatedAt    time.Time             `json:"createdAt"     bson:"createdAt"`
