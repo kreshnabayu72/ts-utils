@@ -18,12 +18,12 @@ type Rfid struct {
 	Status string `json:"status"        bson:"status"`
 	Module string `json:"module"        bson:"module"`
 
-	RfidCode      string `json:"rfidCode"        bson:"rfidCode"`
-	RfidShortCode string `json:"rfidShortCode"        bson:"rfidShortCode"`
-	NfcCode       string `json:"nfcCode"        bson:"nfcCode"`
-	NfcShortCode  string `json:"nfcShortCode"        bson:"nfcShortCode"`
-	QrCode        string `json:"qrCode"        bson:"qrCode"`
-	QrShortCode   string `json:"qrShortCode"        bson:"qrShortCode"`
+	Code         string `json:"code"        bson:"code"`
+	ShortCode    string `json:"shortCode"        bson:"shortCode"`
+	NfcCode      string `json:"nfcCode"        bson:"nfcCode"`
+	NfcShortCode string `json:"nfcShortCode"        bson:"nfcShortCode"`
+	QrCode       string `json:"qrCode"        bson:"qrCode"`
+	QrShortCode  string `json:"qrShortCode"        bson:"qrShortCode"`
 
 	CreatedAt time.Time `json:"createdAt"            bson:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"            bson:"updatedAt"`

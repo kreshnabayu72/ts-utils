@@ -20,8 +20,8 @@ type Nfc struct {
 
 	RfidCode      string `json:"rfidCode"        bson:"rfidCode"`
 	RfidShortCode string `json:"rfidShortCode"        bson:"rfidShortCode"`
-	NfcCode       string `json:"nfcCode"        bson:"nfcCode"`
-	NfcShortCode  string `json:"nfcShortCode"        bson:"nfcShortCode"`
+	Code          string `json:"code"        bson:"code"`
+	ShortCode     string `json:"shortCode"        bson:"shortCode"`
 	QrCode        string `json:"qrCode"        bson:"qrCode"`
 	QrShortCode   string `json:"qrShortCode"        bson:"qrShortCode"`
 
