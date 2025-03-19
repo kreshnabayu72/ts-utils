@@ -1,0 +1,45 @@
+{
+  "data": {
+    "data": [
+      {
+        "_id": "string,objectId",
+        "key": "number",
+        "name": {
+          "_id": "string,objectId",
+          "name": "string",
+          "key": "number"
+        },
+        "image": "string,nullable",
+        "sku": "string",
+        "category": {
+          "_id": "string,objectId",
+          "name": "string",
+          "key": "number"
+        },
+        "brand": {
+          "_id": "string,objectId",
+          "name": "string",
+          "key": "number"
+        },
+        "model": {
+          "_id": "string,objectId",
+          "name": "string",
+          "key": "number"
+        },
+        "tagType": "string",
+        "totalStock": "number",
+        "minimumStock": "number",
+        "safetyStock": "number",
+        "hasBarcode": "boolean",
+        "hasExpiredDate": "boolean",
+        "hasProductionDate": "boolean",
+        "allowMinimumAndSafetyStock": "boolean",
+        "updatedAt": "string,Date",
+        "createdAt": "string,Date"
+      }
+    ],
+    "totalRecords": "number"
+  },
+  "message": "string",
+  "status": "number"
+}
