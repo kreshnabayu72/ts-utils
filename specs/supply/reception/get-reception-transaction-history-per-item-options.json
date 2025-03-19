@@ -35,12 +35,6 @@
         "label": "string",
         "value": "number"
       }
-    ],
-    "tagTypeOptions": [
-      {
-        "label": "string",
-        "value": "string"
-      }
     ]
   },
   "message": "string",

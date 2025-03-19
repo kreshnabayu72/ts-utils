@@ -70,7 +70,6 @@ type UserTransactionRole struct {
 	ManageName          TransactionManageName    `json:"manageName"          bson:"manageName"`
 	ApprovalLevel       *int                     `json:"approvalLevel"       bson:"approvalLevel"`
 	ApprovalType        *TransactionApprovalType `json:"approvalType"        bson:"approvalType"`
-	IsActivated         bool                     `json:"isActivated"         bson:"isActivated"`
 	UpdatedAt           time.Time                `json:"updatedAt"           bson:"updatedAt"`
 	CreatedAt           time.Time                `json:"createdAt"           bson:"createdAt"`
 }
