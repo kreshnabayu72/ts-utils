@@ -83,6 +83,7 @@ type UserSystemRole struct {
 	RoleType            SystemRoleType       `json:"roleType"            bson:"roleType"`
 	AccessType          SystemRoleAccessType `json:"accessType"          bson:"accessType"`
 	Permissions         SystemRolePermission `json:"permissions"         bson:"permissions"`
+	IsActivated         bool                 `json:"isActivated"         bson:"isActivated"`
 	UpdatedAt           time.Time            `json:"updatedAt"           bson:"updatedAt"`
 	CreatedAt           time.Time            `json:"createdAt"           bson:"createdAt"`
 }
