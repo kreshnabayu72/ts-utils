@@ -19,12 +19,15 @@ type Rfid struct {
 	Type   string `json:"type"        bson:"type"`
 	Module string `json:"module"        bson:"module"`
 
-	Code         string `json:"code"        bson:"code"`
-	ShortCode    string `json:"shortCode"        bson:"shortCode"`
-	NfcCode      string `json:"nfcCode"        bson:"nfcCode"`
-	NfcShortCode string `json:"nfcShortCode"        bson:"nfcShortCode"`
-	QrCode       string `json:"qrCode"        bson:"qrCode"`
-	QrShortCode  string `json:"qrShortCode"        bson:"qrShortCode"`
+	Code      string `json:"code"        bson:"code"`
+	ShortCode string `json:"shortCode"        bson:"shortCode"`
+
+	Nfc          *primitive.ObjectID `json:"nfc"        bson:"nfc"`
+	NfcCode      string              `json:"nfcCode"        bson:"nfcCode"`
+	NfcShortCode string              `json:"nfcShortCode"        bson:"nfcShortCode"`
+	Qr           *primitive.ObjectID `json:"qr"        bson:"qr"`
+	QrCode       string              `json:"qrCode"        bson:"qrCode"`
+	QrShortCode  string              `json:"qrShortCode"        bson:"qrShortCode"`
 
 	CreatedAt time.Time `json:"createdAt"            bson:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"            bson:"updatedAt"`
