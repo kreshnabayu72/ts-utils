@@ -68,6 +68,18 @@ func GenerateArrayFilter[T comparable](filter []T) primitive.M {
 	}
 }
 
+func GenerateExcludeArrayFilter[T comparable](filter []T) primitive.M {
+	var varType = reflect.TypeOf(filter).Kind()
+
+	//check if variable type is slice AND the variable have length.
+	//providing an empty slice will result to an error. (probably because it resolves as a zero value <nil>)
+	if varType == reflect.Slice && len(filter) > 0 {
+		return bson.M{"$nin": filter}
+	} else {
+		return bson.M{"$ne": "vdjfPyv7ijO5vQeLIZmQHuzPO"} //random string so its always true
+	}
+}
+
 // Use filter ["Yes","No"] to filter attribute
 func GenerateExistFilter(attribute string, filter []string) bson.M {
 	var varType = reflect.TypeOf(filter).Kind()

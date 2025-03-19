@@ -1,0 +1,62 @@
+{
+  "data": {
+    "detail": {
+      "_id": "string,objectId",
+      "name": "string",
+      "fullPath": "string",
+      "key": "number",
+      "level": "number",
+      "image": "string,nullable",
+      "isAdministrativeGroup": "boolean",
+      "isDisposalGroup": "boolean",
+      "isDeletable": "boolean",
+      "tagType": "string",
+      "totalItem": "number",
+      "totalStock": "number",
+      "totalAdmin": "number",
+      "totalUnplacedStock": "number",
+      "totalAvailableStock": "number",
+      "totalSubgroup": "number",
+      "aliasCode": "string,nullable",
+      "items": [
+        {
+          "itemSKU": {
+            "_id": "string,objectId",
+            "name": {
+              "_id": "string,objectId",
+              "name": "string",
+              "key": "number"
+            },
+            "sku": "string",
+            "key": "string"
+          },
+          "capacity": "number",
+          "totalStock": "number"
+        }
+      ]
+    },
+    "data": [
+      {
+        "_id": "string,objectId",
+        "name": "string",
+        "fullPath": "string",
+        "key": "number",
+        "image": "string,nullable",
+        "isAdministrativeGroup": "boolean",
+        "isDisposalGroup": "boolean",
+        "isDeletable": "boolean",
+        "tagType": "string",
+        "totalItem": "number",
+        "totalStock": "number",
+        "totalUnplacedStock": "number",
+        "totalAvailableStock": "number",
+        "totalAdmin": "number",
+        "totalSubgroup": "number",
+        "aliasCode": "string,nullable"
+      }
+    ],
+    "totalRecords": "number"
+  },
+  "message": "string",
+  "status": "number"
+}
