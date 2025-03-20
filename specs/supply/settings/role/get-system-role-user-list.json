@@ -16,7 +16,8 @@
           "delete": "boolean"
         },
         "isTotalControl": "boolean",
-        "isReadOnly": "boolean"
+        "isReadOnly": "boolean",
+        "isDefault": "boolean"
       }
     ],
     "totalRecords": "number"
