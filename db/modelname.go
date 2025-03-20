@@ -72,6 +72,8 @@ const (
 	ItemSKUModelName                     = "item_skus"
 	LoginSessionModelName                = "login_sessions"
 	StockModelName                       = "stocks"
+	TransactionApprovalModelName         = "transaction_approvals"
+	ApprovalModelName                    = "approvals"
 	ReceptionTransactionModelName        = "reception_transactions"
 	ReceptionTransactionHistoryModelName = "reception_transaction_histories"
 	ReceptionRequestModelName            = "reception_requests"
