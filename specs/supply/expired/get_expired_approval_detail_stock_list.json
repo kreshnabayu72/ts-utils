@@ -26,7 +26,10 @@
           "key": "number"
         },
         "note": "string",
-        "approvedExpiredDate": "string,Date,nullable"
+        "approvedExpiredDate": "string,Date,nullable",
+        "approvedNote": "string,nullable",
+        "isApproved": "boolean",
+        "isApprovedLabel": "string"
       }
     ]
   },

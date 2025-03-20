@@ -64,6 +64,7 @@ const (
 // Stock represents the schema for a single stock data
 type Stock struct {
 	ID                           primitive.ObjectID  `json:"_id,omitempty"                bson:"_id,omitempty"`
+	Key                          int                 `json:"key"                          bson:"key"`
 	ItemName                     primitive.ObjectID  `json:"itemName"                     bson:"itemName"`
 	ItemSKU                      primitive.ObjectID  `json:"itemSKU"                      bson:"itemSKU"`
 	Brand                        primitive.ObjectID  `json:"brand"                        bson:"brand"`
