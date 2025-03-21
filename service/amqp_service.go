@@ -1,0 +1,315 @@
+package service
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"log"
+	"os"
+
+	amqp "github.com/rabbitmq/amqp091-go"
+)
+
+func failOnError(err error, msg string) {
+	if err != nil {
+		log.Panicf("%s: %s", msg, err)
+	}
+}
+
+func getURI() string {
+	hostname := os.Getenv("RABBITMQ_HOSTNAME")
+	if hostname == "" {
+		failOnError(errors.New("hostname can't be empty"), "Empty environment")
+	}
+
+	port := os.Getenv("RABBITMQ_PORT")
+	if port == "" {
+		failOnError(errors.New("port can't be empty"), "Empty environment")
+	}
+
+	username := os.Getenv("RABBITMQ_USERNAME")
+	password := os.Getenv("RABBITMQ_PASSWORD")
+
+	return fmt.Sprintf("amqp://%s:%s@%s:%s/", username, password, hostname, port)
+}
+
+type QueueDeclareArgs struct {
+	name       string
+	durable    bool
+	autoDelete bool
+	exclusive  bool
+	noWait     bool
+	args       amqp.Table
+}
+
+type PublishArgs struct {
+	exchange  string
+	key       string
+	mandatory bool
+	immediate bool
+	msg       amqp.Publishing
+}
+
+type ExchangeDeclareArgs struct {
+	name       string
+	kind       string
+	durable    bool
+	autoDelete bool
+	internal   bool
+	noWait     bool
+	args       amqp.Table
+}
+
+type QueueBindArgs struct {
+	name     string
+	key      string
+	exchange string
+	noWait   bool
+	args     amqp.Table
+}
+
+type ConsumeArgs struct {
+	queue     string
+	consumer  string
+	autoAck   bool
+	exclusive bool
+	noLocal   bool
+	noWait    bool
+	args      amqp.Table
+}
+
+type AMQPServiceImpl interface {
+	Publish(
+		ctx context.Context,
+		exchange ExchangeDeclareArgs,
+		pub PublishArgs,
+	) error
+	Subscribe(
+		exchange ExchangeDeclareArgs,
+		queue QueueDeclareArgs,
+		bind QueueBindArgs,
+		consume ConsumeArgs,
+		handleFunc func(delivery <-chan amqp.Delivery),
+	) error
+	SimplePublish(
+		ctx context.Context,
+		exchange string,
+		key string,
+		msg amqp.Publishing,
+	) error
+	SimpleSubscribe(
+		exchange string,
+		queue string,
+		key string,
+		consumer string,
+		handleFunc func(delivery <-chan amqp.Delivery),
+	) error
+}
+
+// AMQPService abstracts the implementation of rabbitmq's amqp091-go package
+type AMQPService struct {
+	Connection *amqp.Connection
+}
+
+// MakeAMQPService creates and initialize the connection of AMQPService
+func MakeAMQPService() *AMQPService {
+	uri := getURI()
+	conn, err := amqp.Dial(uri)
+	failOnError(err, "Failed to connect to RabbitMQ")
+
+	return &AMQPService{
+		Connection: conn,
+	}
+}
+
+// Publish sends a message to an AMQP exchange
+//
+// It declares the exchange if it does not already exist
+// and then publishes the message to that exchange with the specified routing key
+func (s *AMQPService) Publish(
+	ctx context.Context,
+	exchange ExchangeDeclareArgs,
+	pub PublishArgs,
+) error {
+	ch, err := s.Connection.Channel()
+	if err != nil {
+		return err
+	}
+
+	if err = ch.ExchangeDeclare(
+		exchange.name,
+		exchange.kind,
+		exchange.durable,
+		exchange.autoDelete,
+		exchange.internal,
+		exchange.noWait,
+		exchange.args,
+	); err != nil {
+		return err
+	}
+
+	if err = ch.PublishWithContext(
+		ctx,
+		pub.exchange,
+		pub.key,
+		pub.mandatory,
+		pub.immediate,
+		pub.msg,
+	); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Subscribe subscribes to messages from an AMQP exchange and queue using RabbitMQ
+//
+// sets up a subscription to receive messages from an AMQP exchange and queue.
+// It declares the necessary components (exchange, queue, binding)
+// and starts consuming messages with a specified handler function.
+func (s *AMQPService) Subscribe(
+	exchange ExchangeDeclareArgs,
+	queue QueueDeclareArgs,
+	bind QueueBindArgs,
+	consume ConsumeArgs,
+	handleFunc func(delivery <-chan amqp.Delivery),
+) error {
+	ch, err := s.Connection.Channel()
+	if err != nil {
+		return err
+	}
+
+	if err = ch.ExchangeDeclare(
+		exchange.name,
+		exchange.kind,
+		exchange.durable,
+		exchange.autoDelete,
+		exchange.internal,
+		exchange.noWait,
+		exchange.args,
+	); err != nil {
+		return err
+	}
+
+	if _, err = ch.QueueDeclare(
+		queue.name,
+		queue.durable,
+		queue.autoDelete,
+		queue.exclusive,
+		queue.noWait,
+		queue.args,
+	); err != nil {
+		return err
+	}
+
+	if err = ch.QueueBind(
+		bind.name,
+		bind.key,
+		bind.exchange,
+		bind.noWait,
+		bind.args,
+	); err != nil {
+		return err
+	}
+
+	delivery, err := ch.Consume(
+		consume.queue,
+		consume.consumer,
+		consume.autoAck,
+		consume.exclusive,
+		consume.noLocal,
+		consume.noWait,
+		consume.args,
+	)
+	if err != nil {
+		return err
+	}
+
+	go handleFunc(delivery)
+
+	return nil
+}
+
+// SimplePublish is the simplified version of Publish
+func (s *AMQPService) SimplePublish(
+	ctx context.Context,
+	exchange string,
+	key string,
+	msg amqp.Publishing,
+) error {
+	defaultExchange := ExchangeDeclareArgs{
+		name:       exchange,
+		kind:       "fanout",
+		durable:    false,
+		autoDelete: false,
+		internal:   false,
+		noWait:     false,
+		args:       nil,
+	}
+
+	defaultPublish := PublishArgs{
+		exchange:  exchange,
+		key:       key,
+		mandatory: false,
+		immediate: false,
+		msg:       msg,
+	}
+
+	if err := s.Publish(ctx, defaultExchange, defaultPublish); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// SimpleSubscribe is the simplified version of Subscribe
+func (s *AMQPService) SimpleSubscribe(
+	exchange string,
+	queue string,
+	key string,
+	consumer string,
+	handleFunc func(delivery <-chan amqp.Delivery),
+) error {
+	defaultExchange := ExchangeDeclareArgs{
+		name:       exchange,
+		kind:       "fanout",
+		durable:    false,
+		autoDelete: false,
+		internal:   false,
+		noWait:     false,
+		args:       nil,
+	}
+
+	defaultQueue := QueueDeclareArgs{
+		name:       queue,
+		durable:    false,
+		autoDelete: false,
+		exclusive:  false,
+		noWait:     false,
+		args:       nil,
+	}
+
+	defaultBindQueue := QueueBindArgs{
+		name:     queue,
+		key:      key,
+		exchange: exchange,
+		noWait:   false,
+		args:     nil,
+	}
+
+	defaultConsume := ConsumeArgs{
+		queue:     queue,
+		consumer:  consumer,
+		autoAck:   true,
+		exclusive: false,
+		noLocal:   false,
+		noWait:    false,
+		args:      nil,
+	}
+
+	if err := s.Subscribe(defaultExchange, defaultQueue, defaultBindQueue, defaultConsume, handleFunc); err != nil {
+		return err
+	}
+
+	return nil
+}

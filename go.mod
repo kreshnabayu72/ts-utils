@@ -9,6 +9,7 @@ require (
 	github.com/go-playground/universal-translator v0.18.1
 	github.com/gofiber/fiber/v2 v2.52.5
 	github.com/kittipat1413/go-common v0.9.1
+	github.com/rabbitmq/amqp091-go v1.10.0
 	github.com/stretchr/testify v1.10.0
 	github.com/xuri/excelize/v2 v2.9.0
 	go.mongodb.org/mongo-driver v1.17.1
