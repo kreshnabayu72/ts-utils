@@ -1,0 +1,10 @@
+{
+  "data": [
+    {
+      "label": "string",
+      "value": "any"
+    }
+  ],
+  "message": "string",
+  "status": "number"
+}
