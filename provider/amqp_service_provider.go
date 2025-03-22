@@ -30,7 +30,7 @@ type MockAMQPServiceProvider struct {
 	mock.Mock
 }
 
-func (m *MockServiceProvider) MakeAMQPService(
+func (m *MockAMQPServiceProvider) MakeAMQPService(
 	reconnectDelay time.Duration,
 	reconnectAttempts int,
 	keepAlive bool,
