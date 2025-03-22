@@ -133,6 +133,7 @@ func (s *AMQPServiceImpl) Publish(
 	pub PublishArgs,
 ) error {
 	ch, err := s.Connection.Channel()
+	defer ch.Close()
 	if err != nil {
 		return err
 	}
@@ -176,6 +177,7 @@ func (s *AMQPServiceImpl) Subscribe(
 	handleFunc func(delivery <-chan amqp.Delivery),
 ) error {
 	ch, err := s.Connection.Channel()
+	ch.Close()
 	if err != nil {
 		return err
 	}
