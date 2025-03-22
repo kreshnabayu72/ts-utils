@@ -35,6 +35,6 @@ func (m *MockServiceProvider) MakeAMQPService(
 	reconnectAttempts int,
 	keepAlive bool,
 ) service.AMQPService {
-	args := m.Called()
+	args := m.Called(reconnectDelay, reconnectAttempts, keepAlive)
 	return args.Get(0).(service.AMQPService)
 }
