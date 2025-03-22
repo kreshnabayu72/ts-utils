@@ -5,14 +5,22 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math"
 	"os"
+	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
+func logOnError(err error, msg string) {
+	if err != nil {
+		log.Printf("%s: %s", msg, err)
+	}
+}
+
 func failOnError(err error, msg string) {
 	if err != nil {
-		log.Panicf("%s: %s", msg, err)
+		log.Fatalf("%s: %s", msg, err)
 	}
 }
 
@@ -109,18 +117,34 @@ type AMQPService interface {
 // AMQPServiceImpl is the implementation of the interface AMQPService,
 // it abstracts the rabbitmq's amqp091-go package
 type AMQPServiceImpl struct {
-	Connection *amqp.Connection
+	URI               string
+	Connection        *amqp.Connection
+	ReconnectDelay    time.Duration
+	ReconnectAttempts int
 }
 
 // MakeAMQPService creates and initialize the connection of AMQPServiceImpl
-func MakeAMQPService() *AMQPServiceImpl {
-	uri := getURI()
-	conn, err := amqp.Dial(uri)
-	failOnError(err, "Failed to connect to RabbitMQ")
-
-	return &AMQPServiceImpl{
-		Connection: conn,
+func MakeAMQPService(
+	reconnectDelay time.Duration,
+	reconnectAttempts int,
+	keepAlive bool,
+) *AMQPServiceImpl {
+	amqpServiceImpl := AMQPServiceImpl{
+		URI:               getURI(),
+		ReconnectDelay:    reconnectDelay,
+		ReconnectAttempts: reconnectAttempts,
 	}
+
+	err := amqpServiceImpl.Connect()
+	if err != nil {
+		logOnError(err, fmt.Sprintf("Could not connect to RabbitMQ after %d attempts", amqpServiceImpl.ReconnectAttempts))
+	}
+
+	if keepAlive {
+		go amqpServiceImpl.keepAlive()
+	}
+
+	return &amqpServiceImpl
 }
 
 // Publish sends a message to an AMQP exchange
@@ -314,4 +338,58 @@ func (s *AMQPServiceImpl) SimpleSubscribe(
 	}
 
 	return nil
+}
+
+// Connect establishes a connection to a RabbitMQ server
+//
+// It implements a retry mechanism to handle connection failures
+func (s *AMQPServiceImpl) Connect() error {
+	var err error
+
+	// When ReconnectAttempts <= 0, set ReconnectAttempts to max integer limit, basically means to attempt infinitely
+	if s.ReconnectAttempts <= 0 {
+		s.ReconnectAttempts = math.MaxInt
+	}
+
+	for i := 0; i < s.ReconnectAttempts; i++ {
+		s.Connection, err = amqp.Dial(s.URI)
+		if err != nil {
+			logOnError(err, fmt.Sprintf("Failed to connect to RabbitMQ. Retrying in %v... (%d/%d)", s.ReconnectDelay, i+1, s.ReconnectAttempts))
+			time.Sleep(s.ReconnectDelay)
+			continue
+		}
+
+		return nil
+	}
+
+	logOnError(err, fmt.Sprintf("Could not connect to RabbitMQ after %d attempts", s.ReconnectAttempts))
+
+	return err
+}
+
+// keepAlive maintains a persistent connection to a RabbitMQ server
+//
+// It continuously monitors the connection for closures and attempts to reconnect if a closure is detected
+func (s *AMQPServiceImpl) keepAlive() {
+	notifyClose := make(chan *amqp.Error)
+	s.Connection.NotifyClose(notifyClose)
+
+	for {
+		err := <-notifyClose
+		if err != nil {
+			log.Printf("Connection closed: %v. Reconnecting...", err)
+			var reconnectErr error
+			for {
+				reconnectErr = s.Connect()
+				if reconnectErr == nil {
+					log.Println("Reconnected to RabbitMQ")
+					// Re-assign notifyClose to the newly created connection
+					s.Connection.NotifyClose(notifyClose)
+					break
+				}
+				log.Printf("Reconnection failed: %v. Retrying in %v...", reconnectErr, s.ReconnectDelay)
+				time.Sleep(s.ReconnectDelay)
+			}
+		}
+	}
 }
