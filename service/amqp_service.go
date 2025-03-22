@@ -384,6 +384,7 @@ func (s *AMQPServiceImpl) keepAlive() {
 				if reconnectErr == nil {
 					log.Println("Reconnected to RabbitMQ")
 					// Re-assign notifyClose to the newly created connection
+					notifyClose = make(chan *amqp.Error)
 					s.Connection.NotifyClose(notifyClose)
 					break
 				}
