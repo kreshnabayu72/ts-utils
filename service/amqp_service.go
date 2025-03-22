@@ -78,7 +78,7 @@ type ConsumeArgs struct {
 	args      amqp.Table
 }
 
-type AMQPServiceImpl interface {
+type AMQPService interface {
 	Publish(
 		ctx context.Context,
 		exchange ExchangeDeclareArgs,
@@ -106,18 +106,19 @@ type AMQPServiceImpl interface {
 	) error
 }
 
-// AMQPService abstracts the implementation of rabbitmq's amqp091-go package
-type AMQPService struct {
+// AMQPServiceImpl is the implementation of the interface AMQPService,
+// it abstracts the rabbitmq's amqp091-go package
+type AMQPServiceImpl struct {
 	Connection *amqp.Connection
 }
 
-// MakeAMQPService creates and initialize the connection of AMQPService
-func MakeAMQPService() *AMQPService {
+// MakeAMQPService creates and initialize the connection of AMQPServiceImpl
+func MakeAMQPService() *AMQPServiceImpl {
 	uri := getURI()
 	conn, err := amqp.Dial(uri)
 	failOnError(err, "Failed to connect to RabbitMQ")
 
-	return &AMQPService{
+	return &AMQPServiceImpl{
 		Connection: conn,
 	}
 }
@@ -126,7 +127,7 @@ func MakeAMQPService() *AMQPService {
 //
 // It declares the exchange if it does not already exist
 // and then publishes the message to that exchange with the specified routing key
-func (s *AMQPService) Publish(
+func (s *AMQPServiceImpl) Publish(
 	ctx context.Context,
 	exchange ExchangeDeclareArgs,
 	pub PublishArgs,
@@ -167,7 +168,7 @@ func (s *AMQPService) Publish(
 // sets up a subscription to receive messages from an AMQP exchange and queue.
 // It declares the necessary components (exchange, queue, binding)
 // and starts consuming messages with a specified handler function.
-func (s *AMQPService) Subscribe(
+func (s *AMQPServiceImpl) Subscribe(
 	exchange ExchangeDeclareArgs,
 	queue QueueDeclareArgs,
 	bind QueueBindArgs,
@@ -231,7 +232,7 @@ func (s *AMQPService) Subscribe(
 }
 
 // SimplePublish is the simplified version of Publish
-func (s *AMQPService) SimplePublish(
+func (s *AMQPServiceImpl) SimplePublish(
 	ctx context.Context,
 	exchange string,
 	key string,
@@ -263,7 +264,7 @@ func (s *AMQPService) SimplePublish(
 }
 
 // SimpleSubscribe is the simplified version of Subscribe
-func (s *AMQPService) SimpleSubscribe(
+func (s *AMQPServiceImpl) SimpleSubscribe(
 	exchange string,
 	queue string,
 	key string,
