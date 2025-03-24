@@ -281,6 +281,8 @@ func (s *AMQPServiceImpl) SimplePublish(
 		msg:       msg,
 	}
 
+	log.Printf("Publishing to: %s:%s", exchange, key)
+	log.Printf("Message:\n%s", msg.Body)
 	if err := s.Publish(ctx, defaultExchange, defaultPublish); err != nil {
 		return err
 	}
@@ -333,6 +335,7 @@ func (s *AMQPServiceImpl) SimpleSubscribe(
 		args:      nil,
 	}
 
+	log.Printf("Subscribing to: %s:%s:%s", exchange, queue, key)
 	if err := s.Subscribe(defaultExchange, defaultQueue, defaultBindQueue, defaultConsume, handleFunc); err != nil {
 		return err
 	}
@@ -358,6 +361,7 @@ func (s *AMQPServiceImpl) Connect() error {
 			time.Sleep(s.ReconnectDelay)
 			continue
 		}
+		log.Printf("Connected to RabbitMQ: %s", s.URI)
 
 		return nil
 	}
