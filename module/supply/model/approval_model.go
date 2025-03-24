@@ -40,6 +40,15 @@ type ApprovalApprover[IO any] struct {
 	Data         *IO                `json:"data"         bson:"data"`
 }
 
+// ApprovalStatus represents the possible values for the status of approval
+type ApprovalStatus string
+
+const (
+	ApprovalStatusWaitingForApproval ApprovalStatus = "Waiting for Approval"
+	ApprovalStatusRejected           ApprovalStatus = "Rejected"
+	ApprovalStatusApproved           ApprovalStatus = "Approved"
+)
+
 // Approval stores users and its actions data for each approval level
 //
 // Generic type "O" represents the struct object to be used in the approval list
@@ -52,6 +61,7 @@ type Approval[O any, IO any] struct {
 	ObjectId        primitive.ObjectID     `json:"objectId"        bson:"objectId"`
 	Object          O                      `json:"object"          bson:"object"`
 	Level           int                    `json:"level"           bson:"level"`
+	Status          ApprovalStatus         `json:"status"          bson:"status"`
 	IsActivated     bool                   `json:"isActivated"     bson:"isActivated"`
 	Type            ApprovalType           `json:"type"            bson:"type"`
 	Approvers       []ApprovalApprover[IO] `json:"approvers"       bson:"approvers"`
