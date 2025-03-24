@@ -265,7 +265,7 @@ func (s *AMQPServiceImpl) SimplePublish(
 ) error {
 	defaultExchange := ExchangeDeclareArgs{
 		name:       exchange,
-		kind:       "fanout",
+		kind:       "topic",
 		durable:    false,
 		autoDelete: false,
 		internal:   false,
@@ -300,7 +300,7 @@ func (s *AMQPServiceImpl) SimpleSubscribe(
 ) error {
 	defaultExchange := ExchangeDeclareArgs{
 		name:       exchange,
-		kind:       "fanout",
+		kind:       "topic",
 		durable:    false,
 		autoDelete: false,
 		internal:   false,
