@@ -3,7 +3,6 @@ package model
 import (
 	"time"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/module/common/model"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -32,7 +31,7 @@ type User struct {
 	IsTemporary          bool                `json:"isTemporary"          bson:"isTemporary"`
 	ExpiryDate           *time.Time          `json:"expiryDate"           bson:"expiryDate"`
 	PendingEmailChange   string              `json:"pendingEmailChange"   bson:"pendingEmailChange"`
-	ModifiedBy           *model.UserEmbedded `json:"modifiedBy"           bson:"modifiedBy"`
+	ModifiedBy           *primitive.ObjectID `json:"modifiedBy"           bson:"modifiedBy"`
 	ProfilePictureSmall  *string             `json:"profilePictureSmall"  bson:"profilePictureSmall"`
 	ProfilePictureMedium *string             `json:"profilePictureMedium" bson:"profilePictureMedium"`
 	ProfilePictureBig    *string             `json:"profilePictureBig"    bson:"profilePictureBig"`
