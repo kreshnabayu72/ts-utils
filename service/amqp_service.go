@@ -35,10 +35,7 @@ func getURI() string {
 		failOnError(errors.New("port can't be empty"), "Empty environment")
 	}
 
-	username := os.Getenv("RABBITMQ_USERNAME")
-	password := os.Getenv("RABBITMQ_PASSWORD")
-
-	return fmt.Sprintf("amqp://%s:%s@%s:%s/", username, password, hostname, port)
+	return fmt.Sprintf("amqp://%s:%s/", hostname, port)
 }
 
 type QueueDeclareArgs struct {
@@ -356,14 +353,26 @@ func (s *AMQPServiceImpl) SimpleSubscribe(
 func (s *AMQPServiceImpl) Connect() error {
 	var err error
 
+	username := os.Getenv("RABBITMQ_USERNAME")
+	password := os.Getenv("RABBITMQ_PASSWORD")
+
+	auth := amqp.PlainAuth{
+		Username: username,
+		Password: password,
+	}
+
 	// When ReconnectAttempts <= 0, set ReconnectAttempts to max integer limit, basically means to attempt infinitely
 	if s.ReconnectAttempts <= 0 {
 		s.ReconnectAttempts = math.MaxInt
 	}
 
 	for i := 0; i < s.ReconnectAttempts; i++ {
+
 		s.Connection, err = amqp.DialConfig(s.URI, amqp.Config{
 			Vhost: s.VirtualHost,
+			SASL: []amqp.Authentication{
+				&auth,
+			},
 		})
 		if err != nil {
 			logOnError(err, fmt.Sprintf("Failed to connect to RabbitMQ. Retrying in %v... (%d/%d)", s.ReconnectDelay, i+1, s.ReconnectAttempts))
