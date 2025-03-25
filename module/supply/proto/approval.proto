@@ -42,8 +42,9 @@ message ActionApprovalResponse {
 }
 
 message DeleteApprovalRequest {
-  string approvalFor = 1;
-  string objectId = 2;
+  string administrativeGroupId = 1;
+  string approvalFor = 2;
+  string objectId = 3;
 }
 
 message DeleteApprovalResponse {

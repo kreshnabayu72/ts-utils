@@ -92,16 +92,17 @@ const (
 // Note:
 // - Approver who were absent in the approval process is marked as "Not Involved"
 type Approval[O any, IO any] struct {
-	ID              primitive.ObjectID     `json:"_id,omitempty"   bson:"_id,omitempty"`
-	For             ApprovalFor            `json:"for"             bson:"for"`
-	ApprovalBatchId primitive.ObjectID     `json:"approvalBatchId" bson:"approvalBatchId"`
-	ObjectId        primitive.ObjectID     `json:"objectId"        bson:"objectId"`
-	Object          O                      `json:"object"          bson:"object"`
-	Level           int                    `json:"level"           bson:"level"`
-	Status          ApprovalStatus         `json:"status"          bson:"status"`
-	IsActivated     bool                   `json:"isActivated"     bson:"isActivated"`
-	Type            ApprovalType           `json:"type"            bson:"type"`
-	Approvers       []ApprovalApprover[IO] `json:"approvers"       bson:"approvers"`
-	UpdatedAt       time.Time              `json:"updatedAt"       bson:"updatedAt"`
-	CreatedAt       time.Time              `json:"createdAt"       bson:"createdAt"`
+	ID                    primitive.ObjectID     `json:"_id,omitempty"         bson:"_id,omitempty"`
+	For                   ApprovalFor            `json:"for"                   bson:"for"`
+	AdministrativeGroupId primitive.ObjectID     `json:"administrativeGroupId" bson:"administrativeGroupId"`
+	ApprovalBatchId       primitive.ObjectID     `json:"approvalBatchId"       bson:"approvalBatchId"`
+	ObjectId              primitive.ObjectID     `json:"objectId"              bson:"objectId"`
+	Object                O                      `json:"object"                bson:"object"`
+	Level                 int                    `json:"level"                 bson:"level"`
+	Status                ApprovalStatus         `json:"status"                bson:"status"`
+	IsActivated           bool                   `json:"isActivated"           bson:"isActivated"`
+	Type                  ApprovalType           `json:"type"                  bson:"type"`
+	Approvers             []ApprovalApprover[IO] `json:"approvers"             bson:"approvers"`
+	UpdatedAt             time.Time              `json:"updatedAt"             bson:"updatedAt"`
+	CreatedAt             time.Time              `json:"createdAt"             bson:"createdAt"`
 }
