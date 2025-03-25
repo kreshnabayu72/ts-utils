@@ -1,6 +1,6 @@
 package interceptor
 
-// for using context value, saved in utils so every key come from 1 place
+// MetadataKey used for context value, saved in utils so every key come from 1 place
 type MetadataKey string
 
 const (

@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package approval;
+
+option go_package = "/approval";
+
+service Approval {
+  rpc HasApproval (HasApprovalRequest) returns (HasApprovalResponse) {}
+  rpc CreateApproval (CreateApprovalRequest) returns (CreateApprovalResponse) {}
+  rpc ActionApproval (ActionApprovalRequest) returns (ActionApprovalResponse) {}
+  rpc DeleteApproval (DeleteApprovalRequest) returns (DeleteApprovalResponse) {}
+}
+
+message HasApprovalRequest {
+  string administrativeGroupId = 1;
+  string approvalFor = 2;
+}
+
+message HasApprovalResponse {
+  bool hasApproval = 1;
+}
+
+message CreateApprovalRequest {
+  string administrativeGroupId = 1;
+  string approvalFor = 2;
+  string objectId = 3;
+  bytes object = 4;
+}
+
+message CreateApprovalResponse {
+  string approvalBatchId = 1;
+}
+
+message ActionApprovalRequest {
+  string approvalId = 2;
+  string approverId = 3;
+  string action = 4;
+}
+
+message ActionApprovalResponse {
+  bool isFinished = 1;
+}
+
+message DeleteApprovalRequest {
+  string approvalFor = 1;
+  string objectId = 2;
+}
+
+message DeleteApprovalResponse {
+  bool ok = 1;
+}
