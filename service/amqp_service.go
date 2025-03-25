@@ -121,6 +121,7 @@ type AMQPServiceImpl struct {
 	Connection        *amqp.Connection
 	ReconnectDelay    time.Duration
 	ReconnectAttempts int
+	VirtualHost       string
 }
 
 // MakeAMQPService creates and initialize the connection of AMQPServiceImpl
@@ -129,10 +130,16 @@ func MakeAMQPService(
 	reconnectAttempts int,
 	keepAlive bool,
 ) *AMQPServiceImpl {
+	vhost := os.Getenv("VIRTUAL_HOST")
+	if vhost == "" {
+		failOnError(errors.New("vhost can't be empty"), "Empty environment")
+	}
+
 	amqpServiceImpl := AMQPServiceImpl{
 		URI:               getURI(),
 		ReconnectDelay:    reconnectDelay,
 		ReconnectAttempts: reconnectAttempts,
+		VirtualHost:       vhost,
 	}
 
 	err := amqpServiceImpl.Connect()
@@ -355,7 +362,9 @@ func (s *AMQPServiceImpl) Connect() error {
 	}
 
 	for i := 0; i < s.ReconnectAttempts; i++ {
-		s.Connection, err = amqp.Dial(s.URI)
+		s.Connection, err = amqp.DialConfig(s.URI, amqp.Config{
+			Vhost: s.VirtualHost,
+		})
 		if err != nil {
 			logOnError(err, fmt.Sprintf("Failed to connect to RabbitMQ. Retrying in %v... (%d/%d)", s.ReconnectDelay, i+1, s.ReconnectAttempts))
 			time.Sleep(s.ReconnectDelay)
