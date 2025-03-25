@@ -4,6 +4,8 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
+
+	"gitea.qwertysystem.net/BETS/ts-utils/module/common/model"
 )
 
 type UserEmbeddedRole struct {
@@ -31,7 +33,7 @@ type User struct {
 	IsTemporary          bool                `json:"isTemporary"          bson:"isTemporary"`
 	ExpiryDate           *time.Time          `json:"expiryDate"           bson:"expiryDate"`
 	PendingEmailChange   string              `json:"pendingEmailChange"   bson:"pendingEmailChange"`
-	ModifiedBy           *primitive.ObjectID `json:"modifiedBy"           bson:"modifiedBy"`
+	ModifiedBy           *model.UserEmbedded `json:"modifiedBy"           bson:"modifiedBy"`
 	ProfilePictureSmall  *string             `json:"profilePictureSmall"  bson:"profilePictureSmall"`
 	ProfilePictureMedium *string             `json:"profilePictureMedium" bson:"profilePictureMedium"`
 	ProfilePictureBig    *string             `json:"profilePictureBig"    bson:"profilePictureBig"`
