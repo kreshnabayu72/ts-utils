@@ -35,7 +35,7 @@ func getURI() string {
 		failOnError(errors.New("port can't be empty"), "Empty environment")
 	}
 
-	return fmt.Sprintf("amqp://%s:%s/", hostname, port)
+	return fmt.Sprintf("amqps://%s:%s/", hostname, port)
 }
 
 type QueueDeclareArgs struct {
