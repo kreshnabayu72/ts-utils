@@ -6,15 +6,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// ApprovalFor represents the possible values to "which object this approval belongs for"
-type ApprovalFor string
-
-// TODO(refan): completes the ApprovalFor possible values
-const (
-	TransactionApprovalForReception ApprovalFor = "Reception"
-	TransactionApprovalForExpired   ApprovalFor = "Expired"
-)
-
 // ApprovalType represents the possible values for approval type
 type ApprovalType string
 
@@ -93,7 +84,7 @@ const (
 // - Approver who were absent in the approval process is marked as "Not Involved"
 type Approval[O any, IO any] struct {
 	ID                    primitive.ObjectID     `json:"_id,omitempty"         bson:"_id,omitempty"`
-	For                   ApprovalFor            `json:"for"                   bson:"for"`
+	For                   string                 `json:"for"                   bson:"for"`
 	AdministrativeGroupId primitive.ObjectID     `json:"administrativeGroupId" bson:"administrativeGroupId"`
 	ApprovalBatchId       primitive.ObjectID     `json:"approvalBatchId"       bson:"approvalBatchId"`
 	ObjectId              primitive.ObjectID     `json:"objectId"              bson:"objectId"`
