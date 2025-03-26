@@ -126,9 +126,6 @@ func GenerateDateFilter(requestDate []int) primitive.M {
 		start := time.UnixMilli(int64(requestDate[0]))
 		end := time.UnixMilli(int64(requestDate[1]))
 
-		// Add 24 hours minus 1 millisecond to end time
-		end = end.Add(24*time.Hour - time.Second)
-
 		return bson.M{
 			"$gte": start,
 			"$lte": end,
