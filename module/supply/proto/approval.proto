@@ -25,6 +25,7 @@ message CreateApprovalRequest {
   string approvalFor = 2;
   string objectId = 3;
   bytes object = 4;
+  bytes approverData = 5;
 }
 
 message CreateApprovalResponse {
