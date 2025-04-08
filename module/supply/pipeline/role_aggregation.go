@@ -2,9 +2,9 @@ package pipeline
 
 import (
 	"fmt"
+	"gitea.qwertysystem.net/BETS/ts-utils/functions"
 	"strings"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/functions"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
@@ -424,9 +424,10 @@ func RoleRestrictionAggregation(builder *pipeline.PipelineBuilder, loggedInUserI
 			bson.M{
 				"filterOptions": filterOptions,
 			},
-		).
-		OptionalMatchV2(
-			filterOptions.TransactionRole != nil,
+		)
+
+	if filterOptions.TransactionRole != nil {
+		builder = builder.Match(
 			bson.M{
 				"$or": bson.A{
 					bson.M{
@@ -443,9 +444,11 @@ func RoleRestrictionAggregation(builder *pipeline.PipelineBuilder, loggedInUserI
 					},
 				},
 			},
-		).
-		OptionalMatchV2(
-			filterOptions.SystemRole != nil,
+		)
+	}
+
+	if filterOptions.SystemRole != nil {
+		builder = builder.Match(
 			bson.M{
 				"$or": bson.A{
 					bson.M{
@@ -463,4 +466,5 @@ func RoleRestrictionAggregation(builder *pipeline.PipelineBuilder, loggedInUserI
 				},
 			},
 		)
+	}
 }
