@@ -8,7 +8,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/db"
-	"gitea.qwertysystem.net/BETS/ts-utils/functions"
 	supply_model "gitea.qwertysystem.net/BETS/ts-utils/module/supply/model"
 	"gitea.qwertysystem.net/BETS/ts-utils/pipeline"
 )
@@ -101,7 +100,7 @@ func RolePermissionAggregation(
 	loggedInUserId primitive.ObjectID,
 	administrativeGroupField string,
 ) {
-	if !strings.HasPrefix(administrativeGroupField, "$") {
+	if administrativeGroupField != "" && !strings.HasPrefix(administrativeGroupField, "$") {
 		administrativeGroupField = fmt.Sprintf("$%s", administrativeGroupField)
 	}
 
@@ -118,11 +117,14 @@ func RolePermissionAggregation(
 			},
 			"as": "userTransactionRoles",
 			"pipeline": pipeline.NewPipelineBuilder().
-				Match(bson.M{
-					"$expr": bson.M{
-						"$eq": bson.A{"$administrativeGroup", "$$administrativeGroupField"},
+				OptionalMatch(
+					bson.M{
+						"$expr": bson.M{
+							"$eq": bson.A{"$administrativeGroup", "$$administrativeGroupField"},
+						},
 					},
-				}).
+					administrativeGroupField != "",
+				).
 				Build(),
 		}).
 		Lookup(bson.M{
@@ -275,190 +277,67 @@ func RolePermissionAggregation(
 
 func RoleRestrictionAggregation(builder *pipeline.PipelineBuilder, loggedInUserId primitive.ObjectID, filterOptions RoleRestrictionOptions) {
 	builder = builder.
-		Set(bson.M{
-			"loggedInUserId": loggedInUserId,
-		}).
-		Lookup(bson.M{
-			"from":         db.UserTransactionRoleModelName,
-			"localField":   "loggedInUserId",
-			"foreignField": "user",
-			"as":           "userTransactionRoles",
-		}).
-		Lookup(bson.M{
-			"from":         db.UserSystemRoleModelName,
-			"localField":   "loggedInUserId",
-			"foreignField": "user",
-			"as":           "userSystemRoles",
-		}).
 		Set(
 			bson.M{
-				"permissions": bson.M{
-					"transactionRoles": bson.M{
-						"receptionSupplierReturn": bson.M{
-							"admin":      getTransactionRolePermission(supply_model.TransactionRoleTypeReceptionSupplierReturn, supply_model.TransactionManageTypeAdmin),
-							"monitoring": getTransactionRolePermission(supply_model.TransactionRoleTypeReceptionSupplierReturn, supply_model.TransactionManageTypeMonitoring),
-							"staff":      getTransactionRolePermission(supply_model.TransactionRoleTypeReceptionSupplierReturn, supply_model.TransactionManageTypeStaff),
-							"approver":   getTransactionRolePermission(supply_model.TransactionRoleTypeReceptionSupplierReturn, supply_model.TransactionManageTypeApprover),
-						},
-						"checkoutInternalReturn": bson.M{
-							"admin":      getTransactionRolePermission(supply_model.TransactionRoleTypeCheckoutInternalReturn, supply_model.TransactionManageTypeAdmin),
-							"monitoring": getTransactionRolePermission(supply_model.TransactionRoleTypeCheckoutInternalReturn, supply_model.TransactionManageTypeMonitoring),
-							"staff":      getTransactionRolePermission(supply_model.TransactionRoleTypeCheckoutInternalReturn, supply_model.TransactionManageTypeStaff),
-							"approver":   getTransactionRolePermission(supply_model.TransactionRoleTypeCheckoutInternalReturn, supply_model.TransactionManageTypeApprover),
-						},
-						"transfer": bson.M{
-							"admin":      getTransactionRolePermission(supply_model.TransactionRoleTypeTransfer, supply_model.TransactionManageTypeAdmin),
-							"monitoring": getTransactionRolePermission(supply_model.TransactionRoleTypeTransfer, supply_model.TransactionManageTypeMonitoring),
-							"staff":      getTransactionRolePermission(supply_model.TransactionRoleTypeTransfer, supply_model.TransactionManageTypeStaff),
-							"approver":   getTransactionRolePermission(supply_model.TransactionRoleTypeTransfer, supply_model.TransactionManageTypeApprover),
-						},
-						"defect": bson.M{
-							"admin":      getTransactionRolePermission(supply_model.TransactionRoleTypeDefect, supply_model.TransactionManageTypeAdmin),
-							"monitoring": getTransactionRolePermission(supply_model.TransactionRoleTypeDefect, supply_model.TransactionManageTypeMonitoring),
-							"staff":      getTransactionRolePermission(supply_model.TransactionRoleTypeDefect, supply_model.TransactionManageTypeStaff),
-							"approver":   getTransactionRolePermission(supply_model.TransactionRoleTypeDefect, supply_model.TransactionManageTypeApprover),
-						},
-						"expired": bson.M{
-							"admin":      getTransactionRolePermission(supply_model.TransactionRoleTypeExpired, supply_model.TransactionManageTypeAdmin),
-							"monitoring": getTransactionRolePermission(supply_model.TransactionRoleTypeExpired, supply_model.TransactionManageTypeMonitoring),
-							"staff":      getTransactionRolePermission(supply_model.TransactionRoleTypeExpired, supply_model.TransactionManageTypeStaff),
-							"approver":   getTransactionRolePermission(supply_model.TransactionRoleTypeExpired, supply_model.TransactionManageTypeApprover),
-						},
-						"tracking": bson.M{
-							"admin":      getTransactionRolePermission(supply_model.TransactionRoleTypeTracking, supply_model.TransactionManageTypeAdmin),
-							"monitoring": getTransactionRolePermission(supply_model.TransactionRoleTypeTracking, supply_model.TransactionManageTypeMonitoring),
-							"staff":      getTransactionRolePermission(supply_model.TransactionRoleTypeTracking, supply_model.TransactionManageTypeStaff),
-							"approver":   getTransactionRolePermission(supply_model.TransactionRoleTypeTracking, supply_model.TransactionManageTypeApprover),
-						},
-						"missing": bson.M{
-							"admin":      getTransactionRolePermission(supply_model.TransactionRoleTypeMissing, supply_model.TransactionManageTypeAdmin),
-							"monitoring": getTransactionRolePermission(supply_model.TransactionRoleTypeMissing, supply_model.TransactionManageTypeMonitoring),
-							"staff":      getTransactionRolePermission(supply_model.TransactionRoleTypeMissing, supply_model.TransactionManageTypeStaff),
-							"approver":   getTransactionRolePermission(supply_model.TransactionRoleTypeMissing, supply_model.TransactionManageTypeApprover),
-						},
-						"disposal": bson.M{
-							"admin":      getTransactionRolePermission(supply_model.TransactionRoleTypeDisposal, supply_model.TransactionManageTypeAdmin),
-							"monitoring": getTransactionRolePermission(supply_model.TransactionRoleTypeDisposal, supply_model.TransactionManageTypeMonitoring),
-							"staff":      getTransactionRolePermission(supply_model.TransactionRoleTypeDisposal, supply_model.TransactionManageTypeStaff),
-							"approver":   getTransactionRolePermission(supply_model.TransactionRoleTypeDisposal, supply_model.TransactionManageTypeApprover),
-						},
-						"stockOpname": bson.M{
-							"admin":      getTransactionRolePermission(supply_model.TransactionRoleTypeStockOpname, supply_model.TransactionManageTypeAdmin),
-							"monitoring": getTransactionRolePermission(supply_model.TransactionRoleTypeStockOpname, supply_model.TransactionManageTypeMonitoring),
-							"staff":      getTransactionRolePermission(supply_model.TransactionRoleTypeStockOpname, supply_model.TransactionManageTypeStaff),
-							"approver":   getTransactionRolePermission(supply_model.TransactionRoleTypeStockOpname, supply_model.TransactionManageTypeApprover),
-						},
-					},
-					"systemRoles": bson.M{
-						"importData": bson.M{
-							"create": getSystemRolePermission(supply_model.SystemRoleTypeImportData, "create"),
-							"view":   getSystemRolePermission(supply_model.SystemRoleTypeImportData, "view"),
-							"update": getSystemRolePermission(supply_model.SystemRoleTypeImportData, "update"),
-							"delete": getSystemRolePermission(supply_model.SystemRoleTypeImportData, "delete"),
-						},
-						"itemAttribute": bson.M{
-							"create": getSystemRolePermission(supply_model.SystemRoleTypeItemAttribute, "create"),
-							"view":   getSystemRolePermission(supply_model.SystemRoleTypeItemAttribute, "view"),
-							"update": getSystemRolePermission(supply_model.SystemRoleTypeItemAttribute, "update"),
-							"delete": getSystemRolePermission(supply_model.SystemRoleTypeItemAttribute, "delete"),
-						},
-						"itemPolicy": bson.M{
-							"create": getSystemRolePermission(supply_model.SystemRoleTypeItemPolicy, "create"),
-							"view":   getSystemRolePermission(supply_model.SystemRoleTypeItemPolicy, "view"),
-							"update": getSystemRolePermission(supply_model.SystemRoleTypeItemPolicy, "update"),
-							"delete": getSystemRolePermission(supply_model.SystemRoleTypeItemPolicy, "delete"),
-						},
-						"openApi": bson.M{
-							"create": getSystemRolePermission(supply_model.SystemRoleTypeOpenAPI, "create"),
-							"view":   getSystemRolePermission(supply_model.SystemRoleTypeOpenAPI, "view"),
-							"update": getSystemRolePermission(supply_model.SystemRoleTypeOpenAPI, "update"),
-							"delete": getSystemRolePermission(supply_model.SystemRoleTypeOpenAPI, "delete"),
-						},
-						"documentDeletion": bson.M{
-							"create": getSystemRolePermission(supply_model.SystemRoleTypeDocumentDeletion, "create"),
-							"view":   getSystemRolePermission(supply_model.SystemRoleTypeDocumentDeletion, "view"),
-							"update": getSystemRolePermission(supply_model.SystemRoleTypeDocumentDeletion, "update"),
-							"delete": getSystemRolePermission(supply_model.SystemRoleTypeDocumentDeletion, "delete"),
-						},
-						"group": bson.M{
-							"create": getSystemRolePermission(supply_model.SystemRoleTypeGroup, "create"),
-							"view":   getSystemRolePermission(supply_model.SystemRoleTypeGroup, "view"),
-							"update": getSystemRolePermission(supply_model.SystemRoleTypeGroup, "update"),
-							"delete": getSystemRolePermission(supply_model.SystemRoleTypeGroup, "delete"),
-						},
-						"userRole": bson.M{
-							"create": getSystemRolePermission(supply_model.SystemRoleUserRole, "create"),
-							"view":   getSystemRolePermission(supply_model.SystemRoleUserRole, "view"),
-							"update": getSystemRolePermission(supply_model.SystemRoleUserRole, "update"),
-							"delete": getSystemRolePermission(supply_model.SystemRoleUserRole, "delete"),
-						},
-						"iotReader": bson.M{
-							"create": getSystemRolePermission(supply_model.SystemRoleIOTReader, "create"),
-							"view":   getSystemRolePermission(supply_model.SystemRoleIOTReader, "view"),
-							"update": getSystemRolePermission(supply_model.SystemRoleIOTReader, "update"),
-							"delete": getSystemRolePermission(supply_model.SystemRoleIOTReader, "delete"),
-						},
-						"license": bson.M{
-							"create": getSystemRolePermission(supply_model.SystemRoleLicense, "create"),
-							"view":   getSystemRolePermission(supply_model.SystemRoleLicense, "view"),
-							"update": getSystemRolePermission(supply_model.SystemRoleLicense, "update"),
-							"delete": getSystemRolePermission(supply_model.SystemRoleLicense, "delete"),
-						},
-						"tag": bson.M{
-							"create": getSystemRolePermission(supply_model.SystemRoleTAG, "create"),
-							"view":   getSystemRolePermission(supply_model.SystemRoleTAG, "view"),
-							"update": getSystemRolePermission(supply_model.SystemRoleTAG, "update"),
-							"delete": getSystemRolePermission(supply_model.SystemRoleTAG, "delete"),
-						},
-						"itemStock": bson.M{
-							"create": getSystemRolePermission(supply_model.SystemRoleItemStock, "create"),
-							"view":   getSystemRolePermission(supply_model.SystemRoleItemStock, "view"),
-							"update": getSystemRolePermission(supply_model.SystemRoleItemStock, "update"),
-							"delete": getSystemRolePermission(supply_model.SystemRoleItemStock, "delete"),
-						},
-					},
-				},
+				"loggedInUserId": loggedInUserId,
 			},
 		)
 
 	if filterOptions.TransactionRole != nil {
-		builder = builder.Match(
+		builder = builder.Lookup(
 			bson.M{
-				"$or": bson.A{
-					bson.M{
-						fmt.Sprintf("permissions.transactionRoles.%s.%s", filterOptions.TransactionRole.RoleType, supply_model.TransactionManageTypeAdmin): functions.Contains(filterOptions.TransactionRole.ManageType, supply_model.TransactionManageTypeAdmin),
-					},
-					bson.M{
-						fmt.Sprintf("permissions.transactionRoles.%s.%s", filterOptions.TransactionRole.RoleType, supply_model.TransactionManageTypeMonitoring): functions.Contains(filterOptions.TransactionRole.ManageType, supply_model.TransactionManageTypeMonitoring),
-					},
-					bson.M{
-						fmt.Sprintf("permissions.transactionRoles.%s.%s", filterOptions.TransactionRole.RoleType, supply_model.TransactionManageTypeStaff): functions.Contains(filterOptions.TransactionRole.ManageType, supply_model.TransactionManageTypeStaff),
-					},
-					bson.M{
-						fmt.Sprintf("permissions.transactionRoles.%s.%s", filterOptions.TransactionRole.RoleType, supply_model.TransactionManageTypeApprover): functions.Contains(filterOptions.TransactionRole.ManageType, supply_model.TransactionManageTypeApprover),
-					},
-				},
+				"from":         db.UserTransactionRoleModelName,
+				"localField":   "loggedInUserId",
+				"foreignField": "user",
+				"as":           "userTransactionRoles",
+				"pipeline": pipeline.NewPipelineBuilder().
+					Match(
+						bson.M{
+							"roleType": filterOptions.TransactionRole.RoleType,
+							"manageType": bson.M{
+								"$in": filterOptions.TransactionRole.ManageType,
+							},
+						},
+					).
+					Build(),
 			},
 		)
 	}
 
 	if filterOptions.SystemRole != nil {
-		builder = builder.Match(
+		builder = builder.Lookup(
 			bson.M{
-				"$or": bson.A{
-					bson.M{
-						fmt.Sprintf("permissions.systemRoles.%s.create", filterOptions.SystemRole.RoleType): filterOptions.SystemRole.Permissions.Create,
-					},
-					bson.M{
-						fmt.Sprintf("permissions.systemRoles.%s.view", filterOptions.SystemRole.RoleType): filterOptions.SystemRole.Permissions.View,
-					},
-					bson.M{
-						fmt.Sprintf("permissions.systemRoles.%s.update", filterOptions.SystemRole.RoleType): filterOptions.SystemRole.Permissions.Update,
-					},
-					bson.M{
-						fmt.Sprintf("permissions.systemRoles.%s.delete", filterOptions.SystemRole.RoleType): filterOptions.SystemRole.Permissions.Delete,
-					},
-				},
+				"from":         db.UserSystemRoleModelName,
+				"localField":   "loggedInUserId",
+				"foreignField": "user",
+				"as":           "userSystemRoles",
+				"pipeline": pipeline.NewPipelineBuilder().
+					Match(
+						bson.M{
+							"$and": bson.A{
+								bson.M{
+									"roleType": filterOptions.SystemRole.RoleType,
+								},
+								bson.M{
+									"$or": bson.A{
+										bson.M{
+											"permissions.create": filterOptions.SystemRole.Permissions.Create,
+										},
+										bson.M{
+											"permissions.view": filterOptions.SystemRole.Permissions.View,
+										},
+										bson.M{
+											"permissions.update": filterOptions.SystemRole.Permissions.Update,
+										},
+										bson.M{
+											"permissions.delete": filterOptions.SystemRole.Permissions.Delete,
+										},
+									},
+								},
+							},
+						},
+					).
+					Build(),
 			},
 		)
 	}
