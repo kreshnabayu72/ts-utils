@@ -47,17 +47,6 @@ func (pb *PipelineBuilder) OptionalMatch(matchData bson.M, isMatch bool) *Pipeli
 	return pb
 }
 
-// OptionalMatchV2 optionally adds a $match stage to the pipeline,
-// prefer this over OptionalMatch because the isMatch will be evaluated first.
-func (pb *PipelineBuilder) OptionalMatchV2(isMatch bool, matchData bson.M) *PipelineBuilder {
-	if matchData != nil && isMatch {
-		pb.Pipelines = append(pb.Pipelines, bson.D{
-			{Key: "$match", Value: matchData},
-		})
-	}
-	return pb
-}
-
 // Set adds a $set stage to the pipeline
 func (pb *PipelineBuilder) Set(setData bson.M) *PipelineBuilder {
 	if setData != nil {
@@ -110,17 +99,6 @@ func (pb *PipelineBuilder) Lookup(data bson.M) *PipelineBuilder {
 
 // OptionalLookup Adds a $lookup stage to the pipeline if the condition is met
 func (pb *PipelineBuilder) OptionalLookup(data bson.M, isMatch bool) *PipelineBuilder {
-	if data != nil && isMatch {
-		pb.Pipelines = append(pb.Pipelines, bson.D{
-			{Key: "$lookup", Value: data},
-		})
-	}
-	return pb
-}
-
-// OptionalLookupV2 Adds a $lookup stage to the pipeline if the condition is met,
-// prefer this over OptionalLookup because the isMatch will be evaluated first.
-func (pb *PipelineBuilder) OptionalLookupV2(isMatch bool, data bson.M) *PipelineBuilder {
 	if data != nil && isMatch {
 		pb.Pipelines = append(pb.Pipelines, bson.D{
 			{Key: "$lookup", Value: data},
