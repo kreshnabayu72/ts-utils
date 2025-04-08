@@ -284,84 +284,87 @@ func RoleRestrictionAggregation(builder *pipeline.PipelineBuilder, loggedInUserI
 		)
 
 	if filterOptions.TransactionRole != nil {
-		builder = builder.Lookup(
-			bson.M{
-				"from":         db.UserTransactionRoleModelName,
-				"localField":   "loggedInUserId",
-				"foreignField": "user",
-				"as":           "userTransactionRoles",
-				"pipeline": pipeline.NewPipelineBuilder().
-					Match(
-						bson.M{
-							"roleType": filterOptions.TransactionRole.RoleType,
-							"manageType": bson.M{
-								"$in": filterOptions.TransactionRole.ManageType,
+		builder = builder.
+			Lookup(
+				bson.M{
+					"from":         db.UserTransactionRoleModelName,
+					"localField":   "loggedInUserId",
+					"foreignField": "user",
+					"as":           "userTransactionRoles",
+					"pipeline": pipeline.NewPipelineBuilder().
+						Match(
+							bson.M{
+								"roleType": filterOptions.TransactionRole.RoleType,
+								"manageType": bson.M{
+									"$in": filterOptions.TransactionRole.ManageType,
+								},
 							},
+						).
+						Build(),
+				},
+			).
+			Match(
+				bson.M{
+					"$expr": bson.M{
+						"$gt": bson.A{
+							bson.M{
+								"$size": "$userTransactionRoles",
+							},
+							0,
 						},
-					).
-					Build(),
-			},
-		).Match(
-			bson.M{
-				"$expr": bson.M{
-					"$gt": bson.A{
-						bson.M{
-							"$size": "$userTransactionRoles",
-						},
-						0,
 					},
 				},
-			},
-		)
+			)
 	}
 
 	if filterOptions.SystemRole != nil {
-		builder = builder.Lookup(
-			bson.M{
-				"from":         db.UserSystemRoleModelName,
-				"localField":   "loggedInUserId",
-				"foreignField": "user",
-				"as":           "userSystemRoles",
-				"pipeline": pipeline.NewPipelineBuilder().
-					Match(
-						bson.M{
-							"$and": bson.A{
-								bson.M{
-									"roleType": filterOptions.SystemRole.RoleType,
-								},
-								bson.M{
-									"$or": bson.A{
-										bson.M{
-											"permissions.create": filterOptions.SystemRole.Permissions.Create,
-										},
-										bson.M{
-											"permissions.view": filterOptions.SystemRole.Permissions.View,
-										},
-										bson.M{
-											"permissions.update": filterOptions.SystemRole.Permissions.Update,
-										},
-										bson.M{
-											"permissions.delete": filterOptions.SystemRole.Permissions.Delete,
-										},
-									},
-								},
-							},
-						},
-					).
-					Match(
-						bson.M{
-							"$expr": bson.M{
-								"$gt": bson.A{
+		builder = builder.
+			Lookup(
+				bson.M{
+					"from":         db.UserSystemRoleModelName,
+					"localField":   "loggedInUserId",
+					"foreignField": "user",
+					"as":           "userSystemRoles",
+					"pipeline": pipeline.NewPipelineBuilder().
+						Match(
+							bson.M{
+								"$and": bson.A{
 									bson.M{
-										"$size": "$userSystemRoles",
+										"roleType": filterOptions.SystemRole.RoleType,
 									},
-									0,
+									bson.M{
+										"$or": bson.A{
+											bson.M{
+												"permissions.create": filterOptions.SystemRole.Permissions.Create,
+											},
+											bson.M{
+												"permissions.view": filterOptions.SystemRole.Permissions.View,
+											},
+											bson.M{
+												"permissions.update": filterOptions.SystemRole.Permissions.Update,
+											},
+											bson.M{
+												"permissions.delete": filterOptions.SystemRole.Permissions.Delete,
+											},
+										},
+									},
 								},
 							},
+						).
+						Build(),
+				},
+			).
+			Match(
+				bson.M{
+					"$expr": bson.M{
+						"$gt": bson.A{
+							bson.M{
+								"$size": "$userSystemRoles",
+							},
+							0,
 						},
-					).
-					Build(),
-			},
-		)
+					},
+				},
+			)
 	}
 }
