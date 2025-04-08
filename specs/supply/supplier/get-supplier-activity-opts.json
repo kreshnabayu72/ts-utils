@@ -1,0 +1,24 @@
+{
+  "data": {
+    "supplierOptions": [
+      {
+        "label": "string",
+        "value": "any"
+      }
+    ],
+    "picOptions": [
+      {
+        "label": "string",
+        "value": "any"
+      }
+    ],
+    "groupOptions": [
+      {
+        "label": "string",
+        "value": "any"
+      }
+    ]
+  },
+  "message": "string",
+  "status": "number"
+}

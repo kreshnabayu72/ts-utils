@@ -4,5 +4,9 @@ package service
 type ReservedPort uint16
 
 const (
+	// Global
 	GlobalSettingsGRPCPort ReservedPort = 9080
+
+	// Supply
+	SupplyDataManagerGRPCPort ReservedPort = 9081
 )

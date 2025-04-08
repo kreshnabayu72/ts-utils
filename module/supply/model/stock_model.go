@@ -1,8 +1,9 @@
 package model
 
 import (
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/module/common/model"
 )
