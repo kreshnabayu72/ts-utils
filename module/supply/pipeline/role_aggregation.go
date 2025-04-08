@@ -2,13 +2,13 @@ package pipeline
 
 import (
 	"fmt"
-	"gitea.qwertysystem.net/BETS/ts-utils/functions"
 	"strings"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/db"
+	"gitea.qwertysystem.net/BETS/ts-utils/functions"
 	supply_model "gitea.qwertysystem.net/BETS/ts-utils/module/supply/model"
 	"gitea.qwertysystem.net/BETS/ts-utils/pipeline"
 )
@@ -69,7 +69,7 @@ func getSystemRolePermission(roleType supply_model.SystemRoleType, permission st
 			bson.M{
 				"$size": bson.M{
 					"$filter": bson.M{
-						"input": "userSystemRoles",
+						"input": "$userSystemRoles",
 						"as":    "role",
 						"cond": bson.M{
 							"$and": bson.A{
@@ -418,11 +418,6 @@ func RoleRestrictionAggregation(builder *pipeline.PipelineBuilder, loggedInUserI
 						},
 					},
 				},
-			},
-		).
-		Set(
-			bson.M{
-				"filterOptions": filterOptions,
 			},
 		)
 
