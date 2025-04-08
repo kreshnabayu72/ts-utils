@@ -275,7 +275,16 @@ func RolePermissionAggregation(
 		)
 }
 
-func RoleRestrictionAggregation(builder *pipeline.PipelineBuilder, loggedInUserId primitive.ObjectID, filterOptions RoleRestrictionOptions) {
+func RoleRestrictionAggregation(
+	builder *pipeline.PipelineBuilder,
+	loggedInUserId primitive.ObjectID,
+	administrativeGroupField string,
+	filterOptions RoleRestrictionOptions,
+) {
+	if administrativeGroupField != "" && !strings.HasPrefix(administrativeGroupField, "$") {
+		administrativeGroupField = fmt.Sprintf("$%s", administrativeGroupField)
+	}
+
 	builder = builder.
 		Set(
 			bson.M{
@@ -290,8 +299,19 @@ func RoleRestrictionAggregation(builder *pipeline.PipelineBuilder, loggedInUserI
 					"from":         db.UserTransactionRoleModelName,
 					"localField":   "loggedInUserId",
 					"foreignField": "user",
-					"as":           "userTransactionRoles",
+					"let": bson.M{
+						"administrativeGroupField": administrativeGroupField,
+					},
+					"as": "userTransactionRoles",
 					"pipeline": pipeline.NewPipelineBuilder().
+						OptionalMatch(
+							bson.M{
+								"$expr": bson.M{
+									"$eq": bson.A{"$administrativeGroup", "$$administrativeGroupField"},
+								},
+							},
+							administrativeGroupField != "",
+						).
 						Match(
 							bson.M{
 								"roleType": filterOptions.TransactionRole.RoleType,
@@ -324,8 +344,19 @@ func RoleRestrictionAggregation(builder *pipeline.PipelineBuilder, loggedInUserI
 					"from":         db.UserSystemRoleModelName,
 					"localField":   "loggedInUserId",
 					"foreignField": "user",
-					"as":           "userSystemRoles",
+					"let": bson.M{
+						"administrativeGroupField": administrativeGroupField,
+					},
+					"as": "userSystemRoles",
 					"pipeline": pipeline.NewPipelineBuilder().
+						OptionalMatch(
+							bson.M{
+								"$expr": bson.M{
+									"$eq": bson.A{"$administrativeGroup", "$$administrativeGroupField"},
+								},
+							},
+							administrativeGroupField != "",
+						).
 						Match(
 							bson.M{
 								"$and": bson.A{
