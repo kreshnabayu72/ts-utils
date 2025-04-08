@@ -2,6 +2,7 @@ package pipeline
 
 import (
 	"fmt"
+	"strings"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/functions"
 	"go.mongodb.org/mongo-driver/bson"
@@ -98,8 +99,12 @@ func getSystemRolePermission(roleType supply_model.SystemRoleType, permission st
 func RolePermissionAggregation(
 	builder *pipeline.PipelineBuilder,
 	loggedInUserId primitive.ObjectID,
-	administrativeGroup primitive.ObjectID,
+	administrativeGroupField string,
 ) {
+	if !strings.HasPrefix(administrativeGroupField, "$") {
+		administrativeGroupField = fmt.Sprintf("$%s", administrativeGroupField)
+	}
+
 	builder = builder.
 		Set(bson.M{
 			"loggedInUserId": loggedInUserId,
@@ -108,10 +113,15 @@ func RolePermissionAggregation(
 			"from":         db.UserTransactionRoleModelName,
 			"localField":   "loggedInUserId",
 			"foreignField": "user",
-			"as":           "userTransactionRoles",
+			"let": bson.M{
+				"administrativeGroupField": administrativeGroupField,
+			},
+			"as": "userTransactionRoles",
 			"pipeline": pipeline.NewPipelineBuilder().
 				Match(bson.M{
-					"administrativeGroup": administrativeGroup,
+					"$expr": bson.M{
+						"$eq": bson.A{"$administrativeGroup", "$$administrativeGroupField"},
+					},
 				}).
 				Build(),
 		}).
@@ -119,10 +129,15 @@ func RolePermissionAggregation(
 			"from":         db.UserSystemRoleModelName,
 			"localField":   "loggedInUserId",
 			"foreignField": "user",
-			"as":           "userSystemRoles",
+			"let": bson.M{
+				"administrativeGroupField": administrativeGroupField,
+			},
+			"as": "userSystemRoles",
 			"pipeline": pipeline.NewPipelineBuilder().
 				Match(bson.M{
-					"administrativeGroup": administrativeGroup,
+					"$expr": bson.M{
+						"$eq": bson.A{"$administrativeGroup", "$$administrativeGroupField"},
+					},
 				}).
 				Build(),
 		}).
@@ -410,7 +425,8 @@ func RoleRestrictionAggregation(builder *pipeline.PipelineBuilder, loggedInUserI
 				"filterOptions": filterOptions,
 			},
 		).
-		OptionalMatch(
+		OptionalMatchV2(
+			filterOptions.TransactionRole != nil,
 			bson.M{
 				"$or": bson.A{
 					bson.M{
@@ -427,9 +443,9 @@ func RoleRestrictionAggregation(builder *pipeline.PipelineBuilder, loggedInUserI
 					},
 				},
 			},
-			filterOptions.TransactionRole != nil,
 		).
-		OptionalMatch(
+		OptionalMatchV2(
+			filterOptions.SystemRole != nil,
 			bson.M{
 				"$or": bson.A{
 					bson.M{
@@ -446,6 +462,5 @@ func RoleRestrictionAggregation(builder *pipeline.PipelineBuilder, loggedInUserI
 					},
 				},
 			},
-			filterOptions.SystemRole != nil,
 		)
 }
