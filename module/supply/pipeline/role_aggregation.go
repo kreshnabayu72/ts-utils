@@ -301,6 +301,15 @@ func RoleRestrictionAggregation(builder *pipeline.PipelineBuilder, loggedInUserI
 					).
 					Build(),
 			},
+		).Match(
+			bson.M{
+				"$gt": bson.A{
+					bson.M{
+						"$size": "$userTransactionRoles",
+					},
+					0,
+				},
+			},
 		)
 	}
 
@@ -334,6 +343,16 @@ func RoleRestrictionAggregation(builder *pipeline.PipelineBuilder, loggedInUserI
 										},
 									},
 								},
+							},
+						},
+					).
+					Match(
+						bson.M{
+							"$gt": bson.A{
+								bson.M{
+									"$size": "userSystemRoles",
+								},
+								0,
 							},
 						},
 					).
