@@ -270,7 +270,7 @@ func (s *AMQPServiceImpl) SimplePublish(
 	defaultExchange := ExchangeDeclareArgs{
 		name:       exchange,
 		kind:       "topic",
-		durable:    false,
+		durable:    true,
 		autoDelete: false,
 		internal:   false,
 		noWait:     false,
@@ -305,7 +305,7 @@ func (s *AMQPServiceImpl) SimpleSubscribe(
 	defaultExchange := ExchangeDeclareArgs{
 		name:       exchange,
 		kind:       "topic",
-		durable:    false,
+		durable:    true,
 		autoDelete: false,
 		internal:   false,
 		noWait:     false,
@@ -314,7 +314,7 @@ func (s *AMQPServiceImpl) SimpleSubscribe(
 
 	defaultQueue := QueueDeclareArgs{
 		name:       queue,
-		durable:    false,
+		durable:    true,
 		autoDelete: false,
 		exclusive:  false,
 		noWait:     false,
