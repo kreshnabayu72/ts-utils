@@ -353,7 +353,7 @@ func RoleRestrictionAggregation(builder *pipeline.PipelineBuilder, loggedInUserI
 							"$expr": bson.M{
 								"$gt": bson.A{
 									bson.M{
-										"$size": "userSystemRoles",
+										"$size": "$userSystemRoles",
 									},
 									0,
 								},
