@@ -104,7 +104,7 @@ func RolePermissionAggregation(
 		administrativeGroupField = fmt.Sprintf("$%s", administrativeGroupField)
 	}
 
-	builder = builder.
+	builder.
 		Set(bson.M{
 			"loggedInUserId": loggedInUserId,
 		}).
@@ -285,7 +285,7 @@ func RoleRestrictionAggregation(
 		administrativeGroupField = fmt.Sprintf("$%s", administrativeGroupField)
 	}
 
-	builder = builder.
+	builder.
 		Set(
 			bson.M{
 				"loggedInUserId": loggedInUserId,
@@ -293,7 +293,7 @@ func RoleRestrictionAggregation(
 		)
 
 	if filterOptions.TransactionRole != nil {
-		builder = builder.
+		builder.
 			Lookup(
 				bson.M{
 					"from":         db.UserTransactionRoleModelName,
@@ -338,7 +338,7 @@ func RoleRestrictionAggregation(
 	}
 
 	if filterOptions.SystemRole != nil {
-		builder = builder.
+		builder.
 			Lookup(
 				bson.M{
 					"from":         db.UserSystemRoleModelName,
