@@ -124,7 +124,15 @@ func RolePermissionAggregation(
 							"$eq": bson.A{"$administrativeGroup", "$$administrativeGroupField"},
 						},
 					},
-					administrativeGroupField != "",
+					administrativeGroupField != "" && !isFieldArray,
+				).
+				OptionalMatch(
+					bson.M{
+						"$expr": bson.M{
+							"$in": bson.A{"$administrativeGroup", "$$administrativeGroupField"},
+						},
+					},
+					administrativeGroupField != "" && isFieldArray,
 				).
 				Build(),
 		}).
