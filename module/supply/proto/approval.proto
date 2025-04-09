@@ -6,6 +6,7 @@ option go_package = "/approval";
 
 service Approval {
   rpc HasApproval (HasApprovalRequest) returns (HasApprovalResponse) {}
+  rpc HasOngoingApproval (HasOngoingApprovalRequest) returns (HasOngoingApprovalResponse) {}
   rpc CreateApproval (CreateApprovalRequest) returns (CreateApprovalResponse) {}
   rpc ActionApproval (ActionApprovalRequest) returns (ActionApprovalResponse) {}
   rpc DeleteApproval (DeleteApprovalRequest) returns (DeleteApprovalResponse) {}
@@ -50,4 +51,14 @@ message DeleteApprovalRequest {
 
 message DeleteApprovalResponse {
   bool ok = 1;
+}
+
+message HasOngoingApprovalRequest {
+  string administrativeGroupId = 1;
+  string approvalFor = 2;
+  string objectId = 3;
+}
+
+message HasOngoingApprovalResponse {
+  bool hasOngoingApproval = 1;
 }
