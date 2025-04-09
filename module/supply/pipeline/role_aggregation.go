@@ -99,6 +99,7 @@ func RolePermissionAggregation(
 	builder *pipeline.PipelineBuilder,
 	loggedInUserId primitive.ObjectID,
 	administrativeGroupField string,
+	isFieldArray bool,
 ) {
 	if administrativeGroupField != "" && !strings.HasPrefix(administrativeGroupField, "$") {
 		administrativeGroupField = fmt.Sprintf("$%s", administrativeGroupField)
@@ -136,11 +137,22 @@ func RolePermissionAggregation(
 			},
 			"as": "userSystemRoles",
 			"pipeline": pipeline.NewPipelineBuilder().
-				Match(bson.M{
-					"$expr": bson.M{
-						"$eq": bson.A{"$administrativeGroup", "$$administrativeGroupField"},
+				OptionalMatch(
+					bson.M{
+						"$expr": bson.M{
+							"$eq": bson.A{"$administrativeGroup", "$$administrativeGroupField"},
+						},
 					},
-				}).
+					administrativeGroupField != "" && !isFieldArray,
+				).
+				OptionalMatch(
+					bson.M{
+						"$expr": bson.M{
+							"$in": bson.A{"$administrativeGroup", "$$administrativeGroupField"},
+						},
+					},
+					administrativeGroupField != "" && isFieldArray,
+				).
 				Build(),
 		}).
 		Set(
