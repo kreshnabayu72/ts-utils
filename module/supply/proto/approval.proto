@@ -41,6 +41,8 @@ message ActionApprovalRequest {
 
 message ActionApprovalResponse {
   bool isFinished = 1;
+  string approver = 2;
+  int32 level = 3;
 }
 
 message DeleteApprovalRequest {

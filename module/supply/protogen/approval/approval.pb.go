@@ -300,6 +300,8 @@ func (x *ActionApprovalRequest) GetAction() string {
 type ActionApprovalResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	IsFinished    bool                   `protobuf:"varint,1,opt,name=isFinished,proto3" json:"isFinished,omitempty"`
+	Approver      string                 `protobuf:"bytes,2,opt,name=approver,proto3" json:"approver,omitempty"`
+	Level         int32                  `protobuf:"varint,3,opt,name=level,proto3" json:"level,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -339,6 +341,20 @@ func (x *ActionApprovalResponse) GetIsFinished() bool {
 		return x.IsFinished
 	}
 	return false
+}
+
+func (x *ActionApprovalResponse) GetApprover() string {
+	if x != nil {
+		return x.Approver
+	}
+	return ""
+}
+
+func (x *ActionApprovalResponse) GetLevel() int32 {
+	if x != nil {
+		return x.Level
+	}
+	return 0
 }
 
 type DeleteApprovalRequest struct {
@@ -574,11 +590,13 @@ const file_module_supply_proto_approval_proto_rawDesc = "" +
 	"\n" +
 	"approverId\x18\x03 \x01(\tR\n" +
 	"approverId\x12\x16\n" +
-	"\x06action\x18\x04 \x01(\tR\x06action\"8\n" +
+	"\x06action\x18\x04 \x01(\tR\x06action\"j\n" +
 	"\x16ActionApprovalResponse\x12\x1e\n" +
 	"\n" +
 	"isFinished\x18\x01 \x01(\bR\n" +
-	"isFinished\"\x8b\x01\n" +
+	"isFinished\x12\x1a\n" +
+	"\bapprover\x18\x02 \x01(\tR\bapprover\x12\x14\n" +
+	"\x05level\x18\x03 \x01(\x05R\x05level\"\x8b\x01\n" +
 	"\x15DeleteApprovalRequest\x124\n" +
 	"\x15administrativeGroupId\x18\x01 \x01(\tR\x15administrativeGroupId\x12 \n" +
 	"\vapprovalFor\x18\x02 \x01(\tR\vapprovalFor\x12\x1a\n" +
