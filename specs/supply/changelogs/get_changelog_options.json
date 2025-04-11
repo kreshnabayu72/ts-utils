@@ -1,0 +1,24 @@
+{
+  "status": "number",
+  "message": "string",
+  "data": {
+    "actionOptions": [
+      {
+        "label": "string",
+        "value": "any"
+      }
+    ],
+    "fieldOptions": [
+      {
+        "label": "string",
+        "value": "any"
+      }
+    ],
+    "modifiedByOptions": [
+      {
+        "label": "string",
+        "value": "any"
+      }
+    ]
+  }
+}
