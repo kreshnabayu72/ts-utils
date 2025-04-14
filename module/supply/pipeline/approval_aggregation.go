@@ -96,8 +96,8 @@ func ApprovalAggregation(
 									"$approvers.action",
 									supply_model.ApprovalActionApproved,
 								},
-								"$then": supply_model.ApprovalStatusApproved,
 							},
+							"then": supply_model.ApprovalStatusApproved,
 						},
 						bson.M{
 							"case": bson.M{
@@ -105,13 +105,14 @@ func ApprovalAggregation(
 									"$approvers.action",
 									supply_model.ApprovalActionRejected,
 								},
-								"$then": supply_model.ApprovalStatusRejected,
 							},
+							"then": supply_model.ApprovalStatusRejected,
 						},
 					},
-					"default": supply_model.ApprovalStatusWaitingForApproval,
+					"default": "Need Approval",
 				},
 			},
+			"object.administrativeGroupId": "$administrativeGroupId",
 			"object.createdAt": bson.M{
 				"$toDate": "$object.createdAt",
 			},
