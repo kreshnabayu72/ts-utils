@@ -83,6 +83,14 @@ type ConsumeArgs struct {
 	args      amqp.Table
 }
 
+type Subscriber struct {
+	Exchange   ExchangeDeclareArgs
+	Queue      QueueDeclareArgs
+	Bind       QueueBindArgs
+	Consume    ConsumeArgs
+	HandleFunc func(delivery <-chan amqp.Delivery)
+}
+
 type AMQPService interface {
 	Publish(
 		ctx context.Context,
@@ -119,6 +127,8 @@ type AMQPServiceImpl struct {
 	ReconnectDelay    time.Duration
 	ReconnectAttempts int
 	VirtualHost       string
+	Subscribers       map[uint64]Subscriber
+	subIncrementId    uint64
 }
 
 // MakeAMQPService creates and initialize the connection of AMQPServiceImpl
@@ -137,6 +147,8 @@ func MakeAMQPService(
 		ReconnectDelay:    reconnectDelay,
 		ReconnectAttempts: reconnectAttempts,
 		VirtualHost:       vhost,
+		Subscribers:       make(map[uint64]Subscriber),
+		subIncrementId:    0,
 	}
 
 	err := amqpServiceImpl.Connect()
@@ -257,6 +269,17 @@ func (s *AMQPServiceImpl) Subscribe(
 
 	go handleFunc(delivery)
 
+	// store subscriber for re-subscription on reconnection
+	s.Subscribers[s.subIncrementId] = Subscriber{
+		Exchange:   exchange,
+		Queue:      queue,
+		Bind:       bind,
+		Consume:    consume,
+		HandleFunc: handleFunc,
+	}
+
+	s.subIncrementId++
+
 	return nil
 }
 
@@ -367,7 +390,6 @@ func (s *AMQPServiceImpl) Connect() error {
 	}
 
 	for i := 0; i < s.ReconnectAttempts; i++ {
-
 		s.Connection, err = amqp.DialConfig(s.URI, amqp.Config{
 			Vhost: s.VirtualHost,
 			SASL: []amqp.Authentication{
@@ -408,11 +430,34 @@ func (s *AMQPServiceImpl) keepAlive() {
 					// Re-assign notifyClose to the newly created connection
 					notifyClose = make(chan *amqp.Error)
 					s.Connection.NotifyClose(notifyClose)
+
+					// Attempts to re-subscribe stored subscriber(s)
+					s.Resubscribe()
 					break
 				}
 				log.Printf("Reconnection failed: %v. Retrying in %v...", reconnectErr, s.ReconnectDelay)
 				time.Sleep(s.ReconnectDelay)
 			}
 		}
+	}
+}
+
+func (s *AMQPServiceImpl) Resubscribe() {
+	for id, subscriber := range s.Subscribers {
+		go func() {
+			err := s.Subscribe(
+				subscriber.Exchange,
+				subscriber.Queue,
+				subscriber.Bind,
+				subscriber.Consume,
+				subscriber.HandleFunc,
+			)
+			if err != nil {
+				logOnError(err, fmt.Sprintf("Failed to subscribe: %s", err))
+			}
+		}()
+
+		// Delete previous subscriber because it's already been rejuvenated with another id
+		delete(s.Subscribers, id)
 	}
 }
