@@ -33,7 +33,23 @@
           "capacity": "number",
           "totalStock": "number"
         }
-      ]
+      ],
+      "permissions": {
+        "systemRoles": {
+          "group": {
+            "create": "boolean",
+            "view": "boolean",
+            "update": "boolean",
+            "delete": "boolean"
+          },
+          "itemStock": {
+            "create": "boolean",
+            "view": "boolean",
+            "update": "boolean",
+            "delete": "boolean"
+          }
+        }
+      }
     },
     "data": [
       {
@@ -53,7 +69,23 @@
         "totalAdmin": "number",
         "totalSubgroup": "number",
         "aliasCode": "string,nullable",
-        "updatedAt": "string,Date"
+        "permissions": {
+          "systemRoles": {
+            "group": {
+              "create": "boolean",
+              "view": "boolean",
+              "update": "boolean",
+              "delete": "boolean"
+            },
+            "itemStock": {
+              "create": "boolean",
+              "view": "boolean",
+              "update": "boolean",
+              "delete": "boolean"
+            }
+          }
+        },
+        "updatedAt":"string,date"
       }
     ],
     "totalRecords": "number"

@@ -23,6 +23,22 @@
       "children": [
         ...
       ],
+      "permissions": {
+        "systemRoles": {
+          "group": {
+            "create": "boolean",
+            "view": "boolean",
+            "update": "boolean",
+            "delete": "boolean"
+          },
+          "itemStock": {
+            "create": "boolean",
+            "view": "boolean",
+            "update": "boolean",
+            "delete": "boolean"
+          }
+        }
+      },
       "createdAt": "string,Date"
     }
   ],

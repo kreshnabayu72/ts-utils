@@ -1,0 +1,78 @@
+{
+  "data": {
+    "data": [
+      {
+        "_id": "string,objectId",
+        "itemName": {
+          "_id": "string,objectId",
+          "name": "string",
+          "key": "number"
+        },
+        "itemSKU": {
+          "_id": "string,objectId",
+          "sku": "string",
+          "image": "string,nullable",
+          "key": "number"
+        },
+        "brand": {
+          "_id": "string,objectId",
+          "name": "string",
+          "key": "number"
+        },
+        "model": {
+          "_id": "string,objectId",
+          "name": "string",
+          "key": "number"
+        },
+        "category": {
+          "_id": "string,objectId",
+          "name": "string",
+          "key": "number"
+        },
+        "tagType": "string",
+        "totalStock": "number",
+        "totalUnplacedStock": "number",
+        "totalAvailableStock": "number",
+        "groupPlacements": [
+          {
+            "_id": "string,objectId",
+            "name": "string",
+            "key": "number"
+          }
+        ],
+        "suppliers": [
+          {
+            "_id": "string,objectId",
+            "name": "string",
+            "key": "number"
+          }
+        ],
+        "permissions": {
+          "transactionRoles": {
+            "receptionSupplierReturn": {
+              "admin": "boolean",
+              "monitoring": "boolean",
+              "staff": "boolean",
+              "approver": "boolean"
+            },
+            "checkoutInternalReturn": {
+              "admin": "boolean",
+              "monitoring": "boolean",
+              "staff": "boolean",
+              "approver": "boolean"
+            },
+            "transfer": {
+              "admin": "boolean",
+              "monitoring": "boolean",
+              "staff": "boolean",
+              "approver": "boolean"
+            }
+          }
+        }
+      }
+    ],
+    "totalRecords": "number"
+  },
+  "message": "string",
+  "status": "number"
+}
