@@ -19,15 +19,12 @@ require (
 )
 
 require (
-	gitea.qwertysystem.net/BETS/cron/v3 v3.0.1-0.20250416093848-0119b14c6206 // indirect
-	gitea.qwertysystem.net/BETS/go-agenda v0.0.0-20250416103633-6b7fe4576563 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.6 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/jonboulle/clockwork v0.4.0 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
-	github.com/sirupsen/logrus v1.9.3 // indirect
 	golang.org/x/exp v0.0.0-20240613232115-7f521ea00fb8 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240903143218-8af14fe29dc1 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
