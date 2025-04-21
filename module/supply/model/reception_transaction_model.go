@@ -13,6 +13,7 @@ const (
 	ReceptionTransactionStatusWaitingForApproval ReceptionTransactionStatus = "Waiting for Approval"
 	ReceptionTransactionStatusCompleted          ReceptionTransactionStatus = "Completed"
 	ReceptionTransactionStatusCanceled           ReceptionTransactionStatus = "Canceled"
+	ReceptionTransactionStatusReceived           ReceptionTransactionStatus = "Received"
 )
 
 // ReceptionTransaction represents the active reception transaction that groups ReceptionRequest
