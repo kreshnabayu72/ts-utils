@@ -81,6 +81,7 @@ const (
 	StockModelName                       = "stocks"
 	TransactionApprovalModelName         = "transaction_approvals"
 	ApprovalModelName                    = "approvals"
+	AgendaScheduleModelName              = "agenda_schedules"
 	ReceptionTransactionModelName        = "reception_transactions"
 	ReceptionTransactionHistoryModelName = "reception_transaction_histories"
 	ReceptionRequestModelName            = "reception_requests"
