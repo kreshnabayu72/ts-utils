@@ -3,6 +3,7 @@ module gitea.qwertysystem.net/BETS/ts-utils
 go 1.24.2
 
 require (
+	gitea.qwertysystem.net/BETS/go-agenda v0.0.0-20250420021753-b9ebbc2b6fa7
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/disintegration/imaging v1.6.2
 	github.com/go-co-op/gocron/v2 v2.12.4
@@ -20,7 +21,6 @@ require (
 
 require (
 	gitea.qwertysystem.net/BETS/cron/v3 v3.0.1-0.20250416093848-0119b14c6206 // indirect
-	gitea.qwertysystem.net/BETS/go-agenda v0.0.0-20250416103633-6b7fe4576563 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.6 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/jonboulle/clockwork v0.4.0 // indirect
