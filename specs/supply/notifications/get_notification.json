@@ -6,12 +6,15 @@
     "data": [
       {
         "_id": "string,objectId",
-        "user": "string,objectId",
+        "user": {
+          "_id": "string,objectId",
+          "fullName": "string",
+          "profilePicture": "string,nullable",
+          "key": "number"
+        },
         "title": "string",
         "detail": "string",
         "isRead": "boolean",
-        "isManager": "boolean",
-        "isReadOnly": "boolean",
         "data": "any",
         "module": "string",
         "severity": "string",
