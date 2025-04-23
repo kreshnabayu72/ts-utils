@@ -43,7 +43,7 @@ func MakeAgendaService(collectionName string) *AgendaServiceImpl {
 // Define defines the job that will be watched by the agenda
 //
 // Mainly called in initialization.
-// You only need to call this once per job, or when you wanted to extend jobFunc with another function call
+// You only need to call this once per job, or when you want to extend jobFunc with another function call
 func (s *AgendaServiceImpl) Define(name string, jobFunc func(map[string]any) error) {
 	if err := s.Agenda.Define(name, jobFunc); err != nil {
 		panic(err)
