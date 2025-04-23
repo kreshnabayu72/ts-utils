@@ -237,5 +237,5 @@ var _Approval_serviceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "supply/proto/approval.proto",
+	Metadata: "module/supply/proto/approval.proto",
 }

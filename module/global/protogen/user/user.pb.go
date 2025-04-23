@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.6
 // 	protoc        v3.21.12
-// source: global/proto/user.proto
+// source: module/global/proto/user.proto
 
 package user
 
@@ -30,7 +30,7 @@ type ResendActivationEmailRequest struct {
 
 func (x *ResendActivationEmailRequest) Reset() {
 	*x = ResendActivationEmailRequest{}
-	mi := &file_global_proto_user_proto_msgTypes[0]
+	mi := &file_module_global_proto_user_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -42,7 +42,7 @@ func (x *ResendActivationEmailRequest) String() string {
 func (*ResendActivationEmailRequest) ProtoMessage() {}
 
 func (x *ResendActivationEmailRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_global_proto_user_proto_msgTypes[0]
+	mi := &file_module_global_proto_user_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -55,7 +55,7 @@ func (x *ResendActivationEmailRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResendActivationEmailRequest.ProtoReflect.Descriptor instead.
 func (*ResendActivationEmailRequest) Descriptor() ([]byte, []int) {
-	return file_global_proto_user_proto_rawDescGZIP(), []int{0}
+	return file_module_global_proto_user_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *ResendActivationEmailRequest) GetEmail() []string {
@@ -74,7 +74,7 @@ type ResendActivationEmailResponse struct {
 
 func (x *ResendActivationEmailResponse) Reset() {
 	*x = ResendActivationEmailResponse{}
-	mi := &file_global_proto_user_proto_msgTypes[1]
+	mi := &file_module_global_proto_user_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -86,7 +86,7 @@ func (x *ResendActivationEmailResponse) String() string {
 func (*ResendActivationEmailResponse) ProtoMessage() {}
 
 func (x *ResendActivationEmailResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_global_proto_user_proto_msgTypes[1]
+	mi := &file_module_global_proto_user_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -99,7 +99,7 @@ func (x *ResendActivationEmailResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResendActivationEmailResponse.ProtoReflect.Descriptor instead.
 func (*ResendActivationEmailResponse) Descriptor() ([]byte, []int) {
-	return file_global_proto_user_proto_rawDescGZIP(), []int{1}
+	return file_module_global_proto_user_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *ResendActivationEmailResponse) GetOk() bool {
@@ -109,11 +109,11 @@ func (x *ResendActivationEmailResponse) GetOk() bool {
 	return false
 }
 
-var File_global_proto_user_proto protoreflect.FileDescriptor
+var File_module_global_proto_user_proto protoreflect.FileDescriptor
 
-const file_global_proto_user_proto_rawDesc = "" +
+const file_module_global_proto_user_proto_rawDesc = "" +
 	"\n" +
-	"\x17global/proto/user.proto\x12\x04user\"4\n" +
+	"\x1emodule/global/proto/user.proto\x12\x04user\"4\n" +
 	"\x1cResendActivationEmailRequest\x12\x14\n" +
 	"\x05email\x18\x01 \x03(\tR\x05email\"/\n" +
 	"\x1dResendActivationEmailResponse\x12\x0e\n" +
@@ -122,23 +122,23 @@ const file_global_proto_user_proto_rawDesc = "" +
 	"\x15ResendActivationEmail\x12\".user.ResendActivationEmailRequest\x1a#.user.ResendActivationEmailResponse\"\x00B\aZ\x05/userb\x06proto3"
 
 var (
-	file_global_proto_user_proto_rawDescOnce sync.Once
-	file_global_proto_user_proto_rawDescData []byte
+	file_module_global_proto_user_proto_rawDescOnce sync.Once
+	file_module_global_proto_user_proto_rawDescData []byte
 )
 
-func file_global_proto_user_proto_rawDescGZIP() []byte {
-	file_global_proto_user_proto_rawDescOnce.Do(func() {
-		file_global_proto_user_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_global_proto_user_proto_rawDesc), len(file_global_proto_user_proto_rawDesc)))
+func file_module_global_proto_user_proto_rawDescGZIP() []byte {
+	file_module_global_proto_user_proto_rawDescOnce.Do(func() {
+		file_module_global_proto_user_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_module_global_proto_user_proto_rawDesc), len(file_module_global_proto_user_proto_rawDesc)))
 	})
-	return file_global_proto_user_proto_rawDescData
+	return file_module_global_proto_user_proto_rawDescData
 }
 
-var file_global_proto_user_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_global_proto_user_proto_goTypes = []any{
+var file_module_global_proto_user_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_module_global_proto_user_proto_goTypes = []any{
 	(*ResendActivationEmailRequest)(nil),  // 0: user.ResendActivationEmailRequest
 	(*ResendActivationEmailResponse)(nil), // 1: user.ResendActivationEmailResponse
 }
-var file_global_proto_user_proto_depIdxs = []int32{
+var file_module_global_proto_user_proto_depIdxs = []int32{
 	0, // 0: user.User.ResendActivationEmail:input_type -> user.ResendActivationEmailRequest
 	1, // 1: user.User.ResendActivationEmail:output_type -> user.ResendActivationEmailResponse
 	1, // [1:2] is the sub-list for method output_type
@@ -148,26 +148,26 @@ var file_global_proto_user_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_global_proto_user_proto_init() }
-func file_global_proto_user_proto_init() {
-	if File_global_proto_user_proto != nil {
+func init() { file_module_global_proto_user_proto_init() }
+func file_module_global_proto_user_proto_init() {
+	if File_module_global_proto_user_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_global_proto_user_proto_rawDesc), len(file_global_proto_user_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_module_global_proto_user_proto_rawDesc), len(file_module_global_proto_user_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_global_proto_user_proto_goTypes,
-		DependencyIndexes: file_global_proto_user_proto_depIdxs,
-		MessageInfos:      file_global_proto_user_proto_msgTypes,
+		GoTypes:           file_module_global_proto_user_proto_goTypes,
+		DependencyIndexes: file_module_global_proto_user_proto_depIdxs,
+		MessageInfos:      file_module_global_proto_user_proto_msgTypes,
 	}.Build()
-	File_global_proto_user_proto = out.File
-	file_global_proto_user_proto_goTypes = nil
-	file_global_proto_user_proto_depIdxs = nil
+	File_module_global_proto_user_proto = out.File
+	file_module_global_proto_user_proto_goTypes = nil
+	file_module_global_proto_user_proto_depIdxs = nil
 }

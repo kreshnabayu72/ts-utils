@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package notification;
+
+option go_package = "/notification";
+
+service Notification {
+  rpc PushNotification (PushNotificationRequest) returns (PushNotificationResponse) {}
+}
+
+message PushNotificationRequest {
+  string userId = 1;
+  string title = 2;
+  string detail = 3;
+  string module = 4;
+  string severity = 5;
+  string category = 6;
+  bytes data = 7;
+}
+
+message PushNotificationResponse {
+  bool ok = 1;
+}

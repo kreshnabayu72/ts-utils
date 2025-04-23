@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.6
 // 	protoc        v3.21.12
-// source: supply/proto/approval.proto
+// source: module/supply/proto/approval.proto
 
 package approval
 
@@ -31,7 +31,7 @@ type HasApprovalRequest struct {
 
 func (x *HasApprovalRequest) Reset() {
 	*x = HasApprovalRequest{}
-	mi := &file_supply_proto_approval_proto_msgTypes[0]
+	mi := &file_module_supply_proto_approval_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -43,7 +43,7 @@ func (x *HasApprovalRequest) String() string {
 func (*HasApprovalRequest) ProtoMessage() {}
 
 func (x *HasApprovalRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_supply_proto_approval_proto_msgTypes[0]
+	mi := &file_module_supply_proto_approval_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -56,7 +56,7 @@ func (x *HasApprovalRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HasApprovalRequest.ProtoReflect.Descriptor instead.
 func (*HasApprovalRequest) Descriptor() ([]byte, []int) {
-	return file_supply_proto_approval_proto_rawDescGZIP(), []int{0}
+	return file_module_supply_proto_approval_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *HasApprovalRequest) GetAdministrativeGroupId() string {
@@ -82,7 +82,7 @@ type HasApprovalResponse struct {
 
 func (x *HasApprovalResponse) Reset() {
 	*x = HasApprovalResponse{}
-	mi := &file_supply_proto_approval_proto_msgTypes[1]
+	mi := &file_module_supply_proto_approval_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -94,7 +94,7 @@ func (x *HasApprovalResponse) String() string {
 func (*HasApprovalResponse) ProtoMessage() {}
 
 func (x *HasApprovalResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_supply_proto_approval_proto_msgTypes[1]
+	mi := &file_module_supply_proto_approval_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -107,7 +107,7 @@ func (x *HasApprovalResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HasApprovalResponse.ProtoReflect.Descriptor instead.
 func (*HasApprovalResponse) Descriptor() ([]byte, []int) {
-	return file_supply_proto_approval_proto_rawDescGZIP(), []int{1}
+	return file_module_supply_proto_approval_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *HasApprovalResponse) GetHasApproval() bool {
@@ -131,7 +131,7 @@ type CreateApprovalRequest struct {
 
 func (x *CreateApprovalRequest) Reset() {
 	*x = CreateApprovalRequest{}
-	mi := &file_supply_proto_approval_proto_msgTypes[2]
+	mi := &file_module_supply_proto_approval_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -143,7 +143,7 @@ func (x *CreateApprovalRequest) String() string {
 func (*CreateApprovalRequest) ProtoMessage() {}
 
 func (x *CreateApprovalRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_supply_proto_approval_proto_msgTypes[2]
+	mi := &file_module_supply_proto_approval_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -156,7 +156,7 @@ func (x *CreateApprovalRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateApprovalRequest.ProtoReflect.Descriptor instead.
 func (*CreateApprovalRequest) Descriptor() ([]byte, []int) {
-	return file_supply_proto_approval_proto_rawDescGZIP(), []int{2}
+	return file_module_supply_proto_approval_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *CreateApprovalRequest) GetAdministrativeGroupId() string {
@@ -210,7 +210,7 @@ type CreateApprovalResponse struct {
 
 func (x *CreateApprovalResponse) Reset() {
 	*x = CreateApprovalResponse{}
-	mi := &file_supply_proto_approval_proto_msgTypes[3]
+	mi := &file_module_supply_proto_approval_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -222,7 +222,7 @@ func (x *CreateApprovalResponse) String() string {
 func (*CreateApprovalResponse) ProtoMessage() {}
 
 func (x *CreateApprovalResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_supply_proto_approval_proto_msgTypes[3]
+	mi := &file_module_supply_proto_approval_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -235,7 +235,7 @@ func (x *CreateApprovalResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateApprovalResponse.ProtoReflect.Descriptor instead.
 func (*CreateApprovalResponse) Descriptor() ([]byte, []int) {
-	return file_supply_proto_approval_proto_rawDescGZIP(), []int{3}
+	return file_module_supply_proto_approval_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *CreateApprovalResponse) GetApprovalBatchId() string {
@@ -256,7 +256,7 @@ type ActionApprovalRequest struct {
 
 func (x *ActionApprovalRequest) Reset() {
 	*x = ActionApprovalRequest{}
-	mi := &file_supply_proto_approval_proto_msgTypes[4]
+	mi := &file_module_supply_proto_approval_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -268,7 +268,7 @@ func (x *ActionApprovalRequest) String() string {
 func (*ActionApprovalRequest) ProtoMessage() {}
 
 func (x *ActionApprovalRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_supply_proto_approval_proto_msgTypes[4]
+	mi := &file_module_supply_proto_approval_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -281,7 +281,7 @@ func (x *ActionApprovalRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ActionApprovalRequest.ProtoReflect.Descriptor instead.
 func (*ActionApprovalRequest) Descriptor() ([]byte, []int) {
-	return file_supply_proto_approval_proto_rawDescGZIP(), []int{4}
+	return file_module_supply_proto_approval_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *ActionApprovalRequest) GetApprovalId() string {
@@ -316,7 +316,7 @@ type ActionApprovalResponse struct {
 
 func (x *ActionApprovalResponse) Reset() {
 	*x = ActionApprovalResponse{}
-	mi := &file_supply_proto_approval_proto_msgTypes[5]
+	mi := &file_module_supply_proto_approval_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -328,7 +328,7 @@ func (x *ActionApprovalResponse) String() string {
 func (*ActionApprovalResponse) ProtoMessage() {}
 
 func (x *ActionApprovalResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_supply_proto_approval_proto_msgTypes[5]
+	mi := &file_module_supply_proto_approval_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -341,7 +341,7 @@ func (x *ActionApprovalResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ActionApprovalResponse.ProtoReflect.Descriptor instead.
 func (*ActionApprovalResponse) Descriptor() ([]byte, []int) {
-	return file_supply_proto_approval_proto_rawDescGZIP(), []int{5}
+	return file_module_supply_proto_approval_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ActionApprovalResponse) GetIsFinished() bool {
@@ -376,7 +376,7 @@ type DeleteApprovalRequest struct {
 
 func (x *DeleteApprovalRequest) Reset() {
 	*x = DeleteApprovalRequest{}
-	mi := &file_supply_proto_approval_proto_msgTypes[6]
+	mi := &file_module_supply_proto_approval_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -388,7 +388,7 @@ func (x *DeleteApprovalRequest) String() string {
 func (*DeleteApprovalRequest) ProtoMessage() {}
 
 func (x *DeleteApprovalRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_supply_proto_approval_proto_msgTypes[6]
+	mi := &file_module_supply_proto_approval_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -401,7 +401,7 @@ func (x *DeleteApprovalRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteApprovalRequest.ProtoReflect.Descriptor instead.
 func (*DeleteApprovalRequest) Descriptor() ([]byte, []int) {
-	return file_supply_proto_approval_proto_rawDescGZIP(), []int{6}
+	return file_module_supply_proto_approval_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *DeleteApprovalRequest) GetAdministrativeGroupId() string {
@@ -434,7 +434,7 @@ type DeleteApprovalResponse struct {
 
 func (x *DeleteApprovalResponse) Reset() {
 	*x = DeleteApprovalResponse{}
-	mi := &file_supply_proto_approval_proto_msgTypes[7]
+	mi := &file_module_supply_proto_approval_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -446,7 +446,7 @@ func (x *DeleteApprovalResponse) String() string {
 func (*DeleteApprovalResponse) ProtoMessage() {}
 
 func (x *DeleteApprovalResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_supply_proto_approval_proto_msgTypes[7]
+	mi := &file_module_supply_proto_approval_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -459,7 +459,7 @@ func (x *DeleteApprovalResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteApprovalResponse.ProtoReflect.Descriptor instead.
 func (*DeleteApprovalResponse) Descriptor() ([]byte, []int) {
-	return file_supply_proto_approval_proto_rawDescGZIP(), []int{7}
+	return file_module_supply_proto_approval_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *DeleteApprovalResponse) GetOk() bool {
@@ -480,7 +480,7 @@ type HasOngoingApprovalRequest struct {
 
 func (x *HasOngoingApprovalRequest) Reset() {
 	*x = HasOngoingApprovalRequest{}
-	mi := &file_supply_proto_approval_proto_msgTypes[8]
+	mi := &file_module_supply_proto_approval_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -492,7 +492,7 @@ func (x *HasOngoingApprovalRequest) String() string {
 func (*HasOngoingApprovalRequest) ProtoMessage() {}
 
 func (x *HasOngoingApprovalRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_supply_proto_approval_proto_msgTypes[8]
+	mi := &file_module_supply_proto_approval_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -505,7 +505,7 @@ func (x *HasOngoingApprovalRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HasOngoingApprovalRequest.ProtoReflect.Descriptor instead.
 func (*HasOngoingApprovalRequest) Descriptor() ([]byte, []int) {
-	return file_supply_proto_approval_proto_rawDescGZIP(), []int{8}
+	return file_module_supply_proto_approval_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *HasOngoingApprovalRequest) GetAdministrativeGroupId() string {
@@ -538,7 +538,7 @@ type HasOngoingApprovalResponse struct {
 
 func (x *HasOngoingApprovalResponse) Reset() {
 	*x = HasOngoingApprovalResponse{}
-	mi := &file_supply_proto_approval_proto_msgTypes[9]
+	mi := &file_module_supply_proto_approval_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -550,7 +550,7 @@ func (x *HasOngoingApprovalResponse) String() string {
 func (*HasOngoingApprovalResponse) ProtoMessage() {}
 
 func (x *HasOngoingApprovalResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_supply_proto_approval_proto_msgTypes[9]
+	mi := &file_module_supply_proto_approval_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -563,7 +563,7 @@ func (x *HasOngoingApprovalResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HasOngoingApprovalResponse.ProtoReflect.Descriptor instead.
 func (*HasOngoingApprovalResponse) Descriptor() ([]byte, []int) {
-	return file_supply_proto_approval_proto_rawDescGZIP(), []int{9}
+	return file_module_supply_proto_approval_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *HasOngoingApprovalResponse) GetHasOngoingApproval() bool {
@@ -573,11 +573,11 @@ func (x *HasOngoingApprovalResponse) GetHasOngoingApproval() bool {
 	return false
 }
 
-var File_supply_proto_approval_proto protoreflect.FileDescriptor
+var File_module_supply_proto_approval_proto protoreflect.FileDescriptor
 
-const file_supply_proto_approval_proto_rawDesc = "" +
+const file_module_supply_proto_approval_proto_rawDesc = "" +
 	"\n" +
-	"\x1bsupply/proto/approval.proto\x12\bapproval\"l\n" +
+	"\"module/supply/proto/approval.proto\x12\bapproval\"l\n" +
 	"\x12HasApprovalRequest\x124\n" +
 	"\x15administrativeGroupId\x18\x01 \x01(\tR\x15administrativeGroupId\x12 \n" +
 	"\vapprovalFor\x18\x02 \x01(\tR\vapprovalFor\"7\n" +
@@ -626,19 +626,19 @@ const file_supply_proto_approval_proto_rawDesc = "" +
 	"\x0eDeleteApproval\x12\x1f.approval.DeleteApprovalRequest\x1a .approval.DeleteApprovalResponse\"\x00B\vZ\t/approvalb\x06proto3"
 
 var (
-	file_supply_proto_approval_proto_rawDescOnce sync.Once
-	file_supply_proto_approval_proto_rawDescData []byte
+	file_module_supply_proto_approval_proto_rawDescOnce sync.Once
+	file_module_supply_proto_approval_proto_rawDescData []byte
 )
 
-func file_supply_proto_approval_proto_rawDescGZIP() []byte {
-	file_supply_proto_approval_proto_rawDescOnce.Do(func() {
-		file_supply_proto_approval_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_supply_proto_approval_proto_rawDesc), len(file_supply_proto_approval_proto_rawDesc)))
+func file_module_supply_proto_approval_proto_rawDescGZIP() []byte {
+	file_module_supply_proto_approval_proto_rawDescOnce.Do(func() {
+		file_module_supply_proto_approval_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_module_supply_proto_approval_proto_rawDesc), len(file_module_supply_proto_approval_proto_rawDesc)))
 	})
-	return file_supply_proto_approval_proto_rawDescData
+	return file_module_supply_proto_approval_proto_rawDescData
 }
 
-var file_supply_proto_approval_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
-var file_supply_proto_approval_proto_goTypes = []any{
+var file_module_supply_proto_approval_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_module_supply_proto_approval_proto_goTypes = []any{
 	(*HasApprovalRequest)(nil),         // 0: approval.HasApprovalRequest
 	(*HasApprovalResponse)(nil),        // 1: approval.HasApprovalResponse
 	(*CreateApprovalRequest)(nil),      // 2: approval.CreateApprovalRequest
@@ -650,7 +650,7 @@ var file_supply_proto_approval_proto_goTypes = []any{
 	(*HasOngoingApprovalRequest)(nil),  // 8: approval.HasOngoingApprovalRequest
 	(*HasOngoingApprovalResponse)(nil), // 9: approval.HasOngoingApprovalResponse
 }
-var file_supply_proto_approval_proto_depIdxs = []int32{
+var file_module_supply_proto_approval_proto_depIdxs = []int32{
 	0, // 0: approval.Approval.HasApproval:input_type -> approval.HasApprovalRequest
 	8, // 1: approval.Approval.HasOngoingApproval:input_type -> approval.HasOngoingApprovalRequest
 	2, // 2: approval.Approval.CreateApproval:input_type -> approval.CreateApprovalRequest
@@ -668,26 +668,26 @@ var file_supply_proto_approval_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_supply_proto_approval_proto_init() }
-func file_supply_proto_approval_proto_init() {
-	if File_supply_proto_approval_proto != nil {
+func init() { file_module_supply_proto_approval_proto_init() }
+func file_module_supply_proto_approval_proto_init() {
+	if File_module_supply_proto_approval_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_supply_proto_approval_proto_rawDesc), len(file_supply_proto_approval_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_module_supply_proto_approval_proto_rawDesc), len(file_module_supply_proto_approval_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_supply_proto_approval_proto_goTypes,
-		DependencyIndexes: file_supply_proto_approval_proto_depIdxs,
-		MessageInfos:      file_supply_proto_approval_proto_msgTypes,
+		GoTypes:           file_module_supply_proto_approval_proto_goTypes,
+		DependencyIndexes: file_module_supply_proto_approval_proto_depIdxs,
+		MessageInfos:      file_module_supply_proto_approval_proto_msgTypes,
 	}.Build()
-	File_supply_proto_approval_proto = out.File
-	file_supply_proto_approval_proto_goTypes = nil
-	file_supply_proto_approval_proto_depIdxs = nil
+	File_module_supply_proto_approval_proto = out.File
+	file_module_supply_proto_approval_proto_goTypes = nil
+	file_module_supply_proto_approval_proto_depIdxs = nil
 }
