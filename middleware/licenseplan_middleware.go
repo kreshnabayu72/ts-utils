@@ -33,6 +33,10 @@ func GetLicensePlan() fiber.Handler {
 			return response.SendResponse(ctx, fiber.ErrBadRequest.Code, map[string]interface{}{"message": "Invalid JWT", "status": 400}, "Invalid JWT")
 		} //Throw error if no plan
 
+		if companyData.Plan == nil {
+			return response.SendResponse(ctx, fiber.ErrBadRequest.Code, map[string]interface{}{"message": "Invalid License Plan", "status": 400}, "Invalid License Plan")
+		}
+
 		//Save plan in context
 		ctx.Locals(FixedAssetPlan, companyData.Plan.FixedAsset)
 

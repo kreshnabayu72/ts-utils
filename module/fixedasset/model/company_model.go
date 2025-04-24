@@ -61,7 +61,7 @@ type Company struct {
 	TransferAttrs             TransferAttrs      `json:"transferAttrs"               bson:"transferAttrs"`
 	DisposalAttrs             DisposalAttrs      `json:"disposalAttrs"               bson:"disposalAttrs"`
 	AssetControlAttrs         AssetControlAttrs  `json:"assetControlAttrs"               bson:"assetControlAttrs"`
-	Plan                      LicensePlan        `json:"plan"                 bson:"plan"`
+	Plan                      *LicensePlan       `json:"plan"                 bson:"plan"`
 	CreatedAt                 time.Time          `json:"createdAt"                 bson:"createdAt"`
 	UpdatedAt                 time.Time          `json:"updatedAt"                 bson:"updatedAt"`
 }
