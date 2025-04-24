@@ -9,4 +9,5 @@ const (
 	SessionKey     = ContextKey("session")
 	Company        = ContextKey("company")
 	ReaderId       = ContextKey("readerId")
+	FixedAssetPlan = ContextKey("fixedAssetPlan")
 )
