@@ -34,7 +34,7 @@ func GetLicensePlan() fiber.Handler {
 		} //Throw error if no plan
 
 		//Save plan in context
-		ctx.Locals(UserKey, companyData.Plan.FixedAsset)
+		ctx.Locals(FixedAssetPlan, companyData.Plan.FixedAsset)
 
 		return ctx.Next()
 	}
