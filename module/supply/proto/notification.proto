@@ -15,7 +15,7 @@ message PushNotificationRequest {
   string module = 4;
   string severity = 5;
   string category = 6;
-  bytes data = 7;
+  optional bytes data = 7;
 }
 
 message PushNotificationResponse {
