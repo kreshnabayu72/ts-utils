@@ -30,11 +30,11 @@ func GetLicensePlan() fiber.Handler {
 		var companyData *model.Company
 		err := companyService.FindOne(&companyData, ctx.Context(), bson.M{"_id": company})
 		if err != nil {
-			return response.SendResponse(ctx, fiber.ErrBadRequest.Code, map[string]interface{}{"message": "Invalid JWT", "status": 400}, "Invalid JWT")
+			return response.SendResponse(ctx, fiber.ErrBadRequest.Code, nil, "Invalid JWT")
 		} //Throw error if no plan
 
 		if companyData.Plan == nil {
-			return response.SendResponse(ctx, fiber.ErrBadRequest.Code, map[string]interface{}{"message": "Invalid License Plan", "status": 400}, "Invalid License Plan")
+			return response.SendResponse(ctx, fiber.ErrBadRequest.Code, nil, "Invalid License Plan")
 		}
 
 		//Save plan in context
