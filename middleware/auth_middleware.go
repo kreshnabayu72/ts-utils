@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	"gitea.qwertysystem.net/BETS/ts-utils/response"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -16,7 +17,7 @@ func ValidateJWT() fiber.Handler {
 		var jwtKey = []byte(os.Getenv("JWT_KEY"))
 		tokenStr := ctx.Get("Authorization", "NOT_FOUND")
 		if tokenStr == "NOT_FOUND" {
-			return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+			return response.SendResponse(ctx, fiber.ErrBadRequest.Code, nil, "Unauthorized")
 		}
 
 		// Extract the actual token by removing "Bearer " prefix
@@ -32,7 +33,7 @@ func ValidateJWT() fiber.Handler {
 		})
 
 		if err != nil {
-			return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+			return response.SendResponse(ctx, fiber.ErrBadRequest.Code, nil, "Unauthorized")
 		}
 
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
@@ -51,7 +52,7 @@ func ValidateJWT() fiber.Handler {
 			ctx.Locals(Company, company)
 
 		} else {
-			return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+			return response.SendResponse(ctx, fiber.ErrBadRequest.Code, nil, "Unauthorized")
 		}
 
 		return ctx.Next()
