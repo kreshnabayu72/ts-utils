@@ -29,7 +29,7 @@ type ReceptionTransaction struct {
 	Note           *string                    `json:"note"           bson:"note"`
 	Photo          *string                    `json:"photo"          bson:"photo"`
 	PIC            primitive.ObjectID         `json:"pic"            bson:"pic"`
-	Log            TransactionLogDetail       `json:"log"            bson:"log"`
+	Log            []TransactionLogDetail     `json:"log"            bson:"log"`
 	TotalItem      int                        `json:"totalItem"      bson:"totalItem"`
 	TotalStock     int                        `json:"totalStock"     bson:"totalStock"`
 	ApprovalNote   *string                    `json:"approvalNote"   bson:"approvalNote"`
@@ -48,7 +48,7 @@ type ReceptionTransactionHistory struct {
 	Note           *string                    `json:"note"           bson:"note"`
 	Photo          *string                    `json:"photo"          bson:"photo"`
 	PIC            UserAttributeEmbedded      `json:"pic"            bson:"pic"`
-	Log            TransactionLogDetail       `json:"log"            bson:"log"`
+	Log            []TransactionLogDetail     `json:"log"            bson:"log"`
 	TotalItem      int                        `json:"totalItem"      bson:"totalItem"`
 	TotalStock     int                        `json:"totalStock"     bson:"totalStock"`
 	ApprovalNote   *string                    `json:"approvalNote"   bson:"approvalNote"`
