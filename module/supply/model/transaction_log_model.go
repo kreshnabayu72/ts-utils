@@ -9,17 +9,22 @@ import (
 type TransactionLogType string
 
 const (
-	TransactionLogTypeReception      TransactionLogType = "Reception"
-	TransactionLogTypeSupplierReturn TransactionLogType = "Supplier Return"
-	TransactionLogTypeTransfer       TransactionLogType = "Transfer"
-	TransactionLogTypeCheckout       TransactionLogType = "Checkout"
-	TransactionLogTypeInternalReturn TransactionLogType = "Internal Return"
-	TransactionLogTypeExpired        TransactionLogType = "Expired"
-	TransactionLogTypeDefect         TransactionLogType = "Defect"
-	TransactionLogTypeDisposal       TransactionLogType = "Disposal"
-	TransactionLogTypeMissing        TransactionLogType = "Missing"
-	TransactionLogTypeStockOpname    TransactionLogType = "Stock Opname"
-	TransactionLogTypeTracking       TransactionLogType = "Tracking"
+	TransactionLogTypeReception              TransactionLogType = "Reception"
+	TransactionLogTypeSupplierReturn         TransactionLogType = "Supplier Return"
+	TransactionLogTypeTransfer               TransactionLogType = "Transfer"
+	TransactionLogTypeCheckout               TransactionLogType = "Checkout"
+	TransactionLogTypeInternalReturn         TransactionLogType = "Internal Return"
+	TransactionLogTypeExpired                TransactionLogType = "Expired"
+	TransactionLogTypeDefect                 TransactionLogType = "Defect"
+	TransactionLogTypeDisposal               TransactionLogType = "Disposal"
+	TransactionLogTypeMissing                TransactionLogType = "Missing"
+	TransactionLogTypeStockOpname            TransactionLogType = "Stock Opname"
+	TransactionLogTypeTracking               TransactionLogType = "Tracking"
+	TransactionLogTypePlacement              TransactionLogType = "Placement"
+	TransactionLogTypeSupplierReturnExchange TransactionLogType = "Supplier Return-Exchange"
+	TransactionLogTypeTransferIn             TransactionLogType = "Transfer-In"
+	TransactionLogTypeTransferOut            TransactionLogType = "Transfer-Out"
+	TransactionLogTypeExchange               TransactionLogType = "Exchange"
 )
 
 type TransactionLogDetail struct {
