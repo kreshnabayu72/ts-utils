@@ -38,6 +38,18 @@ type DisposalAttrs struct {
 type AssetControlAttrs struct {
 	Pin int `json:"pin"            bson:"pin"`
 }
+type LicensePlan struct {
+	FixedAsset  PlanTypes `json:"fixedAsset"            bson:"fixedAsset"`
+	SupplyAsset PlanTypes `json:"supplyAsset"            bson:"supplyAsset"`
+}
+
+type PlanTypes string
+
+const (
+	PlanBasic      = PlanTypes("Basic")
+	PlanStandard   = PlanTypes("Standard")
+	PlanEnterprise = PlanTypes("Enterprise")
+)
 
 type Company struct {
 	ID                        primitive.ObjectID `json:"_id"                       bson:"_id"`
@@ -49,6 +61,7 @@ type Company struct {
 	TransferAttrs             TransferAttrs      `json:"transferAttrs"               bson:"transferAttrs"`
 	DisposalAttrs             DisposalAttrs      `json:"disposalAttrs"               bson:"disposalAttrs"`
 	AssetControlAttrs         AssetControlAttrs  `json:"assetControlAttrs"               bson:"assetControlAttrs"`
+	Plan                      *LicensePlan       `json:"plan"                 bson:"plan"`
 	CreatedAt                 time.Time          `json:"createdAt"                 bson:"createdAt"`
 	UpdatedAt                 time.Time          `json:"updatedAt"                 bson:"updatedAt"`
 }
