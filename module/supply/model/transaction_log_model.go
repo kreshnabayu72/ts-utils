@@ -22,6 +22,7 @@ const (
 	TransactionLogTypeTracking               TransactionLogType = "Tracking"
 	TransactionLogTypePlacement              TransactionLogType = "Placement"
 	TransactionLogTypeSupplierReturnExchange TransactionLogType = "Supplier Return-Exchange"
+	TransactionLogTypeInternalReturnExchange TransactionLogType = "Internal Return-Exchange"
 	TransactionLogTypeTransferIn             TransactionLogType = "Transfer-In"
 	TransactionLogTypeTransferOut            TransactionLogType = "Transfer-Out"
 	TransactionLogTypeExchange               TransactionLogType = "Exchange"
