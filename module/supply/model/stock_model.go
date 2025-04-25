@@ -38,9 +38,10 @@ const (
 	StockSourceReception      StockSource = "Reception"
 	StockSourceSupplierReturn StockSource = "Supplier Return"
 	StockSourceInternalReturn StockSource = "Internal Return"
+	StockSourceInitialStock   StockSource = "Initial Stock"
 )
 
-// Stock represents the schema for a single stock data
+// Stock represents the schema for single stock data
 type Stock struct {
 	ID                           primitive.ObjectID  `json:"_id,omitempty"                bson:"_id,omitempty"`
 	Key                          int                 `json:"key"                          bson:"key"`
