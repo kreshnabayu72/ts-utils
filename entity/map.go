@@ -6,7 +6,7 @@ import (
 	"gitea.qwertysystem.net/BETS/ts-utils/functions"
 )
 
-// Container represents a high level pseudo map-like functions.
+// Container represents a high-level pseudo map-like function.
 type Container[K any, V any] interface {
 	Get(key K, fallback V) V
 	Set(key K, value V)
@@ -14,13 +14,13 @@ type Container[K any, V any] interface {
 	Exist(key K) bool
 }
 
-// M is a map-like struct used by Map as a high level map-like data types.
+// M is a map-like struct used by Map as a high-level map-like data types.
 type M[K any, V any] struct {
 	Key   K
 	Value V
 }
 
-// Map is the implementation of Container as a high level map-like data types.
+// Map is the implementation of Container as a high-level map-like data type.
 type Map[K any, V any] struct {
 	_m []M[K, V]
 }
@@ -46,7 +46,7 @@ func (m *Map[K, V]) Exist(key K) bool {
 	return exists
 }
 
-// Get gets the value from the provided key, use fallback if key doesn't exist.
+// Get gets the value from the provided key, use fallback if the key doesn't exist.
 func (m *Map[K, V]) Get(key K, fallback V) V {
 	if !m.Exist(key) {
 		return fallback
@@ -59,7 +59,7 @@ func (m *Map[K, V]) Get(key K, fallback V) V {
 	return v.Value
 }
 
-// Set sets the value from the provided key, if key exists previously, delete the existing value to be overwritten.
+// Set sets the value from the provided key, if the key exists previously, delete the existing value to be overwritten.
 func (m *Map[K, V]) Set(key K, value V) {
 	m.Delete(key)
 
