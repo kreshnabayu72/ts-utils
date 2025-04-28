@@ -70,6 +70,8 @@ const (
 	UserAuthModelName                    = "user_auths"
 	UserModelName                        = "users"
 	UserSystemRoleModelName              = "user_system_roles"
+	UserAssignmentLogModelName           = "user_assignment_logs"
+	UserBorrowingLogModelName            = "user_borrowing_logs"
 	UserTokenModelName                   = "user_tokens"
 	UserTransactionRoleModelName         = "user_transaction_roles"
 	SupplierModelName                    = "suppliers"
