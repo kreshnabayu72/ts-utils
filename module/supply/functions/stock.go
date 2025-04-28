@@ -1,383 +1,158 @@
 package functions
 
 import (
-	"gitea.qwertysystem.net/BETS/ts-utils/entity"
+	"errors"
+	"fmt"
+	"slices"
+
+	"gitea.qwertysystem.net/BETS/ts-utils/functions"
 	supply_model "gitea.qwertysystem.net/BETS/ts-utils/module/supply/model"
 )
 
+// StockStatusPriority is a struct that contains the priority of a stock status for ordering purposes.
+//
+// The status will be sorted from the lowest to the highest priority.
+type StockStatusPriority = map[int]supply_model.StockStatus
+
+// StockStatusPriorityList will be used as a list of stock status priorities.
+//
+// 8, 10 and 12 are reserved for manually inserting "Waiting for Approval" status.
+var StockStatusPriorityList = StockStatusPriority{
+	0:  supply_model.StockStatusAvailable,
+	1:  supply_model.StockStatusInStockOpname,
+	2:  supply_model.StockStatusOnCheckoutProcess,
+	3:  supply_model.StockStatusOnTransfer,
+	4:  supply_model.StockStatusInSupplierReturnProcess,
+	5:  supply_model.StockStatusOnDisposalProcess,
+	6:  supply_model.StockStatusUnplaced,
+	7:  supply_model.StockStatusMissing,
+	8:  supply_model.StockStatusWaitingForApproval,
+	9:  supply_model.StockStatusDefect,
+	10: supply_model.StockStatusWaitingForApproval,
+	11: supply_model.StockStatusExpired,
+	12: supply_model.StockStatusWaitingForApproval,
+	13: supply_model.StockStatusTAGReported,
+	14: supply_model.StockStatusNotPairedYet,
+	15: supply_model.StockStatusDisposed,
+	16: supply_model.StockStatusCheckedOut,
+	17: supply_model.StockStatusExchanged,
+	18: supply_model.StockStatusReturned,
+}
+
 // AddStockStatus adds a new stock status to an existing stock status,
-// validate the transition according to the rules and returns the result
-func AddStockStatus(s []supply_model.StockStatus, statuses ...supply_model.StockStatus) ([]supply_model.StockStatus, error) {
-	type addStockStatusTransition struct {
-		Position string // Possible values: "right", "left"
-		Status   supply_model.StockStatus
+//
+// Existing stock status will not be further added to prevent duplication.
+// If the stock status initially contains "Available", it will be overwritten by the next-in-line new status
+func AddStockStatus(s []supply_model.StockStatus, statuses ...supply_model.StockStatus) []supply_model.StockStatus {
+	addedStatus := []supply_model.StockStatus{}
+
+	if !functions.Contains(addedStatus, supply_model.StockStatusAvailable) {
+		addedStatus = append(addedStatus, s...)
 	}
 
-	ALLOWED_ADD_TRANSITIONS := entity.MakeMap[[]supply_model.StockStatus, []addStockStatusTransition]()
+	orderedStatusKey := []int{}
+	orderedStatusValue := []supply_model.StockStatus{}
 
-	ALLOWED_ADD_TRANSITIONS.Set(
-		[]supply_model.StockStatus{
+	for _, status := range statuses {
+		// Skip appending the status if it already exists
+		if functions.Contains(addedStatus, status) {
+			continue
+		}
+
+		addedStatus = append(addedStatus, status)
+	}
+
+	for _, status := range addedStatus {
+		for k, v := range StockStatusPriorityList {
+			// Manually insert the "Waiting for Approval" status according to the currently available status.
+			if status == supply_model.StockStatusWaitingForApproval {
+				if functions.Contains(addedStatus, supply_model.StockStatusMissing) {
+					orderedStatusKey = append(orderedStatusKey, 8)
+					break
+				} else if functions.Contains(addedStatus, supply_model.StockStatusDefect) {
+					orderedStatusKey = append(orderedStatusKey, 10)
+					break
+				} else {
+					orderedStatusKey = append(orderedStatusKey, 12)
+					break
+				}
+			}
+
+			if v == status {
+				orderedStatusKey = append(orderedStatusKey, k)
+				break
+			}
+		}
+	}
+
+	slices.Sort(orderedStatusKey)
+
+	for _, k := range orderedStatusKey {
+		orderedStatusValue = append(orderedStatusValue, StockStatusPriorityList[k])
+	}
+
+	return orderedStatusValue
+}
+
+// SetStockStatus attempts to set a stock status from an existing stock status.
+//
+// Will return an error if the rule doesn't allow the status to be set.
+// You can use this error for an if case to determine whether to add / remove stock status manually.
+func SetStockStatus(s []supply_model.StockStatus, status supply_model.StockStatus) ([]supply_model.StockStatus, error) {
+	currentStatus := make([]supply_model.StockStatus, len(s))
+	copy(currentStatus, s)
+
+	commonMessage := "you might want to add / remove stock status manually."
+
+	switch status {
+	case
+		supply_model.StockStatusAvailable,
+		supply_model.StockStatusOnCheckoutProcess,
+		supply_model.StockStatusOnTransfer,
+		supply_model.StockStatusDefect,
+		supply_model.StockStatusMissing,
+		supply_model.StockStatusExpired,
+		supply_model.StockStatusUnplaced,
+		supply_model.StockStatusNotPairedYet,
+		supply_model.StockStatusInStockOpname,
+		supply_model.StockStatusDisposed,
+		supply_model.StockStatusCheckedOut,
+		supply_model.StockStatusExchanged,
+		supply_model.StockStatusReturned:
+
+		if len(currentStatus) <= 1 {
+			return []supply_model.StockStatus{status}, nil
+		}
+
+		return currentStatus, errors.New(fmt.Sprintf("can't set \"%s\" status when there are currently more than one status, %s", status, commonMessage))
+	}
+
+	return currentStatus, errors.New(fmt.Sprintf("can't set \"%s\" directly, %s", status, commonMessage))
+}
+
+// RemoveStockStatus removes an existing stock status and preserves the sorting order.
+//
+// Skip deleting stock status if it doesn't exist in the list. If the resulting list is empty,
+// this function will automatically add "Available" to the result.
+func RemoveStockStatus(s []supply_model.StockStatus, statuses ...supply_model.StockStatus) []supply_model.StockStatus {
+	removedStatus := make([]supply_model.StockStatus, len(s))
+	copy(removedStatus, s)
+
+	for _, status := range statuses {
+		i := slices.Index(removedStatus, status)
+		// Skip if the desired status doesn't exist in the list.
+		if i == -1 {
+			continue
+		}
+
+		removedStatus = append(removedStatus[:i], removedStatus[i+1:]...)
+	}
+
+	if len(removedStatus) == 0 {
+		return []supply_model.StockStatus{
 			supply_model.StockStatusAvailable,
-		},
-		[]addStockStatusTransition{},
-	)
+		}
+	}
 
-	ALLOWED_ADD_TRANSITIONS.Set(
-		[]supply_model.StockStatus{
-			supply_model.StockStatusOnCheckoutProcess,
-		},
-		[]addStockStatusTransition{},
-	)
-
-	ALLOWED_ADD_TRANSITIONS.Set(
-		[]supply_model.StockStatus{
-			supply_model.StockStatusOnTransfer,
-		},
-		[]addStockStatusTransition{},
-	)
-
-	ALLOWED_ADD_TRANSITIONS.Set(
-		[]supply_model.StockStatus{
-			supply_model.StockStatusInStockOpname,
-		},
-		[]addStockStatusTransition{
-			{
-				Position: "right",
-				Status:   supply_model.StockStatusTAGReported,
-			},
-		},
-	)
-
-	ALLOWED_ADD_TRANSITIONS.Set(
-		[]supply_model.StockStatus{
-			supply_model.StockStatusDefect,
-		},
-		[]addStockStatusTransition{
-			{
-				Position: "right",
-				Status:   supply_model.StockStatusWaitingForApproval,
-			},
-			{
-				Position: "right",
-				Status:   supply_model.StockStatusTAGReported,
-			},
-			{
-				Position: "left",
-				Status:   supply_model.StockStatusInStockOpname,
-			},
-			{
-				Position: "left",
-				Status:   supply_model.StockStatusOnDisposalProcess,
-			},
-			{
-				Position: "left",
-				Status:   supply_model.StockStatusInSupplierReturnProcess,
-			},
-		},
-	)
-
-	ALLOWED_ADD_TRANSITIONS.Set(
-		[]supply_model.StockStatus{
-			supply_model.StockStatusMissing,
-		},
-		[]addStockStatusTransition{
-			{
-				Position: "left",
-				Status:   supply_model.StockStatusInStockOpname,
-			},
-			{
-				Position: "left",
-				Status:   supply_model.StockStatusOnDisposalProcess,
-			},
-			{
-				Position: "right",
-				Status:   supply_model.StockStatusTAGReported,
-			},
-			{
-				Position: "right",
-				Status:   supply_model.StockStatusNotPairedYet,
-			},
-		},
-	)
-
-	ALLOWED_ADD_TRANSITIONS.Set(
-		[]supply_model.StockStatus{
-			supply_model.StockStatusExpired,
-		},
-		[]addStockStatusTransition{
-			{
-				Position: "right",
-				Status:   supply_model.StockStatusWaitingForApproval,
-			},
-			{
-				Position: "right",
-				Status:   supply_model.StockStatusTAGReported,
-			},
-			{
-				Position: "left",
-				Status:   supply_model.StockStatusInStockOpname,
-			},
-			{
-				Position: "left",
-				Status:   supply_model.StockStatusOnDisposalProcess,
-			},
-			{
-				Position: "left",
-				Status:   supply_model.StockStatusInSupplierReturnProcess,
-			},
-		},
-	)
-
-	ALLOWED_ADD_TRANSITIONS.Set(
-		[]supply_model.StockStatus{
-			supply_model.StockStatusUnplaced,
-		},
-		[]addStockStatusTransition{
-			{
-				Position: "left",
-				Status:   supply_model.StockStatusOnCheckoutProcess,
-			},
-			{
-				Position: "left",
-				Status:   supply_model.StockStatusInSupplierReturnProcess,
-			},
-			{
-				Position: "right",
-				Status:   supply_model.StockStatusExpired,
-			},
-		},
-	)
-
-	ALLOWED_ADD_TRANSITIONS.Set(
-		[]supply_model.StockStatus{
-			supply_model.StockStatusTAGReported,
-		},
-		[]addStockStatusTransition{
-			{
-				Position: "left",
-				Status:   supply_model.StockStatusExpired,
-			},
-		},
-	)
-
-	ALLOWED_ADD_TRANSITIONS.Set(
-		[]supply_model.StockStatus{
-			supply_model.StockStatusNotPairedYet,
-		},
-		[]addStockStatusTransition{
-			{
-				Position: "left",
-				Status:   supply_model.StockStatusExpired,
-			},
-			{
-				Position: "left",
-				Status:   supply_model.StockStatusInStockOpname,
-			},
-		},
-	)
-
-	ALLOWED_ADD_TRANSITIONS.Set(
-		[]supply_model.StockStatus{
-			supply_model.StockStatusOnCheckoutProcess,
-			supply_model.StockStatusUnplaced,
-		},
-		[]addStockStatusTransition{},
-	)
-
-	ALLOWED_ADD_TRANSITIONS.Set(
-		[]supply_model.StockStatus{
-			supply_model.StockStatusMissing,
-			supply_model.StockStatusNotPairedYet,
-		},
-		[]addStockStatusTransition{
-			{
-				Position: "left",
-				Status:   supply_model.StockStatusInStockOpname,
-			},
-			{
-				Position: "left",
-				Status:   supply_model.StockStatusOnDisposalProcess,
-			},
-		},
-	)
-
-	ALLOWED_ADD_TRANSITIONS.Set(
-		[]supply_model.StockStatus{
-			supply_model.StockStatusMissing,
-			supply_model.StockStatusTAGReported,
-		},
-		[]addStockStatusTransition{
-			{
-				Position: "left",
-				Status:   supply_model.StockStatusInStockOpname,
-			},
-			{
-				Position: "left",
-				Status:   supply_model.StockStatusOnDisposalProcess,
-			},
-		},
-	)
-
-	ALLOWED_ADD_TRANSITIONS.Set(
-		[]supply_model.StockStatus{
-			supply_model.StockStatusDefect,
-			supply_model.StockStatusWaitingForApproval,
-		},
-		[]addStockStatusTransition{
-			{
-				Position: "left",
-				Status:   supply_model.StockStatusInStockOpname,
-			},
-		},
-	)
-
-	ALLOWED_ADD_TRANSITIONS.Set(
-		[]supply_model.StockStatus{
-			supply_model.StockStatusExpired,
-			supply_model.StockStatusWaitingForApproval,
-		},
-		[]addStockStatusTransition{
-			{
-				Position: "left",
-				Status:   supply_model.StockStatusInStockOpname,
-			},
-		},
-	)
-
-	ALLOWED_ADD_TRANSITIONS.Set(
-		[]supply_model.StockStatus{
-			supply_model.StockStatusExpired,
-			supply_model.StockStatusNotPairedYet,
-		},
-		[]addStockStatusTransition{
-			{
-				Position: "left",
-				Status:   supply_model.StockStatusInStockOpname,
-			},
-			{
-				Position: "left",
-				Status:   supply_model.StockStatusOnDisposalProcess,
-			},
-		},
-	)
-
-	ALLOWED_ADD_TRANSITIONS.Set(
-		[]supply_model.StockStatus{
-			supply_model.StockStatusDefect,
-			supply_model.StockStatusNotPairedYet,
-		},
-		[]addStockStatusTransition{
-			{
-				Position: "left",
-				Status:   supply_model.StockStatusInStockOpname,
-			},
-			{
-				Position: "left",
-				Status:   supply_model.StockStatusOnDisposalProcess,
-			},
-		},
-	)
-
-	ALLOWED_ADD_TRANSITIONS.Set(
-		[]supply_model.StockStatus{
-			supply_model.StockStatusUnplaced,
-			supply_model.StockStatusDefect,
-		},
-		[]addStockStatusTransition{
-			{
-				Position: "left",
-				Status:   supply_model.StockStatusOnDisposalProcess,
-			},
-			{
-				Position: "left",
-				Status:   supply_model.StockStatusInSupplierReturnProcess,
-			},
-			{
-				Position: "right",
-				Status:   supply_model.StockStatusWaitingForApproval,
-			},
-		},
-	)
-
-	ALLOWED_ADD_TRANSITIONS.Set(
-		[]supply_model.StockStatus{
-			supply_model.StockStatusUnplaced,
-			supply_model.StockStatusExpired,
-		},
-		[]addStockStatusTransition{
-			{
-				Position: "left",
-				Status:   supply_model.StockStatusOnDisposalProcess,
-			},
-			{
-				Position: "left",
-				Status:   supply_model.StockStatusInSupplierReturnProcess,
-			},
-			{
-				Position: "right",
-				Status:   supply_model.StockStatusWaitingForApproval,
-			},
-		},
-	)
-
-	ALLOWED_ADD_TRANSITIONS.Set(
-		[]supply_model.StockStatus{
-			supply_model.StockStatusUnplaced,
-			supply_model.StockStatusDefect,
-			supply_model.StockStatusWaitingForApproval,
-		},
-		[]addStockStatusTransition{},
-	)
-
-	ALLOWED_ADD_TRANSITIONS.Set(
-		[]supply_model.StockStatus{
-			supply_model.StockStatusUnplaced,
-			supply_model.StockStatusExpired,
-			supply_model.StockStatusWaitingForApproval,
-		},
-		[]addStockStatusTransition{},
-	)
-
-	ALLOWED_ADD_TRANSITIONS.Set(
-		[]supply_model.StockStatus{
-			supply_model.StockStatusInSupplierReturnProcess,
-			supply_model.StockStatusExpired,
-		},
-		[]addStockStatusTransition{},
-	)
-
-	ALLOWED_ADD_TRANSITIONS.Set(
-		[]supply_model.StockStatus{
-			supply_model.StockStatusInSupplierReturnProcess,
-			supply_model.StockStatusUnplaced,
-		},
-		[]addStockStatusTransition{},
-	)
-
-	ALLOWED_ADD_TRANSITIONS.Set(
-		[]supply_model.StockStatus{
-			supply_model.StockStatusInSupplierReturnProcess,
-			supply_model.StockStatusUnplaced,
-			supply_model.StockStatusExpired,
-		},
-		[]addStockStatusTransition{},
-	)
-
-	// TODO(refan): Programmatically adds status based on the transition rules
-	s = append(s, s...)
-	return s, nil
-}
-
-// SetStockStatus sets a new stock status,
-// validate the transition according to the rules based from the existing stock statuses and returns the result
-func SetStockStatus(s []supply_model.StockStatus, statuses ...supply_model.StockStatus) ([]supply_model.StockStatus, error) {
-	// TODO(refan): Programmatically sets status ONLY if the transition rules allows it
-	return statuses, nil
-}
-
-// RemoveStockStatus removes a stock status,
-// validate the transition according to the rules based from the existing stock statuses and returns the result
-func RemoveStockStatus(s []supply_model.StockStatus, statuses ...supply_model.StockStatus) ([]supply_model.StockStatus, error) {
-	// TODO(refan): Programmatically removes status based on the transition rules
-	return s, nil
+	return removedStatus
 }
