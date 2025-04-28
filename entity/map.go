@@ -25,7 +25,7 @@ type Map[K any, V any] struct {
 	_m []M[K, V]
 }
 
-// remove removes an element from a slice in the provided index.
+// remove removes an element from a slice of the provided index.
 func remove[T any](s []T, i int) []T {
 	s[i] = s[len(s)-1]
 	return s[:len(s)-1]
@@ -66,7 +66,7 @@ func (m *Map[K, V]) Set(key K, value V) {
 	m._m = append(m._m, M[K, V]{Key: key, Value: value})
 }
 
-// Delete deletes the key-value pair from the map, doesn't return anything whether key exists or not.
+// Delete deletes the key-value pair from the map, doesn't return anything whether the key exists or not.
 func (m *Map[K, V]) Delete(key K) {
 	functions.ForEach(m._m, func(_m M[K, V], index int) {
 		if reflect.DeepEqual(_m.Key, key) {
