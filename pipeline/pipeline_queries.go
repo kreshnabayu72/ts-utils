@@ -14,19 +14,19 @@ func GenerateRangeQuery(filter []int) bson.M {
 	if len(filter) == 2 && filter[0] >= 0 && filter[1] >= 0 {
 		return bson.M{
 			"$gte": filter[0],
-			"lte":  filter[1],
+			"$lte": filter[1],
 		}
 	}
 
 	if len(filter) == 2 && filter[1] >= 0 {
 		return bson.M{
-			"lte": filter[1],
+			"$lte": filter[1],
 		}
 	}
 
 	if len(filter) == 1 && filter[0] >= 0 {
 		return bson.M{
-			"gte": filter[0],
+			"$gte": filter[0],
 		}
 	}
 
