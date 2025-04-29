@@ -29,7 +29,7 @@ type ExpiredRequest struct {
 	Stock        primitive.ObjectID   `json:"stock"         bson:"stock"`
 	TagType      model.TagType        `json:"tagType"       bson:"tagType"`
 	Note         *string              `json:"note"          bson:"note"`
-	ReportedBy   primitive.ObjectID   `json:"reportedBy"    bson:"reportedBy"`
+	ReportedBy   *primitive.ObjectID   `json:"reportedBy"    bson:"reportedBy"`
 	ReportedDate time.Time            `json:"reportedDate"  bson:"reportedDate"`
 	ApprovalNote *string              `json:"approvalNote"  bson:"approvalNote"`
 	ApprovedDate *time.Time           `json:"approvedDate"  bson:"approvedDate"`
@@ -50,7 +50,7 @@ type ExpiredRequestHistory struct {
 	Stock        Stock                 `json:"stock"         bson:"stock"`
 	TagType      model.TagType         `json:"tagType"       bson:"tagType"`
 	Note         *string               `json:"note"          bson:"note"`
-	ReportedBy   UserAttributeEmbedded `json:"reportedBy"    bson:"reportedBy"`
+	ReportedBy   *UserAttributeEmbedded `json:"reportedBy"    bson:"reportedBy"`
 	ReportedDate time.Time             `json:"reportedDate"  bson:"reportedDate"`
 	ApprovalNote *string               `json:"approvalNote"  bson:"approvalNote"`
 	ApprovedDate *time.Time            `json:"approvedDate"  bson:"approvedDate"`
