@@ -35,6 +35,16 @@
           "profilePicture": "string,nullable",
           "key": "number"
         },
+        "permissions": {
+          "systemRoles": {
+            "userRole": {
+              "create": "boolean",
+              "view": "boolean",
+              "update": "boolean",
+              "delete": "boolean"
+            }
+          }
+        },
         "updatedAt": "string,Date",
         "createdAt": "string,Date"
       }

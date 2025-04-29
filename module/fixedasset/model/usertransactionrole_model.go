@@ -18,7 +18,7 @@ type UserTransactionRole struct {
 	User                      userAttribute             `json:"user" bson:"user"`
 	TransactionGroupAttribute TransactionGroupAttribute `json:"transactionGroupAttribute" bson:"transactionGroupAttribute"`
 	Transaction               TransactionType           `json:"transaction"               bson:"transaction"`
-	RoleType                  RoleType                  `json:"roleType"                  bson:"roleType"`
+	RoleType                  TransactionRoleType       `json:"roleType"                  bson:"roleType"`
 	ApprovalLevel             int                       `json:"approvalLevel"             bson:"approvalLevel"`
 	ApprovalType              ApprovalType              `json:"approvalType"              bson:"approvalType"`
 	Group                     *Group                    `json:"group,omitempty"           bson:"group,omitempty"`

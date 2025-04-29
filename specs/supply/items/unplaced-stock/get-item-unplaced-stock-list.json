@@ -30,6 +30,28 @@
           "name": "string",
           "key": "number"
         },
+        "permissions": {
+          "transactionRoles": {
+            "receptionSupplierReturn": {
+              "admin": "boolean",
+              "monitoring": "boolean",
+              "staff": "boolean",
+              "approver": "boolean"
+            },
+            "checkoutInternalReturn": {
+              "admin": "boolean",
+              "monitoring": "boolean",
+              "staff": "boolean",
+              "approver": "boolean"
+            },
+            "transfer": {
+              "admin": "boolean",
+              "monitoring": "boolean",
+              "staff": "boolean",
+              "approver": "boolean"
+            }
+          }
+        },
         "totalStock": "number"
       }
     ],

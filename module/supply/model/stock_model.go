@@ -31,28 +31,6 @@ const (
 	StockStatusReturned                StockStatus = "Returned"
 )
 
-// AddStockStatus adds a new stock status to an existing stock statuses,
-// validate the transition according to the rules and returns the result
-func AddStockStatus(s []StockStatus, statuses ...StockStatus) ([]StockStatus, error) {
-	// TODO(refan): Programmatically adds status based on the transition rules
-	s = append(s, s...)
-	return s, nil
-}
-
-// SetStockStatus sets a new stock status,
-// validate the transition according to the rules based from the existing stock statuses and returns the result
-func SetStockStatus(s []StockStatus, statuses ...StockStatus) ([]StockStatus, error) {
-	// TODO(refan): Programmatically sets status ONLY if the transition rules allows it
-	return statuses, nil
-}
-
-// RemoveStockStatus removes a stock status,
-// validate the transition according to the rules based from the existing stock statuses and returns the result
-func RemoveStockStatus(s []StockStatus, statuses ...StockStatus) ([]StockStatus, error) {
-	// TODO(refan): Programmatically removes status based on the transition rules
-	return s, nil
-}
-
 // StockSource represents stock source values.
 type StockSource string
 
@@ -60,9 +38,10 @@ const (
 	StockSourceReception      StockSource = "Reception"
 	StockSourceSupplierReturn StockSource = "Supplier Return"
 	StockSourceInternalReturn StockSource = "Internal Return"
+	StockSourceInitialStock   StockSource = "Initial Stock"
 )
 
-// Stock represents the schema for a single stock data
+// Stock represents the schema for single stock data
 type Stock struct {
 	ID                           primitive.ObjectID  `json:"_id,omitempty"                bson:"_id,omitempty"`
 	Key                          int                 `json:"key"                          bson:"key"`
