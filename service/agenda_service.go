@@ -14,6 +14,7 @@ type AgendaService interface {
 	Start()
 	Define(name string, jobFunc func(map[string]any) error)
 	Schedule(name string, t time.Time, data map[string]any)
+	Every(name string, t time.Time, data map[string]any, repeatEvery string)
 	Stop(filter bson.M)
 }
 
@@ -52,7 +53,15 @@ func (s *AgendaServiceImpl) Define(name string, jobFunc func(map[string]any) err
 
 // Schedule defines a schedule of the job, with provided name and time, along with optional data
 func (s *AgendaServiceImpl) Schedule(name string, t time.Time, data map[string]any) {
-	if err := s.Agenda.NewSchedule(name, t, data); err != nil {
+	if err := s.Agenda.NewSchedule(name, t, data, nil); err != nil {
+		panic(err)
+	}
+}
+
+// Every defines a schedule of the job, with provided name and time, along with optional data.
+// It will then be repeated for every %repeatEvery% provided.
+func (s *AgendaServiceImpl) Every(name string, t time.Time, data map[string]any, repeatEvery string) {
+	if err := s.Agenda.NewSchedule(name, t, data, &repeatEvery); err != nil {
 		panic(err)
 	}
 }
