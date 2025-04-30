@@ -367,41 +367,42 @@ func SystemRolePermissionAggregation(
 		groupField = fmt.Sprintf("$%s", groupField)
 	}
 
+	objectIdtest, _ := primitive.ObjectIDFromHex(loggedInUserId.Hex())
 	builder.Set(bson.M{
-		"loggedInUserId": loggedInUserId,
+		"loggedInUserId": objectIdtest,
 	}).
 		Lookup(bson.M{
 			"from":         db.UserSystemRoleModelName,
 			"localField":   "loggedInUser",
 			"foreignField": "user._id",
-			"let": bson.M{
-				"groupField": "$group._id",
-			},
+			// "let": bson.M{
+			// 	"groupField": "$group._id",
+			// },
 			"as": "userSystemRoles",
-			"pipeline": pipeline.NewPipelineBuilder().
-				Match(bson.M{"isActive": true, "type": roleType}).
-				// OptionalMatch(
-				// 	bson.M{
-				// 		"$expr": bson.M{
-				// 			"$and": bson.A{
-				// 				bson.M{"$in": bson.A{"$$groupField", "$group._id"}},
-				// 			},
-				// 		},
-				// 	},
-				// 	"group._id" != "" && !isFieldArray,
-				// ).
-				// OptionalMatch(
-				// 	bson.M{
-				// 		"$expr": bson.M{
-				// 			"$gt": bson.A{
-				// 				bson.M{"$size": bson.M{"$setIntersection": bson.A{"$$groupField", "$group._id"}}},
-				// 				0,
-				// 			},
-				// 		},
-				// 	},
-				// 	"group._id" != "" && isFieldArray,
-				// ).
-				Build(),
+			// "pipeline": pipeline.NewPipelineBuilder().
+			// Match(bson.M{"isActive": true, "type": roleType}).
+			// OptionalMatch(
+			// 	bson.M{
+			// 		"$expr": bson.M{
+			// 			"$and": bson.A{
+			// 				bson.M{"$in": bson.A{"$$groupField", "$group._id"}},
+			// 			},
+			// 		},
+			// 	},
+			// 	"group._id" != "" && !isFieldArray,
+			// ).
+			// OptionalMatch(
+			// 	bson.M{
+			// 		"$expr": bson.M{
+			// 			"$gt": bson.A{
+			// 				bson.M{"$size": bson.M{"$setIntersection": bson.A{"$$groupField", "$group._id"}}},
+			// 				0,
+			// 			},
+			// 		},
+			// 	},
+			// 	"group._id" != "" && isFieldArray,
+			// ).
+			// Build(),
 		}).
 		Addfields(
 			getHasSystemRoleSection(roleType),
