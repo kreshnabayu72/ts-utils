@@ -23,6 +23,10 @@ func (m *MockAgendaService) Schedule(name string, t time.Time, data map[string]a
 	m.Called(name, t, data)
 }
 
+func (m *MockAgendaService) Every(name string, t time.Time, data map[string]any, repeatEvery string) {
+	m.Called(name, t, data, repeatEvery)
+}
+
 func (m *MockAgendaService) Stop(filter bson.M) {
 	m.Called(filter)
 }
