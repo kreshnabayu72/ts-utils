@@ -21,6 +21,24 @@ const (
 	RTOpenApi             RoleType = "openApi"
 )
 
+var RoleTypeMap = map[string]RoleType{
+	"importData":          RTImportData,
+	"assetAttribute":      RTAssetAttribute,
+	"assetPolicies":       RTAssetPolicies,
+	"depreciationGroup":   RTDepreciationGroup,
+	"depreciationMethod":  RTDepreciationMethod,
+	"documentDeletion":    RTDocumentDeletion,
+	"group":               RTGroup,
+	"iotReader":           RTIotReader,
+	"purchaseDocument":    RTPurchaseDocument,
+	"purchaseInformation": RTPurchaseInformation,
+	"userAndRole":         RTUserAndRole,
+	"tag":                 RTTag,
+	"registerAsset":       RTRegisterAsset,
+	"tagType":             RTTagType,
+	"openApi":             RTOpenApi,
+}
+
 type RoleName string
 
 var RoleNameMap = map[RoleType]RoleName{
