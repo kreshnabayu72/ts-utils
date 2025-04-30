@@ -361,7 +361,7 @@ func SystemRolePermissionAggregation(
 		sysRoleFilter = bson.M{
 			"$expr": bson.M{
 				"$gt": bson.A{
-					bson.M{"$size": bson.M{"$setIntersection": bson.A{groupField, "$systemRole.group._id"}}},
+					bson.M{"$size": bson.M{"$setIntersection": bson.A{groupField, "$$systemRole.group._id"}}},
 					0,
 				},
 			},
