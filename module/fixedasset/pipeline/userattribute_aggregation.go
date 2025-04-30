@@ -1,6 +1,8 @@
 package pipeline
 
 import (
+	"fmt"
+
 	"go.mongodb.org/mongo-driver/bson"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/db"
@@ -13,6 +15,7 @@ func LookupUserAttributeAggregation(
 	builder *pipeline.PipelineBuilder,
 	localField string,
 	as string,
+	preserveUserLookup bool,
 ) {
 	builder.
 		Lookup(bson.M{
@@ -27,5 +30,5 @@ func LookupUserAttributeAggregation(
 					"key":      1,
 				}).
 				Build(),
-		})
+		}).Unwind(bson.M{"path": fmt.Sprintf("$%s", as), "preserveNullAndEmptyArrays": preserveUserLookup})
 }
