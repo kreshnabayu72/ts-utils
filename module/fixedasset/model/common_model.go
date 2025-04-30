@@ -10,12 +10,11 @@ const (
 	RTDepreciationMethod  RoleType = "depreciationMethod"
 	RTDocumentDeletion    RoleType = "documentDeletion"
 	RTGroup               RoleType = "group"
-	RTUser                RoleType = "user"
 	RTIotReader           RoleType = "iotReader"
 	RTLicense             RoleType = "license"
 	RTPurchaseDocument    RoleType = "purchaseDocument"
 	RTPurchaseInformation RoleType = "purchaseInformation"
-	RTRole                RoleType = "role"
+	RTUserAndRole         RoleType = "userAndRole"
 	RTTag                 RoleType = "tag"
 	RTRegisterAsset       RoleType = "registerAsset"
 	RTTagType             RoleType = "tagType"
@@ -32,12 +31,11 @@ var RoleNameMap = map[RoleType]RoleName{
 	RTDepreciationMethod:  "Manage depreciation method",
 	RTDocumentDeletion:    "Manage document deletion",
 	RTGroup:               "Manage group",
-	RTUser:                "Manage user",
+	RTUserAndRole:         "Manage user and role",
 	RTIotReader:           "Manage IOT and reader",
 	RTLicense:             "Manage license",
 	RTPurchaseDocument:    "Manage purchase document",
 	RTPurchaseInformation: "Manage purchase information",
-	RTRole:                "Manage role",
 	RTTag:                 "Manage TAG",
 	RTRegisterAsset:       "Register assets",
 	RTTagType:             "Manage TAG type",
@@ -132,4 +130,14 @@ const (
 	TagTypeQR     TagType = "QR"
 	TagTypeRFID   TagType = "RFID"
 	TagTypeRFIDQR TagType = "RFID & QR"
+)
+
+// TransactionManageType represents the transaction role's manage type
+type TransactionManageType string
+
+const (
+	TransactionManageTypeManager    TransactionManageType = "Manager"
+	TransactionManageTypeMonitoring TransactionManageType = "Monitoring"
+	TransactionManageTypeStaff      TransactionManageType = "Staff"
+	TransactionManageTypeApprover   TransactionManageType = "Approval"
 )
