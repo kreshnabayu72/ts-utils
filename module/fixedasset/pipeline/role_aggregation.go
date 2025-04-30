@@ -388,7 +388,7 @@ func SystemRolePermissionAggregation(
 		}).
 		Addfields(
 			bson.M{
-				"hasSystemRoles": bson.M{
+				"hasSystemRole": bson.M{
 					"importData": bson.M{
 						"create": getSystemRolePermission(fixedasset_model.RTImportData, "create"),
 						"view":   getSystemRolePermission(fixedasset_model.RTImportData, "view"),
