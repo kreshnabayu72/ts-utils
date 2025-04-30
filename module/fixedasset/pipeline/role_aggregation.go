@@ -380,35 +380,27 @@ func SystemRolePermissionAggregation(
 			"as": "userSystemRoles",
 			"pipeline": pipeline.NewPipelineBuilder().
 				Match(bson.M{"isActive": true, "type": roleType}).
-				OptionalMatch(
-					bson.M{
-						"$expr": bson.M{
-							"$and": bson.A{
-								bson.M{"$in": bson.A{"$$groupField", "$group._id"}},
-								bson.M{"$eq": bson.A{"$isActive", true}},
-							},
-						},
-					},
-					"group._id" != "" && !isFieldArray,
-				).
-				OptionalMatch(
-					bson.M{
-						"$expr": bson.M{
-							"$and": bson.A{
-								bson.M{
-									"$expr": bson.M{
-										"$gt": bson.A{
-											bson.M{"$size": bson.M{"$setIntersection": bson.A{"$$groupField", "$group._id"}}},
-											0,
-										},
-									},
-								},
-								bson.M{"$eq": bson.A{"$isActive", true}},
-							},
-						},
-					},
-					"group._id" != "" && isFieldArray,
-				).
+				// OptionalMatch(
+				// 	bson.M{
+				// 		"$expr": bson.M{
+				// 			"$and": bson.A{
+				// 				bson.M{"$in": bson.A{"$$groupField", "$group._id"}},
+				// 			},
+				// 		},
+				// 	},
+				// 	"group._id" != "" && !isFieldArray,
+				// ).
+				// OptionalMatch(
+				// 	bson.M{
+				// 		"$expr": bson.M{
+				// 			"$gt": bson.A{
+				// 				bson.M{"$size": bson.M{"$setIntersection": bson.A{"$$groupField", "$group._id"}}},
+				// 				0,
+				// 			},
+				// 		},
+				// 	},
+				// 	"group._id" != "" && isFieldArray,
+				// ).
 				Build(),
 		}).
 		Addfields(
