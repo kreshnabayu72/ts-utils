@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+
 	"github.com/stretchr/testify/mock"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -136,7 +137,7 @@ func (m *MockBaseService) CountDocuments(ctx context.Context, filter interface{}
 
 func (m *MockBaseService) CreateIndex(
 	ctx context.Context,
-	fields bson.M,
+	fields bson.D,
 	index *options.IndexOptions,
 ) error {
 	args := m.Called(ctx, fields, index)

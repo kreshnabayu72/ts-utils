@@ -76,7 +76,7 @@ type Service interface {
 	) (bson.M, error)
 	MakeUnique(ctx context.Context, filter interface{}) error
 	CountDocuments(ctx context.Context, filter interface{}) (int64, error)
-	CreateIndex(ctx context.Context, fields bson.M, index *options.IndexOptions) error
+	CreateIndex(ctx context.Context, fields bson.D, index *options.IndexOptions) error
 }
 
 type BaseService struct {
@@ -314,7 +314,7 @@ func (s *BaseService) CountDocuments(ctx context.Context, filter interface{}) (i
 
 func (s *BaseService) CreateIndex(
 	ctx context.Context,
-	fields bson.M,
+	fields bson.D,
 	index *options.IndexOptions,
 ) error {
 	indexModel := mongo.IndexModel{
