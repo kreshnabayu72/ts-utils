@@ -143,3 +143,12 @@ func (m *MockBaseService) CreateIndex(
 	args := m.Called(ctx, fields, index)
 	return args.Error(0)
 }
+
+func (m *MockBaseService) AggregateExplain(
+	ctx context.Context,
+	pipeline mongo.Pipeline,
+	opts ...*options.AggregateOptions,
+) (bson.M, error) {
+	args := m.Called(ctx, pipeline, opts)
+	return args.Get(0).(bson.M), args.Error(1)
+}
