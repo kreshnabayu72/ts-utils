@@ -69,6 +69,11 @@ type Service interface {
 		pipeline mongo.Pipeline,
 		options ...*options.AggregateOptions,
 	) error
+	AggregateExplain(
+		ctx context.Context,
+		pipeline mongo.Pipeline,
+		opts ...*options.AggregateOptions,
+	) (bson.M, error)
 	MakeUnique(ctx context.Context, filter interface{}) error
 	CountDocuments(ctx context.Context, filter interface{}) (int64, error)
 	CreateIndex(ctx context.Context, fields bson.M, index *options.IndexOptions) error
