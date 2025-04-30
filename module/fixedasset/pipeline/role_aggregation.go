@@ -140,7 +140,7 @@ func RolePermissionAggregation(
 		Lookup(bson.M{
 			"from":         db.UserSystemRoleModelName,
 			"localField":   "loggedInUserId",
-			"foreignField": "user",
+			"foreignField": "user._id",
 			"let": bson.M{
 				"groupField": groupField,
 			},
@@ -336,7 +336,7 @@ func SystemRolePermissionAggregation(
 		Lookup(bson.M{
 			"from":         db.UserSystemRoleModelName,
 			"localField":   "loggedInUserId",
-			"foreignField": "user",
+			"foreignField": "user._id",
 			"let": bson.M{
 				"groupField": groupField,
 			},
@@ -489,7 +489,7 @@ func RoleRestrictionAggregation(
 				bson.M{
 					"from":         db.UserTransactionRoleModelName,
 					"localField":   "loggedInUserId",
-					"foreignField": "user",
+					"foreignField": "user._id",
 					"let": bson.M{
 						"groupField": groupField,
 					},
@@ -535,7 +535,7 @@ func RoleRestrictionAggregation(
 				bson.M{
 					"from":         db.UserSystemRoleModelName,
 					"localField":   "loggedInUserId",
-					"foreignField": "user",
+					"foreignField": "user._id",
 					"let": bson.M{
 						"groupField": groupField,
 					},
