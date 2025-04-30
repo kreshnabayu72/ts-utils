@@ -5,9 +5,14 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// Used to get isManager isMonitoring etc inside aggregation
-// Used after addFields or lookup to user_transaction_roles
-// Filter the transactionRoles array by isActive:true and isManagedByParent:{$ne:true} before using this
+/*
+	Used to get isManager isMonitoring etc inside aggregation
+ 	Used after addFields or lookup to user_transaction_roles
+	Filter the transactionRoles array by isActive:true and isManagedByParent:{$ne:true} before using this
+
+	example: AddFields(bson.M{"isManager":CheckHasTransactionRoleAggregation("$transactionRoles","transferRole","Manager","$assetGroup._id")})
+*/
+
 func CheckHasTransactionRoleAggregation(transactionRoleAttribute string, transactionType string, roleType string, groupIdAttribute string) primitive.M {
 	return bson.M{
 		"$anyElementTrue": bson.M{
