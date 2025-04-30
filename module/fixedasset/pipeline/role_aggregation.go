@@ -1,6 +1,7 @@
 package pipeline
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -318,65 +319,71 @@ func RolePermissionAggregation(
 		)
 }
 
+func FindUserSystemRoles(v any, ctx context.Context, companyCode string, loggedInUserId primitive.ObjectID) error {
+	db.ConnectToDB(db.FixedAssetDBName.CompanyDBName(companyCode))
+	coll := db.GetCollection(db.UserSystemRoleModelName)
+
+	cursor, err := coll.Find(context.Background(), bson.M{"user._id": loggedInUserId, "isActive": true})
+	if err != nil {
+		return err
+	}
+	defer cursor.Close(ctx)
+
+	err = cursor.All(ctx, v)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // only system role (for settings, file manager, import, etc)
 func SystemRolePermissionAggregation(
 	builder *pipeline.PipelineBuilder,
+	companyCode string,
 	loggedInUserId primitive.ObjectID,
 	groupField string,
 	isFieldArray bool,
-	additionalSystemRoleMatch *bson.M,
 ) {
 	if groupField != "" && !strings.HasPrefix(groupField, "$") {
 		groupField = fmt.Sprintf("$%s", groupField)
 	}
 
-	//optional match doesnt accept *bson.M
-	match := bson.M{}
-	if additionalSystemRoleMatch != nil {
-		match = *additionalSystemRoleMatch
+	var systemRoles []fixedasset_model.UserSystemRole = make([]fixedasset_model.UserSystemRole, 0)
+	FindUserSystemRoles(&systemRoles, context.TODO(), companyCode, loggedInUserId)
+
+	sysRoleFilter := bson.M{
+		"$and": bson.A{
+			bson.M{"$in": bson.A{groupField, "$$systemRole.group._id"}},
+		},
+	}
+	if isFieldArray {
+		sysRoleFilter = bson.M{
+			"$expr": bson.M{
+				"$gt": bson.A{
+					bson.M{"$size": bson.M{"$setIntersection": bson.A{groupField, "$systemRole.group._id"}}},
+					0,
+				},
+			},
+		}
 	}
 
 	builder.
+		Addfields(bson.M{
+			"systemRoles": systemRoles,
+		}).
 		Set(bson.M{
-			"loggedInUserId": loggedInUserId,
-		}).
-		Lookup(bson.M{
-			"from":         db.UserSystemRoleModelName,
-			"localField":   "loggedInUserId",
-			"foreignField": "user._id",
-			"let": bson.M{
-				"groupField": groupField,
+			"systemRoles": bson.M{
+				"$filter": bson.M{
+					"input": "$systemRoles",
+					"as":    "systemRole",
+					"cond":  sysRoleFilter,
+				},
 			},
-			"as": "userSystemRoles",
-			"pipeline": pipeline.NewPipelineBuilder().
-				OptionalMatch(match, additionalSystemRoleMatch != nil).
-				OptionalMatch(
-					bson.M{
-						"$expr": bson.M{
-							"$and": bson.A{
-								bson.M{"$eq": bson.A{"$group._id", "$$groupField"}},
-								bson.M{"$eq": bson.A{"$isActive", true}},
-							},
-						},
-					},
-					groupField != "" && !isFieldArray,
-				).
-				OptionalMatch(
-					bson.M{
-						"$expr": bson.M{
-							"$and": bson.A{
-								bson.M{"$in": bson.A{"$group._id", "$$groupField"}},
-								bson.M{"$eq": bson.A{"$isActive", true}},
-							},
-						},
-					},
-					groupField != "" && isFieldArray,
-				).
-				Build(),
 		}).
-		Set(
+		Addfields(
 			bson.M{
-				"permissions": bson.M{
+				"hasSystemRoles": bson.M{
 					"systemRoles": bson.M{
 						"importData": bson.M{
 							"create": getSystemRolePermission(fixedasset_model.RTImportData, "create"),
