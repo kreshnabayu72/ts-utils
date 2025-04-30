@@ -252,6 +252,38 @@ func (s *BaseService) Aggregate(
 	return nil
 }
 
+func (s *BaseService) AggregateExplain(
+	ctx context.Context,
+	pipeline mongo.Pipeline,
+	opts ...*options.AggregateOptions,
+) (bson.M, error) {
+	// Build the aggregate command
+	command := bson.D{
+		{Key: "explain", Value: bson.D{
+			{Key: "aggregate", Value: s.collection.Name()},
+			{Key: "pipeline", Value: pipeline},
+			{Key: "cursor", Value: bson.D{}},
+		}},
+	}
+
+	// Add options if needed (e.g., allowDiskUse)
+	if len(opts) > 0 && opts[0] != nil && opts[0].AllowDiskUse != nil {
+		command[0].Value = append(
+			command[0].Value.(bson.D),
+			bson.E{Key: "allowDiskUse", Value: *opts[0].AllowDiskUse},
+		)
+	}
+
+	// Run the explain command
+	var result bson.M
+	err := s.collection.Database().RunCommand(ctx, command).Decode(&result)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
 func (s *BaseService) MakeUnique(ctx context.Context, filter interface{}) error {
 	indexModel := mongo.IndexModel{
 		Keys:    filter,
