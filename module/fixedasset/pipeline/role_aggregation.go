@@ -324,9 +324,16 @@ func SystemRolePermissionAggregation(
 	loggedInUserId primitive.ObjectID,
 	groupField string,
 	isFieldArray bool,
+	additionalSystemRoleMatch *bson.M,
 ) {
 	if groupField != "" && !strings.HasPrefix(groupField, "$") {
 		groupField = fmt.Sprintf("$%s", groupField)
+	}
+
+	//optional match doesnt accept *bson.M
+	match := bson.M{}
+	if additionalSystemRoleMatch != nil {
+		match = *additionalSystemRoleMatch
 	}
 
 	builder.
@@ -342,6 +349,7 @@ func SystemRolePermissionAggregation(
 			},
 			"as": "userSystemRoles",
 			"pipeline": pipeline.NewPipelineBuilder().
+				OptionalMatch(match, additionalSystemRoleMatch != nil).
 				OptionalMatch(
 					bson.M{
 						"$expr": bson.M{
