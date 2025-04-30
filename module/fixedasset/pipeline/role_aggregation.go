@@ -297,6 +297,147 @@ func RolePermissionAggregation(
 		)
 }
 
+func SystemRolePermissionAggregation(
+	builder *pipeline.PipelineBuilder,
+	loggedInUserId primitive.ObjectID,
+	groupField string,
+	isFieldArray bool,
+) {
+	if groupField != "" && !strings.HasPrefix(groupField, "$") {
+		groupField = fmt.Sprintf("$%s", groupField)
+	}
+
+	builder.
+		Set(bson.M{
+			"loggedInUserId": loggedInUserId,
+		}).
+		Lookup(bson.M{
+			"from":         db.UserSystemRoleModelName,
+			"localField":   "loggedInUserId",
+			"foreignField": "user",
+			"let": bson.M{
+				"groupField": groupField,
+			},
+			"as": "userSystemRoles",
+			"pipeline": pipeline.NewPipelineBuilder().
+				OptionalMatch(
+					bson.M{
+						"$expr": bson.M{
+							"$eq": bson.A{"$group", "$$groupField"},
+						},
+					},
+					groupField != "" && !isFieldArray,
+				).
+				OptionalMatch(
+					bson.M{
+						"$expr": bson.M{
+							"$in": bson.A{"$group", "$$groupField"},
+						},
+					},
+					groupField != "" && isFieldArray,
+				).
+				Build(),
+		}).
+		Set(
+			bson.M{
+				"permissions": bson.M{
+					"systemRoles": bson.M{
+						"importData": bson.M{
+							"create": getSystemRolePermission(fixedasset_model.RTImportData, "create"),
+							"view":   getSystemRolePermission(fixedasset_model.RTImportData, "view"),
+							"update": getSystemRolePermission(fixedasset_model.RTImportData, "update"),
+							"delete": getSystemRolePermission(fixedasset_model.RTImportData, "delete"),
+						},
+						"assetAttribute": bson.M{
+							"create": getSystemRolePermission(fixedasset_model.RTAssetAttribute, "create"),
+							"view":   getSystemRolePermission(fixedasset_model.RTAssetAttribute, "view"),
+							"update": getSystemRolePermission(fixedasset_model.RTAssetAttribute, "update"),
+							"delete": getSystemRolePermission(fixedasset_model.RTAssetAttribute, "delete"),
+						},
+						"assetPolicies": bson.M{
+							"create": getSystemRolePermission(fixedasset_model.RTAssetPolicies, "create"),
+							"view":   getSystemRolePermission(fixedasset_model.RTAssetPolicies, "view"),
+							"update": getSystemRolePermission(fixedasset_model.RTAssetPolicies, "update"),
+							"delete": getSystemRolePermission(fixedasset_model.RTAssetPolicies, "delete"),
+						},
+						"depreciationGroup": bson.M{
+							"create": getSystemRolePermission(fixedasset_model.RTDepreciationGroup, "create"),
+							"view":   getSystemRolePermission(fixedasset_model.RTDepreciationGroup, "view"),
+							"update": getSystemRolePermission(fixedasset_model.RTDepreciationGroup, "update"),
+							"delete": getSystemRolePermission(fixedasset_model.RTDepreciationGroup, "delete"),
+						},
+						"depreciationMethod": bson.M{
+							"create": getSystemRolePermission(fixedasset_model.RTDepreciationMethod, "create"),
+							"view":   getSystemRolePermission(fixedasset_model.RTDepreciationMethod, "view"),
+							"update": getSystemRolePermission(fixedasset_model.RTDepreciationMethod, "update"),
+							"delete": getSystemRolePermission(fixedasset_model.RTDepreciationMethod, "delete"),
+						},
+						"documentDeletion": bson.M{
+							"create": getSystemRolePermission(fixedasset_model.RTDocumentDeletion, "create"),
+							"view":   getSystemRolePermission(fixedasset_model.RTDocumentDeletion, "view"),
+							"update": getSystemRolePermission(fixedasset_model.RTDocumentDeletion, "update"),
+							"delete": getSystemRolePermission(fixedasset_model.RTDocumentDeletion, "delete"),
+						},
+						"group": bson.M{
+							"create": getSystemRolePermission(fixedasset_model.RTGroup, "create"),
+							"view":   getSystemRolePermission(fixedasset_model.RTGroup, "view"),
+							"update": getSystemRolePermission(fixedasset_model.RTGroup, "update"),
+							"delete": getSystemRolePermission(fixedasset_model.RTGroup, "delete"),
+						},
+						"iotReader": bson.M{
+							"create": getSystemRolePermission(fixedasset_model.RTIotReader, "create"),
+							"view":   getSystemRolePermission(fixedasset_model.RTIotReader, "view"),
+							"update": getSystemRolePermission(fixedasset_model.RTIotReader, "update"),
+							"delete": getSystemRolePermission(fixedasset_model.RTIotReader, "delete"),
+						},
+						"purchaseDocument": bson.M{
+							"create": getSystemRolePermission(fixedasset_model.RTPurchaseDocument, "create"),
+							"view":   getSystemRolePermission(fixedasset_model.RTPurchaseDocument, "view"),
+							"update": getSystemRolePermission(fixedasset_model.RTPurchaseDocument, "update"),
+							"delete": getSystemRolePermission(fixedasset_model.RTPurchaseDocument, "delete"),
+						},
+						"purchaseInformation": bson.M{
+							"create": getSystemRolePermission(fixedasset_model.RTPurchaseInformation, "create"),
+							"view":   getSystemRolePermission(fixedasset_model.RTPurchaseInformation, "view"),
+							"update": getSystemRolePermission(fixedasset_model.RTPurchaseInformation, "update"),
+							"delete": getSystemRolePermission(fixedasset_model.RTPurchaseInformation, "delete"),
+						},
+						"userAndRole": bson.M{
+							"create": getSystemRolePermission(fixedasset_model.RTUserAndRole, "create"),
+							"view":   getSystemRolePermission(fixedasset_model.RTUserAndRole, "view"),
+							"update": getSystemRolePermission(fixedasset_model.RTUserAndRole, "update"),
+							"delete": getSystemRolePermission(fixedasset_model.RTUserAndRole, "delete"),
+						},
+						"tag": bson.M{
+							"create": getSystemRolePermission(fixedasset_model.RTTag, "create"),
+							"view":   getSystemRolePermission(fixedasset_model.RTTag, "view"),
+							"update": getSystemRolePermission(fixedasset_model.RTTag, "update"),
+							"delete": getSystemRolePermission(fixedasset_model.RTTag, "delete"),
+						},
+						"registerAsset": bson.M{
+							"create": getSystemRolePermission(fixedasset_model.RTRegisterAsset, "create"),
+							"view":   getSystemRolePermission(fixedasset_model.RTRegisterAsset, "view"),
+							"update": getSystemRolePermission(fixedasset_model.RTRegisterAsset, "update"),
+							"delete": getSystemRolePermission(fixedasset_model.RTRegisterAsset, "delete"),
+						},
+						"tagType": bson.M{
+							"create": getSystemRolePermission(fixedasset_model.RTTagType, "create"),
+							"view":   getSystemRolePermission(fixedasset_model.RTTagType, "view"),
+							"update": getSystemRolePermission(fixedasset_model.RTTagType, "update"),
+							"delete": getSystemRolePermission(fixedasset_model.RTTagType, "delete"),
+						},
+						"openApi": bson.M{
+							"create": getSystemRolePermission(fixedasset_model.RTOpenApi, "create"),
+							"view":   getSystemRolePermission(fixedasset_model.RTOpenApi, "view"),
+							"update": getSystemRolePermission(fixedasset_model.RTOpenApi, "update"),
+							"delete": getSystemRolePermission(fixedasset_model.RTOpenApi, "delete"),
+						},
+					},
+				},
+			},
+		)
+}
+
 func RoleRestrictionAggregation(
 	builder *pipeline.PipelineBuilder,
 	loggedInUserId primitive.ObjectID,
