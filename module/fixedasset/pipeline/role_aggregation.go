@@ -28,8 +28,8 @@ type RoleRestrictionOptions struct {
 }
 
 func getTransactionRolePermission(
-	roleType fixedasset_model.TransactionGroupAttribute,
-	manageType fixedasset_model.TransactionManageType,
+	transactionGroupAttribute fixedasset_model.TransactionGroupAttribute,
+	roleType fixedasset_model.TransactionManageType,
 ) bson.M {
 	return bson.M{
 		"$gt": bson.A{
@@ -42,14 +42,14 @@ func getTransactionRolePermission(
 							"$and": bson.A{
 								bson.M{
 									"$eq": bson.A{
-										"$$role.roleType",
-										roleType,
+										"$$role.transactionGroupAttribute",
+										transactionGroupAttribute,
 									},
 								},
 								bson.M{
 									"$eq": bson.A{
-										"$$role.manageType",
-										manageType,
+										"$$role.roleType",
+										roleType,
 									},
 								},
 							},
@@ -71,19 +71,9 @@ func getSystemRolePermission(roleType fixedasset_model.RoleType, permission stri
 						"input": "$userSystemRoles",
 						"as":    "role",
 						"cond": bson.M{
-							"$and": bson.A{
-								bson.M{
-									"$eq": bson.A{
-										"$$role.roleType",
-										roleType,
-									},
-								},
-								bson.M{
-									"$eq": bson.A{
-										fmt.Sprintf("$$role.permissions.%s", permission),
-										true,
-									},
-								},
+							"$eq": bson.A{
+								fmt.Sprintf("$$role.managePermission.%s.%s", roleType, permission),
+								true,
 							},
 						},
 					},
