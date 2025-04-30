@@ -110,17 +110,28 @@ func RolePermissionAggregation(
 			"pipeline": pipeline.NewPipelineBuilder().
 				OptionalMatch(
 					bson.M{
-						"$expr": bson.M{
-							"$eq": bson.A{"$group._id", "$$groupField"},
-						},
+						"$expr": bson.M{"$and": bson.A{
+							bson.M{
+								"$eq": bson.A{"$group._id", "$$groupField"},
+							},
+							bson.M{
+								"$eq": bson.A{"$isActive", true},
+							},
+						}},
 					},
+
 					groupField != "" && !isFieldArray,
 				).
 				OptionalMatch(
 					bson.M{
-						"$expr": bson.M{
-							"$in": bson.A{"$group._id", "$$groupField"},
-						},
+						"$expr": bson.M{"$and": bson.A{
+							bson.M{
+								"$in": bson.A{"$group._id", "$$groupField"},
+							},
+							bson.M{
+								"$eq": bson.A{"$isActive", true},
+							},
+						}},
 					},
 					groupField != "" && isFieldArray,
 				).
@@ -137,17 +148,27 @@ func RolePermissionAggregation(
 			"pipeline": pipeline.NewPipelineBuilder().
 				OptionalMatch(
 					bson.M{
-						"$expr": bson.M{
-							"$eq": bson.A{"$group", "$$groupField"},
-						},
+						"$expr": bson.M{"$and": bson.A{
+							bson.M{
+								"$eq": bson.A{"$group._id", "$$groupField"},
+							},
+							bson.M{
+								"$eq": bson.A{"$isActive", true},
+							},
+						}},
 					},
 					groupField != "" && !isFieldArray,
 				).
 				OptionalMatch(
 					bson.M{
-						"$expr": bson.M{
-							"$in": bson.A{"$group", "$$groupField"},
-						},
+						"$expr": bson.M{"$and": bson.A{
+							bson.M{
+								"$in": bson.A{"$group._id", "$$groupField"},
+							},
+							bson.M{
+								"$eq": bson.A{"$isActive", true},
+							},
+						}},
 					},
 					groupField != "" && isFieldArray,
 				).
@@ -324,7 +345,10 @@ func SystemRolePermissionAggregation(
 				OptionalMatch(
 					bson.M{
 						"$expr": bson.M{
-							"$eq": bson.A{"$group", "$$groupField"},
+							"$and": bson.A{
+								bson.M{"$eq": bson.A{"$group._id", "$$groupField"}},
+								bson.M{"$eq": bson.A{"$isActive", true}},
+							},
 						},
 					},
 					groupField != "" && !isFieldArray,
@@ -332,7 +356,10 @@ func SystemRolePermissionAggregation(
 				OptionalMatch(
 					bson.M{
 						"$expr": bson.M{
-							"$in": bson.A{"$group", "$$groupField"},
+							"$and": bson.A{
+								bson.M{"$in": bson.A{"$group._id", "$$groupField"}},
+								bson.M{"$eq": bson.A{"$isActive", true}},
+							},
 						},
 					},
 					groupField != "" && isFieldArray,
@@ -470,9 +497,10 @@ func RoleRestrictionAggregation(
 					"pipeline": pipeline.NewPipelineBuilder().
 						OptionalMatch(
 							bson.M{
-								"$expr": bson.M{
-									"$eq": bson.A{"$group", "$$groupField"},
-								},
+								"$expr": bson.M{"$and": bson.A{
+									bson.M{"$eq": bson.A{"$group._id", "$$groupField"}},
+									bson.M{"$eq": bson.A{"$isActive", true}},
+								}},
 							},
 							groupField != "",
 						).
@@ -515,9 +543,10 @@ func RoleRestrictionAggregation(
 					"pipeline": pipeline.NewPipelineBuilder().
 						OptionalMatch(
 							bson.M{
-								"$expr": bson.M{
-									"$eq": bson.A{"$group._id", "$$groupField"},
-								},
+								"$expr": bson.M{"$and": bson.A{
+									bson.M{"$eq": bson.A{"$group._id", "$$groupField"}},
+									bson.M{"$eq": bson.A{"$isActive", true}},
+								}},
 							},
 							groupField != "",
 						).
