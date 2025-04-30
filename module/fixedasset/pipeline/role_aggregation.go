@@ -384,23 +384,30 @@ func SystemRolePermissionAggregation(
 					bson.M{
 						"$expr": bson.M{
 							"$and": bson.A{
-								bson.M{"$eq": bson.A{"$group._id", "$$groupField"}},
+								bson.M{"$in": bson.A{"$$groupField", "$group._id"}},
 								bson.M{"$eq": bson.A{"$isActive", true}},
 							},
 						},
 					},
-					"group._id" != "" && !false,
+					"group._id" != "" && !isFieldArray,
 				).
 				OptionalMatch(
 					bson.M{
 						"$expr": bson.M{
 							"$and": bson.A{
-								bson.M{"$in": bson.A{"$group._id", "$$groupField"}},
+								bson.M{
+									"$expr": bson.M{
+										"$gt": bson.A{
+											bson.M{"$size": bson.M{"$setIntersection": bson.A{"$$groupField", "$group._id"}}},
+											0,
+										},
+									},
+								},
 								bson.M{"$eq": bson.A{"$isActive", true}},
 							},
 						},
 					},
-					"group._id" != "" && false,
+					"group._id" != "" && isFieldArray,
 				).
 				Build(),
 		}).
