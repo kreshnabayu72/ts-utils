@@ -297,6 +297,7 @@ func RolePermissionAggregation(
 		)
 }
 
+// only system role (for settings, file manager, import, etc)
 func SystemRolePermissionAggregation(
 	builder *pipeline.PipelineBuilder,
 	loggedInUserId primitive.ObjectID,
