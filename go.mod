@@ -3,7 +3,7 @@ module gitea.qwertysystem.net/BETS/ts-utils
 go 1.24.2
 
 require (
-	gitea.qwertysystem.net/BETS/go-agenda v0.0.0-20250420021753-b9ebbc2b6fa7
+	gitea.qwertysystem.net/BETS/go-agenda v0.0.0-20250430033213-9de617e4be39
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/disintegration/imaging v1.6.2
 	github.com/go-co-op/gocron/v2 v2.12.4
