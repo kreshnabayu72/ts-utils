@@ -32,3 +32,28 @@ func LookupUserAttributeAggregation(
 				Build(),
 		}).Unwind(bson.M{"path": fmt.Sprintf("$%s", as), "preserveNullAndEmptyArrays": preserveUserLookup})
 }
+
+// Lookup and unwind attributes with _id name key
+// needed in basic
+func LookupAttributesAggregation(
+	builder *pipeline.PipelineBuilder,
+	modelName string,
+	localField string,
+	as string,
+	preserveNullAndEmptyArrays bool,
+) {
+	builder.
+		Lookup(bson.M{
+			"from":         modelName,
+			"localField":   localField,
+			"foreignField": "_id",
+			"as":           as,
+			"pipeline": pipeline.NewPipelineBuilder().
+				Project(bson.M{
+					"_id":  1,
+					"name": 1,
+					"key":  1,
+				}).
+				Build(),
+		}).Unwind(bson.M{"path": fmt.Sprintf("$%s", as), "preserveNullAndEmptyArrays": preserveNullAndEmptyArrays})
+}
