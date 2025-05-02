@@ -337,7 +337,7 @@ func FindUserSystemRoles(v any, ctx context.Context, companyCode string, loggedI
 	return nil
 }
 
-func getHasSystemRoleSection(key string) bson.M {
+func GetHasSystemRoleSection(key string) bson.M {
 	rt, ok := fixedasset_model.RoleTypeMap[key]
 	if !ok {
 		return bson.M{} // or panic/log error
@@ -404,7 +404,7 @@ func SystemRolePermissionAggregation(
 				Build(),
 		}).
 		Addfields(
-			getHasSystemRoleSection(roleType),
+			GetHasSystemRoleSection(roleType),
 		)
 }
 
