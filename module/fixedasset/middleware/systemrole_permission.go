@@ -20,7 +20,7 @@ func checkPermission(ctx *fiber.Ctx, permissionKey model.PermissionType, resourc
 	}
 
 	permissionKeyStr := string(permissionKey)
-	companyCode := ctx.Locals(string(middleware.CompanyCodeKey)).(string)
+	companyCode := ctx.Locals(middleware.CompanyCodeKey).(string)
 
 	db.ConnectToDB(db.FixedAssetDBName.CompanyDBName(companyCode))
 	coll := db.GetCollection(db.UserSystemRoleModelName)
