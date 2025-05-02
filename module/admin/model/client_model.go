@@ -13,6 +13,7 @@ type FileStorage struct {
 	UsedKB            float64 `json:"usedKB"            bson:"usedKB"`
 	AvailableKB       float64 `json:"availableKB"       bson:"availableKB"`
 	TotalKB           float64 `json:"totalKB"           bson:"totalKB"`
+	AttachmentKB      float64 `json:"attachmentKB"            bson:"attachmentKB"`
 	DamagedKB         float64 `json:"damagedKB"         bson:"damagedKB"`
 	DisposalKB        float64 `json:"disposalKB"        bson:"disposalKB"`
 	RepairTicketingKB float64 `json:"repairTicketingKB" bson:"repairTicketingKB"`
