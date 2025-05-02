@@ -24,6 +24,7 @@ const (
 	DepreciationGroupModelName           = "depreciation_groups"
 	DivisionModelName                    = "divisions"
 	DisposalTransactionModelName         = "disposal_transactions"
+	FileAttachmentModelName              = "file_attachments"
 	FileDamageModelName                  = "file_damages"
 	FileDisposalDocumentModelName        = "file_disposal_documents"
 	FileDisposalPhotoModelName           = "file_disposal_photos"
