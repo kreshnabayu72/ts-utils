@@ -159,3 +159,12 @@ const (
 	TransactionManageTypeStaff      TransactionManageType = "Staff"
 	TransactionManageTypeApprover   TransactionManageType = "Approval"
 )
+
+type PermissionType string
+
+const (
+	PermissionCreate PermissionType = "create"
+	PermissionUpdate PermissionType = "update"
+	PermissionDelete PermissionType = "delete"
+	PermissionView   PermissionType = "view"
+)
