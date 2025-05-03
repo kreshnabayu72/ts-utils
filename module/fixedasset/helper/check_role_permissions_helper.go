@@ -42,16 +42,6 @@ func CheckSystemRolePermission(ctx *fiber.Ctx, permissionKey model.PermissionTyp
 			return entity.InternalServerError(err.Error())
 		}
 
-		fmt.Println(bson.M{
-			"user._id": userId,
-			fmt.Sprintf("managePermission.%s.%s", resourceType, permissionKeyStr): true,
-			"type":      resourceType,
-			"group.key": groupFilter,
-		})
-
-		count2, _ := coll.CountDocuments(ctx.Context(), bson.M{})
-		fmt.Printf("COUNT 2 %v\n", count2)
-
 		if count < 1 {
 			return entity.Unauthorized("You do not have the required permissions")
 		}
