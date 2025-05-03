@@ -10,6 +10,15 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+
+	"context"
+	"errors"
+
+	"gitea.qwertysystem.net/BETS/ts-utils/pipeline"
+	utilpipeline "gitea.qwertysystem.net/BETS/ts-utils/pipeline"
+	"gitea.qwertysystem.net/BETS/ts-utils/service"
+
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // Group filter can be "$in":[] or "$eq":"" or just empty bson.M{}
@@ -45,6 +54,57 @@ func CheckSystemRolePermission(ctx *fiber.Ctx, permissionKey model.PermissionTyp
 		if count < 1 {
 			return entity.Unauthorized("You do not have the required permissions")
 		}
+	}
+
+	return nil
+}
+
+// For checking system role group permisson, usually for editing or deleting data
+func CheckGroupPermission(service service.Service,
+	loggedInUser *primitive.ObjectID,
+	dataFilter primitive.M,
+	groupIdField string,
+	permissions []model.PermissionType,
+	systemRoleTypes []model.RoleType,
+) error {
+	filter := bson.M{
+		"user._id": loggedInUser,
+		"type":     bson.M{"$in": systemRoleTypes},
+	}
+
+	for _, systemRoleType := range systemRoleTypes {
+		for _, permission := range permissions {
+			filter[fmt.Sprintf("managePermission.%s.%s", systemRoleType, string(permission))] = true
+		}
+	}
+
+	pipeline := utilpipeline.NewPipelineBuilder().
+		Match(dataFilter).
+		Lookup(bson.M{
+			"from":         db.UserSystemRoleModelName,
+			"localField":   groupIdField,
+			"foreignField": "group._id",
+			"as":           "systemRoles",
+			"pipeline": pipeline.NewPipelineBuilder().
+				Match(filter).
+				Build(),
+		}).Unwind(bson.M{"path": "$systemRoles", "preserveNullAndEmptyArrays": false}).
+		Build()
+
+	var permissionCheck []map[string]any
+	err := service.Aggregate(
+		&permissionCheck,
+		context.Background(),
+		pipeline,
+		&options.AggregateOptions{
+			Collation: &options.Collation{
+				Locale:   "en",
+				Strength: 3,
+			},
+		},
+	)
+	if err != nil {
+		return errors.New("You have no permission")
 	}
 
 	return nil
