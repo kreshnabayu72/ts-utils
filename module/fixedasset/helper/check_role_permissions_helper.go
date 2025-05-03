@@ -88,7 +88,7 @@ func CheckGroupPermission(service service.Service,
 			"pipeline": pipeline.NewPipelineBuilder().
 				Match(filter).
 				Build(),
-		}).Unwind(bson.M{"path": "$systemRoles", "preserveNullAndEmptyArrays": false}).
+		}).Unwind(bson.M{"path": "$systemRoles", "preserveNullAndEmptyArrays": true}).
 		Build()
 
 	var permissionCheck []map[string]any
@@ -104,6 +104,17 @@ func CheckGroupPermission(service service.Service,
 		},
 	)
 	if err != nil || len(permissionCheck) < 1 {
+		return errors.New("Data not found")
+	}
+
+	var filtered []map[string]any
+	for _, data := range permissionCheck {
+		if len(data["systemRoles"].(bson.A)) == 0 {
+			filtered = append(filtered, data)
+		}
+	}
+
+	if len(filtered) < 1 {
 		return errors.New("You have no permission")
 	}
 
