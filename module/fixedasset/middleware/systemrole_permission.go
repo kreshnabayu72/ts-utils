@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"gitea.qwertysystem.net/BETS/ts-utils/middleware"
 	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/helper"
 	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/model"
 	"gitea.qwertysystem.net/BETS/ts-utils/response"
@@ -11,6 +12,10 @@ import (
 // Not filtered by group
 func GlobalSystemRoleRestriction(permission model.PermissionType, resourceTypes []model.RoleType) fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		isTest := c.Locals(middleware.IsTest)
+		if isTest != nil {
+			return c.Next()
+		}
 
 		// Check permissions based on the provided permissionKey and resourceTypes
 		err := helper.CheckSystemRolePermission(c, permission, resourceTypes, bson.M{"$ne": nil})

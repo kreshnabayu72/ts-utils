@@ -21,7 +21,6 @@ import (
 
 func GetLicensePlan() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		//get company id
 		isTest := ctx.Locals(IsTest)
 		if isTest != nil {
 			return ctx.Next()
