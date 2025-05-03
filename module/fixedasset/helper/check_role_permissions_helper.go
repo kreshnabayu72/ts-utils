@@ -109,9 +109,11 @@ func CheckGroupPermission(service service.Service,
 
 	var filtered []map[string]any
 	for _, data := range permissionCheck {
-		if len(data["systemRoles"].(bson.A)) == 0 {
+		systemRoles, ok := data["systemRoles"].(bson.A)
+		if !ok || len(systemRoles) == 0 {
 			filtered = append(filtered, data)
 		}
+
 	}
 
 	if len(filtered) < 1 {
