@@ -103,7 +103,7 @@ func CheckGroupPermission(service service.Service,
 			},
 		},
 	)
-	if err != nil {
+	if err != nil || len(permissionCheck) < 1 {
 		return errors.New("You have no permission")
 	}
 
