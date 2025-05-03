@@ -8,12 +8,12 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-// Group system role need to filter by group
+// Not filtered by group
 func GlobalSystemRoleRestriction(permission model.PermissionType, resourceTypes []model.RoleType) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 
 		// Check permissions based on the provided permissionKey and resourceTypes
-		err := helper.CheckSystemRolePermission(c, permission, resourceTypes, bson.M{})
+		err := helper.CheckSystemRolePermission(c, permission, resourceTypes, bson.M{"$ne": nil})
 		if err != nil {
 			return response.SendResponse(c, fiber.StatusUnauthorized, nil, "Unauthorized: "+err.Message)
 		}
