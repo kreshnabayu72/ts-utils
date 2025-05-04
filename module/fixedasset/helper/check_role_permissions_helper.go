@@ -7,6 +7,7 @@ import (
 	"gitea.qwertysystem.net/BETS/ts-utils/entity"
 	"gitea.qwertysystem.net/BETS/ts-utils/middleware"
 	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/model"
+	"gitea.qwertysystem.net/BETS/ts-utils/service"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -16,7 +17,6 @@ import (
 
 	"gitea.qwertysystem.net/BETS/ts-utils/pipeline"
 	utilpipeline "gitea.qwertysystem.net/BETS/ts-utils/pipeline"
-	"gitea.qwertysystem.net/BETS/ts-utils/service"
 
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -109,11 +109,12 @@ func CheckGroupPermission(service service.Service,
 
 	var filtered []map[string]any
 	for _, data := range permissionCheck {
-		systemRoles, ok := data["systemRoles"].(bson.A)
-		if !ok || len(systemRoles) == 0 {
-			filtered = append(filtered, data)
+		systemRoles, _ := data["systemRoles"]
+		if systemRoles == nil {
+			continue
 		}
 
+		filtered = append(filtered, data)
 	}
 
 	if len(filtered) < 1 {
