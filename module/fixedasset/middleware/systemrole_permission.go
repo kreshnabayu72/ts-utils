@@ -29,7 +29,7 @@ func GlobalSystemRoleRestriction(permission model.PermissionType, resourceTypes 
 }
 
 // Check user data, totalControl.isAssigned & totalControl.isActive
-func TotalControlRoleRestriction(permission model.PermissionType, resourceTypes []model.RoleType) fiber.Handler {
+func TotalControlRoleRestriction() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		isTest := c.Locals(middleware.IsTest)
 		if isTest != nil {
