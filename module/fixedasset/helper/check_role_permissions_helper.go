@@ -123,3 +123,28 @@ func CheckGroupPermission(service service.Service,
 
 	return nil
 }
+
+func CheckTotalControlPermission(ctx *fiber.Ctx) *entity.HttpError {
+	// Get userId from Locals in Fiber context
+	userId, ok := ctx.Locals(middleware.UserKey).(primitive.ObjectID)
+	if !ok {
+		return entity.Unauthorized("User not authenticated")
+	}
+
+	companyCode := ctx.Locals(middleware.CompanyCodeKey).(string)
+
+	db.ConnectToDB(db.FixedAssetDBName.CompanyDBName(companyCode))
+	coll := db.GetCollection(db.UserModelName)
+
+	count, err := coll.CountDocuments(ctx.Context(), bson.M{"_id": userId, "totalControl.isActive": true, "totalControl.isAssigned": true})
+
+	if err != nil {
+		return entity.InternalServerError(err.Error())
+	}
+
+	if count < 1 {
+		return entity.Unauthorized("You do not have the required permissions")
+	}
+
+	return nil
+}
