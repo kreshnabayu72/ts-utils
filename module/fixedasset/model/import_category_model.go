@@ -7,9 +7,10 @@ import (
 )
 
 type ImportCategory struct {
-	ID        primitive.ObjectID `bson:"_id,omitempty"       json:"_id,omitempty"` // MongoDB ObjectID
-	Name      string             `bson:"name"      json:"name"`
-	Key       int                `bson:"key,omitempty"       json:"key,omitempty"`
-	CreatedAt time.Time          `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
-	UpdatedAt time.Time          `bson:"updatedAt,omitempty" json:"updatedAt,omitempty"`
+	ID           primitive.ObjectID `bson:"_id,omitempty"       json:"_id,omitempty"` // MongoDB ObjectID
+	Name         string             `bson:"name"      json:"name"`
+	CategoryCode string             `bson:"categoryCode"        json:"categoryCode"`
+	Key          int                `bson:"key,omitempty"       json:"key,omitempty"`
+	CreatedAt    time.Time          `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
+	UpdatedAt    time.Time          `bson:"updatedAt,omitempty" json:"updatedAt,omitempty"`
 }
