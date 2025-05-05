@@ -27,3 +27,22 @@ func GlobalSystemRoleRestriction(permission model.PermissionType, resourceTypes 
 		return c.Next()
 	}
 }
+
+// Check user data, totalControl.isAssigned & totalControl.isActive
+func TotalControlRoleRestriction(permission model.PermissionType, resourceTypes []model.RoleType) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		isTest := c.Locals(middleware.IsTest)
+		if isTest != nil {
+			return c.Next()
+		}
+
+		// Check permissions based on the provided permissionKey and resourceTypes
+		err := helper.CheckTotalControlPermission(c)
+		if err != nil {
+			return response.SendResponse(c, fiber.StatusUnauthorized, nil, "Unauthorized: "+err.Message)
+		}
+
+		// Continue to the next handler if permission is granted
+		return c.Next()
+	}
+}
