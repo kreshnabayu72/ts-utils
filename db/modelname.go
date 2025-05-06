@@ -91,4 +91,5 @@ const (
 	ReceptionRequestHistoryModelName     = "reception_request_histories"
 	ExpiredRequestModelName              = "expired_requests"
 	ExpiredRequestHistoryModelName       = "expired_request_histories"
+	RegisterTokenModelName               = "register_token"
 )

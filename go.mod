@@ -23,9 +23,6 @@ require (
 	gitea.qwertysystem.net/BETS/cron/v3 v3.0.1-0.20250416093848-0119b14c6206 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.6 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
-	github.com/gofiber/fiber v1.14.6 // indirect
-	github.com/gofiber/utils v0.0.10 // indirect
-	github.com/gorilla/schema v1.1.0 // indirect
 	github.com/jonboulle/clockwork v0.4.0 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
