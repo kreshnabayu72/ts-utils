@@ -12,7 +12,7 @@ type ImportAsset struct {
 	Group       string `bson:"group"                json:"group"`
 	Category    string `bson:"category"        json:"category"`
 	Name        string `bson:"name"        json:"name"`
-	Qty         string `bson:"qty"        json:"qty"`
+	Qty         int    `bson:"qty"        json:"qty"`
 	Brand       string `bson:"brand"        json:"brand"`
 	Model       string `bson:"model"        json:"model"`
 	Measurement string `bson:"measurement"        json:"measurement"`
