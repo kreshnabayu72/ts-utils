@@ -67,6 +67,9 @@ type Stock struct {
 	PlacementDate                *time.Time          `json:"placementDate"                bson:"placementDate"`
 	ProductionDate               *time.Time          `json:"productionDate"               bson:"productionDate"`
 	ExpiredDate                  *time.Time          `json:"expiredDate"                  bson:"expiredDate"`
+	ExpiredReportedDate          *time.Time          `json:"expiredReportedDate"          bson:"expiredReportedDate"`
+	MissingReportedDate          *time.Time          `json:"missingReportedDate"          bson:"missingReportedDate"`
+	DefectReportedDate           *time.Time          `json:"defectReportedDate"           bson:"defectReportedDate"`
 	CustomFields                 []CustomField       `json:"customFields"                 bson:"customFields"`
 	UpdatedAt                    time.Time           `json:"updatedAt"                    bson:"updatedAt"`
 	CreatedAt                    time.Time           `json:"createdAt"                    bson:"createdAt"`
