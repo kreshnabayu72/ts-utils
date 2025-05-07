@@ -107,15 +107,12 @@ func CheckGroupPermission(service service.Service,
 		return errors.New("Data not found")
 	}
 
-	var filtered []map[string]any
 	for _, data := range permissionCheck {
 		systemRoles, _ := data["systemRoles"]
 		if systemRoles == nil {
 			//If ONE OF data to edit/delete have no permission, throw error
 			return errors.New("You have no permission")
 		}
-
-		filtered = append(filtered, data)
 	}
 
 	return nil
