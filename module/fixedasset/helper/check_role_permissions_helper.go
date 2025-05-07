@@ -111,14 +111,11 @@ func CheckGroupPermission(service service.Service,
 	for _, data := range permissionCheck {
 		systemRoles, _ := data["systemRoles"]
 		if systemRoles == nil {
-			continue
+			//If ONE OF data to edit/delete have no permission, throw error
+			return errors.New("You have no permission")
 		}
 
 		filtered = append(filtered, data)
-	}
-
-	if len(filtered) < 1 {
-		return errors.New("You have no permission")
 	}
 
 	return nil
