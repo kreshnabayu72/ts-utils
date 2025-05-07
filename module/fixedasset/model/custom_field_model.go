@@ -13,6 +13,7 @@ type CustomField struct {
 	Type                 string                    `json:"type"                 bson:"type"`
 	DataType             string                    `json:"dataType"             bson:"dataType"`
 	IsRequired           bool                      `json:"isRequired"           bson:"isRequired"`
+	IsShowOnTable        bool					   `json:"isShowOnTable"        bson:"isShowOnTable"`
 	OptionValue          []string                  `json:"optionValue"          bson:"optionValue"`
 	Value                any                       `json:"value"                bson:"value"`
 	Category             []model.AttributeEmbedded `json:"category"             bson:"category"`
