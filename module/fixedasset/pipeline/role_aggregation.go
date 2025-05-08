@@ -408,6 +408,75 @@ func SystemRolePermissionAggregation(
 		)
 }
 
+func GetHasTransactionRole(transactionGroupAttribute fixedasset_model.TransactionGroupAttribute) bson.M {
+	return bson.M{
+		"isManager":    getTransactionRolePermission(transactionGroupAttribute, fixedasset_model.TransactionManageTypeManager),
+		"isMonitoring": getTransactionRolePermission(transactionGroupAttribute, fixedasset_model.TransactionManageTypeMonitoring),
+	}
+}
+
+func TransactionRolePermissionAggregation(
+	builder *pipeline.PipelineBuilder,
+	loggedInUserId primitive.ObjectID,
+	groupField string,
+	transactionGroupAttribute fixedasset_model.TransactionGroupAttribute,
+	filterOptions RoleRestrictionOptions, //for filtering user_transaction_roles
+) {
+	if groupField != "" && !strings.HasPrefix(groupField, "$") {
+		groupField = fmt.Sprintf("$%s", groupField)
+	}
+
+	builder.
+		Set(
+			bson.M{
+				"loggedInUserId": loggedInUserId,
+			},
+		).
+		Lookup(
+			bson.M{
+				"from":         db.UserTransactionRoleModelName,
+				"localField":   "loggedInUserId",
+				"foreignField": "user._id",
+				"let": bson.M{
+					"groupField": groupField,
+				},
+				"as": "userTransactionRoles",
+				"pipeline": pipeline.NewPipelineBuilder().
+					OptionalMatch(
+						bson.M{
+							"$expr": bson.M{"$and": bson.A{
+								bson.M{"$eq": bson.A{"$group._id", "$$groupField"}},
+								bson.M{"$eq": bson.A{"$isActive", true}},
+							}},
+						},
+						groupField != "",
+					).
+					Match(
+						bson.M{
+							"roleType": filterOptions.TransactionRole.RoleType,
+							"manageType": bson.M{
+								"$in": filterOptions.TransactionRole.ManageType,
+							},
+						},
+					).
+					Build(),
+			},
+		).
+		Match(
+			bson.M{
+				"$expr": bson.M{
+					"$gt": bson.A{
+						bson.M{
+							"$size": "$userTransactionRoles",
+						},
+						0,
+					},
+				},
+			},
+		).
+		Addfields(GetHasTransactionRole(transactionGroupAttribute))
+}
+
 func RoleRestrictionAggregation(
 	builder *pipeline.PipelineBuilder,
 	loggedInUserId primitive.ObjectID,
