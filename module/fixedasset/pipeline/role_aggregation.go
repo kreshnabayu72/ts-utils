@@ -513,7 +513,6 @@ func TransactionRoleMultiPermissionAggregation(
 					).
 					Match(
 						bson.M{
-							"roleType": bson.M{"$in": {""}},
 							"manageType": bson.M{
 								"$in": bson.A{"Manager"},
 							},
