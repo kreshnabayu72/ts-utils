@@ -27,6 +27,9 @@ type Asset struct {
 	SecondImageMedium  *string                     `bson:"secondImageMedium"  json:"secondImageMedium"`
 	SecondImageBig     *string                     `bson:"secondImageBig"     json:"secondImageBig"`
 	SecondImageSmall   *string                     `bson:"secondImageSmall"   json:"secondImageSmall"`
+	DefaultImageMedium *string                     `bson:"defaultImageMedium"  json:"defaultImageMedium"`
+	DefaultImageBig    *string                     `bson:"defaultImageBig"     json:"defaultImageBig"`
+	DefaultImageSmall  *string                     `bson:"defaultImageSmall"   json:"defaultImageSmall"`
 	SetDefault         *string                     `bson:"setDefault"         json:"setDefault"`
 	Status             string                      `bson:"status"                       json:"status"`
 	PreviousStatus     *string                     `bson:"previousStatus,omitempty"     json:"previousStatus,omitempty"`

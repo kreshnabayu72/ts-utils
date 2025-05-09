@@ -6,6 +6,8 @@ import (
 )
 
 /*
+	Already used by old repos
+
 	Used to get isManager isMonitoring etc inside aggregation
  	Used after addFields or lookup to user_transaction_roles
 	Filter the transactionRoles array by isActive:true and isManagedByParent:{$ne:true} before using this
