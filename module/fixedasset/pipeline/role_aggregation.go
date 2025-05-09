@@ -14,7 +14,6 @@ import (
 )
 
 type TransactionRoleRestriction struct {
-	RoleType   fixedasset_model.TransactionRoleType     `json:"roleType"   bson:"roleType"`
 	ManageType []fixedasset_model.TransactionManageType `json:"manageType" bson:"manageType"`
 }
 
@@ -453,10 +452,10 @@ func TransactionRolePermissionAggregation(
 					).
 					Match(
 						bson.M{
-							"roleType": filterOptions.TransactionRole.RoleType,
-							"manageType": bson.M{
+							"roleType": bson.M{
 								"$in": filterOptions.TransactionRole.ManageType,
 							},
+							"transactionGroupAttribute": transactionGroupAttribute,
 						},
 					).
 					Build(),
@@ -475,6 +474,73 @@ func TransactionRolePermissionAggregation(
 			},
 		).
 		Addfields(GetHasTransactionRole(transactionGroupAttribute))
+}
+
+// When this function is made, this is intender only for asset list
+func TransactionRoleMultiPermissionAggregation(
+	builder *pipeline.PipelineBuilder,
+	loggedInUserId primitive.ObjectID,
+	groupField string,
+) {
+	if groupField != "" && !strings.HasPrefix(groupField, "$") {
+		groupField = fmt.Sprintf("$%s", groupField)
+	}
+
+	builder.
+		Set(
+			bson.M{
+				"loggedInUserId": loggedInUserId,
+			},
+		).
+		Lookup(
+			bson.M{
+				"from":         db.UserTransactionRoleModelName,
+				"localField":   "loggedInUserId",
+				"foreignField": "user._id",
+				"let": bson.M{
+					"groupField": groupField,
+				},
+				"as": "userTransactionRoles",
+				"pipeline": pipeline.NewPipelineBuilder().
+					OptionalMatch(
+						bson.M{
+							"$expr": bson.M{"$and": bson.A{
+								bson.M{"$eq": bson.A{"$group._id", "$$groupField"}},
+								bson.M{"$eq": bson.A{"$isActive", true}},
+							}},
+						},
+						groupField != "",
+					).
+					Match(
+						bson.M{
+							"roleType": bson.M{"$in": {""}},
+							"manageType": bson.M{
+								"$in": bson.A{"Manager"},
+							},
+						},
+					).
+					Build(),
+			},
+		).
+		Match(
+			bson.M{
+				"$expr": bson.M{
+					"$gt": bson.A{
+						bson.M{
+							"$size": "$userTransactionRoles",
+						},
+						0,
+					},
+				},
+			},
+		).
+		Addfields(
+			bson.M{"manager": bson.M{
+				"transfer":  getTransactionRolePermission(fixedasset_model.TGATransferRole, fixedasset_model.TransactionManageTypeManager),
+				"borrowing": getTransactionRolePermission(fixedasset_model.TGABorrowingRole, fixedasset_model.TransactionManageTypeManager),
+				"disposal":  getTransactionRolePermission(fixedasset_model.TGADisposalRole, fixedasset_model.TransactionManageTypeManager),
+			}},
+		)
 }
 
 func RoleRestrictionAggregation(
@@ -517,7 +583,6 @@ func RoleRestrictionAggregation(
 						).
 						Match(
 							bson.M{
-								"roleType": filterOptions.TransactionRole.RoleType,
 								"manageType": bson.M{
 									"$in": filterOptions.TransactionRole.ManageType,
 								},
