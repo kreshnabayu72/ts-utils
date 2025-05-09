@@ -4,7 +4,7 @@ type RoleType string
 
 const (
 	RTImportData          RoleType = "importData"
-	RTAssetAttribute      RoleType = "assetAttributes"
+	RTAssetAttribute      RoleType = "assetAttribute"
 	RTAssetPolicies       RoleType = "assetPolicies"
 	RTDepreciationGroup   RoleType = "depreciationGroup"
 	RTDepreciationMethod  RoleType = "depreciationMethod"
