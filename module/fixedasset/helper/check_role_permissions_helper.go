@@ -46,6 +46,7 @@ func CheckSystemRolePermission(ctx *fiber.Ctx, permissionKey model.PermissionTyp
 			fmt.Sprintf("managePermission.%s.%s", resourceType, permissionKeyStr): true,
 			"type":      resourceType,
 			"group.key": groupFilter,
+			"isActive":  true,
 		})
 		if err != nil {
 			return entity.InternalServerError(err.Error())
@@ -60,6 +61,7 @@ func CheckSystemRolePermission(ctx *fiber.Ctx, permissionKey model.PermissionTyp
 }
 
 // For checking system role group permisson, usually for editing or deleting data
+// Can handle multiple data with different groups
 func CheckGroupPermission(service service.Service,
 	loggedInUser *primitive.ObjectID,
 	dataFilter primitive.M,
@@ -70,6 +72,7 @@ func CheckGroupPermission(service service.Service,
 	filter := bson.M{
 		"user._id": loggedInUser,
 		"type":     bson.M{"$in": systemRoleTypes},
+		"isActive": true,
 	}
 
 	for _, systemRoleType := range systemRoleTypes {
@@ -110,7 +113,64 @@ func CheckGroupPermission(service service.Service,
 	for _, data := range permissionCheck {
 		systemRoles, _ := data["systemRoles"]
 		if systemRoles == nil {
-			//If ONE OF data to edit/delete have no permission, throw error
+			//If ONE OF data have no permission, throw error
+			return errors.New("You have no permission")
+		}
+	}
+
+	return nil
+}
+
+// For checking system role group permisson, usually for editing or deleting data
+// Can handle multiple data with different groups
+func CheckTransactionRoleMultiGroupPermissions(
+	service service.Service, //service for data (assets, transactions, etc)
+	loggedInUser *primitive.ObjectID,
+	dataFilter primitive.M,
+	groupIdField string,
+	transactionType []model.TransactionGroupAttribute,
+	roleType []model.TransactionRoleType,
+) error {
+	filter := bson.M{
+		"isActive":                  true,
+		"user._id":                  loggedInUser,
+		"roleType":                  bson.M{"$in": roleType},
+		"transactionGroupAttribute": bson.M{"$in": transactionType},
+	}
+
+	pipeline := utilpipeline.NewPipelineBuilder().
+		Match(dataFilter).
+		Lookup(bson.M{
+			"from":         db.UserTransactionRoleModelName,
+			"localField":   groupIdField,
+			"foreignField": "group._id",
+			"as":           "transactionRoles",
+			"pipeline": pipeline.NewPipelineBuilder().
+				Match(filter).
+				Build(),
+		}).Unwind(bson.M{"path": "$transactionRoles", "preserveNullAndEmptyArrays": true}).
+		Build()
+
+	var permissionCheck []map[string]any
+	err := service.Aggregate(
+		&permissionCheck,
+		context.Background(),
+		pipeline,
+		&options.AggregateOptions{
+			Collation: &options.Collation{
+				Locale:   "en",
+				Strength: 3,
+			},
+		},
+	)
+	if err != nil || len(permissionCheck) < 1 {
+		return errors.New("Data not found")
+	}
+
+	for _, data := range permissionCheck {
+		transactionRoles, _ := data["transactionRoles"]
+		if transactionRoles == nil {
+			//If ONE OF data have no permission, throw error
 			return errors.New("You have no permission")
 		}
 	}
@@ -120,6 +180,8 @@ func CheckGroupPermission(service service.Service,
 
 // For checking transaction role permisson
 // Group filter is primitive.M so it can be bson.M{"$eq":group} or bson.M{"$in":groups}
+// CANNOT HANDLE INPUT ARRAY WITH POTENTIALLY DIFFERENT GROUPS FOR EACH ITEM
+// (e.g Have role in Group 1, but no role in Group 2: It will still pass)
 func CheckTransactionRolePermission(
 	ctx *fiber.Ctx,
 	groupIdFilter primitive.M,
