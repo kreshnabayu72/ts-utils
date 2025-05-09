@@ -13,7 +13,7 @@ const (
 	BorrowingTransactionStatusReturned           = BorrowingTransactionStatus("Returned")
 	BorrowingTransactionStatusWaitingForApproval = BorrowingTransactionStatus("Waiting for Approval")
 	BorrowingTransactionStatusWaitingForHandover = BorrowingTransactionStatus("Waiting for Handover")
-	BorrowingTransactionStatusOnBorrowing        = BorrowingTransactionStatus("On Borrowing")
+	BorrowingTransactionStatusBorrowed           = BorrowingTransactionStatus("Borrowed") // Previously On Borrowing
 	BorrowingTransactionStatusCompleted          = BorrowingTransactionStatus("Completed")
 )
 
