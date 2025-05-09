@@ -118,6 +118,45 @@ func CheckGroupPermission(service service.Service,
 	return nil
 }
 
+// For checking transaction role permisson
+// Group filter is primitive.M so it can be bson.M{"$eq":group} or bson.M{"$in":groups}
+func CheckTransactionRolePermission(
+	ctx *fiber.Ctx,
+	groupIdFilter primitive.M,
+	transactionType []model.TransactionGroupAttribute,
+	roleType []model.TransactionRoleType,
+) error {
+	// Get userId from Locals in Fiber context
+	userId, ok := ctx.Locals(middleware.UserKey).(primitive.ObjectID)
+	if !ok {
+		return entity.Unauthorized("User not authenticated")
+	}
+
+	companyCode := ctx.Locals(middleware.CompanyCodeKey).(string)
+
+	db.ConnectToDB(db.FixedAssetDBName.CompanyDBName(companyCode))
+	transactionRoleModel := db.GetCollection(db.UserTransactionRoleModelName)
+
+	count, err := transactionRoleModel.CountDocuments(ctx.Context(),
+		bson.M{
+			"user._id":                  userId,
+			"roleType":                  bson.M{"$in": roleType},
+			"transactionGroupAttribute": bson.M{"$in": transactionType},
+			"group._id":                 groupIdFilter,
+		},
+	)
+
+	if err != nil {
+		return entity.InternalServerError(err.Error())
+	}
+
+	if count < 1 {
+		return entity.Unauthorized("You do not have the required permissions")
+	}
+
+	return nil
+}
+
 func CheckTotalControlPermission(ctx *fiber.Ctx) *entity.HttpError {
 	// Get userId from Locals in Fiber context
 	userId, ok := ctx.Locals(middleware.UserKey).(primitive.ObjectID)
