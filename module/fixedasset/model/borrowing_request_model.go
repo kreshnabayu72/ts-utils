@@ -20,6 +20,7 @@ type BorrowingRequest struct {
 	ID primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
 
 	Transaction      primitive.ObjectID      `json:"transaction" bson:"transaction"`
+	TransactionId    string                  `json:"transactionId" bson:"transactionId"`
 	Asset            primitive.ObjectID      `json:"asset" bson:"asset"`
 	AssetId          string                  `json:"assetId" bson:"assetId"`
 	AssetParent      *primitive.ObjectID     `json:"assetParent" bson:"assetParent"`
