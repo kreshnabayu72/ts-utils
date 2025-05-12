@@ -163,8 +163,12 @@ func CheckTransactionRoleMultiGroupPermissions(
 			},
 		},
 	)
-	if err != nil || len(permissionCheck) < 1 {
-		fmt.Printf("ERR: %v, PERMISSION: %v", err.Error(), len(permissionCheck))
+	if err != nil {
+		fmt.Printf("ERR: %v\n", err.Error())
+		return errors.New("Data not found")
+	}
+	if len(permissionCheck) < 1 {
+		fmt.Printf("PERMISSION: %v\n", len(permissionCheck))
 		return errors.New("Data not found")
 	}
 
