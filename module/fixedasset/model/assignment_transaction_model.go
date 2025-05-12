@@ -14,6 +14,7 @@ const (
 	AssignmentTransactionStatusReturned           = AssignmentTransactionStatus("Returned")
 	AssignmentTransactionStatusWaitingForApproval = AssignmentTransactionStatus("Waiting for Approval")
 	AssignmentTransactionStatusWaitingForHandover = AssignmentTransactionStatus("Waiting for Handover")
+	AssignmentTransactionStatusAssigned           = AssignmentTransactionStatus("Assigned")
 	AssignmentTransactionStatusUnassigned         = AssignmentTransactionStatus("Unassigned")
 )
 
