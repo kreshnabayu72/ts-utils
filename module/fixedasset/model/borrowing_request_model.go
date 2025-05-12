@@ -10,10 +10,10 @@ import (
 type BorrowingStatus string
 
 const (
-	BorrowStatusBorrowed  = BorrowingStatus("Borrowed")
-	BorrowStatusDamaged   = BorrowingStatus("Reported Damaged")
-	BorrowStatusMissing   = BorrowingStatus("Reported Missing")
-	BorrowStatusCompleted = BorrowingStatus("Completed")
+	BorrowStatusBorrowed = BorrowingStatus("Borrowed")
+	BorrowStatusDamaged  = BorrowingStatus("Reported Damaged")
+	BorrowStatusMissing  = BorrowingStatus("Reported Missing")
+	BorrowStatusReturned = BorrowingStatus("Returned")
 )
 
 type BorrowingRequest struct {
