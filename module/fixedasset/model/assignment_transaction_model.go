@@ -25,8 +25,8 @@ type AssignmentTransaction struct {
 	Status        AssignmentTransactionStatus `json:"status" bson:"status"`
 	Group         model.AttributeEmbedded     `json:"group" bson:"group"`
 
-	Manager  model.UserEmbedded `json:"manager" bson:"manager"`
-	Assigner model.UserEmbedded `json:"borrower" bson:"borrower"`
+	Manager    model.UserEmbedded `json:"manager" bson:"manager"`
+	AssignedTo model.UserEmbedded `json:"assignedTo" bson:"assignedTo"`
 
 	ConfirmationEmail string `json:"confirmationEmail" bson:"confirmationEmail"`
 
