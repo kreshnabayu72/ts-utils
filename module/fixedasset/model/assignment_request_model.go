@@ -10,10 +10,10 @@ import (
 type AssignmentStatus string
 
 const (
-	AssignStatusAssigned = AssignmentStatus("Assigned")
-	AssignStatusDamaged  = AssignmentStatus("Reported Damaged")
-	AssignStatusMissing  = AssignmentStatus("Reported Missing")
-	AssignStatusReturned = AssignmentStatus("Returned")
+	AssignStatusAssigned   = AssignmentStatus("Assigned")
+	AssignStatusDamaged    = AssignmentStatus("Reported Damaged")
+	AssignStatusMissing    = AssignmentStatus("Reported Missing")
+	AssignStatusUnassigned = AssignmentStatus("Unassigned")
 )
 
 type AssignmentRequest struct {
