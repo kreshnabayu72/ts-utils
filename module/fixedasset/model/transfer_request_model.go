@@ -18,7 +18,7 @@ type TransferRequest struct {
 	AssetImageBig    string                  `json:"assetImageBig" bson:"assetImageBig"`
 	AssetImageMedium string                  `json:"assetImageMedium" bson:"assetImageMedium"`
 	AssetImageSmall  string                  `json:"assetImageSmall" bson:"assetImageSmall"`
-	AssetName        model.NameEmbedded      `json:"assetName" bson:"assetName"`
+	AssetName        AssetNameEmbedAttr      `json:"assetName" bson:"assetName"`
 	AssetBrand       model.AttributeEmbedded `json:"assetBrand" bson:"assetBrand"`
 	AssetModel       model.AttributeEmbedded `json:"assetModel" bson:"assetModel"`
 	Status           TransferStatus          `json:"status" bson:"status"`
