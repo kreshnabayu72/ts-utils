@@ -523,7 +523,8 @@ func TransactionRoleMultipleGroupAggregation(
 		)
 
 	for _, groupFieldAndAttribute := range checkedGroupFields {
-		fieldWithoutDollar := strings.ReplaceAll(groupFieldAndAttribute.Field, "$", "")
+		attributeField := strings.ReplaceAll(groupFieldAndAttribute.Field, "$", "")
+		attributeField = strings.ReplaceAll(groupFieldAndAttribute.Field, ".", "")
 
 		builder.Lookup(
 			bson.M{
@@ -531,14 +532,14 @@ func TransactionRoleMultipleGroupAggregation(
 				"localField":   "loggedInUserId",
 				"foreignField": "user._id",
 				"let": bson.M{
-					fieldWithoutDollar: groupFieldAndAttribute.Field,
+					attributeField: groupFieldAndAttribute.Field,
 				},
 				"as": "userTransactionRoles",
 				"pipeline": pipeline.NewPipelineBuilder().
 					Match(
 						bson.M{
 							"$expr": bson.M{"$and": bson.A{
-								bson.M{"$eq": bson.A{"$group._id", fmt.Sprintf("$$%s", fieldWithoutDollar)}},
+								bson.M{"$eq": bson.A{"$group._id", fmt.Sprintf("$$%s", attributeField)}},
 								bson.M{"$eq": bson.A{"$isActive", true}},
 							}},
 						},
