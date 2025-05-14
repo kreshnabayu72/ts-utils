@@ -26,6 +26,7 @@ type TransactionLog struct {
 	ReaderType                string                 `json:"readerType" bson:"readerType"`
 	Module                    string                 `json:"module"     bson:"module"`
 	Borrower                  *string                `json:"borrower" bson:"borrower"`
+	AssignedTo                *string                `json:"assignedTo" bson:"assignedTo"`
 	Group                     *string                `json:"group" bson:"group"`
 	CreatedAt                 time.Time              `json:"createdAt" bson:"createdAt"`
 	UpdatedAt                 time.Time              `json:"updatedAt" bson:"updatedAt"`
