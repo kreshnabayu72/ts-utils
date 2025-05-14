@@ -486,6 +486,73 @@ func TransactionRolePermissionAggregation(
 		Addfields(GetHasTransactionRole(transactionGroupAttribute))
 }
 
+// Example: Transfer needs both origin & destination group role
+func TransactionRoleMultiplePermissionAggregation(
+	builder *pipeline.PipelineBuilder,
+	loggedInUserId primitive.ObjectID,
+	groupFields []string,
+	transactionGroupAttribute fixedasset_model.TransactionGroupAttribute,
+	filterOptions RoleRestrictionOptions, //for filtering user_transaction_roles
+) {
+	checkedGroupFields := make([]string, 0)
+
+	for _, groupField := range groupFields {
+		checkedField := groupField
+
+		if checkedField != "" && !strings.HasPrefix(checkedField, "$") {
+			checkedField = fmt.Sprintf("$%s", checkedField)
+		}
+
+		checkedGroupFields = append(checkedGroupFields, checkedField)
+	}
+
+	builder.
+		Set(
+			bson.M{
+				"loggedInUserId": loggedInUserId,
+			},
+		)
+
+	for _, checkedGroupField := range checkedGroupFields {
+		builder.Lookup(
+			bson.M{
+				"from":         db.UserTransactionRoleModelName,
+				"localField":   "loggedInUserId",
+				"foreignField": "user._id",
+				"let": bson.M{
+					checkedGroupField: checkedGroupField,
+				},
+				"as": "userTransactionRoles",
+				"pipeline": pipeline.NewPipelineBuilder().
+					OptionalMatch(
+						bson.M{
+							"$expr": bson.M{"$and": bson.A{
+								bson.M{"$eq": bson.A{"$group._id", fmt.Sprintf("$$%s", checkedGroupField)}},
+								bson.M{"$eq": bson.A{"$isActive", true}},
+							}},
+						},
+						checkedGroupField != "",
+					).
+					Match(
+						bson.M{
+							"roleType": bson.M{
+								"$in": filterOptions.TransactionRole.ManageType,
+							},
+							"transactionGroupAttribute": transactionGroupAttribute,
+						},
+					).
+					Build(),
+			},
+		).
+			Addfields(
+				bson.M{
+					fmt.Sprintf("%sManager", checkedGroupField):    getTransactionRolePermission(transactionGroupAttribute, fixedasset_model.TransactionManageTypeManager),
+					fmt.Sprintf("%sMonitoring", checkedGroupField): getTransactionRolePermission(transactionGroupAttribute, fixedasset_model.TransactionManageTypeMonitoring),
+				},
+			)
+	}
+}
+
 // When this function is made, this is intender only for asset list
 func TransactionRoleMultiPermissionAggregation(
 	builder *pipeline.PipelineBuilder,
