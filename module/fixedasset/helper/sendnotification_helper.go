@@ -40,6 +40,12 @@ type NotificationHelper interface {
 		userIds []primitive.ObjectID,
 		notificationDataWithoutUser model.Notification,
 	) *entity.HttpError
+
+	SendNotification(
+		serviceProvider util_provider.ServiceProvider,
+		companyCode string,
+		notifications []model.Notification,
+	) *entity.HttpError
 }
 
 type SendNotificationHelperImpl struct{}
@@ -56,7 +62,10 @@ func (r *SendNotificationHelperImpl) SendNotificationToTransactionRoles(
 	roleType []model.TransactionRoleType,
 	notificationDataWithoutUser model.Notification,
 ) *entity.HttpError {
-	userTransactionRoleService := serviceProvider.MakeService(db.FixedAssetDBName.CompanyDBName(companyCode), util_db.UserTransactionRoleModelName)
+	userTransactionRoleService := serviceProvider.MakeService(
+		db.FixedAssetDBName.CompanyDBName(companyCode),
+		util_db.UserTransactionRoleModelName,
+	)
 
 	var roles []model.UserTransactionRole
 	err := userTransactionRoleService.Find(
@@ -77,7 +86,7 @@ func (r *SendNotificationHelperImpl) SendNotificationToTransactionRoles(
 	var uniqueUserIdsCheck map[primitive.ObjectID]bool = make(map[primitive.ObjectID]bool)
 
 	for _, role := range roles {
-		//if user id already used, continue/skip
+		// if user id already used, continue/skip
 		if _, ok := uniqueUserIdsCheck[role.User.ID]; ok {
 			continue
 		}
@@ -86,7 +95,12 @@ func (r *SendNotificationHelperImpl) SendNotificationToTransactionRoles(
 		uniqueUserIdsCheck[role.User.ID] = true
 	}
 
-	return r.SendNotificationToUsers(serviceProvider, companyCode, uniqueUserIds, notificationDataWithoutUser)
+	return r.SendNotificationToUsers(
+		serviceProvider,
+		companyCode,
+		uniqueUserIds,
+		notificationDataWithoutUser,
+	)
 }
 
 func (r *SendNotificationHelperImpl) SendNotificationToSystemRoles(
@@ -96,8 +110,10 @@ func (r *SendNotificationHelperImpl) SendNotificationToSystemRoles(
 	roleType []model.RoleType,
 	notificationDataWithoutUser model.Notification,
 ) *entity.HttpError {
-
-	userTransactionRoleService := serviceProvider.MakeService(db.FixedAssetDBName.CompanyDBName(companyCode), util_db.UserTransactionRoleModelName)
+	userTransactionRoleService := serviceProvider.MakeService(
+		db.FixedAssetDBName.CompanyDBName(companyCode),
+		util_db.UserTransactionRoleModelName,
+	)
 
 	var roles []model.UserSystemRole
 	err := userTransactionRoleService.Find(
@@ -117,7 +133,7 @@ func (r *SendNotificationHelperImpl) SendNotificationToSystemRoles(
 	var uniqueUserIdsCheck map[primitive.ObjectID]bool = make(map[primitive.ObjectID]bool)
 
 	for _, role := range roles {
-		//if user id already used, continue/skip
+		// if user id already used, continue/skip
 		if _, ok := uniqueUserIdsCheck[*role.User.ID]; ok {
 			continue
 		}
@@ -126,7 +142,12 @@ func (r *SendNotificationHelperImpl) SendNotificationToSystemRoles(
 		uniqueUserIdsCheck[*role.User.ID] = true
 	}
 
-	return r.SendNotificationToUsers(serviceProvider, companyCode, uniqueUserIds, notificationDataWithoutUser)
+	return r.SendNotificationToUsers(
+		serviceProvider,
+		companyCode,
+		uniqueUserIds,
+		notificationDataWithoutUser,
+	)
 }
 
 func (r *SendNotificationHelperImpl) SendNotificationToUsers(
@@ -139,10 +160,7 @@ func (r *SendNotificationHelperImpl) SendNotificationToUsers(
 		return nil
 	}
 
-	notificationApi := os.Getenv("NOTIFICATION_API")
 	var pendingNotifications []model.Notification
-
-	notificationService := serviceProvider.MakeService(db.FixedAssetDBName.CompanyDBName(companyCode), util_db.NotificationModelName)
 
 	for _, userId := range userIds {
 		pendingNotifications = append(pendingNotifications, model.Notification{
@@ -163,10 +181,35 @@ func (r *SendNotificationHelperImpl) SendNotificationToUsers(
 		})
 	}
 
-	notificationsInterface := []interface{}{}
-	for _, pendingNotification := range pendingNotifications {
+	return r.SendNotification(serviceProvider, companyCode, pendingNotifications)
+}
+
+func (r *SendNotificationHelperImpl) SendNotification(
+	serviceProvider util_provider.ServiceProvider,
+	companyCode string,
+	notifications []model.Notification,
+) *entity.HttpError {
+	if len(notifications) == 0 {
+		return nil
+	}
+
+	notificationApi := os.Getenv("NOTIFICATION_API")
+
+	notificationService := serviceProvider.MakeService(
+		db.FixedAssetDBName.CompanyDBName(companyCode),
+		util_db.NotificationModelName,
+	)
+
+	notificationsInterface := []any{}
+	for _, pendingNotification := range notifications {
 		notificationsInterface = append(notificationsInterface, pendingNotification)
-		_, err := http.Get(fmt.Sprintf("%s/v2/sse/send?id=%s&message=user:unread-notification", notificationApi, pendingNotification.User.Hex()))
+		_, err := http.Get(
+			fmt.Sprintf(
+				"%s/v2/sse/send?id=%s&message=user:unread-notification",
+				notificationApi,
+				pendingNotification.User.Hex(),
+			),
+		)
 		if err != nil {
 			return entity.InternalServerError(err.Error())
 		}
