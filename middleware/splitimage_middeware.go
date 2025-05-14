@@ -93,6 +93,8 @@ func SplitImageMiddleware(folderName string, attribute string) fiber.Handler {
 			ctx.Locals(key, path)
 		}
 
+		ctx.Locals(FileSize, fileHeader.Size)
+
 		return ctx.Next()
 	}
 }
