@@ -521,14 +521,14 @@ func TransactionRoleMultipleGroupAggregation(
 				"localField":   "loggedInUserId",
 				"foreignField": "user._id",
 				"let": bson.M{
-					checkedGroupField: checkedGroupField,
+					fieldWithoutDollar: checkedGroupField,
 				},
 				"as": "userTransactionRoles",
 				"pipeline": pipeline.NewPipelineBuilder().
 					OptionalMatch(
 						bson.M{
 							"$expr": bson.M{"$and": bson.A{
-								bson.M{"$eq": bson.A{"$group._id", fmt.Sprintf("$$%s", checkedGroupField)}},
+								bson.M{"$eq": bson.A{"$group._id", fmt.Sprintf("$$%s", fieldWithoutDollar)}},
 								bson.M{"$eq": bson.A{"$isActive", true}},
 							}},
 						},
