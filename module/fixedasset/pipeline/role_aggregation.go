@@ -487,7 +487,7 @@ func TransactionRolePermissionAggregation(
 }
 
 // Example: Transfer needs both origin & destination group role
-func TransactionRoleMultiplePermissionAggregation(
+func TransactionRoleMultipleGroupAggregation(
 	builder *pipeline.PipelineBuilder,
 	loggedInUserId primitive.ObjectID,
 	groupFields []string,
