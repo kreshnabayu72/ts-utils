@@ -10,7 +10,7 @@ import (
 )
 
 type MockRolePermissionHelper struct {
-	mock *mock.Mock
+	mock.Mock
 }
 
 func (m *MockRolePermissionHelper) CheckSystemRolePermission(
@@ -19,7 +19,7 @@ func (m *MockRolePermissionHelper) CheckSystemRolePermission(
 	resourceTypes []model.RoleType,
 	groupFilter primitive.M,
 ) *entity.HttpError {
-	args := m.mock.Called(ctx, permissionKey, resourceTypes, groupFilter)
+	args := m.Mock.Called(ctx, permissionKey, resourceTypes, groupFilter)
 	return args.Get(0).(*entity.HttpError)
 }
 
@@ -31,7 +31,7 @@ func (m *MockRolePermissionHelper) CheckGroupPermission(
 	permissions []model.PermissionType,
 	systemRoleTypes []model.RoleType,
 ) error {
-	args := m.mock.Called(
+	args := m.Mock.Called(
 		service,
 		loggedInUser,
 		dataFilter,
@@ -50,7 +50,7 @@ func (m *MockRolePermissionHelper) CheckTransactionRoleMultiGroupPermissions(
 	transactionType []model.TransactionGroupAttribute,
 	roleType []model.TransactionRoleType,
 ) error {
-	args := m.mock.Called(
+	args := m.Mock.Called(
 		service,
 		loggedInUser,
 		dataFilter,
@@ -67,11 +67,11 @@ func (m *MockRolePermissionHelper) CheckTransactionRolePermission(
 	transactionType []model.TransactionGroupAttribute,
 	roleType []model.TransactionRoleType,
 ) error {
-	args := m.mock.Called(ctx, groupIdFilter, transactionType, roleType)
+	args := m.Mock.Called(ctx, groupIdFilter, transactionType, roleType)
 	return args.Error(0)
 }
 
 func (m *MockRolePermissionHelper) CheckTotalControlPermission(ctx *fiber.Ctx) *entity.HttpError {
-	args := m.mock.Called(ctx)
+	args := m.Mock.Called(ctx)
 	return args.Get(0).(*entity.HttpError)
 }
