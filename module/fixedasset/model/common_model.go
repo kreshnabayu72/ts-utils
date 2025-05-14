@@ -4,7 +4,7 @@ type RoleType string
 
 const (
 	RTImportData          RoleType = "importData"
-	RTAssetAttribute      RoleType = "assetAttributes"
+	RTAssetAttribute      RoleType = "assetAttribute"
 	RTAssetPolicies       RoleType = "assetPolicies"
 	RTDepreciationGroup   RoleType = "depreciationGroup"
 	RTDepreciationMethod  RoleType = "depreciationMethod"
@@ -85,12 +85,11 @@ type ManagePermission struct {
 	DepreciationMethod  Permission `json:"depreciationMethod"  bson:"depreciationMethod"`
 	DocumentDeletion    Permission `json:"documentDeletion"    bson:"documentDeletion"`
 	Group               Permission `json:"group"               bson:"group"`
-	User                Permission `json:"user"                bson:"user"`
+	UserAndRole         Permission `json:"userAndRole"         bson:"userAndRole"`
 	IotReader           Permission `json:"iotReader"           bson:"iotReader"`
 	License             Permission `json:"license"             bson:"license"`
 	PurchaseDocument    Permission `json:"purchaseDocument"    bson:"purchaseDocument"`
 	PurchaseInformation Permission `json:"purchaseInformation" bson:"purchaseInformation"`
-	Role                Permission `json:"role"                bson:"role"`
 	Tag                 Permission `json:"tag"                 bson:"tag"`
 	RegisterAsset       Permission `json:"registerAsset"       bson:"registerAsset"`
 	TagType             Permission `json:"tagType"             bson:"tagType"`

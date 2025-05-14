@@ -46,3 +46,22 @@ func TotalControlRoleRestriction() fiber.Handler {
 		return c.Next()
 	}
 }
+
+// Not filtered by group
+func TransactionRoleRestriction(roleTypes []model.TransactionRoleType, transactionAttributes []model.TransactionGroupAttribute) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		isTest := c.Locals(middleware.IsTest)
+		if isTest != nil {
+			return c.Next()
+		}
+
+		// Check permissions based on the provided permissionKey and resourceTypes
+		err := helper.CheckTransactionRolePermission(c, bson.M{"$ne": nil}, transactionAttributes, roleTypes)
+		if err != nil {
+			return response.SendResponse(c, fiber.StatusUnauthorized, nil, "Unauthorized: "+err.Error())
+		}
+
+		// Continue to the next handler if permission is granted
+		return c.Next()
+	}
+}

@@ -10,16 +10,17 @@ import (
 type BorrowingStatus string
 
 const (
-	BorrowStatusBorrowed  = BorrowingStatus("Borrowed")
-	BorrowStatusDamaged   = BorrowingStatus("Reported Damaged")
-	BorrowStatusMissing   = BorrowingStatus("Reported Missing")
-	BorrowStatusCompleted = BorrowingStatus("Completed")
+	BorrowStatusBorrowed = BorrowingStatus("Borrowed")
+	BorrowStatusDamaged  = BorrowingStatus("Reported Damaged")
+	BorrowStatusMissing  = BorrowingStatus("Reported Missing")
+	BorrowStatusReturned = BorrowingStatus("Returned")
 )
 
 type BorrowingRequest struct {
 	ID primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
 
 	Transaction      primitive.ObjectID      `json:"transaction" bson:"transaction"`
+	TransactionId    string                  `json:"transactionId" bson:"transactionId"`
 	Asset            primitive.ObjectID      `json:"asset" bson:"asset"`
 	AssetId          string                  `json:"assetId" bson:"assetId"`
 	AssetParent      *primitive.ObjectID     `json:"assetParent" bson:"assetParent"`

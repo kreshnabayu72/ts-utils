@@ -10,11 +10,11 @@ import (
 type BorrowingTransactionStatus string
 
 const (
+	BorrowingTransactionStatusRejected           = BorrowingTransactionStatus("Rejected")
 	BorrowingTransactionStatusReturned           = BorrowingTransactionStatus("Returned")
 	BorrowingTransactionStatusWaitingForApproval = BorrowingTransactionStatus("Waiting for Approval")
 	BorrowingTransactionStatusWaitingForHandover = BorrowingTransactionStatus("Waiting for Handover")
-	BorrowingTransactionStatusOnBorrowing        = BorrowingTransactionStatus("On Borrowing")
-	BorrowingTransactionStatusCompleted          = BorrowingTransactionStatus("Completed")
+	BorrowingTransactionStatusBorrowed           = BorrowingTransactionStatus("Borrowed") // Previously On Borrowing
 )
 
 type BorrowingTransaction struct {

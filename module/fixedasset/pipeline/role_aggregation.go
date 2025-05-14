@@ -514,7 +514,10 @@ func TransactionRoleMultiPermissionAggregation(
 					Match(
 						bson.M{
 							"manageType": bson.M{
-								"$in": bson.A{"Manager"},
+								"$in": bson.A{fixedasset_model.TRTManager, fixedasset_model.TRTMonitoring},
+							},
+							"transactionGroupAttribute": bson.M{
+								"$in": bson.A{fixedasset_model.TGABorrowingRole, fixedasset_model.TGATransferRole, fixedasset_model.TGADisposalRole},
 							},
 						},
 					).
@@ -534,11 +537,18 @@ func TransactionRoleMultiPermissionAggregation(
 			},
 		).
 		Addfields(
-			bson.M{"manager": bson.M{
-				"transfer":  getTransactionRolePermission(fixedasset_model.TGATransferRole, fixedasset_model.TransactionManageTypeManager),
-				"borrowing": getTransactionRolePermission(fixedasset_model.TGABorrowingRole, fixedasset_model.TransactionManageTypeManager),
-				"disposal":  getTransactionRolePermission(fixedasset_model.TGADisposalRole, fixedasset_model.TransactionManageTypeManager),
-			}},
+			bson.M{
+				"manager": bson.M{
+					"transfer":  getTransactionRolePermission(fixedasset_model.TGATransferRole, fixedasset_model.TransactionManageTypeManager),
+					"borrowing": getTransactionRolePermission(fixedasset_model.TGABorrowingRole, fixedasset_model.TransactionManageTypeManager),
+					"disposal":  getTransactionRolePermission(fixedasset_model.TGADisposalRole, fixedasset_model.TransactionManageTypeManager),
+				},
+				"monitoring": bson.M{
+					"transfer":  getTransactionRolePermission(fixedasset_model.TGATransferRole, fixedasset_model.TransactionManageTypeMonitoring),
+					"borrowing": getTransactionRolePermission(fixedasset_model.TGABorrowingRole, fixedasset_model.TransactionManageTypeMonitoring),
+					"disposal":  getTransactionRolePermission(fixedasset_model.TGADisposalRole, fixedasset_model.TransactionManageTypeMonitoring),
+				},
+			},
 		)
 }
 
