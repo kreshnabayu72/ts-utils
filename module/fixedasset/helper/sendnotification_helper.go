@@ -250,11 +250,16 @@ func (r *SendNotificationHelperImpl) SendNotification(
 				pendingNotification.User.Hex(),
 			),
 		)
+		//Dont throw error, if notif is down, let transaction continue
 		if err != nil {
-			return entity.InternalServerError(err.Error())
+			fmt.Println("NOTIFICATION ERROR: " + err.Error())
 		}
 
-		r.SendMobileNotification(pendingNotification)
+		mobileNotifErr := r.SendMobileNotification(pendingNotification)
+
+		if mobileNotifErr != nil {
+			fmt.Println("MOBILE NOTIFICATION ERROR: " + mobileNotifErr.Error())
+		}
 	}
 
 	_, err := notificationService.InsertMany(context.Background(), notificationsInterface)
