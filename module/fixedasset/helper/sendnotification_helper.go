@@ -1,4 +1,4 @@
-package notification
+package helper
 
 import (
 	"context"
@@ -16,7 +16,39 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func SendNotificationToTransactionRoles(
+type NotificationHelper interface {
+	SendNotificationToTransactionRoles(
+		serviceProvider util_provider.ServiceProvider,
+		companyCode string,
+		groupIdFilter primitive.M,
+		transactionType []model.TransactionGroupAttribute,
+		roleType []model.TransactionRoleType,
+		notificationDataWithoutUser model.Notification,
+	) *entity.HttpError
+
+	SendNotificationToSystemRoles(
+		serviceProvider util_provider.ServiceProvider,
+		companyCode string,
+		groupIdFilter primitive.M,
+		roleType []model.RoleType,
+		notificationDataWithoutUser model.Notification,
+	) *entity.HttpError
+
+	SendNotificationToUsers(
+		serviceProvider util_provider.ServiceProvider,
+		companyCode string,
+		userIds []primitive.ObjectID,
+		notificationDataWithoutUser model.Notification,
+	) *entity.HttpError
+}
+
+type SendNotificationHelperImpl struct{}
+
+func MakeNotificationHelperImpl() *SendNotificationHelperImpl {
+	return &SendNotificationHelperImpl{}
+}
+
+func (r *SendNotificationHelperImpl) SendNotificationToTransactionRoles(
 	serviceProvider util_provider.ServiceProvider,
 	companyCode string,
 	groupIdFilter primitive.M,
@@ -54,16 +86,17 @@ func SendNotificationToTransactionRoles(
 		uniqueUserIdsCheck[role.User.ID] = true
 	}
 
-	return SendNotificationToUsers(serviceProvider, companyCode, uniqueUserIds, notificationDataWithoutUser)
+	return r.SendNotificationToUsers(serviceProvider, companyCode, uniqueUserIds, notificationDataWithoutUser)
 }
 
-func SendNotificationToSystemRoles(
+func (r *SendNotificationHelperImpl) SendNotificationToSystemRoles(
 	serviceProvider util_provider.ServiceProvider,
 	companyCode string,
 	groupIdFilter primitive.M,
 	roleType []model.RoleType,
 	notificationDataWithoutUser model.Notification,
 ) *entity.HttpError {
+
 	userTransactionRoleService := serviceProvider.MakeService(db.FixedAssetDBName.CompanyDBName(companyCode), util_db.UserTransactionRoleModelName)
 
 	var roles []model.UserSystemRole
@@ -93,10 +126,10 @@ func SendNotificationToSystemRoles(
 		uniqueUserIdsCheck[*role.User.ID] = true
 	}
 
-	return SendNotificationToUsers(serviceProvider, companyCode, uniqueUserIds, notificationDataWithoutUser)
+	return r.SendNotificationToUsers(serviceProvider, companyCode, uniqueUserIds, notificationDataWithoutUser)
 }
 
-func SendNotificationToUsers(
+func (r *SendNotificationHelperImpl) SendNotificationToUsers(
 	serviceProvider util_provider.ServiceProvider,
 	companyCode string,
 	userIds []primitive.ObjectID,
