@@ -20,7 +20,14 @@ func (m *MockNotificationHelper) SendNotificationToTransactionRoles(
 	roleType []model.TransactionRoleType,
 	notificationDataWithoutUser model.Notification,
 ) *entity.HttpError {
-	args := m.Mock.Called(serviceProvider, companyCode, groupIdFilter, transactionType, roleType, notificationDataWithoutUser)
+	args := m.Mock.Called(
+		serviceProvider,
+		companyCode,
+		groupIdFilter,
+		transactionType,
+		roleType,
+		notificationDataWithoutUser,
+	)
 	return args.Get(0).(*entity.HttpError)
 }
 
@@ -31,9 +38,16 @@ func (m *MockNotificationHelper) SendNotificationToSystemRoles(
 	roleType []model.RoleType,
 	notificationDataWithoutUser model.Notification,
 ) *entity.HttpError {
-	args := m.Mock.Called(serviceProvider, companyCode, groupIdFilter, roleType, notificationDataWithoutUser)
+	args := m.Mock.Called(
+		serviceProvider,
+		companyCode,
+		groupIdFilter,
+		roleType,
+		notificationDataWithoutUser,
+	)
 	return args.Get(0).(*entity.HttpError)
 }
+
 func (m *MockNotificationHelper) SendNotificationToUsers(
 	serviceProvider util_provider.ServiceProvider,
 	companyCode string,
@@ -41,5 +55,14 @@ func (m *MockNotificationHelper) SendNotificationToUsers(
 	notificationDataWithoutUser model.Notification,
 ) *entity.HttpError {
 	args := m.Mock.Called(serviceProvider, companyCode, userIds, notificationDataWithoutUser)
+	return args.Get(0).(*entity.HttpError)
+}
+
+func (m *MockNotificationHelper) SendNotification(
+	serviceProvider util_provider.ServiceProvider,
+	companyCode string,
+	notifications []model.Notification,
+) *entity.HttpError {
+	args := m.Mock.Called(serviceProvider, companyCode, notifications)
 	return args.Get(0).(*entity.HttpError)
 }
