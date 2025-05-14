@@ -514,6 +514,7 @@ func TransactionRoleMultipleGroupAggregation(
 		)
 
 	for _, checkedGroupField := range checkedGroupFields {
+		fieldWithoutDollar := strings.ReplaceAll(checkedGroupField, "$", "")
 		builder.Lookup(
 			bson.M{
 				"from":         db.UserTransactionRoleModelName,
@@ -546,8 +547,8 @@ func TransactionRoleMultipleGroupAggregation(
 		).
 			Addfields(
 				bson.M{
-					fmt.Sprintf("%sManager", checkedGroupField):    getTransactionRolePermission(transactionGroupAttribute, fixedasset_model.TransactionManageTypeManager),
-					fmt.Sprintf("%sMonitoring", checkedGroupField): getTransactionRolePermission(transactionGroupAttribute, fixedasset_model.TransactionManageTypeMonitoring),
+					fmt.Sprintf("%sManager", fieldWithoutDollar):    getTransactionRolePermission(transactionGroupAttribute, fixedasset_model.TransactionManageTypeManager),
+					fmt.Sprintf("%sMonitoring", fieldWithoutDollar): getTransactionRolePermission(transactionGroupAttribute, fixedasset_model.TransactionManageTypeMonitoring),
 				},
 			)
 	}
