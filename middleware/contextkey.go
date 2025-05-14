@@ -4,13 +4,15 @@ package middleware
 type ContextKey string
 
 const (
-	UserKey        = ContextKey("user")
-	CompanyCodeKey = ContextKey("companyCode")
-	SessionKey     = ContextKey("session")
-	Company        = ContextKey("company")
-	ReaderId       = ContextKey("readerId")
-	FixedAssetPlan = ContextKey("fixedAssetPlan")
-	FileSize       = ContextKey("fileSize")
+	UserKey            = ContextKey("user")
+	CompanyCodeKey     = ContextKey("companyCode")
+	SessionKey         = ContextKey("session")
+	Company            = ContextKey("company")
+	ReaderId           = ContextKey("readerId")
+	FixedAssetPlan     = ContextKey("fixedAssetPlan")
+	FileSize           = ContextKey("fileSize")
+	FileNameWithoutExt = ContextKey("fileNameWithoutExt")
+	FileExt            = ContextKey("fileExt")
 
 	// Only used for GetLicensePlan middleware cause idk how to mock the service in middleware
 	IsTest = ContextKey("isTest")
