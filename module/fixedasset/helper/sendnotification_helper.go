@@ -135,6 +135,10 @@ func (r *SendNotificationHelperImpl) SendNotificationToUsers(
 	userIds []primitive.ObjectID,
 	notificationDataWithoutUser model.Notification,
 ) *entity.HttpError {
+	if len(userIds) == 0 {
+		return nil
+	}
+
 	notificationApi := os.Getenv("NOTIFICATION_API")
 	var pendingNotifications []model.Notification
 
