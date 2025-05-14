@@ -110,13 +110,13 @@ func (r *SendNotificationHelperImpl) SendNotificationToSystemRoles(
 	roleType []model.RoleType,
 	notificationDataWithoutUser model.Notification,
 ) *entity.HttpError {
-	userTransactionRoleService := serviceProvider.MakeService(
+	userSystemRoleService := serviceProvider.MakeService(
 		db.FixedAssetDBName.CompanyDBName(companyCode),
-		util_db.UserTransactionRoleModelName,
+		util_db.UserSystemRoleModelName,
 	)
 
 	var roles []model.UserSystemRole
-	err := userTransactionRoleService.Find(
+	err := userSystemRoleService.Find(
 		&roles,
 		context.Background(),
 		bson.M{
