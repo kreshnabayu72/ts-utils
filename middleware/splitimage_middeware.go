@@ -52,6 +52,7 @@ func SplitImageMiddleware(folderName string, attribute string) fiber.Handler {
 		}
 
 		// Process and save resized images
+		fileNamePrefix := strconv.FormatInt(time.Now().Unix(), 10)
 		for _, size := range sizes {
 			// Resize the image to the specified dimensions
 			resizedImg := imaging.Resize(img, size.width, size.height, imaging.Lanczos)
@@ -64,7 +65,7 @@ func SplitImageMiddleware(folderName string, attribute string) fiber.Handler {
 			// Save the resized image to disk
 			filename := fmt.Sprintf(
 				"%s.jpg",
-				strconv.FormatInt(time.Now().Unix(), 10)+"-"+size.name,
+				fileNamePrefix+"-"+size.name,
 			)
 			outputFilePath := filepath.Join(
 				absPath,
@@ -93,6 +94,8 @@ func SplitImageMiddleware(folderName string, attribute string) fiber.Handler {
 			ctx.Locals(key, path)
 		}
 
+		ctx.Locals(FileNameWithoutExt, fileNamePrefix)
+		ctx.Locals(FileExt, ".jpg")
 		ctx.Locals(FileSize, fileHeader.Size)
 
 		return ctx.Next()
