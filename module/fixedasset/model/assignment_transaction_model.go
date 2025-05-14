@@ -12,10 +12,14 @@ type AssignmentTransactionStatus string
 const (
 	AssignmentTransactionStatusRejected           = AssignmentTransactionStatus("Rejected")
 	AssignmentTransactionStatusReturned           = AssignmentTransactionStatus("Returned")
-	AssignmentTransactionStatusWaitingForApproval = AssignmentTransactionStatus("Waiting for Approval")
-	AssignmentTransactionStatusWaitingForHandover = AssignmentTransactionStatus("Waiting for Handover")
-	AssignmentTransactionStatusAssigned           = AssignmentTransactionStatus("Assigned")
-	AssignmentTransactionStatusUnassigned         = AssignmentTransactionStatus("Unassigned")
+	AssignmentTransactionStatusWaitingForApproval = AssignmentTransactionStatus(
+		"Waiting for Approval",
+	)
+	AssignmentTransactionStatusWaitingForHandover = AssignmentTransactionStatus(
+		"Waiting for Handover",
+	)
+	AssignmentTransactionStatusAssigned   = AssignmentTransactionStatus("Assigned")
+	AssignmentTransactionStatusUnassigned = AssignmentTransactionStatus("Unassigned")
 )
 
 type AssignmentTransaction struct {
@@ -29,6 +33,7 @@ type AssignmentTransaction struct {
 	AssignedTo model.UserEmbedded `json:"assignedTo" bson:"assignedTo"`
 
 	ConfirmationEmail string `json:"confirmationEmail" bson:"confirmationEmail"`
+	TotalAssets       int    `json:"totalAssets" bson:"totalAssets"`
 
 	CreatedAt time.Time `json:"createdAt" bson:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt" bson:"updatedAt"`
