@@ -12,9 +12,15 @@ type BorrowingTransactionStatus string
 const (
 	BorrowingTransactionStatusRejected           = BorrowingTransactionStatus("Rejected")
 	BorrowingTransactionStatusReturned           = BorrowingTransactionStatus("Returned")
-	BorrowingTransactionStatusWaitingForApproval = BorrowingTransactionStatus("Waiting for Approval")
-	BorrowingTransactionStatusWaitingForHandover = BorrowingTransactionStatus("Waiting for Handover")
-	BorrowingTransactionStatusBorrowed           = BorrowingTransactionStatus("Borrowed") // Previously On Borrowing
+	BorrowingTransactionStatusWaitingForApproval = BorrowingTransactionStatus(
+		"Waiting for Approval",
+	)
+	BorrowingTransactionStatusWaitingForHandover = BorrowingTransactionStatus(
+		"Waiting for Handover",
+	)
+	BorrowingTransactionStatusBorrowed = BorrowingTransactionStatus(
+		"Borrowed",
+	) // Previously On Borrowing
 )
 
 type BorrowingTransaction struct {
@@ -28,6 +34,7 @@ type BorrowingTransaction struct {
 	Borrower model.UserEmbedded `json:"borrower" bson:"borrower"`
 
 	ConfirmationEmail string `json:"confirmationEmail" bson:"confirmationEmail"`
+	TotalAssets       int    `json:"totalAssets" bson:"totalAssets"`
 
 	DueReturnDate    time.Time `json:"dueReturnDate" bson:"dueReturnDate"`
 	ActualReturnDate time.Time `json:"actualReturnDate" bson:"actualReturnDate"`
