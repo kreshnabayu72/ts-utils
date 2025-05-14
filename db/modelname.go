@@ -64,6 +64,7 @@ const (
 	RfIdTagModelName                     = "rfids"
 	RoleModelName                        = "roles"
 	RoutineApprovalModelName             = "routine_approvals"
+	RoutineEventLogModelName             = "routine_task_event_logs"
 	RoutineTaskModelName                 = "routine_task"
 	ServiceCenterModelName               = "service_centers"
 	SessionLogModelName                  = "session_logs"

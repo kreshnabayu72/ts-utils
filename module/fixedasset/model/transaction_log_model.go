@@ -25,6 +25,10 @@ type TransactionLog struct {
 	ReaderNameWithoutSequence string                 `json:"readerNameWithoutSequence" bson:"readerNameWithoutSequence"`
 	ReaderType                string                 `json:"readerType" bson:"readerType"`
 	Module                    string                 `json:"module"     bson:"module"`
+	Borrower                  *string                `json:"borrower" bson:"borrower"`
+	AssignedTo                *string                `json:"assignedTo" bson:"assignedTo"`
+	Group                     *string                `json:"group" bson:"group"`
+	TaskName                  *string                `json:"taskName" bson:"taskName"`
 	CreatedAt                 time.Time              `json:"createdAt" bson:"createdAt"`
 	UpdatedAt                 time.Time              `json:"updatedAt" bson:"updatedAt"`
 }
