@@ -420,9 +420,16 @@ func TransactionRolePermissionAggregation(
 	groupField string,
 	transactionGroupAttribute fixedasset_model.TransactionGroupAttribute,
 	filterOptions RoleRestrictionOptions, //for filtering user_transaction_roles
+	filterOutEmptyRole ...bool,
 ) {
 	if groupField != "" && !strings.HasPrefix(groupField, "$") {
 		groupField = fmt.Sprintf("$%s", groupField)
+	}
+
+	filter := true
+
+	if len(filterOutEmptyRole) > 0 {
+		filter = filterOutEmptyRole[0]
 	}
 
 	builder.
@@ -461,18 +468,21 @@ func TransactionRolePermissionAggregation(
 					Build(),
 			},
 		).
-		Match(
-			bson.M{
-				"$expr": bson.M{
-					"$gt": bson.A{
-						bson.M{
-							"$size": "$userTransactionRoles",
+		Match(bson.M{
+			"$expr": bson.M{
+				"$and": bson.A{
+					bson.M{
+						"$gt": bson.A{
+							bson.M{
+								"$size": "$userTransactionRoles",
+							},
+							0,
 						},
-						0,
 					},
+					filter,
 				},
 			},
-		).
+		}).
 		Addfields(GetHasTransactionRole(transactionGroupAttribute))
 }
 
