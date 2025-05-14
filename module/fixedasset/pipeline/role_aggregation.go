@@ -487,23 +487,32 @@ func TransactionRolePermissionAggregation(
 }
 
 // Example: Transfer needs both origin & destination group role
+
+type GroupFieldAndAttributeName struct {
+	Field         string // originGroup._id / destinationGroup._id
+	AttributeName string // Origin / Destination (For isDestinationManager)
+}
+
 func TransactionRoleMultipleGroupAggregation(
 	builder *pipeline.PipelineBuilder,
 	loggedInUserId primitive.ObjectID,
-	groupFields []string,
+	groupFieldsAndAttribute []GroupFieldAndAttributeName,
 	transactionGroupAttribute fixedasset_model.TransactionGroupAttribute,
 	filterOptions RoleRestrictionOptions, //for filtering user_transaction_roles
 ) {
-	checkedGroupFields := make([]string, 0)
+	checkedGroupFields := make([]GroupFieldAndAttributeName, 0)
 
-	for _, groupField := range groupFields {
-		checkedField := groupField
+	for _, groupField := range groupFieldsAndAttribute {
+		checkedField := groupField.Field
 
 		if checkedField != "" && !strings.HasPrefix(checkedField, "$") {
 			checkedField = fmt.Sprintf("$%s", checkedField)
 		}
 
-		checkedGroupFields = append(checkedGroupFields, checkedField)
+		checkedGroupFields = append(checkedGroupFields, GroupFieldAndAttributeName{
+			Field:         checkedField,
+			AttributeName: groupField.AttributeName,
+		})
 	}
 
 	builder.
@@ -513,26 +522,26 @@ func TransactionRoleMultipleGroupAggregation(
 			},
 		)
 
-	for _, checkedGroupField := range checkedGroupFields {
-		fieldWithoutDollar := strings.ReplaceAll(checkedGroupField, "$", "")
+	for _, groupFieldAndAttribute := range checkedGroupFields {
+		fieldWithoutDollar := strings.ReplaceAll(groupFieldAndAttribute.Field, "$", "")
+
 		builder.Lookup(
 			bson.M{
 				"from":         db.UserTransactionRoleModelName,
 				"localField":   "loggedInUserId",
 				"foreignField": "user._id",
 				"let": bson.M{
-					fieldWithoutDollar: checkedGroupField,
+					fieldWithoutDollar: groupFieldAndAttribute.Field,
 				},
 				"as": "userTransactionRoles",
 				"pipeline": pipeline.NewPipelineBuilder().
-					OptionalMatch(
+					Match(
 						bson.M{
 							"$expr": bson.M{"$and": bson.A{
 								bson.M{"$eq": bson.A{"$group._id", fmt.Sprintf("$$%s", fieldWithoutDollar)}},
 								bson.M{"$eq": bson.A{"$isActive", true}},
 							}},
 						},
-						checkedGroupField != "",
 					).
 					Match(
 						bson.M{
@@ -547,8 +556,8 @@ func TransactionRoleMultipleGroupAggregation(
 		).
 			Addfields(
 				bson.M{
-					fmt.Sprintf("%sManager", fieldWithoutDollar):    getTransactionRolePermission(transactionGroupAttribute, fixedasset_model.TransactionManageTypeManager),
-					fmt.Sprintf("%sMonitoring", fieldWithoutDollar): getTransactionRolePermission(transactionGroupAttribute, fixedasset_model.TransactionManageTypeMonitoring),
+					fmt.Sprintf("is%sManager", groupFieldAndAttribute.AttributeName):    getTransactionRolePermission(transactionGroupAttribute, fixedasset_model.TransactionManageTypeManager),
+					fmt.Sprintf("is%sMonitoring", groupFieldAndAttribute.AttributeName): getTransactionRolePermission(transactionGroupAttribute, fixedasset_model.TransactionManageTypeMonitoring),
 				},
 			)
 	}
