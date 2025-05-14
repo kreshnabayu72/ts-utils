@@ -524,7 +524,7 @@ func TransactionRoleMultipleGroupAggregation(
 
 	for _, groupFieldAndAttribute := range checkedGroupFields {
 		attributeField := strings.ReplaceAll(groupFieldAndAttribute.Field, "$", "")
-		attributeField = strings.ReplaceAll(groupFieldAndAttribute.Field, ".", "")
+		attributeField = strings.ReplaceAll(attributeField, ".", "")
 
 		builder.Lookup(
 			bson.M{
