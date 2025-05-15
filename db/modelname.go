@@ -24,6 +24,8 @@ const (
 	DamageReportModelName                = "damage_reports"
 	DepreciationGroupModelName           = "depreciation_groups"
 	DivisionModelName                    = "divisions"
+	DisposalReportModelName              = "disposal_reports"
+	DisposalRequestModelName             = "disposal_requests"
 	DisposalTransactionModelName         = "disposal_transactions"
 	FileAttachmentModelName              = "file_attachments"
 	FileDamageModelName                  = "file_damages"
