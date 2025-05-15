@@ -19,6 +19,8 @@ type DisposalReport struct {
 	ID               primitive.ObjectID      `json:"id,omitempty" bson:"_id,omitempty"`
 	Asset            primitive.ObjectID      `json:"asset" bson:"asset"`
 	AssetImageBig    string                  `json:"assetImageBig" bson:"assetImageBig"`
+	PreviousStatus   string                  `json:"previousStatus" bson:"previousStatus"`
+	IsDeleted        bool                    `json:"isDeleted" bson:"isDeleted"`
 	AssetImageMedium string                  `json:"assetImageMedium" bson:"assetImageMedium"`
 	AssetImageSmall  string                  `json:"assetImageSmall" bson:"assetImageSmall"`
 	AssetName        AssetNameEmbedAttr      `json:"assetName" bson:"assetName"`
