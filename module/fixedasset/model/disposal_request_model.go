@@ -24,6 +24,7 @@ type DisposalRequest struct {
 	AssetTagType     string                  `json:"assetTagType" bson:"assetTagType"`
 	AssetQr          string                  `json:"assetQr" bson:"assetQr"`
 	AssetRfid        string                  `json:"assetRfid" bson:"assetRfid"`
+	Method           string                  `json:"method" bson:"method"`
 
 	Reason string `json:"reason" bson:"reason"`
 
