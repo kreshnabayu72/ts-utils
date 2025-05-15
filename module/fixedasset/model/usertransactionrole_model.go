@@ -6,7 +6,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type userAttribute struct {
+type UserAttribute struct {
 	ID        primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
 	FullName  string             `json:"fullName"      bson:"fullName"`
 	Key       int                `json:"key"           bson:"key"`
@@ -15,7 +15,7 @@ type userAttribute struct {
 
 type UserTransactionRole struct {
 	ID                        primitive.ObjectID        `json:"_id,omitempty"             bson:"_id,omitempty"`
-	User                      userAttribute             `json:"user" bson:"user"`
+	User                      UserAttribute             `json:"user" bson:"user"`
 	TransactionGroupAttribute TransactionGroupAttribute `json:"transactionGroupAttribute" bson:"transactionGroupAttribute"`
 	Transaction               TransactionType           `json:"transaction"               bson:"transaction"`
 	RoleType                  TransactionRoleType       `json:"roleType"                  bson:"roleType"`
