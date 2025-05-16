@@ -103,4 +103,5 @@ const (
 	ExpiredRequestModelName              = "expired_requests"
 	ExpiredRequestHistoryModelName       = "expired_request_histories"
 	RegisterTokenModelName               = "register_tokens"
+	LicenseTransactionModelName          = "license_transactions"
 )
