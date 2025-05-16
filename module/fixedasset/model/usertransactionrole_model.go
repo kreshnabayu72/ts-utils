@@ -42,3 +42,14 @@ var ValidTransactionNames = []string{
 	"missingRole",
 	"damagedRole",
 }
+var RoleAttributeToName = map[string]string{
+	"borrowingRole":   "Borrowing/Assignment",
+	"disposalRole":    "Disposal",
+	"transferRole":    "Transfer",
+	"auditRole":       "Audit",
+	"maintenanceRole": "Maintenance Routine",
+	"repairRole":      "Repair Ticketing",
+	"trackingRole":    "Tracking",
+	"missingRole":     "Missing",
+	"damagedRole":     "Damaged",
+}
