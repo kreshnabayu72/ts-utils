@@ -14,4 +14,5 @@ type Model struct {
 	Category  *primitive.ObjectID `json:"category,omitempty" bson:"category,omitempty"` // Default null
 	CreatedAt time.Time           `json:"createdAt"          bson:"createdAt"`          // Otomatis disimpan MongoDB
 	UpdatedAt time.Time           `json:"updatedAt"          bson:"updatedAt"`          // Otomatis disimpan MongoDB
+	IsDeleted bool				  `json:"isDeleted"          bson:"isDeleted"`
 }
