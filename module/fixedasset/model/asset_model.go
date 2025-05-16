@@ -41,13 +41,13 @@ type Asset struct {
 	Borrower           *UserInfo                   `bson:"borrower,omitempty"           json:"borrower,omitempty"`
 	Policy             *string                     `bson:"policy,omitempty"             json:"policy,omitempty"`
 	IsTransactionable  bool                        `bson:"isTransactionable"            json:"isTransactionable"`
-	IsParent           *bool                       `bson:"isParent,omitempty"           json:"isParent,omitempty"`
+	IsParent           bool                        `bson:"isParent"           json:"isParent"`
 	License            AssetLicense                `bson:"license"                      json:"license"`
 	Transactions       AssetTransactions           `bson:"transactions"                 json:"transactions"`
 	AddOn              AssetAddOn                  `bson:"addOn"                        json:"addOn"`
 	Purchase           AssetPurchase               `bson:"purchase"                     json:"purchase"`
 	LastModifier       *UserInfo                   `bson:"lastModifier,omitempty"       json:"lastModifier,omitempty"`
-	Parent             *primitive.ObjectID         `bson:"parent,omitempty"             json:"parent,omitempty"`
+	Parent             *primitive.ObjectID         `bson:"parent"             json:"parent"`
 	NameNumber         *int                        `bson:"nameNumber,omitempty"         json:"nameNumber,omitempty"`
 	DeviceSerialNumber *string                     `bson:"deviceSerialNumber,omitempty" json:"deviceSerialNumber,omitempty"`
 	TagReported        *TagReported                `bson:"tagReported,omitempty"        json:"tagReported,omitempty"`
