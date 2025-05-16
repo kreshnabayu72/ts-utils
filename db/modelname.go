@@ -9,6 +9,7 @@ const (
 	AssetNameModelName                   = "asset_names"
 	AssignmentRequestModelName           = "assignment_requests"
 	AssignmentTransactionModelName       = "assignment_transactions"
+	AttachmentModelName                  = "attachments"
 	AuditAssetModelName                  = "audit_asset"
 	AuditScheduleModelName               = "audit_schedule"
 	AuditScheduledAssetModelName         = "audit_scheduled_asset"
