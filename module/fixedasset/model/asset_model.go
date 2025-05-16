@@ -56,6 +56,7 @@ type Asset struct {
 	CustomFields       []CustomField               `bson:"customFields"                    json:"customFields"`
 	CreatedAt          time.Time                   `bson:"createdAt"                    json:"createdAt"`
 	UpdatedAt          time.Time                   `bson:"updatedAt"                    json:"updatedAt"`
+	IsDeleted		   bool						   `bson:"isDeleted"                    json:"isDeleted"`
 }
 
 type AssetTag struct {
