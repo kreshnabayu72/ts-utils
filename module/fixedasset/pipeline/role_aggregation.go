@@ -612,18 +612,6 @@ func TransactionRoleMultiPermissionAggregation(
 					Build(),
 			},
 		).
-		Match(
-			bson.M{
-				"$expr": bson.M{
-					"$gt": bson.A{
-						bson.M{
-							"$size": "$userTransactionRoles",
-						},
-						0,
-					},
-				},
-			},
-		).
 		Addfields(
 			bson.M{
 				"manager": bson.M{
