@@ -52,17 +52,22 @@ const (
 	PlanEnterprise = PlanTypes("Enterprise")
 )
 
+type LicenseAttrs struct {
+	ConcurrentUser int `json:"concurrentUser" bson:"concurrentUser"`
+}
+
 type Company struct {
 	ID                        primitive.ObjectID `json:"_id"                       bson:"_id"`
 	DepreciationMethod        DepreciationMethod `json:"depreciationMethod"        bson:"depreciationMethod"`
 	PendingDepreciationMethod DepreciationMethod `json:"pendingDepreciationMethod" bson:"pendingDepreciationMethod"`
 	FileStorage               FileStorage        `json:"fileStorage"               bson:"fileStorage"`
-	AuditAttrs                AuditAttrs         `json:"auditAttrs"               bson:"auditAttrs"`
-	BorrowingAttrs            BorrowingAttrs     `json:"borrowingAttrs"               bson:"borrowingAttrs"`
-	TransferAttrs             TransferAttrs      `json:"transferAttrs"               bson:"transferAttrs"`
-	DisposalAttrs             DisposalAttrs      `json:"disposalAttrs"               bson:"disposalAttrs"`
-	AssetControlAttrs         AssetControlAttrs  `json:"assetControlAttrs"               bson:"assetControlAttrs"`
-	Plan                      *LicensePlan       `json:"plan"                 bson:"plan"`
+	AuditAttrs                AuditAttrs         `json:"auditAttrs"                bson:"auditAttrs"`
+	BorrowingAttrs            BorrowingAttrs     `json:"borrowingAttrs"            bson:"borrowingAttrs"`
+	TransferAttrs             TransferAttrs      `json:"transferAttrs"             bson:"transferAttrs"`
+	DisposalAttrs             DisposalAttrs      `json:"disposalAttrs"             bson:"disposalAttrs"`
+	AssetControlAttrs         AssetControlAttrs  `json:"assetControlAttrs"         bson:"assetControlAttrs"`
+	Plan                      *LicensePlan       `json:"plan"                      bson:"plan"`
+	License                   LicenseAttrs       `json:"license"                   bson:"license"`
 	CreatedAt                 time.Time          `json:"createdAt"                 bson:"createdAt"`
 	UpdatedAt                 time.Time          `json:"updatedAt"                 bson:"updatedAt"`
 }
