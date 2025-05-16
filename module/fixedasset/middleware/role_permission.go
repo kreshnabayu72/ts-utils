@@ -78,15 +78,12 @@ func AssetListRoleRestriction() fiber.Handler {
 		err := helper.CheckTransactionRolePermission(c, bson.M{"$ne": nil},
 			[]model.TransactionGroupAttribute{model.TGABorrowingRole, model.TGADisposalRole, model.TGATransferRole, model.TGAAuditRole, model.TGAMaintenanceRole, model.TGARepairRole, model.TGATrackingRole, model.TGADamagedRole, model.TGAMissingRole},
 			[]model.TransactionRoleType{model.TRTManager, model.TRTMonitoring, model.TRTStaff})
-		if err != nil {
-			return response.SendResponse(c, fiber.StatusUnauthorized, nil, "Unauthorized: "+err.Error())
-		}
 
 		// Check permissions based on the provided permissionKey and resourceTypes
 		systErr := helper.CheckSystemRolePermission(c, model.PermissionView,
 			[]model.RoleType{model.RTTag, model.RTPurchaseInformation, model.RTRegisterAsset, model.RTPurchaseDocument, model.RTDepreciationGroup, model.RTDepreciationMethod},
 			bson.M{"$ne": nil})
-		if systErr != nil {
+		if systErr != nil && err != nil {
 			return response.SendResponse(c, fiber.StatusUnauthorized, nil, "Unauthorized: "+systErr.Message)
 		}
 
