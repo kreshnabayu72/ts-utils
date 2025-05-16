@@ -3,11 +3,12 @@ package functions
 import (
 	"errors"
 	"fmt"
-	"gitea.qwertysystem.net/BETS/ts-utils/middleware"
 	"os"
 	"path/filepath"
 	"strconv"
 	"time"
+
+	"gitea.qwertysystem.net/BETS/ts-utils/middleware"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/valyala/fasthttp"
@@ -69,4 +70,59 @@ func SaveFile(ctx *fiber.Ctx, folderName string, attribute string) (string, erro
 	path := fmt.Sprintf("/%s/%s/%s", companyCode, folderName, filename)
 
 	return path, nil
+}
+
+// SaveFileWithName saves the uploaded file (if any) into
+// ../../../../tsv2-files/{companyCode}/{folderName}/{fileName}.
+// If the provided fileName has no extension, the original file’s
+// extension is appended. If no file is uploaded under `attribute`,
+// it returns ("", nil).
+func SaveFileWithName(
+	ctx *fiber.Ctx,
+	folderName string,
+	attribute string,
+	fileName string,
+) (string, error) {
+	// 1. Try to get the uploaded file
+	fileHeader, err := ctx.FormFile(attribute)
+	if errors.Is(err, fasthttp.ErrMissingFile) {
+		// no file provided → nothing to do
+		return "", nil
+	}
+	if err != nil {
+		return "", err
+	}
+
+	// 2. Ensure fileName has an extension
+	origExt := filepath.Ext(fileHeader.Filename)
+	if filepath.Ext(fileName) == "" {
+		fileName += origExt
+	}
+
+	// 3. Build absolute path
+	companyCode := ctx.Locals(middleware.ContextKey("companyCode")).(string)
+	baseDir := fmt.Sprintf("../../../../tsv2-files/%s/%s", companyCode, folderName)
+	absPath, err := filepath.Abs(baseDir)
+	if err != nil {
+		return "", fiber.NewError(fiber.StatusInternalServerError,
+			"Error resolving storage path: "+err.Error())
+	}
+
+	// 4. Ensure directory exists
+	if err := os.MkdirAll(absPath, os.ModePerm); err != nil {
+		return "", fiber.NewError(fiber.StatusInternalServerError,
+			"Error creating directory: "+err.Error())
+	}
+
+	// 5. Save the file
+	dst := filepath.Join(absPath, fileName)
+	if err := ctx.SaveFile(fileHeader, dst); err != nil {
+		return "", fiber.NewError(fiber.StatusInternalServerError,
+			"Error saving file: "+err.Error())
+	}
+
+	// 6. Return the public path
+	publicPath := fmt.Sprintf("/%s/%s/%s", companyCode, folderName, fileName)
+	return publicPath, nil
+
 }

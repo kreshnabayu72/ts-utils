@@ -30,3 +30,15 @@ type UserTransactionRole struct {
 	CreatedAt                 time.Time                 `json:"createdAt"                 bson:"createdAt"`
 	UpdatedAt                 time.Time                 `json:"updatedAt"                 bson:"updatedAt"`
 }
+
+var ValidTransactionNames = []string{
+	"borrowingRole",
+	"disposalRole",
+	"transferRole",
+	"auditRole",
+	"maintenanceRole",
+	"repairRole",
+	"trackingRole",
+	"missingRole",
+	"damagedRole",
+}
