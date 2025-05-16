@@ -30,7 +30,7 @@ type BorrowingRequest struct {
 	Status           BorrowingStatus         `json:"status" bson:"status"`
 	AssetName        AssetNameEmbedAttr      `json:"assetName" bson:"assetName"`
 	AssetCategory    model.AttributeEmbedded `json:"assetCategory" bson:"assetCategory"`
-	AssetGroup       model.AttributeEmbedded `json:"assetGroup" bson:"assetGroup"`
+	Group            model.AttributeEmbedded `json:"group" bson:"group"`
 	AssetBrand       model.AttributeEmbedded `json:"assetBrand" bson:"assetBrand"`
 	AssetModel       model.AttributeEmbedded `json:"assetModel" bson:"assetModel"`
 

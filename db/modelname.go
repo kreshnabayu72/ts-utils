@@ -24,6 +24,8 @@ const (
 	DamageReportModelName                = "damage_reports"
 	DepreciationGroupModelName           = "depreciation_groups"
 	DivisionModelName                    = "divisions"
+	DisposalReportModelName              = "disposal_reports"
+	DisposalRequestModelName             = "disposal_requests"
 	DisposalTransactionModelName         = "disposal_transactions"
 	FileAttachmentModelName              = "file_attachments"
 	FileDamageModelName                  = "file_damages"
@@ -101,4 +103,5 @@ const (
 	ExpiredRequestModelName              = "expired_requests"
 	ExpiredRequestHistoryModelName       = "expired_request_histories"
 	RegisterTokenModelName               = "register_tokens"
+	LicenseTransactionModelName          = "license_transactions"
 )
