@@ -30,9 +30,10 @@ type AssignmentRequest struct {
 	Status           AssignmentStatus        `json:"status" bson:"status"`
 	AssetName        AssetNameEmbedAttr      `json:"assetName" bson:"assetName"`
 	AssetCategory    model.AttributeEmbedded `json:"assetCategory" bson:"assetCategory"`
-	AssetGroup       model.AttributeEmbedded `json:"assetGroup" bson:"assetGroup"`
-	AssetBrand       model.AttributeEmbedded `json:"assetBrand" bson:"assetBrand"`
-	AssetModel       model.AttributeEmbedded `json:"assetModel" bson:"assetModel"`
+	Group            model.AttributeEmbedded `json:"group" bson:"group"`
+
+	AssetBrand model.AttributeEmbedded `json:"assetBrand" bson:"assetBrand"`
+	AssetModel model.AttributeEmbedded `json:"assetModel" bson:"assetModel"`
 
 	Manager    model.UserEmbedded `json:"manager" bson:"manager"`
 	AssignedTo model.UserEmbedded `json:"assignedTo" bson:"assignedTo"`
