@@ -23,9 +23,9 @@ type FileStorage struct {
 type FileStorageAttribute string
 
 const (
-	PlanBFileStorageAttributeAttachment = PlanTypes("attachmentKB")
-	PlanBFileStorageAttributeDamaged    = PlanTypes("damagedKB")
-	PlanBFileStorageAttributeDisposal   = PlanTypes("disposalKB")
+	FileStorageAttributeAttachment = PlanTypes("attachmentKB")
+	FileStorageAttributeDamaged    = PlanTypes("damagedKB")
+	FileStorageAttributeDisposal   = PlanTypes("disposalKB")
 )
 
 type AuditAttrs struct {
