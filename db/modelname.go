@@ -64,6 +64,7 @@ const (
 	ReaderAuthModelName                  = "reader_auths"
 	RepairApprovalModelName              = "repair_approvals"
 	RepairModelName                      = "repairs"
+	ReportModelName                      = "reports"
 	RfIdTagModelName                     = "rfids"
 	RoleModelName                        = "roles"
 	RoutineApprovalModelName             = "routine_approvals"
