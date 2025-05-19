@@ -20,6 +20,14 @@ type FileStorage struct {
 	RoutineKB         float64 `json:"routineKB"         bson:"routineKB"`
 }
 
+type FileStorageAttribute string
+
+const (
+	FileStorageAttributeAttachment = PlanTypes("attachmentKB")
+	FileStorageAttributeDamaged    = PlanTypes("damagedKB")
+	FileStorageAttributeDisposal   = PlanTypes("disposalKB")
+)
+
 type AuditAttrs struct {
 	MaxGracePeriod int `json:"maxGracePeriod"            bson:"maxGracePeriod"`
 }
