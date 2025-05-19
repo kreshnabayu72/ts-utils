@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/middleware"
@@ -125,4 +126,29 @@ func SaveFileWithName(
 	publicPath := fmt.Sprintf("/%s/%s/%s", companyCode, folderName, fileName)
 	return publicPath, nil
 
+}
+
+func DeleteFile(filePath string) error {
+	currentDir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+	os.Remove(filepath.Join(currentDir, "..", "..", "..", "tsv2-files", filePath))
+
+	return nil
+}
+
+func DeleteSplittedFile(fileMediumPath string) error {
+	currentDir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	os.Remove(filepath.Join(currentDir, "..", "..", "..", "tsv2-files", fileMediumPath))
+	big := strings.ReplaceAll(fileMediumPath, "medium", "big")
+	os.Remove(filepath.Join(currentDir, "..", "..", "..", "tsv2-files", big))
+	small := strings.ReplaceAll(fileMediumPath, "medium", "small")
+	os.Remove(filepath.Join(currentDir, "..", "..", "..", "tsv2-files", small))
+
+	return nil
 }
