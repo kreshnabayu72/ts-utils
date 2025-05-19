@@ -11,6 +11,7 @@ const (
 	ReaderId           = ContextKey("readerId")
 	FixedAssetPlan     = ContextKey("fixedAssetPlan")
 	FileSize           = ContextKey("fileSize")
+	FileSizeString     = ContextKey("fileSizeString")
 	FileNameWithoutExt = ContextKey("fileNameWithoutExt")
 	FileExt            = ContextKey("fileExt")
 

@@ -3,14 +3,42 @@ package middleware
 import (
 	"fmt"
 	"image"
+	"mime"
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/disintegration/imaging"
 	"github.com/gofiber/fiber/v2"
 )
+
+func getFileType(headerValue string) (string, error) {
+	// mime.ParseMediaType will strip any parameters for you
+	mediaType, _, err := mime.ParseMediaType(headerValue)
+	if err != nil {
+		return "", err
+	}
+	parts := strings.Split(mediaType, "/")
+	if len(parts) != 2 {
+		return "", fmt.Errorf("invalid media type: %q", mediaType)
+	}
+	return strings.ToUpper(parts[1]), nil
+}
+
+// converts a size in bytes into a string like "24 MB", "400 KB", "1 GB", etc.
+func getFileSizeString(bytes uint64) string {
+	units := []string{"B", "KB", "MB", "GB", "TB", "PB", "EB"}
+	f := float64(bytes)
+	i := 0
+	for f >= 1024 && i < len(units)-1 {
+		f /= 1024
+		i++
+	}
+	// "%.0f" rounds to nearest integer; drop decimals entirely
+	return fmt.Sprintf("%.0f %s", f, units[i])
+}
 
 // uploadHandler handles image upload and resizing
 // splitImageMiddleware handles image uploads, resizes the images, and saves them to disk.
@@ -37,6 +65,17 @@ func SplitImageMiddleware(folderName string, attribute string) fiber.Handler {
 
 		fmt.Println("Uploaded file size:", fileHeader.Size)
 		fmt.Println("Uploaded file type:", fileHeader.Header.Get("Content-Type"))
+
+		if fileType, err := getFileType(fileHeader.Header.Get("Content-Type")); err == nil {
+			fmt.Println("Uploaded file type:", fileType) // prints "PNG"
+			ctx.Locals(FileExt, fileType)
+		} else {
+			// handle parse error
+			fmt.Println("Could not parse content type:", err)
+		}
+
+		ctx.Locals(FileSize, fileHeader.Size)
+		ctx.Locals(FileSizeString, getFileSizeString(uint64(fileHeader.Size)))
 
 		file, err := fileHeader.Open()
 		if err != nil {
@@ -95,8 +134,6 @@ func SplitImageMiddleware(folderName string, attribute string) fiber.Handler {
 		}
 
 		ctx.Locals(FileNameWithoutExt, fileNamePrefix)
-		ctx.Locals(FileExt, ".jpg")
-		ctx.Locals(FileSize, fileHeader.Size)
 
 		return ctx.Next()
 	}
