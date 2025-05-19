@@ -126,3 +126,13 @@ func SaveFileWithName(
 	return publicPath, nil
 
 }
+
+func DeleteFile(filePath string) error {
+	currentDir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+	os.Remove(filepath.Join(currentDir, "..", "..", "..", "tsv2-files", filePath))
+
+	return nil
+}
