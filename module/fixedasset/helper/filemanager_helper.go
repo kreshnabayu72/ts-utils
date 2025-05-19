@@ -22,7 +22,11 @@ type FileManagerHelper interface {
 	) *entity.HttpError
 }
 
-type SendFileManagerHelperImpl struct {
+func MakeFileManagerHelperImplHelperImpl() *FileManagerHelperImpl {
+	return &FileManagerHelperImpl{}
+}
+
+type FileManagerHelperImpl struct {
 	AccessToken          string
 	MobileFileManagerURI string
 }
