@@ -26,12 +26,9 @@ func MakeFileManagerHelperImplHelperImpl() *FileManagerHelperImpl {
 	return &FileManagerHelperImpl{}
 }
 
-type FileManagerHelperImpl struct {
-	AccessToken          string
-	MobileFileManagerURI string
-}
+type FileManagerHelperImpl struct{}
 
-func CreateFileManager(
+func (f *FileManagerHelperImpl) CreateFileManager(
 	serviceFactory utilprovider.ServiceProvider,
 	companyCode string,
 	collection string,
