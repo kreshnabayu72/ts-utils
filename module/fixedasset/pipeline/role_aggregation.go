@@ -374,7 +374,7 @@ func SystemRolePermissionAggregation(
 			"localField":   "loggedInUserId",
 			"foreignField": "user._id",
 			"let": bson.M{
-				"groupField": "$group._id",
+				"groupField": groupField,
 			},
 			"as": "userSystemRoles",
 			"pipeline": pipeline.NewPipelineBuilder().
