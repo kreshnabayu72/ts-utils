@@ -20,6 +20,10 @@ type FileCommon struct {
 	ModifiedBy model.UserEmbedded `bson:"modifiedBy"       json:"modifiedBy"`
 	DeletedAt  *time.Time         `bson:"deletedAt"        json:"deletedAt"`
 	Group      GroupAttribute     `bson:"group"            json:"group"`
-	CreatedAt  time.Time          `bson:"createdAt"        json:"createdAt"`
-	UpdatedAt  time.Time          `bson:"updatedAt"        json:"updatedAt"`
+
+	//for: attachment _id, report damage _id (so it can easily deleted when the relatedData is canceled/deleted)
+	RelatedDataId primitive.ObjectID `bson:"relatedDataId,omitempty"    json:"relatedDataId,omitempty"`
+
+	CreatedAt time.Time `bson:"createdAt"        json:"createdAt"`
+	UpdatedAt time.Time `bson:"updatedAt"        json:"updatedAt"`
 }
