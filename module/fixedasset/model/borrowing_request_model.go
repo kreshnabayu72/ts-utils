@@ -43,9 +43,9 @@ type BorrowingRequest struct {
 
 	Duration int `json:"duration" bson:"duration"`
 
-	IsActive         bool      `json:"isActive" bson:"isActive"`
-	DueReturnDate    time.Time `json:"dueReturnDate" bson:"dueReturnDate"`
-	ActualReturnDate time.Time `json:"actualReturnDate" bson:"actualReturnDate"`
-	CreatedAt        time.Time `json:"createdAt" bson:"createdAt"`
-	UpdatedAt        time.Time `json:"updatedAt" bson:"updatedAt"`
+	IsActive         bool       `json:"isActive" bson:"isActive"`
+	DueReturnDate    time.Time  `json:"dueReturnDate" bson:"dueReturnDate"`
+	ActualReturnDate *time.Time `json:"actualReturnDate" bson:"actualReturnDate"`
+	CreatedAt        time.Time  `json:"createdAt" bson:"createdAt"`
+	UpdatedAt        time.Time  `json:"updatedAt" bson:"updatedAt"`
 }

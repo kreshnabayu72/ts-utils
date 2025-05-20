@@ -36,8 +36,8 @@ type BorrowingTransaction struct {
 	ConfirmationEmail string `json:"confirmationEmail" bson:"confirmationEmail"`
 	TotalAssets       int    `json:"totalAssets" bson:"totalAssets"`
 
-	DueReturnDate    time.Time `json:"dueReturnDate" bson:"dueReturnDate"`
-	ActualReturnDate time.Time `json:"actualReturnDate" bson:"actualReturnDate"`
-	CreatedAt        time.Time `json:"createdAt" bson:"createdAt"`
-	UpdatedAt        time.Time `json:"updatedAt" bson:"updatedAt"`
+	DueReturnDate    time.Time  `json:"dueReturnDate" bson:"dueReturnDate"`
+	ActualReturnDate *time.Time `json:"actualReturnDate" bson:"actualReturnDate"`
+	CreatedAt        time.Time  `json:"createdAt" bson:"createdAt"`
+	UpdatedAt        time.Time  `json:"updatedAt" bson:"updatedAt"`
 }
