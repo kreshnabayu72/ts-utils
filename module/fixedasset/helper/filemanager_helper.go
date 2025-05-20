@@ -25,8 +25,8 @@ type FileManagerHelper interface {
 		serviceFactory utilprovider.ServiceProvider,
 		companyCode string,
 		collection string,
-		data model.FileCommon, // need to pass all to get totalkb etc
-		fileStorageAttribute model.FileStorageAttribute,
+		filter primitive.M,
+		fileStorageAttribute model.FileCommon,
 	) *entity.HttpError
 }
 
