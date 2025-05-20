@@ -68,7 +68,7 @@ message HasOngoingApprovalResponse {
 }
 
 message ResetApprovalRequest {
-  string approvalId = 1;
+  string approvalBatchId = 1;
 }
 
 message ResetApprovalResponse {
