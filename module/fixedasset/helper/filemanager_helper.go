@@ -26,7 +26,7 @@ type FileManagerHelper interface {
 		companyCode string,
 		collection string,
 		filter primitive.M,
-		fileStorageAttribute model.FileCommon,
+		fileStorageAttribute model.FileStorageAttribute,
 	) *entity.HttpError
 }
 
@@ -80,7 +80,7 @@ func (f *FileManagerHelperImpl) DeleteFileManager(
 	companyCode string,
 	collection string,
 	filter primitive.M,
-	fileStorageAttribute model.FileCommon,
+	fileStorageAttribute model.FileStorageAttribute,
 ) *entity.HttpError {
 	database := utildb.FixedAssetDBName.CompanyDBName(companyCode)
 
