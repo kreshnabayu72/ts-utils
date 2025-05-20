@@ -10,6 +10,7 @@ import (
 	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/model"
 	utilprovider "gitea.qwertysystem.net/BETS/ts-utils/provider"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type FileManagerHelper interface {
@@ -78,31 +79,36 @@ func (f *FileManagerHelperImpl) DeleteFileManager(
 	serviceFactory utilprovider.ServiceProvider,
 	companyCode string,
 	collection string,
-	data model.FileCommon, // need to pass all to get totalkb etc
-	fileStorageAttribute model.FileStorageAttribute,
+	filter primitive.M,
+	fileStorageAttribute model.FileCommon,
 ) *entity.HttpError {
+	database := utildb.FixedAssetDBName.CompanyDBName(companyCode)
+
+	fileService := serviceFactory.MakeService(database, collection)
+
+	var data model.FileCommon
+	err := fileService.FindOne(&data, context.Background(), filter)
+	if err != nil {
+		return entity.InternalServerError(err.Error())
+	}
+
+	_, err = fileService.DeleteOne(context.Background(), filter)
+	if err != nil {
+		return entity.InternalServerError(err.Error())
+	}
+
 	// ─────── Check & update storage ───────
 	adminDb := utildb.AdminDBName
 	clientService := serviceFactory.MakeService(adminDb, db.ClientModelName)
 
 	var client *model.Company
-	err := clientService.FindOne(&client, context.Background(), bson.M{"clientId": companyCode})
+	err = clientService.FindOne(&client, context.Background(), bson.M{"clientId": companyCode})
 	if err != nil {
 		return &entity.HttpError{}
 	}
 
 	_, err = clientService.UpdateOne(context.Background(), bson.M{"clientId": companyCode},
 		bson.M{"$inc": bson.M{"fileStorage.usedKB": -1 * data.FileSizeKb, "fileStorage.availableKB": data.FileSizeKb, fmt.Sprintf("fileStorage.%v", fileStorageAttribute): -1 * data.FileSizeKb}})
-	if err != nil {
-		return entity.InternalServerError(err.Error())
-	}
-
-	// ─────── Delete file ───────
-	db := utildb.FixedAssetDBName.CompanyDBName(companyCode)
-
-	fileService := serviceFactory.MakeService(db, collection)
-
-	_, err = fileService.DeleteOne(context.Background(), bson.M{"_id": data.ID})
 	if err != nil {
 		return entity.InternalServerError(err.Error())
 	}
