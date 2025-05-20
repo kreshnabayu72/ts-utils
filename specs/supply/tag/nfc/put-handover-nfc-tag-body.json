@@ -1,0 +1,4 @@
+{
+  "holderId": "string,objectId",
+  "nfcTag": "string[]"
+}

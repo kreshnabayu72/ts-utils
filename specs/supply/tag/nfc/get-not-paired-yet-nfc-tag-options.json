@@ -1,0 +1,18 @@
+{
+  "data": {
+    "nfcSkuOptions": [
+      {
+        "label": "string",
+        "value": "any"
+      }
+    ],
+    "statusOptions": [
+      {
+        "label": "string",
+        "value": "any"
+      }
+    ]
+  },
+  "message": "string",
+  "status": "number"
+}

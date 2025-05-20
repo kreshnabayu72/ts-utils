@@ -22,8 +22,13 @@
         "group": {
           "_id": "string,objectId",
           "name": "string",
+          "fullPath": "string",
           "key": "number"
         },
+        "isPaired": "boolean",
+        "rfidShortCode": "string,nullable",
+        "nfcShortCode": "string,nullable",
+        "qrShortCode": "string,nullable",
         "receptionDate": "string,Date",
         "productionDate": "string,Date,nullable",
         "expiredDate": "string,Date,nullable"

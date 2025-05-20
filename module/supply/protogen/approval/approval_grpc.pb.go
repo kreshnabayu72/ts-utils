@@ -22,6 +22,7 @@ type ApprovalClient interface {
 	CreateApproval(ctx context.Context, in *CreateApprovalRequest, opts ...grpc.CallOption) (*CreateApprovalResponse, error)
 	ActionApproval(ctx context.Context, in *ActionApprovalRequest, opts ...grpc.CallOption) (*ActionApprovalResponse, error)
 	DeleteApproval(ctx context.Context, in *DeleteApprovalRequest, opts ...grpc.CallOption) (*DeleteApprovalResponse, error)
+	ResetApproval(ctx context.Context, in *ResetApprovalRequest, opts ...grpc.CallOption) (*ResetApprovalResponse, error)
 }
 
 type approvalClient struct {
@@ -77,6 +78,15 @@ func (c *approvalClient) DeleteApproval(ctx context.Context, in *DeleteApprovalR
 	return out, nil
 }
 
+func (c *approvalClient) ResetApproval(ctx context.Context, in *ResetApprovalRequest, opts ...grpc.CallOption) (*ResetApprovalResponse, error) {
+	out := new(ResetApprovalResponse)
+	err := c.cc.Invoke(ctx, "/approval.Approval/ResetApproval", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ApprovalServer is the server API for Approval service.
 // All implementations must embed UnimplementedApprovalServer
 // for forward compatibility
@@ -86,6 +96,7 @@ type ApprovalServer interface {
 	CreateApproval(context.Context, *CreateApprovalRequest) (*CreateApprovalResponse, error)
 	ActionApproval(context.Context, *ActionApprovalRequest) (*ActionApprovalResponse, error)
 	DeleteApproval(context.Context, *DeleteApprovalRequest) (*DeleteApprovalResponse, error)
+	ResetApproval(context.Context, *ResetApprovalRequest) (*ResetApprovalResponse, error)
 	mustEmbedUnimplementedApprovalServer()
 }
 
@@ -107,6 +118,9 @@ func (UnimplementedApprovalServer) ActionApproval(context.Context, *ActionApprov
 }
 func (UnimplementedApprovalServer) DeleteApproval(context.Context, *DeleteApprovalRequest) (*DeleteApprovalResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteApproval not implemented")
+}
+func (UnimplementedApprovalServer) ResetApproval(context.Context, *ResetApprovalRequest) (*ResetApprovalResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ResetApproval not implemented")
 }
 func (UnimplementedApprovalServer) mustEmbedUnimplementedApprovalServer() {}
 
@@ -211,6 +225,24 @@ func _Approval_DeleteApproval_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Approval_ResetApproval_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResetApprovalRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApprovalServer).ResetApproval(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/approval.Approval/ResetApproval",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApprovalServer).ResetApproval(ctx, req.(*ResetApprovalRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Approval_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "approval.Approval",
 	HandlerType: (*ApprovalServer)(nil),
@@ -234,6 +266,10 @@ var _Approval_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteApproval",
 			Handler:    _Approval_DeleteApproval_Handler,
+		},
+		{
+			MethodName: "ResetApproval",
+			Handler:    _Approval_ResetApproval_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -573,6 +573,94 @@ func (x *HasOngoingApprovalResponse) GetHasOngoingApproval() bool {
 	return false
 }
 
+type ResetApprovalRequest struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	ApprovalBatchId string                 `protobuf:"bytes,1,opt,name=approvalBatchId,proto3" json:"approvalBatchId,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *ResetApprovalRequest) Reset() {
+	*x = ResetApprovalRequest{}
+	mi := &file_module_supply_proto_approval_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ResetApprovalRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ResetApprovalRequest) ProtoMessage() {}
+
+func (x *ResetApprovalRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_module_supply_proto_approval_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ResetApprovalRequest.ProtoReflect.Descriptor instead.
+func (*ResetApprovalRequest) Descriptor() ([]byte, []int) {
+	return file_module_supply_proto_approval_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *ResetApprovalRequest) GetApprovalBatchId() string {
+	if x != nil {
+		return x.ApprovalBatchId
+	}
+	return ""
+}
+
+type ResetApprovalResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Ok            bool                   `protobuf:"varint,1,opt,name=ok,proto3" json:"ok,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ResetApprovalResponse) Reset() {
+	*x = ResetApprovalResponse{}
+	mi := &file_module_supply_proto_approval_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ResetApprovalResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ResetApprovalResponse) ProtoMessage() {}
+
+func (x *ResetApprovalResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_module_supply_proto_approval_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ResetApprovalResponse.ProtoReflect.Descriptor instead.
+func (*ResetApprovalResponse) Descriptor() ([]byte, []int) {
+	return file_module_supply_proto_approval_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *ResetApprovalResponse) GetOk() bool {
+	if x != nil {
+		return x.Ok
+	}
+	return false
+}
+
 var File_module_supply_proto_approval_proto protoreflect.FileDescriptor
 
 const file_module_supply_proto_approval_proto_rawDesc = "" +
@@ -617,13 +705,18 @@ const file_module_supply_proto_approval_proto_rawDesc = "" +
 	"\vapprovalFor\x18\x02 \x01(\tR\vapprovalFor\x12\x1a\n" +
 	"\bobjectId\x18\x03 \x01(\tR\bobjectId\"L\n" +
 	"\x1aHasOngoingApprovalResponse\x12.\n" +
-	"\x12hasOngoingApproval\x18\x01 \x01(\bR\x12hasOngoingApproval2\xc0\x03\n" +
+	"\x12hasOngoingApproval\x18\x01 \x01(\bR\x12hasOngoingApproval\"@\n" +
+	"\x14ResetApprovalRequest\x12(\n" +
+	"\x0fapprovalBatchId\x18\x01 \x01(\tR\x0fapprovalBatchId\"'\n" +
+	"\x15ResetApprovalResponse\x12\x0e\n" +
+	"\x02ok\x18\x01 \x01(\bR\x02ok2\x94\x04\n" +
 	"\bApproval\x12L\n" +
 	"\vHasApproval\x12\x1c.approval.HasApprovalRequest\x1a\x1d.approval.HasApprovalResponse\"\x00\x12a\n" +
 	"\x12HasOngoingApproval\x12#.approval.HasOngoingApprovalRequest\x1a$.approval.HasOngoingApprovalResponse\"\x00\x12U\n" +
 	"\x0eCreateApproval\x12\x1f.approval.CreateApprovalRequest\x1a .approval.CreateApprovalResponse\"\x00\x12U\n" +
 	"\x0eActionApproval\x12\x1f.approval.ActionApprovalRequest\x1a .approval.ActionApprovalResponse\"\x00\x12U\n" +
-	"\x0eDeleteApproval\x12\x1f.approval.DeleteApprovalRequest\x1a .approval.DeleteApprovalResponse\"\x00B\vZ\t/approvalb\x06proto3"
+	"\x0eDeleteApproval\x12\x1f.approval.DeleteApprovalRequest\x1a .approval.DeleteApprovalResponse\"\x00\x12R\n" +
+	"\rResetApproval\x12\x1e.approval.ResetApprovalRequest\x1a\x1f.approval.ResetApprovalResponse\"\x00B\vZ\t/approvalb\x06proto3"
 
 var (
 	file_module_supply_proto_approval_proto_rawDescOnce sync.Once
@@ -637,7 +730,7 @@ func file_module_supply_proto_approval_proto_rawDescGZIP() []byte {
 	return file_module_supply_proto_approval_proto_rawDescData
 }
 
-var file_module_supply_proto_approval_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_module_supply_proto_approval_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_module_supply_proto_approval_proto_goTypes = []any{
 	(*HasApprovalRequest)(nil),         // 0: approval.HasApprovalRequest
 	(*HasApprovalResponse)(nil),        // 1: approval.HasApprovalResponse
@@ -649,23 +742,27 @@ var file_module_supply_proto_approval_proto_goTypes = []any{
 	(*DeleteApprovalResponse)(nil),     // 7: approval.DeleteApprovalResponse
 	(*HasOngoingApprovalRequest)(nil),  // 8: approval.HasOngoingApprovalRequest
 	(*HasOngoingApprovalResponse)(nil), // 9: approval.HasOngoingApprovalResponse
+	(*ResetApprovalRequest)(nil),       // 10: approval.ResetApprovalRequest
+	(*ResetApprovalResponse)(nil),      // 11: approval.ResetApprovalResponse
 }
 var file_module_supply_proto_approval_proto_depIdxs = []int32{
-	0, // 0: approval.Approval.HasApproval:input_type -> approval.HasApprovalRequest
-	8, // 1: approval.Approval.HasOngoingApproval:input_type -> approval.HasOngoingApprovalRequest
-	2, // 2: approval.Approval.CreateApproval:input_type -> approval.CreateApprovalRequest
-	4, // 3: approval.Approval.ActionApproval:input_type -> approval.ActionApprovalRequest
-	6, // 4: approval.Approval.DeleteApproval:input_type -> approval.DeleteApprovalRequest
-	1, // 5: approval.Approval.HasApproval:output_type -> approval.HasApprovalResponse
-	9, // 6: approval.Approval.HasOngoingApproval:output_type -> approval.HasOngoingApprovalResponse
-	3, // 7: approval.Approval.CreateApproval:output_type -> approval.CreateApprovalResponse
-	5, // 8: approval.Approval.ActionApproval:output_type -> approval.ActionApprovalResponse
-	7, // 9: approval.Approval.DeleteApproval:output_type -> approval.DeleteApprovalResponse
-	5, // [5:10] is the sub-list for method output_type
-	0, // [0:5] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	0,  // 0: approval.Approval.HasApproval:input_type -> approval.HasApprovalRequest
+	8,  // 1: approval.Approval.HasOngoingApproval:input_type -> approval.HasOngoingApprovalRequest
+	2,  // 2: approval.Approval.CreateApproval:input_type -> approval.CreateApprovalRequest
+	4,  // 3: approval.Approval.ActionApproval:input_type -> approval.ActionApprovalRequest
+	6,  // 4: approval.Approval.DeleteApproval:input_type -> approval.DeleteApprovalRequest
+	10, // 5: approval.Approval.ResetApproval:input_type -> approval.ResetApprovalRequest
+	1,  // 6: approval.Approval.HasApproval:output_type -> approval.HasApprovalResponse
+	9,  // 7: approval.Approval.HasOngoingApproval:output_type -> approval.HasOngoingApprovalResponse
+	3,  // 8: approval.Approval.CreateApproval:output_type -> approval.CreateApprovalResponse
+	5,  // 9: approval.Approval.ActionApproval:output_type -> approval.ActionApprovalResponse
+	7,  // 10: approval.Approval.DeleteApproval:output_type -> approval.DeleteApprovalResponse
+	11, // 11: approval.Approval.ResetApproval:output_type -> approval.ResetApprovalResponse
+	6,  // [6:12] is the sub-list for method output_type
+	0,  // [0:6] is the sub-list for method input_type
+	0,  // [0:0] is the sub-list for extension type_name
+	0,  // [0:0] is the sub-list for extension extendee
+	0,  // [0:0] is the sub-list for field type_name
 }
 
 func init() { file_module_supply_proto_approval_proto_init() }
@@ -679,7 +776,7 @@ func file_module_supply_proto_approval_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_module_supply_proto_approval_proto_rawDesc), len(file_module_supply_proto_approval_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   10,
+			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
