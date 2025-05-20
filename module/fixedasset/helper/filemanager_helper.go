@@ -20,6 +20,13 @@ type FileManagerHelper interface {
 		data model.FileCommon,
 		fileStorageAttribute model.FileStorageAttribute,
 	) *entity.HttpError
+	DeleteFileManager(
+		serviceFactory utilprovider.ServiceProvider,
+		companyCode string,
+		collection string,
+		data model.FileCommon, // need to pass all to get totalkb etc
+		fileStorageAttribute model.FileStorageAttribute,
+	) *entity.HttpError
 }
 
 func MakeFileManagerHelperImplHelperImpl() *FileManagerHelperImpl {
@@ -61,6 +68,41 @@ func (f *FileManagerHelperImpl) CreateFileManager(
 	fileService := serviceFactory.MakeService(db, collection)
 
 	_, err = fileService.InsertOne(context.Background(), data)
+	if err != nil {
+		return entity.InternalServerError(err.Error())
+	}
+
+	return nil
+}
+func (f *FileManagerHelperImpl) DeleteFileManager(
+	serviceFactory utilprovider.ServiceProvider,
+	companyCode string,
+	collection string,
+	data model.FileCommon, // need to pass all to get totalkb etc
+	fileStorageAttribute model.FileStorageAttribute,
+) *entity.HttpError {
+	// ─────── Check & update storage ───────
+	adminDb := utildb.AdminDBName
+	clientService := serviceFactory.MakeService(adminDb, db.ClientModelName)
+
+	var client *model.Company
+	err := clientService.FindOne(&client, context.Background(), bson.M{"clientId": companyCode})
+	if err != nil {
+		return &entity.HttpError{}
+	}
+
+	_, err = clientService.UpdateOne(context.Background(), bson.M{"clientId": companyCode},
+		bson.M{"$inc": bson.M{"fileStorage.usedKB": -1 * data.FileSizeKb, "fileStorage.availableKB": data.FileSizeKb, fmt.Sprintf("fileStorage.%v", fileStorageAttribute): -1 * data.FileSizeKb}})
+	if err != nil {
+		return entity.InternalServerError(err.Error())
+	}
+
+	// ─────── Delete file ───────
+	db := utildb.FixedAssetDBName.CompanyDBName(companyCode)
+
+	fileService := serviceFactory.MakeService(db, collection)
+
+	_, err = fileService.DeleteOne(context.Background(), bson.M{"_id": data.ID})
 	if err != nil {
 		return entity.InternalServerError(err.Error())
 	}
