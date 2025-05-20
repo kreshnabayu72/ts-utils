@@ -574,10 +574,10 @@ func (x *HasOngoingApprovalResponse) GetHasOngoingApproval() bool {
 }
 
 type ResetApprovalRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ApprovalId    string                 `protobuf:"bytes,1,opt,name=approvalId,proto3" json:"approvalId,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	ApprovalBatchId string                 `protobuf:"bytes,1,opt,name=approvalBatchId,proto3" json:"approvalBatchId,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *ResetApprovalRequest) Reset() {
@@ -610,9 +610,9 @@ func (*ResetApprovalRequest) Descriptor() ([]byte, []int) {
 	return file_module_supply_proto_approval_proto_rawDescGZIP(), []int{10}
 }
 
-func (x *ResetApprovalRequest) GetApprovalId() string {
+func (x *ResetApprovalRequest) GetApprovalBatchId() string {
 	if x != nil {
-		return x.ApprovalId
+		return x.ApprovalBatchId
 	}
 	return ""
 }
@@ -705,11 +705,9 @@ const file_module_supply_proto_approval_proto_rawDesc = "" +
 	"\vapprovalFor\x18\x02 \x01(\tR\vapprovalFor\x12\x1a\n" +
 	"\bobjectId\x18\x03 \x01(\tR\bobjectId\"L\n" +
 	"\x1aHasOngoingApprovalResponse\x12.\n" +
-	"\x12hasOngoingApproval\x18\x01 \x01(\bR\x12hasOngoingApproval\"6\n" +
-	"\x14ResetApprovalRequest\x12\x1e\n" +
-	"\n" +
-	"approvalId\x18\x01 \x01(\tR\n" +
-	"approvalId\"'\n" +
+	"\x12hasOngoingApproval\x18\x01 \x01(\bR\x12hasOngoingApproval\"@\n" +
+	"\x14ResetApprovalRequest\x12(\n" +
+	"\x0fapprovalBatchId\x18\x01 \x01(\tR\x0fapprovalBatchId\"'\n" +
 	"\x15ResetApprovalResponse\x12\x0e\n" +
 	"\x02ok\x18\x01 \x01(\bR\x02ok2\x94\x04\n" +
 	"\bApproval\x12L\n" +
