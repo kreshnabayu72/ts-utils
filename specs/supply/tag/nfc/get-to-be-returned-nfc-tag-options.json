@@ -1,0 +1,18 @@
+{
+  "data": {
+    "holderOptions": [
+      {
+        "label": "string",
+        "value": "any"
+      }
+    ],
+    "stockStatusOptions": [
+      {
+        "label": "string",
+        "value": "any"
+      }
+    ]
+  },
+  "message": "string",
+  "status": "number"
+}

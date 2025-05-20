@@ -1,0 +1,34 @@
+{
+  "data": {
+    "totalRecords": "number",
+    "data": [
+      {
+        "_id": "string,objectId",
+        "stock": {
+          "_id": "string,objectId",
+          "nameWithSequence": "string",
+          "sequence": "number",
+          "tagType": "string",
+          "key": "number"
+        },
+        "group": {
+          "_id": "string,objectId",
+          "name": "string",
+          "fullPath": "string",
+          "key": "number"
+        },
+        "productionDate": "string,Date",
+        "expiredDate": "string,Date,nullable",
+        "pic": {
+          "_id": "string,objectId",
+          "fullName": "string",
+          "profilePicture": "string,nullable",
+          "key": "number"
+        },
+        "finishedDate": "string,Date"
+      }
+    ]
+  },
+  "message": "string",
+  "status": "number"
+}

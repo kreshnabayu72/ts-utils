@@ -1,0 +1,13 @@
+{
+  "data": [
+    {
+      "stock": "string,objectId",
+      "rfidCode": "string,nullable",
+      "nfcCode": "string,nullable",
+      "qrCode": "string,nullable",
+      "rfidIsVerified": "boolean",
+      "nfcIsVerified": "boolean",
+      "qrIsVerified": "boolean"
+    }
+  ]
+}
