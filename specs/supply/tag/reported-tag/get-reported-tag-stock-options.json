@@ -1,0 +1,18 @@
+{
+  "data": {
+    "statusOptions": [
+      {
+        "label": "string",
+        "value": "any"
+      }
+    ],
+    "reportedByOptions": [
+      {
+        "label": "string",
+        "value": "any"
+      }
+    ]
+  },
+  "message": "string",
+  "status": "number"
+}

@@ -1,0 +1,10 @@
+{
+  "action": "string",
+  "tags": [
+    {
+      "rfid": "string,objectId,nullable",
+      "qr": "string,objectId,nullable",
+      "nfc": "string,objectId,nullable"
+    }
+  ]
+}
