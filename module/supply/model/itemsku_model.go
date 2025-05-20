@@ -43,6 +43,7 @@ type ItemSKU struct {
 	MinimumAndSafetyStockSettings   SafetyStockSettings `json:"minimumAndSafetyStockSettings"   bson:"minimumAndSafetyStockSettings"`
 	AllowMinimumAndSafetyStockUsage bool                `json:"allowMinimumAndSafetyStockUsage" bson:"allowMinimumAndSafetyStockUsage"`
 	TagType                         model.TagType       `json:"tagType"                         bson:"tagType"`
+	RequireBatchNumber              bool                `json:"requireBatchNumber"              bson:"requireBatchNumber"`
 	HasProductionDate               bool                `json:"hasProductionDate"               bson:"hasProductionDate"`
 	HasExpiredDate                  bool                `json:"hasExpiredDate"                  bson:"hasExpiredDate"`
 	HasBarcode                      bool                `json:"hasBarcode"                      bson:"hasBarcode"`
