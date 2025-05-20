@@ -77,21 +77,20 @@ func SaveFile(ctx *fiber.Ctx, folderName string, attribute string) (string, erro
 // ../../../../tsv2-files/{companyCode}/{folderName}/{fileName}.
 // If the provided fileName has no extension, the original file’s
 // extension is appended. If no file is uploaded under `attribute`,
-// it returns ("", nil).
 func SaveFileWithName(
 	ctx *fiber.Ctx,
 	folderName string,
 	attribute string,
 	fileName string,
-) (string, error) {
+) (string, string, string, int64, string, error) {
 	// 1. Try to get the uploaded file
 	fileHeader, err := ctx.FormFile(attribute)
 	if errors.Is(err, fasthttp.ErrMissingFile) {
 		// no file provided → nothing to do
-		return "", nil
+		return "", "", "", 0, "", nil
 	}
 	if err != nil {
-		return "", err
+		return "", "", "", 0, "", err
 	}
 
 	// 2. Ensure fileName has an extension
@@ -105,26 +104,31 @@ func SaveFileWithName(
 	baseDir := fmt.Sprintf("../../../../tsv2-files/%s/%s", companyCode, folderName)
 	absPath, err := filepath.Abs(baseDir)
 	if err != nil {
-		return "", fiber.NewError(fiber.StatusInternalServerError,
+		return "", "", "", 0, "", fiber.NewError(fiber.StatusInternalServerError,
 			"Error resolving storage path: "+err.Error())
 	}
 
 	// 4. Ensure directory exists
 	if err := os.MkdirAll(absPath, os.ModePerm); err != nil {
-		return "", fiber.NewError(fiber.StatusInternalServerError,
+		return "", "", "", 0, "", fiber.NewError(fiber.StatusInternalServerError,
 			"Error creating directory: "+err.Error())
 	}
 
 	// 5. Save the file
 	dst := filepath.Join(absPath, fileName)
 	if err := ctx.SaveFile(fileHeader, dst); err != nil {
-		return "", fiber.NewError(fiber.StatusInternalServerError,
+		return "", "", "", 0, "", fiber.NewError(fiber.StatusInternalServerError,
 			"Error saving file: "+err.Error())
+	}
+
+	var filetype string
+	if fileType, err := middleware.GetFileType(fileHeader.Header.Get("Content-Type")); err == nil {
+		filetype = fileType
 	}
 
 	// 6. Return the public path
 	publicPath := fmt.Sprintf("/%s/%s/%s", companyCode, folderName, fileName)
-	return publicPath, nil
+	return publicPath, fileName, filetype, fileHeader.Size, middleware.GetFileSizeString(uint64(fileHeader.Size)), nil
 
 }
 
