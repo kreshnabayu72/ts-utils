@@ -1,0 +1,44 @@
+{
+  "data": {
+    "totalRecords": "number",
+    "data": [
+      {
+        "_id": "string,objectId",
+        "itemName": {
+          "_id": "string,objectId",
+          "name": "string",
+          "key": "number"
+        },
+        "itemSKU": {
+          "_id": "string,objectId",
+          "sku": "string",
+          "skuAlias": "string,nullable",
+          "tagType": "string",
+          "image": "string,nullable",
+          "key": "number"
+        },
+        "brand": {
+          "_id": "string,objectId",
+          "name": "string",
+          "key": "number"
+        },
+        "model": {
+          "_id": "string,objectId",
+          "name": "string",
+          "key": "number"
+        },
+        "tagType": "string",
+        "totalStock": "number",
+        "pic": {
+          "_id": "string",
+          "fullName": "string",
+          "profilePicture": "string,nullable",
+          "key": "number"
+        },
+        "createdAt": "string,Date"
+      }
+    ]
+  },
+  "message": "string",
+  "status": "number"
+}

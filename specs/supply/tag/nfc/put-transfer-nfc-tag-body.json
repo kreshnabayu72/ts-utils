@@ -1,0 +1,4 @@
+{
+  "destinationGroupId": "string,objectId",
+  "nfcTag": "string[]"
+}

@@ -10,6 +10,7 @@ service Approval {
   rpc CreateApproval (CreateApprovalRequest) returns (CreateApprovalResponse) {}
   rpc ActionApproval (ActionApprovalRequest) returns (ActionApprovalResponse) {}
   rpc DeleteApproval (DeleteApprovalRequest) returns (DeleteApprovalResponse) {}
+  rpc ResetApproval (ResetApprovalRequest) returns (ResetApprovalResponse) {}
 }
 
 message HasApprovalRequest {
@@ -64,4 +65,12 @@ message HasOngoingApprovalRequest {
 
 message HasOngoingApprovalResponse {
   bool hasOngoingApproval = 1;
+}
+
+message ResetApprovalRequest {
+  string approvalId = 1;
+}
+
+message ResetApprovalResponse {
+  bool ok = 1;
 }

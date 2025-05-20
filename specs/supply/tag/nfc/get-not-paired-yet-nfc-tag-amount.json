@@ -1,0 +1,8 @@
+{
+  "data":  {
+    "totalAvailableTag": "number",
+    "totalUnavailableTag": "number"
+  },
+  "message": "string",
+  "status": "number"
+}

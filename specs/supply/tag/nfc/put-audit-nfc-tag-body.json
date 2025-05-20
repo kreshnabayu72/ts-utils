@@ -1,0 +1,29 @@
+{
+  "availableTag": [
+    {
+      "tag": "string",
+      "groupId": "string,objectId"
+    }
+  ],
+  "damagedMissingTag": [
+    {
+      "tag": "string",
+      "groupId": "string,objectId"
+    }
+  ],
+  "settingsPortalTag": [
+    {
+      "tag": "string",
+      "groupId": "string,objectId"
+    }
+  ],
+  "fixedAssetTag": [
+    {
+      "tag": "string",
+      "groupId": "string,objectId"
+    }
+  ],
+  "setNotFoundAsDamagedMissing": "boolean",
+  "moveSettingsPortalTag": "boolean",
+  "moveFixedAssetTag": "boolean"
+}
