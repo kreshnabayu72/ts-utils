@@ -14,7 +14,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func getFileType(headerValue string) (string, error) {
+func GetFileType(headerValue string) (string, error) {
 	// mime.ParseMediaType will strip any parameters for you
 	mediaType, _, err := mime.ParseMediaType(headerValue)
 	if err != nil {
@@ -28,7 +28,7 @@ func getFileType(headerValue string) (string, error) {
 }
 
 // converts a size in bytes into a string like "24 MB", "400 KB", "1 GB", etc.
-func getFileSizeString(bytes uint64) string {
+func GetFileSizeString(bytes uint64) string {
 	units := []string{"B", "KB", "MB", "GB", "TB", "PB", "EB"}
 	f := float64(bytes)
 	i := 0
@@ -66,7 +66,7 @@ func SplitImageMiddleware(folderName string, attribute string) fiber.Handler {
 		fmt.Println("Uploaded file size:", fileHeader.Size)
 		fmt.Println("Uploaded file type:", fileHeader.Header.Get("Content-Type"))
 
-		if fileType, err := getFileType(fileHeader.Header.Get("Content-Type")); err == nil {
+		if fileType, err := GetFileType(fileHeader.Header.Get("Content-Type")); err == nil {
 			fmt.Println("Uploaded file type:", fileType) // prints "PNG"
 			ctx.Locals(FileExt, fileType)
 		} else {
@@ -75,7 +75,7 @@ func SplitImageMiddleware(folderName string, attribute string) fiber.Handler {
 		}
 
 		ctx.Locals(FileSize, fileHeader.Size)
-		ctx.Locals(FileSizeString, getFileSizeString(uint64(fileHeader.Size)))
+		ctx.Locals(FileSizeString, GetFileSizeString(uint64(fileHeader.Size)))
 
 		file, err := fileHeader.Open()
 		if err != nil {
