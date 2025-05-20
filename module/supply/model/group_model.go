@@ -27,6 +27,8 @@ type Group struct {
 	FullPath              string              `json:"fullPath"              bson:"fullPath"`
 	AliasCode             *string             `json:"aliasCode"             bson:"aliasCode"`
 	Parent                *primitive.ObjectID `json:"parent"                bson:"parent"`
+	GroupType             string              `json:"groupType"             bson:"groupType"`
+	CanPlaceAllItems      *bool				  `json:"canPlaceAllItems"      bson:"canPlaceAllItems"`
 	AdministrativeGroup   primitive.ObjectID  `json:"administrativeGroup"   bson:"administrativeGroup"`
 	Level                 int                 `json:"level"                 bson:"level"`
 	Items                 []PlacedItem        `json:"items"                 bson:"items"`
