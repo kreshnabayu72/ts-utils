@@ -28,7 +28,7 @@ func (m *MockFileManagerHelper) DeleteFileManager(
 	companyCode string,
 	collection string,
 	filter primitive.M,
-	fileStorageAttribute model.FileCommon,
+	fileStorageAttribute model.FileStorageAttribute,
 ) *entity.HttpError {
 	args := m.Mock.Called(serviceFactory, companyCode, collection, filter, fileStorageAttribute)
 	return args.Get(0).(*entity.HttpError)
