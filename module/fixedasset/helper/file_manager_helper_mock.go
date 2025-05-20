@@ -5,6 +5,7 @@ import (
 	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/model"
 	utilprovider "gitea.qwertysystem.net/BETS/ts-utils/provider"
 	"github.com/stretchr/testify/mock"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type MockFileManagerHelper struct {
@@ -26,9 +27,9 @@ func (m *MockFileManagerHelper) DeleteFileManager(
 	serviceFactory utilprovider.ServiceProvider,
 	companyCode string,
 	collection string,
-	data model.FileCommon, // need to pass all to get totalkb etc
-	fileStorageAttribute model.FileStorageAttribute,
+	filter primitive.M,
+	fileStorageAttribute model.FileCommon,
 ) *entity.HttpError {
-	args := m.Mock.Called(serviceFactory, companyCode, collection, data, fileStorageAttribute)
+	args := m.Mock.Called(serviceFactory, companyCode, collection, filter, fileStorageAttribute)
 	return args.Get(0).(*entity.HttpError)
 }
