@@ -14,6 +14,7 @@ const (
 	AuditScheduleModelName               = "audit_schedule"
 	AuditScheduledAssetModelName         = "audit_scheduled_asset"
 	AuditTaskModelName                   = "audit_tasks"
+	BatchNumberModelName                 = "batch_numbers"
 	BrandModelName                       = "brands"
 	BorrowingApprovalModelName           = "borrowing_approvals"
 	BorrowingRequestModelName            = "borrowing_requests"
