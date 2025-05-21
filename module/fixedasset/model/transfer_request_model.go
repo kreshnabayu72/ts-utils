@@ -25,6 +25,7 @@ type TransferRequest struct {
 	AssetTagType     string                  `json:"assetTagType" bson:"assetTagType"`
 	AssetQr          string                  `json:"assetQr" bson:"assetQr"`
 	AssetRfid        string                  `json:"assetRfid" bson:"assetRfid"`
+	Notes            string                  `json:"notes" bson:"notes"`
 	HasChildren      bool                    `json:"hasChildren" bson:"hasChildren"`
 	CreatedAt        time.Time               `json:"createdAt" bson:"createdAt"`
 	UpdatedAt        time.Time               `json:"updatedAt" bson:"updatedAt"`
