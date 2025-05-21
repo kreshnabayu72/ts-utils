@@ -27,10 +27,12 @@ type Group struct {
 	FullPath              string              `json:"fullPath"              bson:"fullPath"`
 	AliasCode             *string             `json:"aliasCode"             bson:"aliasCode"`
 	Parent                *primitive.ObjectID `json:"parent"                bson:"parent"`
+	GroupType             string              `json:"groupType"             bson:"groupType"`
+	CanPlaceAllItems      *bool				  `json:"canPlaceAllItems"      bson:"canPlaceAllItems"`
 	AdministrativeGroup   primitive.ObjectID  `json:"administrativeGroup"   bson:"administrativeGroup"`
 	Level                 int                 `json:"level"                 bson:"level"`
 	Items                 []PlacedItem        `json:"items"                 bson:"items"`
-	TagType               model.TagType       `json:"tagType"               bson:"tagType"`
+	TagType               *model.TagType      `json:"tagType"               bson:"tagType"`
 	Tag                   model.Tag           `json:"tag"                   bson:"tag"`
 	IsAdministrativeGroup bool                `json:"isAdministrativeGroup" bson:"isAdministrativeGroup"`
 	IsDisposalGroup       bool                `json:"isDisposalGroup"       bson:"isDisposalGroup"`

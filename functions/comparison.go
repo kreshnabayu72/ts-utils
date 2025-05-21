@@ -21,6 +21,10 @@ import "reflect"
 // which can be difficult to do manually. It's especially helpful when dealing with nested structs
 // or dynamic types where the struct's fields may not be known at compile time.
 func IsZeroValue(v interface{}) bool {
+	if v == nil {
+		return true
+	}
+
 	return reflect.DeepEqual(v, reflect.Zero(reflect.TypeOf(v)).Interface())
 }
 
