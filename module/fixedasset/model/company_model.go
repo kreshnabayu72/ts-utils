@@ -60,8 +60,15 @@ const (
 	PlanEnterprise = PlanTypes("Enterprise")
 )
 
+type LicenseAmounts struct {
+	Total     int `json:"total" bson:"total"`
+	Managed   int `json:"managed" bson:"managed"`
+	Unmanaged int `json:"unmanaged" bson:"unmanaged"`
+	Available int `json:"available" bson:"available"`
+}
 type LicenseAttrs struct {
-	ConcurrentUser int `json:"concurrentUser" bson:"concurrentUser"`
+	ConcurrentUser int            `json:"concurrentUser" bson:"concurrentUser"`
+	FixedAsset     LicenseAmounts `json:"fixedAsset" bson:"fixedAsset"`
 }
 
 type Company struct {
