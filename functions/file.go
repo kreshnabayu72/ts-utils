@@ -101,7 +101,7 @@ func SaveFileWithName(
 
 	// 3. Build absolute path
 	companyCode := ctx.Locals(middleware.ContextKey("companyCode")).(string)
-	baseDir := fmt.Sprintf("../../../../tsv2-files/%s/%s", companyCode, folderName)
+	baseDir := fmt.Sprintf("../../tsv2-files/%s/%s", companyCode, folderName)
 	absPath, err := filepath.Abs(baseDir)
 	if err != nil {
 		return "", "", "", 0, "", fiber.NewError(fiber.StatusInternalServerError,

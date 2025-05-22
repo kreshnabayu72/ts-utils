@@ -3,11 +3,12 @@ package middleware
 import (
 	"errors"
 	"fmt"
-	"github.com/valyala/fasthttp"
 	"os"
 	"path/filepath"
 	"strconv"
 	"time"
+
+	"github.com/valyala/fasthttp"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -34,7 +35,7 @@ func MultiUploadMiddleware(folderName string, attributes []string) fiber.Handler
 			companyCode := ctx.Locals(ContextKey("companyCode")).(string)
 
 			absPath, _ := filepath.Abs(
-				fmt.Sprintf("../../../../tsv2-files/%s/%s", companyCode, folderName),
+				fmt.Sprintf("../../tsv2-files/%s/%s", companyCode, folderName),
 			)
 			// Save the resized image to disk
 			filename := fmt.Sprintf(
