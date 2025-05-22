@@ -41,6 +41,17 @@ const (
 	StockSourceInitialStock   StockSource = "Initial Stock"
 )
 
+// DefectSource defines possible sources for stock defect status.
+type DefectSource string
+
+const (
+	DefectSourceStockOpname    DefectSource = "Stock Opname"
+	DefectSourceTransfer       DefectSource = "Transfer"
+	DefectSourceInternalReturn DefectSource = "Internal Return"
+	DefectSourceTracking       DefectSource = "Tracking"
+	DefectSourceBatchNumber    DefectSource = "Batch Number"
+)
+
 // Stock represents the schema for single stock data
 type Stock struct {
 	ID                           primitive.ObjectID  `json:"_id,omitempty"                bson:"_id,omitempty"`
@@ -62,8 +73,9 @@ type Stock struct {
 	Sequence                     int                 `json:"sequence"                     bson:"sequence"`
 	Status                       []StockStatus       `json:"status"                       bson:"status"`
 	Source                       *StockSource        `json:"source"                       bson:"source"`
-	BatchNumber                  *string             `json:"batchNumber"                  bson:"batchNumber"`
+	BatchNumber                  *primitive.ObjectID `json:"batchNumber"                  bson:"batchNumber"`
 	ModifiedBy                   primitive.ObjectID  `json:"modifiedBy"                   bson:"modifiedBy"`
+	DefectSource                 *DefectSource       `json:"defectSource"                 bson:"defectSource"`
 	ReceptionDate                time.Time           `json:"receptionDate"                bson:"receptionDate"`
 	PlacementDate                *time.Time          `json:"placementDate"                bson:"placementDate"`
 	ProductionDate               *time.Time          `json:"productionDate"               bson:"productionDate"`
