@@ -5,8 +5,8 @@ import (
 	"fmt"
 )
 
-// PrintJS prints any Go object or array as a beautified JavaScript constant.
-func PrintJS(obj interface{}) {
+// FormattedLog prints any Go object or array as a beautified JavaScript constant.
+func FormattedLog(obj interface{}) {
 	// Marshal with indentation for readability
 	jsonBytes, err := json.MarshalIndent(obj, "", "  ")
 	if err != nil {
