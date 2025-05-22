@@ -56,7 +56,7 @@ const (
 	ReportAssetInfoMissing            ReportAssetInformationType = "Missing"
 )
 
-type ListedBy string // TODO(refan): current design is not needed, need confirmation
+type ListedBy string
 
 const (
 	ListedByGroup    ListedBy = "Group"
@@ -109,9 +109,9 @@ type Report struct {
 	Email            ReportEmail                `json:"email"            bson:"email"`
 	Frequency        Frequency                  `json:"frequency"        bson:"frequency"`
 	StartFrom        *time.Time                 `json:"startFrom"        bson:"startFrom"`
-	StartDate        *time.Time                 `json:"startDate"        bson:"startDate"`
-	EndDate          *time.Time                 `json:"endDate"          bson:"endDate"`
-	ListedBy         *ListedBy                  `json:"listedBy"         bson:"listedBy"`
+	StartDate        *time.Time                 `json:"startDate"        bson:"startDate"` // TODO(refan): current design is not needed, need confirmation
+	EndDate          *time.Time                 `json:"endDate"          bson:"endDate"`   // TODO(refan): current design is not needed, need confirmation
+	ListedBy         *ListedBy                  `json:"listedBy"         bson:"listedBy"`  // TODO(refan): current design is not needed, need confirmation
 	Filters          Filters                    `json:"filters"          bson:"filters"`
 	Content          []string                   `json:"content"          bson:"content"`
 	Columns          []string                   `json:"columns"          bson:"columns"`
