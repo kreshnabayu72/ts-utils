@@ -30,6 +30,7 @@ type AssetNameAttribute struct {
 	ID               primitive.ObjectID `bson:"_id,omitempty"    json:"_id,omitempty"`
 	Name             string             `bson:"name"             json:"name"`
 	NameWithSequence string             `bson:"nameWithSequence" json:"nameWithSequence"`
+	Sequence         int                `bson:"sequence"    json:"sequence"`
 	Key              int                `bson:"key,omitempty"    json:"key,omitempty"`
 }
 
