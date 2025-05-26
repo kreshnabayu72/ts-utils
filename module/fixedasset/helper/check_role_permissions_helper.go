@@ -40,19 +40,22 @@ func CheckSystemRolePermission(ctx *fiber.Ctx, permissionKey model.PermissionTyp
 	for i, resourceType := range resourceTypes {
 		resourceTypeStrs[i] = string(resourceType)
 
-		// Check for matching documents where the resource type is in the given array
-		count, err := coll.CountDocuments(ctx.Context(), bson.M{
+		filter := bson.M{
 			"user._id": userId,
 			fmt.Sprintf("managePermission.%s.%s", resourceType, permissionKeyStr): true,
 			"type":      resourceType,
 			"group.key": groupFilter,
 			"isActive":  true,
-		})
+		}
+
+		// Check for matching documents where the resource type is in the given array
+		count, err := coll.CountDocuments(ctx.Context(), filter)
 		if err != nil {
 			return entity.InternalServerError(err.Error())
 		}
 
 		if count < 1 {
+			fmt.Printf("FILTER: %v\n", filter)
 			return entity.Unauthorized("You do not have the required permissions")
 		}
 	}
