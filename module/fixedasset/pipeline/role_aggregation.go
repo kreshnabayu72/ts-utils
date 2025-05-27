@@ -601,7 +601,7 @@ func TransactionRoleMultiPermissionAggregation(
 					).
 					Match(
 						bson.M{
-							"manageType": bson.M{
+							"roleType": bson.M{
 								"$in": bson.A{fixedasset_model.TRTManager, fixedasset_model.TRTMonitoring},
 							},
 							"transactionGroupAttribute": bson.M{
