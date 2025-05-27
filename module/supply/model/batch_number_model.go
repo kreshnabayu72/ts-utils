@@ -24,6 +24,8 @@ type BatchNumber struct {
 	Status         BatchNumberStatus   `json:"status"            bson:"status"`
 	ProductionDate time.Time           `json:"productionDate"    bson:"productionDate"`
 	ExpiredDate    time.Time           `json:"expiredDate"       bson:"expiredDate"`
+	CreatedBy      primitive.ObjectID  `json:"createdBy"         bson:"createdBy"`
+	ModifiedBy     primitive.ObjectID  `json:"modifiedBy"        bson:"modifiedBy"`
 	CreatedAt      time.Time           `json:"createdAt"         bson:"createdAt"`
 	UpdatedAt      time.Time           `json:"updatedAt"         bson:"updatedAt"`
 }
