@@ -75,6 +75,7 @@ type Stock struct {
 	Source                       *StockSource        `json:"source"                       bson:"source"`
 	BatchNumber                  *primitive.ObjectID `json:"batchNumber"                  bson:"batchNumber"`
 	ModifiedBy                   primitive.ObjectID  `json:"modifiedBy"                   bson:"modifiedBy"`
+	OnHold                       bool                `json:"onHold"                       bson:"onHold"`
 	DefectSource                 *DefectSource       `json:"defectSource"                 bson:"defectSource"`
 	ReceptionDate                time.Time           `json:"receptionDate"                bson:"receptionDate"`
 	PlacementDate                *time.Time          `json:"placementDate"                bson:"placementDate"`
