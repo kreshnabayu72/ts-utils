@@ -28,4 +28,5 @@ type BatchNumber struct {
 	ModifiedBy     primitive.ObjectID  `json:"modifiedBy"        bson:"modifiedBy"`
 	CreatedAt      time.Time           `json:"createdAt"         bson:"createdAt"`
 	UpdatedAt      time.Time           `json:"updatedAt"         bson:"updatedAt"`
+	IsDeleted      bool                `json:"isDeleted"         bson:"isDeleted"`
 }
