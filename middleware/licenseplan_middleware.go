@@ -43,6 +43,7 @@ func GetLicensePlan() fiber.Handler {
 
 		//Save plan in context
 		ctx.Locals(FixedAssetPlan, companyData.Plan.FixedAsset)
+		ctx.Locals(SupplyPlan, companyData.Plan.SupplyAsset)
 
 		return ctx.Next()
 	}

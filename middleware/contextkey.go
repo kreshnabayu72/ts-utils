@@ -10,6 +10,7 @@ const (
 	Company            = ContextKey("company")
 	ReaderId           = ContextKey("readerId")
 	FixedAssetPlan     = ContextKey("fixedAssetPlan")
+	SupplyPlan         = ContextKey("supplyPlan")
 	FileSize           = ContextKey("fileSize")
 	FileSizeString     = ContextKey("fileSizeString")
 	FileNameWithoutExt = ContextKey("fileNameWithoutExt")
