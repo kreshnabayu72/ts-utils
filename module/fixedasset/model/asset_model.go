@@ -56,7 +56,7 @@ type Asset struct {
 	CustomFields       []CustomField               `bson:"customFields"                    json:"customFields"`
 	CreatedAt          time.Time                   `bson:"createdAt"                    json:"createdAt"`
 	UpdatedAt          time.Time                   `bson:"updatedAt"                    json:"updatedAt"`
-	IsDeleted		   bool						   `bson:"isDeleted"                    json:"isDeleted"`
+	IsDeleted          bool                        `bson:"isDeleted"                    json:"isDeleted"`
 }
 
 type AssetTag struct {
@@ -107,6 +107,7 @@ type AssetAddOn struct {
 	Maintenance     bool `bson:"maintenance"     json:"maintenance"`
 	Tracking        bool `bson:"tracking"        json:"tracking"`
 	Audit           bool `bson:"audit"           json:"audit"`
+	AssetControl    bool `bson:"assetControl"           json:"assetControl"`
 }
 
 type AssetPurchase struct {
