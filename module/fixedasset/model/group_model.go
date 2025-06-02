@@ -44,6 +44,7 @@ type Quota struct {
 	Maintenance     AddOnData `bson:"maintenance"     json:"maintenance"`
 	Audit           AddOnData `bson:"audit"           json:"audit"`
 	Tracking        AddOnData `bson:"tracking"        json:"tracking"`
+	AssetControl    AddOnData `bson:"assetControl"        json:"assetControl"`
 }
 
 // License represents the license information for various categories.
