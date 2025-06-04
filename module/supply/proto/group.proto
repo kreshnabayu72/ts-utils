@@ -22,5 +22,5 @@ message HasTransactionRequest {
 }
 
 message HasTransactionResponse {
-  string hasTransaction = 1;
+  bool hasTransaction = 1;
 }
