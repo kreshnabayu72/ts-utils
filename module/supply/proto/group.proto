@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package group;
+
+option go_package = "/group";
+
+service Group {
+  rpc UpdateHasStock (HasStockRequest) returns (HasStockResponse) {}
+  rpc UpdateHasTransaction (HasTransactionRequest) returns (HasTransactionResponse) {}
+}
+
+message HasStockRequest {
+  string groupId = 1;
+}
+
+message HasStockResponse {
+  bool hasStock = 1;
+}
+
+message HasTransactionRequest {
+  string groupId = 1;
+}
+
+message HasTransactionResponse {
+  string hasTransaction = 1;
+}

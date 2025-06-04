@@ -36,7 +36,8 @@ type Group struct {
 	Tag                   model.Tag           `json:"tag"                   bson:"tag"`
 	IsAdministrativeGroup bool                `json:"isAdministrativeGroup" bson:"isAdministrativeGroup"`
 	IsDisposalGroup       bool                `json:"isDisposalGroup"       bson:"isDisposalGroup"`
-	IsDeletable			  bool				  `json:"isDeletable"           bson:"isDeletable"`
+	HasStock			  bool				  `json:"hasStock"              bson:"hasStock"`
+	HasTransaction		  bool				  `json:"hasTransaction"        bson:"hasTransaction"`
 	Image                 *string             `json:"image"                 bson:"image"`
 	IsDeleted             bool                `json:"isDeleted"             bson:"isDeleted"`
 	CreatedAt             time.Time           `json:"createdAt"             bson:"createdAt"`
