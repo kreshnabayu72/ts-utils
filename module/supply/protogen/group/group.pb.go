@@ -155,7 +155,7 @@ func (x *HasTransactionRequest) GetGroupId() string {
 
 type HasTransactionResponse struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
-	HasTransaction string                 `protobuf:"bytes,1,opt,name=hasTransaction,proto3" json:"hasTransaction,omitempty"`
+	HasTransaction bool                   `protobuf:"varint,1,opt,name=hasTransaction,proto3" json:"hasTransaction,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -190,11 +190,11 @@ func (*HasTransactionResponse) Descriptor() ([]byte, []int) {
 	return file_module_supply_proto_group_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *HasTransactionResponse) GetHasTransaction() string {
+func (x *HasTransactionResponse) GetHasTransaction() bool {
 	if x != nil {
 		return x.HasTransaction
 	}
-	return ""
+	return false
 }
 
 var File_module_supply_proto_group_proto protoreflect.FileDescriptor
@@ -209,7 +209,7 @@ const file_module_supply_proto_group_proto_rawDesc = "" +
 	"\x15HasTransactionRequest\x12\x18\n" +
 	"\agroupId\x18\x01 \x01(\tR\agroupId\"@\n" +
 	"\x16HasTransactionResponse\x12&\n" +
-	"\x0ehasTransaction\x18\x01 \x01(\tR\x0ehasTransaction2\xa3\x01\n" +
+	"\x0ehasTransaction\x18\x01 \x01(\bR\x0ehasTransaction2\xa3\x01\n" +
 	"\x05Group\x12C\n" +
 	"\x0eUpdateHasStock\x12\x16.group.HasStockRequest\x1a\x17.group.HasStockResponse\"\x00\x12U\n" +
 	"\x14UpdateHasTransaction\x12\x1c.group.HasTransactionRequest\x1a\x1d.group.HasTransactionResponse\"\x00B\bZ\x06/groupb\x06proto3"
