@@ -26,7 +26,9 @@ type BatchNumber struct {
 	ExpiredDate    time.Time           `json:"expiredDate"       bson:"expiredDate"`
 	CreatedBy      primitive.ObjectID  `json:"createdBy"         bson:"createdBy"`
 	ModifiedBy     primitive.ObjectID  `json:"modifiedBy"        bson:"modifiedBy"`
+	Source         string              `json:"source"            bson:"source"`
 	CreatedAt      time.Time           `json:"createdAt"         bson:"createdAt"`
 	UpdatedAt      time.Time           `json:"updatedAt"         bson:"updatedAt"`
+	IsCompleted    bool                `json:"isCompleted"       bson:"isCompleted"`
 	IsDeleted      bool                `json:"isDeleted"         bson:"isDeleted"`
 }
