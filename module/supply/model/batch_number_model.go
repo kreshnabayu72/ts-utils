@@ -14,7 +14,6 @@ const (
 	BatchNumberStatusExpired     BatchNumberStatus = "Expired"
 	BatchNumberStatusDefect      BatchNumberStatus = "Defect"
 	BatchNumberStatusDisposed    BatchNumberStatus = "Disposed"
-	BatchNumberStatusUnderReview BatchNumberStatus = "Under Review"
 )
 
 type BatchNumber struct {
