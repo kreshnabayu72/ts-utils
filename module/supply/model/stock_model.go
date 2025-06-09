@@ -60,7 +60,7 @@ type Stock struct {
 	ItemSKU                      	primitive.ObjectID  `json:"itemSKU"                         bson:"itemSKU"`
 	Brand                        	primitive.ObjectID  `json:"brand"                           bson:"brand"`
 	Model                        	primitive.ObjectID  `json:"model"                           bson:"model"`
-	Category                     	primitive.ObjectID  `json:"category"                        bson:"category"`
+	Category                     	*primitive.ObjectID `json:"category"                        bson:"category"`
 	Supplier                     	*primitive.ObjectID `json:"supplier"                        bson:"supplier"`
 	OldPlacementAdministrativeGroup *primitive.ObjectID `json:"oldPlacementAdministrativeGroup" bson:"oldPlacementAdministrativeGroup"`
 	PlacementAdministrativeGroup 	*primitive.ObjectID `json:"placementAdministrativeGroup"    bson:"placementAdministrativeGroup"`
