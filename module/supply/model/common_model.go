@@ -42,3 +42,8 @@ type StockAttributeEmbedded struct {
 	TagType          model.TagType      `json:"tagType"          bson:"tagType"`
 	Key              int                `json:"key"              bson:"key"`
 }
+
+type BatchAttributeEmbedded struct {
+	ID          primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
+	BatchNumber string             `json:"batchNumber"   bson:"batchNumber"`
+}

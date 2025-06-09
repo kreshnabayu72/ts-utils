@@ -38,6 +38,7 @@ type ReceptionRequestHistory struct {
 	Model          AttributeEmbedded          `json:"model"          bson:"model"`
 	ReceivingGroup TreeAttributeEmbedded      `json:"receivingGroup" bson:"receivingGroup"`
 	PIC            UserAttributeEmbedded      `json:"pic"            bson:"pic"`
+	BatchNumber    BatchAttributeEmbedded     `json:"batchNumber"    bson:"batchNumber"`
 	Stocks         []StockAttributeEmbedded   `json:"stocks"         bson:"stocks"`
 	TagType        model.TagType              `json:"tagType"        bson:"tagType"`
 	Quantity       int                        `json:"quantity"       bson:"quantity"`
