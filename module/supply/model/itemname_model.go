@@ -11,7 +11,7 @@ type ItemName struct {
 	Name        string               `json:"name"          bson:"name"`
 	Key         int                  `json:"key"           bson:"key"`
 	Measurement primitive.ObjectID   `json:"measurement"   bson:"measurement"`
-	Category    primitive.ObjectID   `json:"category"      bson:"category"`
+	Category    *primitive.ObjectID  `json:"category"      bson:"category"`
 	Brand       []primitive.ObjectID `json:"brand"         bson:"brand"`
 	Model       []primitive.ObjectID `json:"model"         bson:"model"`
 	ModifiedBy  primitive.ObjectID   `json:"modifiedBy"    bson:"modifiedBy"`
