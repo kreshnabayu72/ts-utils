@@ -45,5 +45,5 @@ type StockAttributeEmbedded struct {
 
 type BatchAttributeEmbedded struct {
 	ID          primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
-	BatchNumber string             `json:"batchNumber" bson:"batchNumber"`
+	BatchNumber string             `json:"batchNumber"   bson:"batchNumber"`
 }
