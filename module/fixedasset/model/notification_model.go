@@ -34,6 +34,8 @@ const (
 	NotificationModuleAudit              = NotificationModule("Audit")
 	NotificationModuleMaintenanceRoutine = NotificationModule("Maintenance Routine")
 	NotificationModuleRepairTicketing    = NotificationModule("Repair Ticketing")
+	NotificationModuleDamage             = NotificationModule("Damage")
+	NotificationModuleMissing            = NotificationModule("Missing")
 	NotificationModuleTracking           = NotificationModule("Tracking")
 	NotificationModuleTAG                = NotificationModule("TAG")
 	NotificationModuleGeneralAsset       = NotificationModule("General Asset")
@@ -44,6 +46,7 @@ type Notification struct {
 	User       primitive.ObjectID     `json:"user" bson:"user"`
 	Title      string                 `json:"title"         bson:"title"`
 	Detail     string                 `json:"detail"        bson:"detail"`
+	Plan       string                 `json:"plan"        bson:"plan"`
 	IsRead     bool                   `json:"isRead"        bson:"isRead"`
 	IsReadOnly bool                   `json:"isReadOnly"    bson:"isReadOnly"`
 	IsManager  bool                   `json:"isManager"     bson:"isManager"`
