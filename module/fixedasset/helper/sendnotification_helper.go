@@ -289,6 +289,7 @@ func (r *SendNotificationHelperImpl) SendMobileNotification(data model.Notificat
 
 				d["data"] = inner
 				d["title"] = data.Title
+				d["app"] = data.App
 				d["detail"] = data.Detail
 				d["user"] = data.User
 				d["isReadOnly"] = data.IsReadOnly
