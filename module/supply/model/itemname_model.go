@@ -10,7 +10,7 @@ type ItemName struct {
 	ID          primitive.ObjectID   `json:"_id,omitempty" bson:"_id,omitempty"`
 	Name        string               `json:"name"          bson:"name"`
 	Key         int                  `json:"key"           bson:"key"`
-	Measurement primitive.ObjectID   `json:"measurement"   bson:"measurement"`
+	Measurement *primitive.ObjectID  `json:"measurement"   bson:"measurement"`
 	Category    *primitive.ObjectID  `json:"category"      bson:"category"`
 	Brand       []primitive.ObjectID `json:"brand"         bson:"brand"`
 	Model       []primitive.ObjectID `json:"model"         bson:"model"`
