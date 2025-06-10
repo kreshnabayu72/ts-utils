@@ -26,7 +26,7 @@ type DisposalReport struct {
 	AssetName        AssetNameEmbedAttr      `json:"assetName" bson:"assetName"`
 	AssetBrand       model.AttributeEmbedded `json:"assetBrand" bson:"assetBrand"`
 	AssetModel       model.AttributeEmbedded `json:"assetModel" bson:"assetModel"`
-	AssetGroup       model.AttributeEmbedded `json:"assetGroup" bson:"assetGroup"`
+	OriginGroup      model.AttributeEmbedded `json:"originGroup" bson:"originGroup"`
 	LastCondition    DisposalLastCondition   `json:"lastCondition" bson:"lastCondition"`
 
 	Notes  string `json:"notes" bson:"notes"`
