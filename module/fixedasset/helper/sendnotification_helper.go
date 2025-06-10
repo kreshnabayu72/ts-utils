@@ -207,6 +207,7 @@ func (r *SendNotificationHelperImpl) SendNotificationToUsers(
 			ID:         primitive.NewObjectID(),
 			Title:      notificationDataWithoutUser.Title,
 			Detail:     notificationDataWithoutUser.Detail,
+			App:        notificationDataWithoutUser.App,
 			User:       userId,
 			IsRead:     false,
 			IsReadOnly: notificationDataWithoutUser.IsReadOnly,
