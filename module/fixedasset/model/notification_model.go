@@ -41,6 +41,12 @@ const (
 	NotificationModuleGeneralAsset       = NotificationModule("General Asset")
 )
 
+type NotificationApp string
+
+const (
+	NotificationAppFixedAsset NotificationModule = "Fixed Asset"
+)
+
 type Notification struct {
 	ID         primitive.ObjectID     `json:"_id,omitempty" bson:"_id,omitempty"`
 	User       primitive.ObjectID     `json:"user" bson:"user"`
@@ -50,6 +56,7 @@ type Notification struct {
 	IsRead     bool                   `json:"isRead"        bson:"isRead"`
 	IsReadOnly bool                   `json:"isReadOnly"    bson:"isReadOnly"`
 	IsManager  bool                   `json:"isManager"     bson:"isManager"`
+	App        NotificationApp        `json:"app"        bson:"app"`
 	Module     NotificationModule     `json:"module"        bson:"module"`
 	Status     string                 `json:"status"        bson:"status"`
 	Severity   NotificationSeverity   `json:"severity"      bson:"severity"`
