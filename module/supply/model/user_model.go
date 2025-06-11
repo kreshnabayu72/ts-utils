@@ -35,6 +35,7 @@ type User struct {
 	IsTotalControl       bool               `json:"isTotalControl"       bson:"isTotalControl"`
 	IsReadOnly           bool               `json:"isReadOnly"           bson:"isReadOnly"`
 	IsDeleted            bool               `json:"isDeleted"            bson:"isDeleted"`
+	FCMToken             *string            `json:"fcmToken"    bson:"fcmToken"`
 	CreatedAt            time.Time          `json:"createdAt"            bson:"createdAt"`
 	UpdatedAt            time.Time          `json:"updatedAt"            bson:"updatedAt"`
 }

@@ -276,7 +276,7 @@ func (r *SendNotificationHelperImpl) SendMobileNotification(data model.Notificat
 	// build payload
 	payload := map[string]interface{}{
 		"message": map[string]interface{}{
-			"topic": data.User,
+			"topic": data.FCMToken,
 			"data": func() map[string]interface{} {
 				// copy original data and add title/module
 				// prepare the wrapper map
