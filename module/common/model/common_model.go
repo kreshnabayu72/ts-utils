@@ -45,3 +45,10 @@ type Tag struct {
 	NFCCode       *string `json:"nfcCode"       bson:"nfcCode"`
 	ShortNFCCode  *string `json:"shortNFCCode"  bson:"shortNFCCode"`
 }
+
+type AppModule string
+
+const (
+	FixedAssetModule  AppModule = "Fixed Asset"
+	SupplyAssetModule AppModule = "Supply Asset"
+)
