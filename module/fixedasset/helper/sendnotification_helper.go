@@ -290,6 +290,7 @@ func (r *SendNotificationHelperImpl) SendNotification(
 
 func (r *SendNotificationHelperImpl) SendMobileNotification(data model.Notification) *entity.HttpError {
 	httpClient := &http.Client{Timeout: 10 * time.Second}
+
 	// build payload
 	payload := map[string]interface{}{
 		"message": map[string]interface{}{
@@ -331,6 +332,7 @@ func (r *SendNotificationHelperImpl) SendMobileNotification(data model.Notificat
 			},
 		},
 	}
+	fmt.Printf("Mobile log %v\n", payload)
 
 	// marshal JSON
 	bodyBytes, err := json.Marshal(payload)
