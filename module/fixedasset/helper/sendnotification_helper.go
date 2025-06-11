@@ -297,11 +297,11 @@ func (r *SendNotificationHelperImpl) SendMobileNotification(data model.Notificat
 	ctx := context.Background()
 	app, err := firebase.NewApp(ctx, nil)
 	if err != nil {
-		log.Fatalf("error initializing app: %v\n", err)
+		fmt.Printf("error initializing app: %v\n", err)
 	}
 	client, err := app.Messaging(ctx)
 	if err != nil {
-		log.Fatalf("error getting Messaging client: %v\n", err)
+		fmt.Printf("error getting Messaging client: %v\n", err)
 	}
 
 	dataPayload := make(map[string]string)
