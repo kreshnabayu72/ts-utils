@@ -1,7 +1,6 @@
 package helper
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -11,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	firebase "firebase.google.com/go/v4"
+	"firebase.google.com/go/v4/messaging"
 	"gitea.qwertysystem.net/BETS/ts-utils/db"
 	util_db "gitea.qwertysystem.net/BETS/ts-utils/db"
 	"gitea.qwertysystem.net/BETS/ts-utils/entity"
@@ -293,81 +294,82 @@ func (r *SendNotificationHelperImpl) SendNotification(
 }
 
 func (r *SendNotificationHelperImpl) SendMobileNotification(data model.Notification, tokens []string) *entity.HttpError {
-	httpClient := &http.Client{Timeout: 10 * time.Second}
+	ctx := context.Background()
+	app, err := firebase.NewApp(ctx, nil)
+	if err != nil {
+		log.Fatalf("error initializing app: %v\n", err)
+	}
+	client, err := app.Messaging(ctx)
+	if err != nil {
+		log.Fatalf("error getting Messaging client: %v\n", err)
+	}
 
-	// build payload
-	payload := map[string]interface{}{
-		"message": map[string]interface{}{
-			"tokens": tokens,
-			"data": func() map[string]string {
-				// copy original data and add title/module
-				// prepare the wrapper map
-				d := make(map[string]string, 4)
+	dataPayload := make(map[string]string)
 
-				for k, v := range data.Data {
-					d[k] = fmt.Sprintf("%v", v)
-				}
+	// Serialisasi data.Data (map[string]interface{}) ke JSON string
+	if data.Data != nil {
+		jsonData, err := json.Marshal(data.Data)
+		if err == nil {
+			dataPayload["original_data"] = string(jsonData) // Kirim sebagai satu string JSON
+		}
+	}
 
-				d["title"] = data.Title
-				d["app"] = string(data.App)
-				d["detail"] = data.Detail
-				d["user"] = data.User.Hex()
-				d["isReadOnly"] = fmt.Sprintf("%v", data.IsReadOnly)
-				d["plan"] = data.Plan
-				d["module"] = string(data.Module)
-				d["status"] = data.Status
-				d["severity"] = string(data.Severity)
-				d["category"] = string(data.Category)
-				d["type"] = data.Type
-				return d
-			}(),
-			"notification": map[string]string{
-				"body":  data.Detail,
-				"title": data.Title,
-			},
-			"android": map[string]interface{}{
-				"priority": "HIGH",
-				"notification": map[string]string{
-					"click_action": "MOBILE_NOTIFICATION",
-				},
+	// Tambahkan field lain sebagai string
+	dataPayload["title"] = data.Title
+	dataPayload["detail"] = data.Detail
+	dataPayload["user"] = data.User.Hex()
+	dataPayload["isReadOnly"] = fmt.Sprintf("%v", data.IsReadOnly)
+	dataPayload["plan"] = data.Plan
+	dataPayload["module"] = string(data.Module)
+	dataPayload["status"] = string(data.Status)
+	dataPayload["severity"] = string(data.Severity)
+	dataPayload["category"] = string(data.Category)
+	dataPayload["type"] = data.Type
+
+	// --- 2. Bangun Pesan Multicast Menggunakan Struct SDK ---
+	// Ini cara yang lebih aman dan direkomendasikan daripada map[string]interface{}
+	message := &messaging.MulticastMessage{
+		Tokens: tokens, // Targetnya adalah daftar token, bukan satu topik
+		Data:   dataPayload,
+		Notification: &messaging.Notification{
+			Title: data.Title,
+			Body:  data.Detail,
+		},
+		Android: &messaging.AndroidConfig{
+			Priority: "high",
+			Notification: &messaging.AndroidNotification{
+				ClickAction: "MOBILE_NOTIFICATION",
 			},
 		},
+		// Jika perlu, tambahkan juga konfigurasi untuk APNS (iOS) dan Webpush
+		// APNS: &messaging.APNSConfig{ ... },
+		// Webpush: &messaging.WebpushConfig{ ... },
 	}
-	fmt.Printf("Mobile log %v\n", payload)
+	fmt.Printf("Mobile log %v\n", message)
 
-	// marshal JSON
-	bodyBytes, err := json.Marshal(payload)
+	// --- 3. Kirim Pesan dengan SendMulticast ---
+	br, err := client.SendEachForMulticast(context.Background(), message)
 	if err != nil {
-		log.Printf("failed to marshal notification body: %v", err)
-		return entity.InternalServerError(err.Error())
+		log.Printf("Gagal mengirim notifikasi multicast: %v\n", err)
+		return nil
 	}
 
-	// create request with context
-	req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, r.MobileNotificationURI, bytes.NewReader(bodyBytes))
-	if err != nil {
-		log.Printf("error creating HTTP request: %v", err)
-		return entity.InternalServerError(err.Error())
+	// --- 4. (SANGAT PENTING) Tangani Respons & Bersihkan Token Gagal ---
+	// Cek respons untuk setiap token yang dikirim.
+	log.Printf("Berhasil mengirim notifikasi ke: %d perangkat\n", br.SuccessCount)
+	log.Printf("Gagal mengirim notifikasi ke: %d perangkat\n", br.FailureCount)
+
+	if br.FailureCount > 0 {
+		var failedTokens []string
+		for idx, resp := range br.Responses {
+			if !resp.Success {
+				// Token gagal, catat atau langsung hapus dari database bos.
+				// Kode error 'messaging.IsRegistrationTokenNotRegistered' menandakan token sudah tidak valid.
+				log.Printf("Gagal kirim ke token %s: %v\n", tokens[idx], resp.Error)
+				failedTokens = append(failedTokens, tokens[idx])
+			}
+		}
+		log.Printf("Daftar token yang gagal: %v", failedTokens)
 	}
-	req.Header.Set("Authorization", "Bearer "+r.AccessToken)
-	req.Header.Set("Content-Type", "application/json")
-
-	// do the request
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		log.Printf("error sending notification: %v", err)
-		return entity.InternalServerError(err.Error())
-
-	}
-	defer resp.Body.Close()
-
-	// optional: decode and log response body
-	var respBody map[string]interface{}
-	if err := json.NewDecoder(resp.Body).Decode(&respBody); err != nil {
-		log.Printf("error decoding response: %v", err)
-		return entity.InternalServerError(err.Error())
-
-	}
-	log.Printf("notification response: %+v", respBody)
-
 	return nil
 }
