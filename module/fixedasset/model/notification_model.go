@@ -62,6 +62,7 @@ type Notification struct {
 	Severity   NotificationSeverity   `json:"severity"      bson:"severity"`
 	Category   NotificationCategory   `json:"category"      bson:"category"`
 	Type       string                 `json:"type"          bson:"type"`
+	FCMToken   string                 `json:"fcmToken"    bson:"fcmToken"`
 	Data       map[string]interface{} `json:"data"          bson:"data"`
 
 	CreatedAt time.Time `json:"createdAt" bson:"createdAt"`
