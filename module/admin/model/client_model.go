@@ -102,10 +102,11 @@ type Client struct {
 	CreatedAt                 time.Time           `json:"createdAt"                 bson:"createdAt"`
 	UpdatedAt                 time.Time           `json:"updatedAt"                 bson:"updatedAt"`
 
-	DateFormat DateFormat `json:"dateFormat" bson:"dateFormat"`
-	TimeFormat bool       `json:"timeFormat" bson:"timeFormat"`
-	TimeZone   string     `json:"timezone" bson:"timezone"`
-	Currency   Currency   `json:"currency" bson:"currency"`
+	DateFormat  DateFormat `json:"dateFormat" bson:"dateFormat"`
+	TimeFormat  bool       `json:"timeFormat" bson:"timeFormat"`
+	TimeZone    string     `json:"timezone" bson:"timezone"`
+	Currency    Currency   `json:"currency" bson:"currency"`
+	Geolocation bool       `json:"geolocation" bson:"geolocation"`
 }
 
 type DateFormat struct {
