@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"gitea.qwertysystem.net/BETS/ts-utils/db"
+	common_model "gitea.qwertysystem.net/BETS/ts-utils/module/common/model"
 	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/model"
 	"gitea.qwertysystem.net/BETS/ts-utils/response"
 	"gitea.qwertysystem.net/BETS/ts-utils/service"
@@ -28,22 +29,38 @@ func GetLicensePlan() fiber.Handler {
 
 		company := ctx.Locals(Company).(primitive.ObjectID)
 
-		//get the plan attribute
+		// get the plan attribute
 		companyService := service.MakeService(db.AdminDBName, db.ClientModelName)
 
 		var companyData *model.Company
 		err := companyService.FindOne(&companyData, ctx.Context(), bson.M{"_id": company})
 		if err != nil {
 			return response.SendResponse(ctx, fiber.StatusBadRequest, nil, "Invalid JWT")
-		} //Throw error if no plan
+		} // Throw error if no plan
 
 		if companyData.Plan == nil {
 			return response.SendResponse(ctx, fiber.StatusBadRequest, nil, "Invalid License Plan")
 		}
 
-		//Save plan in context
+		// Save plan in context
 		ctx.Locals(FixedAssetPlan, companyData.Plan.FixedAsset)
 		ctx.Locals(SupplyPlan, companyData.Plan.SupplyAsset)
+
+		return ctx.Next()
+	}
+}
+
+func ValidateLicensePlan(module common_model.AppModule) fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+		contextKey := map[common_model.AppModule]ContextKey{
+			common_model.FixedAssetModule:  FixedAssetPlan,
+			common_model.SupplyAssetModule: SupplyPlan,
+		}
+
+		_, ok := ctx.Locals(contextKey).(model.PlanTypes)
+		if !ok {
+			return response.SendResponse(ctx, fiber.StatusUnauthorized, nil, "Invalid License Plan")
+		}
 
 		return ctx.Next()
 	}
