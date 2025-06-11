@@ -47,7 +47,7 @@ type User struct {
 	TotalControl         *UserEmbeddedRole        `json:"totalControl"         bson:"totalControl"`
 	ReadOnly             *UserEmbeddedRole        `json:"readOnly"             bson:"readOnly"`
 	Access               []string                 `json:"access" bson:"access"`
-	FCMToken             *string                  `json:"fcmToken"    bson:"fcmToken"`
+	FCMToken             string                   `json:"fcmToken"    bson:"fcmToken"`
 	CreatedAt            time.Time                `json:"createdAt"            bson:"createdAt"`
 	UpdatedAt            time.Time                `json:"updatedAt"            bson:"updatedAt"`
 }

@@ -199,16 +199,33 @@ func (r *SendNotificationHelperImpl) SendNotificationToUsers(
 	if len(userIds) == 0 {
 		return nil
 	}
+	userService := serviceProvider.MakeService(
+		db.FixedAssetDBName.CompanyDBName(companyCode),
+		util_db.UserModelName,
+	)
+
+	var users []model.User
+	err := userService.Find(
+		&users,
+		context.Background(),
+		bson.M{
+			"_id": bson.M{"$in": userIds},
+		},
+	)
+	if err != nil {
+		return entity.InternalServerError(err.Error())
+	}
 
 	var pendingNotifications []model.Notification
 
-	for _, userId := range userIds {
+	for _, user := range users {
 		pendingNotifications = append(pendingNotifications, model.Notification{
 			ID:         primitive.NewObjectID(),
 			Title:      notificationDataWithoutUser.Title,
 			Detail:     notificationDataWithoutUser.Detail,
 			App:        notificationDataWithoutUser.App,
-			User:       userId,
+			User:       user.ID,
+			FCMToken:   user.FCMToken,
 			IsRead:     false,
 			IsReadOnly: notificationDataWithoutUser.IsReadOnly,
 			Module:     notificationDataWithoutUser.Module,
