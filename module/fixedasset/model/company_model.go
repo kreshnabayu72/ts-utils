@@ -60,6 +60,12 @@ const (
 	PlanEnterprise = PlanTypes("Enterprise")
 )
 
+var PlanEnum = map[string]PlanTypes{
+	"Basic":      PlanBasic,
+	"Standard":   PlanStandard,
+	"Enterprise": PlanEnterprise,
+}
+
 type LicenseAmounts struct {
 	Total     int `json:"total" bson:"total"`
 	Managed   int `json:"managed" bson:"managed"`
