@@ -299,28 +299,25 @@ func (r *SendNotificationHelperImpl) SendMobileNotification(data model.Notificat
 	payload := map[string]interface{}{
 		"message": map[string]interface{}{
 			"tokens": tokens,
-			"data": func() map[string]interface{} {
+			"data": func() map[string]string {
 				// copy original data and add title/module
 				// prepare the wrapper map
-				d := make(map[string]interface{}, 4)
+				d := make(map[string]string, 4)
 
-				// create a nested map for the original data.Data
-				inner := map[string]interface{}{}
 				for k, v := range data.Data {
-					inner[k] = v
+					d[k] = fmt.Sprintf("%v", v)
 				}
 
-				d["data"] = inner
 				d["title"] = data.Title
-				d["app"] = data.App
+				d["app"] = string(data.App)
 				d["detail"] = data.Detail
-				d["user"] = data.User
-				d["isReadOnly"] = data.IsReadOnly
+				d["user"] = data.User.Hex()
+				d["isReadOnly"] = fmt.Sprintf("%v", data.IsReadOnly)
 				d["plan"] = data.Plan
-				d["module"] = data.Module
+				d["module"] = string(data.Module)
 				d["status"] = data.Status
-				d["severity"] = data.Severity
-				d["category"] = data.Category
+				d["severity"] = string(data.Severity)
+				d["category"] = string(data.Category)
 				d["type"] = data.Type
 				return d
 			}(),
