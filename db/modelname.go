@@ -88,6 +88,7 @@ const (
 	UserAssignmentLogModelName           = "user_assignment_logs"
 	UserBorrowingLogModelName            = "user_borrowing_logs"
 	UserTokenModelName                   = "user_tokens"
+	ResetPasswordTokenModelName          = "reset_password_tokens"
 	UserTransactionRoleModelName         = "user_transaction_roles"
 	SupplierModelName                    = "suppliers"
 	SupplierActivityModelName            = "supplier_activities"
