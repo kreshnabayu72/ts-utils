@@ -217,6 +217,7 @@ func (r *SendNotificationHelperImpl) SendNotificationToUsers(
 	}
 
 	var pendingNotifications []model.Notification
+	var fcmTokens []string
 
 	for _, user := range users {
 		pendingNotifications = append(pendingNotifications, model.Notification{
@@ -237,6 +238,14 @@ func (r *SendNotificationHelperImpl) SendNotificationToUsers(
 			CreatedAt:  time.Now(),
 			UpdatedAt:  time.Now(),
 		})
+
+		fcmTokens = append(fcmTokens, user.FCMToken)
+	}
+
+	mobileNotifErr := r.SendMobileNotification(notificationDataWithoutUser, fcmTokens)
+
+	if mobileNotifErr != nil {
+		fmt.Println("MOBILE NOTIFICATION ERROR: " + mobileNotifErr.Error())
 	}
 
 	return r.SendNotification(serviceProvider, companyCode, pendingNotifications)
@@ -273,11 +282,6 @@ func (r *SendNotificationHelperImpl) SendNotification(
 			fmt.Println("NOTIFICATION ERROR: " + err.Error())
 		}
 
-		mobileNotifErr := r.SendMobileNotification(pendingNotification)
-
-		if mobileNotifErr != nil {
-			fmt.Println("MOBILE NOTIFICATION ERROR: " + mobileNotifErr.Error())
-		}
 	}
 
 	_, err := notificationService.InsertMany(context.Background(), notificationsInterface)
@@ -288,13 +292,13 @@ func (r *SendNotificationHelperImpl) SendNotification(
 	return nil
 }
 
-func (r *SendNotificationHelperImpl) SendMobileNotification(data model.Notification) *entity.HttpError {
+func (r *SendNotificationHelperImpl) SendMobileNotification(data model.Notification, tokens []string) *entity.HttpError {
 	httpClient := &http.Client{Timeout: 10 * time.Second}
 
 	// build payload
 	payload := map[string]interface{}{
 		"message": map[string]interface{}{
-			"tokens": data.FCMToken,
+			"tokens": tokens,
 			"data": func() map[string]interface{} {
 				// copy original data and add title/module
 				// prepare the wrapper map
