@@ -57,7 +57,7 @@ func ValidateLicensePlan(module common_model.AppModule) fiber.Handler {
 			common_model.SupplyAssetModule: SupplyPlan,
 		}
 
-		_, ok := ctx.Locals(contextKey).(model.PlanTypes)
+		_, ok := ctx.Locals(contextKey[module]).(model.PlanTypes)
 		if !ok {
 			return response.SendResponse(ctx, fiber.StatusUnauthorized, nil, "Invalid License Plan")
 		}
