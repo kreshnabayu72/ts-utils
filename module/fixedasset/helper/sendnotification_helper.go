@@ -295,7 +295,10 @@ func (r *SendNotificationHelperImpl) SendNotification(
 }
 
 func (r *SendNotificationHelperImpl) SendMobileNotification(data model.Notification, tokens []string) *entity.HttpError {
-	//TODO: Move to env
+	// ─────── credentials ───────
+	// cred := os.Getenv("MOBILE_CREDENTIAL_JSON")
+	// opt := option.WithCredentialsJSON([]byte(cred))
+
 	sdk := bson.M{
 		"type":                        "service_account",
 		"project_id":                  "tag-samurai",
@@ -309,21 +312,18 @@ func (r *SendNotificationHelperImpl) SendMobileNotification(data model.Notificat
 		"client_x509_cert_url":        "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-53b72%40tag-samurai.iam.gserviceaccount.com",
 		"universe_domain":             "googleapis.com",
 	}
+	credBytes, err := json.Marshal(sdk)
+	if err != nil {
+		fmt.Printf("error marshalling cred: %v\n", err)
+	}
+	opt := option.WithCredentialsJSON(credBytes)
 
+	// ─────── init firebase app ───────
 	ctx := context.Background()
 
 	config := &firebase.Config{
 		ProjectID: "tag-samurai", // <-- explicitly set your Firebase project ID
 	}
-
-	// 2. Convert bson.M to []byte JSON
-	credBytes, err := json.Marshal(sdk)
-	if err != nil {
-		fmt.Printf("error marshalling cred: %v\n", err)
-	}
-
-	// 3. Use WithCredentialsJSON
-	opt := option.WithCredentialsJSON(credBytes)
 
 	app, err := firebase.NewApp(ctx, config, opt)
 	if err != nil {
@@ -336,15 +336,12 @@ func (r *SendNotificationHelperImpl) SendMobileNotification(data model.Notificat
 
 	dataPayload := make(map[string]string)
 
-	// Serialisasi data.Data (map[string]interface{}) ke JSON string
-	if data.Data != nil {
-		jsonData, err := json.Marshal(data.Data)
-		if err == nil {
-			dataPayload["original_data"] = string(jsonData) // Kirim sebagai satu string JSON
-		}
+	for k, v := range data.Data {
+		dataPayload[k] = v.(string)
 	}
 
 	// Tambahkan field lain sebagai string
+	dataPayload["_id"] = data.ID.Hex()
 	dataPayload["title"] = data.Title
 	dataPayload["detail"] = data.Detail
 	dataPayload["user"] = data.User.Hex()
@@ -371,11 +368,7 @@ func (r *SendNotificationHelperImpl) SendMobileNotification(data model.Notificat
 				ClickAction: "MOBILE_NOTIFICATION",
 			},
 		},
-		// Jika perlu, tambahkan juga konfigurasi untuk APNS (iOS) dan Webpush
-		// APNS: &messaging.APNSConfig{ ... },
-		// Webpush: &messaging.WebpushConfig{ ... },
 	}
-	fmt.Printf("Mobile log %v\n", message)
 
 	// --- 3. Kirim Pesan dengan SendMulticast ---
 	br, err := client.SendEachForMulticast(context.Background(), message)
