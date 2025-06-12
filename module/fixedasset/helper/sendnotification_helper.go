@@ -295,35 +295,14 @@ func (r *SendNotificationHelperImpl) SendNotification(
 }
 
 func (r *SendNotificationHelperImpl) SendMobileNotification(data model.Notification, tokens []string) *entity.HttpError {
-	//TODO: Move to env
-	sdk := bson.M{
-		"type":                        "service_account",
-		"project_id":                  "tag-samurai",
-		"private_key_id":              "d19ee481e128dff14adee2ee60199cdcec5da6f9",
-		"private_key":                 "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQCprSiwaneeldw2\nnmlJhxeEpkpn+R6xGJQu7PZkPOGYTbA+kddSpCLFHY55YFYqwpbFgRlxwzJNyQ5S\nNTdkjcSXpOe6zRPgEDTV+XSm1YLdG/OCwCQjrlP5d/bH9T4IolgZOwTQteuTNTGs\nkWpfyz3ldhUd77QonbCGNFSDmjQlE1vTbUd9alg2ILRIe0Vp9KHZ4p3YrNvb112B\n0xKRYbwOhntagVOkx9BwU8N8AYdst7reKdY69dZuxs+cv/5X+gnnQBiAyZk9kbKS\nTg6CIRIDC142mlujlL8SgcCxTJuEDlQF4yvf411ybUt11ieY1C0y5isQfHiPUUIA\nXtj5osxVAgMBAAECggEAKziWosmcCuN1otwbScWFsh6B2ZZVwRrXtFRcNxBjDt7L\nRET2KnDxAnES98wYZvAGY+0MxDPKvpG2ei5gG9cY+t/gv26531uBeff/RPgiS5xx\nHR9AlW40qdlrHWhVEvH3qwWjpl6Q0YC9VI3+IMSu0aKQon2K0MXKT4VI+fTvz3mB\n+CESD16h7Gwc97LTYquOw2b7ZqFpVzC3r8tp+1AlAtCGeKdjvETNwcfX8Frdn8Iw\n/IVSPj1JNsYCqXBKjWFOqqLWMjDAOJXVD8YZUHtaqdVCK5haY8pVK0HFWsE1uOW1\nFwR9nLC6GIfL6u0i+xZRPH0igcmNqR1sECKDvF90iQKBgQC4tUvkc/06zPR6X02m\nI0drm2Czf1bDHr+qE1R6PkVhBXO8xY5aPLFmplyUiJ5dD9TgCUKZV+IFq/3s9MjB\n7/cclPEtj2tTwkEqGGSa3TkHFPMV8DTJ2au+WRsA2Msx7xXQjaZuExd2s6U/3aZy\nBMnw/6O3XaLjFQQ0JrrMkjM7pwKBgQDrKpjXqrz9WEXv0NRjK9N/EerqifdMCjIA\nhwNtzifaDfzLwHDeDfDnX1VIR+aV4ZjGq7WKjKhLvtcYF1fwCzUCi7rFNA9xp//g\nkM3soJJdWh1fmf6M2UO9YT4CunDIOhrs1vOlVo9BWtx25YzDOQ3B2K+uobRj2Aqq\ns6mxk9PHowKBgQCGvbpfLT3NZzXxDxTV3WZ8WRxx1LK2I/gtWWyGwGZcIF4NlxAB\nQ8Ul3LYspHzh5mqkBB1RP4riGFVkRi0tTKA3eW92jOj+cPaYfrLlRfwT7nRlzJS1\nqtReRyIru/p+sqp3ON3v7n1vWh1yOX7yLgwiglorqWLpxKsMYDRkh0JYgQKBgQDg\naYnpZNlsuewjahkDejMds6+FmZsQSTpmHnE7O9vzzh1LIp2SiaM2aFct3s9AgEQW\nco2PZaLEhZ0lNEGKpGc1wrm8rm1+fF9FoWmhQanqw6/8JywupLZr5nwShnBR4oEH\nOijPwsZ6C4cPPwcQ1UU3ktwzvcQy81tagpCREQysGQKBgQCokjPV+yPbqh53aD5P\nGqHfkdnc+mADOI3H5w6t6B0HQ/rAbABAqiPXyCwAQFtRWQj5Skfk+cegNQ3WqmYR\nfcgtlMgrQkZCk4hmVxGFP/oJXhhTqi5gfXpHxLcBY3oi4hzQ9Q8aImjq6H/KzvvQ\njGiufBx0zcUBqihIEsPHgfgDZQ==\n-----END PRIVATE KEY-----\n",
-		"client_email":                "firebase-adminsdk-53b72@tag-samurai.iam.gserviceaccount.com",
-		"client_id":                   "103240756892132408402",
-		"auth_uri":                    "https://accounts.google.com/o/oauth2/auth",
-		"token_uri":                   "https://oauth2.googleapis.com/token",
-		"auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-		"client_x509_cert_url":        "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-53b72%40tag-samurai.iam.gserviceaccount.com",
-		"universe_domain":             "googleapis.com",
-	}
+	cred := os.Getenv("MOBILE_CREDENTIAL_JSON")
+	opt := option.WithCredentialsJSON([]byte(cred))
 
 	ctx := context.Background()
 
 	config := &firebase.Config{
 		ProjectID: "tag-samurai", // <-- explicitly set your Firebase project ID
 	}
-
-	// 2. Convert bson.M to []byte JSON
-	credBytes, err := json.Marshal(sdk)
-	if err != nil {
-		fmt.Printf("error marshalling cred: %v\n", err)
-	}
-
-	// 3. Use WithCredentialsJSON
-	opt := option.WithCredentialsJSON(credBytes)
 
 	app, err := firebase.NewApp(ctx, config, opt)
 	if err != nil {
