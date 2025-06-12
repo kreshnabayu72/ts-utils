@@ -295,7 +295,11 @@ func (r *SendNotificationHelperImpl) SendNotification(
 
 func (r *SendNotificationHelperImpl) SendMobileNotification(data model.Notification, tokens []string) *entity.HttpError {
 	ctx := context.Background()
-	app, err := firebase.NewApp(ctx, nil)
+
+	config := &firebase.Config{
+		ProjectID: "tag-samurai", // <-- explicitly set your Firebase project ID
+	}
+	app, err := firebase.NewApp(ctx, config)
 	if err != nil {
 		fmt.Printf("error initializing app: %v\n", err)
 	}
