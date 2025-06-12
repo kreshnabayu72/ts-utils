@@ -184,6 +184,16 @@ func (pb *PipelineBuilder) Sort(field bson.M) *PipelineBuilder {
 	return pb
 }
 
+// Sort multiple attributes (has different input than sort (bson.D) since bson.M cant handle sort)
+func (pb *PipelineBuilder) SortMultiAttribute(field bson.D) *PipelineBuilder {
+	if field != nil {
+		pb.Pipelines = append(pb.Pipelines, bson.D{
+			{Key: "$sort", Value: field},
+		})
+	}
+	return pb
+}
+
 // Facet adds a $facet stage to the pipeline
 func (pb *PipelineBuilder) Facet(facets bson.M) *PipelineBuilder {
 
