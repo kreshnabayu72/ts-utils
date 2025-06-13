@@ -240,7 +240,9 @@ func (r *SendNotificationHelperImpl) SendNotificationToUsers(
 			UpdatedAt:  time.Now(),
 		})
 
-		fcmTokens = append(fcmTokens, user.FCMToken)
+		if user.FCMToken != "" {
+			fcmTokens = append(fcmTokens, user.FCMToken)
+		}
 	}
 
 	mobileNotifErr := r.SendMobileNotification(notificationDataWithoutUser, fcmTokens)
