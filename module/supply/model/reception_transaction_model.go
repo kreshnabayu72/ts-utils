@@ -25,7 +25,7 @@ type ReceptionTransaction struct {
 	Supplier       primitive.ObjectID         `json:"supplier"       bson:"supplier"`
 	Status         ReceptionTransactionStatus `json:"status"         bson:"status"`
 	ReceivingGroup primitive.ObjectID         `json:"receivingGroup" bson:"receivingGroup"`
-	Document       string                    `json:"document"       bson:"document"`
+	Document       string                     `json:"document"       bson:"document"`
 	Note           *string                    `json:"note"           bson:"note"`
 	Photo          *string                    `json:"photo"          bson:"photo"`
 	PIC            primitive.ObjectID         `json:"pic"            bson:"pic"`
