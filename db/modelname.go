@@ -108,4 +108,9 @@ const (
 	ExpiredRequestHistoryModelName       = "expired_request_histories"
 	RegisterTokenModelName               = "register_tokens"
 	LicenseTransactionModelName          = "license_transactions"
+	SupplierReturnTransactionModelName           = "supplier_return_transactions"
+	SupplierReturnRequestModelName               = "supplier_return_requests"
+	SupplierReturnTransactionHistoryModelName    = "supplier_return_transaction_histories"
+	SupplierReturnRequestHistoryModelName        = "supplier_return_request_histories"
+	SupplierReturnCompletionModelName            = "supplier_return_completion_transactions"
 )
