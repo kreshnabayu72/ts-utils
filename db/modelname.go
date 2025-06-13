@@ -113,4 +113,6 @@ const (
 	SupplierReturnTransactionHistoryModelName    = "supplier_return_transaction_histories"
 	SupplierReturnRequestHistoryModelName        = "supplier_return_request_histories"
 	SupplierReturnCompletionModelName            = "supplier_return_completion_transactions"
+	SupplierReturnPreListItemModelName           = "supplier_return_prelist_items"
+	SupplierReturnPreListModelName               = "supplier_return_prelists"
 )
