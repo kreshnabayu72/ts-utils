@@ -44,7 +44,7 @@ type ReceptionTransactionHistory struct {
 	Supplier       AttributeEmbedded          `json:"supplier"       bson:"supplier"`
 	Status         ReceptionTransactionStatus `json:"status"         bson:"status"`
 	ReceivingGroup TreeAttributeEmbedded      `json:"receivingGroup" bson:"receivingGroup"`
-	Document       *string                     `json:"document"       bson:"document"`
+	Document       *string                     `json:"document"      bson:"document"`
 	Note           *string                    `json:"note"           bson:"note"`
 	Photo          *string                    `json:"photo"          bson:"photo"`
 	PIC            UserAttributeEmbedded      `json:"pic"            bson:"pic"`
