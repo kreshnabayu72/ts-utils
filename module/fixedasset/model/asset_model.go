@@ -30,7 +30,7 @@ type Asset struct {
 	DefaultImageMedium *string                     `bson:"defaultImageMedium"  json:"defaultImageMedium"`
 	DefaultImageBig    *string                     `bson:"defaultImageBig"     json:"defaultImageBig"`
 	DefaultImageSmall  *string                     `bson:"defaultImageSmall"   json:"defaultImageSmall"`
-	SetDefault         *string                     `bson:"setDefault"         json:"setDefault"`
+	SetDefault         string                      `bson:"setDefault"         json:"setDefault"`
 	Status             string                      `bson:"status"                       json:"status"`
 	PreviousStatus     *string                     `bson:"previousStatus,omitempty"     json:"previousStatus,omitempty"`
 	Category           AssetTreeAttribute          `bson:"category"                     json:"category"`

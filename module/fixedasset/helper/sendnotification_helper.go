@@ -353,7 +353,7 @@ func (r *SendNotificationHelperImpl) SendMobileNotification(data model.Notificat
 	// --- 3. Kirim Pesan dengan SendMulticast ---
 	br, err := client.SendEachForMulticast(context.Background(), message)
 	if err != nil {
-		log.Printf("Gagal mengirim notifikasi multicast: %v\n", err)
+		log.Printf("Gagal mengirim notifikasi multicast: %v %v\n", err, message)
 		return nil
 	}
 
