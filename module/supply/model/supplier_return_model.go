@@ -36,7 +36,7 @@ type SupplierReturnRequest struct {
 	Stocks         *[]primitive.ObjectID           `json:"stocks" bson:"stocks"`
 	RequestStocks  *[]SupplierReturnStocks        `json:"requeststocks" bson:"requeststocks"`
 	ExchangeStocks *int                            `json:"exchangeStocks" bson:"exchangeStocks"`
-	BatchID        primitive.ObjectID              `json:"batchId" bson:"batchId"`
+	BatchID        *primitive.ObjectID              `json:"batchId" bson:"batchId"`
 	ReturnStocks   *int                            `json:"returnStocks" bson:"returnStocks"`
 	ApprovalNote   *string                         `json:"approvalNote" bson:"approvalNote"`
 	TagType        util_common_model.TagType       `json:"tagType"        bson:"tagType"`
