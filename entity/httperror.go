@@ -6,9 +6,10 @@ import (
 )
 
 type HttpError struct {
-	Code    int         `json:"code"`
-	Message string      `json:"message"`
-	Err     interface{} `json:"error,omitempty"`
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Err     any    `json:"error,omitempty"`
+	Data    any    `json:"data,omitempty"`
 }
 
 func (e *HttpError) Error() string {
