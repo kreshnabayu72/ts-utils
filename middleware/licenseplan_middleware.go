@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"slices"
+
 	"gitea.qwertysystem.net/BETS/ts-utils/db"
 	common_model "gitea.qwertysystem.net/BETS/ts-utils/module/common/model"
 	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/model"
@@ -60,6 +62,30 @@ func ValidateLicensePlan(module common_model.AppModule) fiber.Handler {
 		_, ok := ctx.Locals(contextKey[module]).(model.PlanTypes)
 		if !ok {
 			return response.SendResponse(ctx, fiber.StatusUnauthorized, nil, "Invalid License Plan")
+		}
+
+		return ctx.Next()
+	}
+}
+
+func LicensePlanGuard(module common_model.AppModule, allowedPlan []model.PlanTypes) fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+		contextKey := map[common_model.AppModule]ContextKey{
+			common_model.FixedAssetModule:  FixedAssetPlan,
+			common_model.SupplyAssetModule: SupplyPlan,
+		}
+
+		plan := ctx.Locals(contextKey[module]).(model.PlanTypes)
+
+		isAllowed := slices.Contains(allowedPlan, plan)
+
+		if !isAllowed {
+			return response.SendResponse(
+				ctx,
+				fiber.StatusForbidden,
+				nil,
+				"This action is not allowed in your current plan",
+			)
 		}
 
 		return ctx.Next()
