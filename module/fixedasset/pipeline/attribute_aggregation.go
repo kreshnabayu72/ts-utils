@@ -50,9 +50,10 @@ func LookupAttributesAggregation(
 			"as":           as,
 			"pipeline": pipeline.NewPipelineBuilder().
 				Project(bson.M{
-					"_id":  1,
-					"name": 1,
-					"key":  1,
+					"_id":      1,
+					"name":     1,
+					"key":      1,
+					"fullPath": 1,
 				}).
 				Build(),
 		}).Unwind(bson.M{"path": fmt.Sprintf("$%s", as), "preserveNullAndEmptyArrays": preserveNullAndEmptyArrays})
