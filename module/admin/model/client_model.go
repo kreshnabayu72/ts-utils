@@ -126,9 +126,9 @@ type Currency struct {
 }
 
 type AddOn struct {
-	Maintenance    bool `json:"maintenance" bson:"maintenance"`
-	Tracking       bool `json:"tracking" bson:"tracking"`
-	Audit          bool `json:"audit" bson:"audit"`
-	RepairTicketin bool `json:"repairTicketin" bson:"repairTicketin"`
-	AssetControl   bool `json:"assetControl" bson:"assetControl"`
+	Maintenance     bool `json:"maintenance" bson:"maintenance"`
+	Tracking        bool `json:"tracking" bson:"tracking"`
+	Audit           bool `json:"audit" bson:"audit"`
+	RepairTicketing bool `json:"repairTicketing" bson:"repairTicketing"`
+	AssetControl    bool `json:"assetControl" bson:"assetControl"`
 }
