@@ -102,6 +102,8 @@ type Client struct {
 	CreatedAt                 time.Time           `json:"createdAt"                 bson:"createdAt"`
 	UpdatedAt                 time.Time           `json:"updatedAt"                 bson:"updatedAt"`
 
+	AddOn AddOn `json:"addOn"   bson:"addOn"`
+
 	DateFormat  DateFormat `json:"dateFormat" bson:"dateFormat"`
 	TimeFormat  bool       `json:"timeFormat" bson:"timeFormat"`
 	TimeZone    string     `json:"timezone" bson:"timezone"`
@@ -121,4 +123,12 @@ type Currency struct {
 	Symbol   string `json:"symbol" bson:"symbol"`
 	Locale   string `json:"locale" bson:"locale"`
 	Label    string `json:"label" bson:"label"`
+}
+
+type AddOn struct {
+	Maintenance    bool `json:"maintenance" bson:"maintenance"`
+	Tracking       bool `json:"tracking" bson:"tracking"`
+	Audit          bool `json:"audit" bson:"audit"`
+	RepairTicketin bool `json:"repairTicketin" bson:"repairTicketin"`
+	AssetControl   bool `json:"assetControl" bson:"assetControl"`
 }
