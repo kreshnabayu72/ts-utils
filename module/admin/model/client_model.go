@@ -3,6 +3,7 @@ package model
 import (
 	"time"
 
+	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/model"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -104,11 +105,17 @@ type Client struct {
 
 	AddOn AddOn `json:"addOn"   bson:"addOn"`
 
-	DateFormat  DateFormat `json:"dateFormat" bson:"dateFormat"`
-	TimeFormat  bool       `json:"timeFormat" bson:"timeFormat"`
-	TimeZone    string     `json:"timezone" bson:"timezone"`
-	Currency    Currency   `json:"currency" bson:"currency"`
-	Geolocation bool       `json:"geolocation" bson:"geolocation"`
+	DateFormat  DateFormat         `json:"dateFormat" bson:"dateFormat"`
+	TimeFormat  bool               `json:"timeFormat" bson:"timeFormat"`
+	TimeZone    string             `json:"timezone" bson:"timezone"`
+	Currency    Currency           `json:"currency" bson:"currency"`
+	Geolocation bool               `json:"geolocation" bson:"geolocation"`
+	Plan        CompanyLicensePlan `json:"plan" bson:"plan"`
+}
+
+type CompanyLicensePlan struct {
+	FixedAsset  model.PlanTypes `json:"fixedAsset" bson:"fixedAsset"`
+	SupplyAsset model.PlanTypes `json:"supplyAsset" bson:"supplyAsset"`
 }
 
 type DateFormat struct {
