@@ -10,6 +10,7 @@ import (
 
 type Rfid struct {
 	ID               primitive.ObjectID        `json:"_id,omitempty"              bson:"_id,omitempty"`
+	Holder			 *common.UserEmbedded	   `json:"holder"                     bson:"holder"`
 	Group            *common.AttributeEmbedded `json:"group"                      bson:"group"`
 	FixedAssetGroup  *common.AttributeEmbedded `json:"fixedAssetGroup,omitempty"  bson:"fixedAssetGroup,omitempty"`
 	SupplyAssetGroup *common.AttributeEmbedded `json:"supplyAssetGroup,omitempty" bson:"supplyAssetGroup,omitempty"`
