@@ -239,3 +239,13 @@ func GenerateFacetOptionWithUnwind(
 		ReplaceRoot(bson.M{"newRoot": "$_id"}).
 		Build()
 }
+
+func GenerateNameWithSequenceSort(defaultSort Sort, paginationQuery PaginationQuery, nameWithSequenceAttribute string, nameAttribute string, sequenceAttribute string) []Sort {
+	nameSort := []Sort{defaultSort}
+
+	if paginationQuery.SortBy == nameWithSequenceAttribute {
+		nameSort = []Sort{{SortBy: nameAttribute, SortOrder: paginationQuery.SortOrder}, {SortBy: sequenceAttribute, SortOrder: paginationQuery.SortOrder}}
+	}
+
+	return nameSort
+}
