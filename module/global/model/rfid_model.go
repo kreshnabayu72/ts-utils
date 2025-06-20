@@ -26,6 +26,7 @@ type Rfid struct {
 	Qr               *primitive.ObjectID       `json:"qr"                         bson:"qr"`
 	QrCode           string                    `json:"qrCode"                     bson:"qrCode"`
 	QrShortCode      string                    `json:"qrShortCode"                bson:"qrShortCode"`
+	ToBeReturnedAt   *time.Time				   `json:"toBeReturnedAt"             bson:"toBeReturnedAt"`
 	CreatedAt        time.Time                 `json:"createdAt"                  bson:"createdAt"`
 	UpdatedAt        time.Time                 `json:"updatedAt"                  bson:"updatedAt"`
 }
