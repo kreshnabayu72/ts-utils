@@ -240,12 +240,12 @@ func GenerateFacetOptionWithUnwind(
 		Build()
 }
 
-func GenerateNameWithSequenceSort(defaultSort Sort, paginationQuery PaginationQuery, nameWithSequenceAttribute string, nameAttribute string, sequenceAttribute string) []Sort {
+func GenerateNameWithSequenceSort(defaultSort Sort, paginationQuery *PaginationQuery, nameWithSequenceAttribute string, nameAttribute string, sequenceAttribute string) {
 	nameSort := []Sort{defaultSort}
 
 	if paginationQuery.SortBy == nameWithSequenceAttribute {
 		nameSort = []Sort{{SortBy: nameAttribute, SortOrder: paginationQuery.SortOrder}, {SortBy: sequenceAttribute, SortOrder: paginationQuery.SortOrder}}
 	}
 
-	return nameSort
+	paginationQuery.MultiSort = nameSort
 }

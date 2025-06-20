@@ -217,6 +217,7 @@ type PaginationQuery struct {
 	Limit     int    `bson:"limit"     json:"limit"     transform:"int"`
 	SortBy    string `bson:"sortBy"    json:"sortBy"    transform:"string"`
 	SortOrder int    `bson:"sortOrder" json:"sortOrder" transform:"int"`
+	MultiSort []Sort `bson:"multiSort" json:"multiSort"`
 }
 type Sort struct {
 	SortBy    string `bson:"sortBy"    json:"sortBy"`
@@ -227,9 +228,10 @@ type Sort struct {
 // Custom sort can be used as a default sort
 //
 // Priority order:
-// 1. query.SortBy
-// 2. customSort
-// 3. internal SortBy & SortOrder
+// 1. query.MultiSort
+// 2. query.SortBy
+// 3. customSort
+// 4. internal SortBy & SortOrder
 //
 // For some complex sorting logic, set query.SortBy to "" and use customSort
 func (pb *PipelineBuilder) Pagination(query PaginationQuery, customSort ...Sort) *PipelineBuilder {
@@ -254,6 +256,18 @@ func (pb *PipelineBuilder) Pagination(query PaginationQuery, customSort ...Sort)
 	// Only use customSort if provided AND query.SortBy is empty
 	// Meaning the default (sortby and sortOrder) will get ignored
 	if len(customSort) > 0 && query.SortBy == "" {
+		formattedSort = bson.D{}
+
+		for _, sort := range customSort {
+			formattedSort = append(
+				formattedSort,
+				bson.E{Key: sort.SortBy, Value: sort.SortOrder},
+			)
+		}
+	}
+
+	//MULTISORT WILL BE PRIORITIZED
+	if len(query.MultiSort) > 0 {
 		formattedSort = bson.D{}
 
 		for _, sort := range customSort {
