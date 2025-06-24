@@ -15,5 +15,6 @@ type Attachment struct {
 	Name      string             	`json:"name"       bson:"name"`
 	File      string             	`json:"file"       bson:"file"`
 	CreatedAt time.Time          	`json:"createdAt"  bson:"createdAt"`
+	updatedAt time.Time          	`json:"updatedAt"  bson:"updatedAt"`
 	CreatedBy model.UserEmbedded    `json:"createdBy"  bson:"createdBy"`
 }
