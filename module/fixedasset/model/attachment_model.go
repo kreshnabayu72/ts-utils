@@ -9,12 +9,12 @@ import (
 )
 
 type Attachment struct {
-	ID        primitive.ObjectID 	`json:"_id"        bson:"_id"`
-	Asset     primitive.ObjectID 	`json:"asset"      bson:"asset"`
-	Type      string             	`json:"type"       bson:"type"` // Possible values: "Purchase" or "Product"
-	Name      string             	`json:"name"       bson:"name"`
-	File      string             	`json:"file"       bson:"file"`
-	CreatedAt time.Time          	`json:"createdAt"  bson:"createdAt"`
-	updatedAt time.Time          	`json:"updatedAt"  bson:"updatedAt"`
-	CreatedBy model.UserEmbedded    `json:"createdBy"  bson:"createdBy"`
+	ID        primitive.ObjectID `json:"_id"        bson:"_id"`
+	Asset     primitive.ObjectID `json:"asset"      bson:"asset"`
+	Type      string             `json:"type"       bson:"type"` // Possible values: "Purchase" or "Product"
+	Name      string             `json:"name"       bson:"name"`
+	File      string             `json:"file"       bson:"file"`
+	CreatedAt time.Time          `json:"createdAt"  bson:"createdAt"`
+	UpdatedAt time.Time          `json:"updatedAt"  bson:"updatedAt"`
+	CreatedBy model.UserEmbedded `json:"createdBy"  bson:"createdBy"`
 }
