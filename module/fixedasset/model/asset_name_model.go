@@ -58,6 +58,7 @@ type AssetNameEmbedAttr struct {
 	ID               primitive.ObjectID `json:"_id" bson:"_id"`
 	Name             string             `json:"name" bson:"name"`
 	Key              int                `json:"key" bson:"key"`
+	Sequence         int                `json:"sequence" bson:"sequence"`
 	NameWithSequence string             `json:"nameWithSequence" bson:"nameWithSequence"`
 	AliasCode        string             `json:"aliasCode" bson:"aliasCode"`
 }
