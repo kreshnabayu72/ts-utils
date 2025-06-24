@@ -270,7 +270,7 @@ func (pb *PipelineBuilder) Pagination(query PaginationQuery, customSort ...Sort)
 	if len(query.MultiSort) > 0 {
 		formattedSort = bson.D{}
 
-		for _, sort := range customSort {
+		for _, sort := range query.MultiSort {
 			formattedSort = append(
 				formattedSort,
 				bson.E{Key: sort.SortBy, Value: sort.SortOrder},
