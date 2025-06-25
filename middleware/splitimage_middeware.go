@@ -12,6 +12,7 @@ import (
 
 	"github.com/disintegration/imaging"
 	"github.com/gofiber/fiber/v2"
+	_ "golang.org/x/image/webp"
 )
 
 func GetFileType(headerValue string) (string, error) {

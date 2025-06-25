@@ -11,6 +11,7 @@ import (
 	"github.com/valyala/fasthttp"
 
 	"github.com/gofiber/fiber/v2"
+	_ "golang.org/x/image/webp"
 )
 
 // MultiUploadMiddleware handles multi uploads and saves them to disk.
