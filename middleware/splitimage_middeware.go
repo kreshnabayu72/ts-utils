@@ -121,6 +121,8 @@ func SplitImageMiddleware(folderName string, attribute string) fiber.Handler {
 				)
 			}
 
+			fmt.Println("Saved a file in: " + outputFilePath)
+
 			err := imaging.Save(resizedImg, outputFilePath)
 			if err != nil {
 				return fiber.NewError(
