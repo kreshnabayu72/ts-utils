@@ -35,9 +35,22 @@ func MultiUploadMiddleware(folderName string, attributes []string) fiber.Handler
 
 			companyCode := ctx.Locals(ContextKey("companyCode")).(string)
 
-			absPath, _ := filepath.Abs(
-				fmt.Sprintf("../../tsv2-files/%s/%s", companyCode, folderName),
-			)
+			// absPath, _ := filepath.Abs(
+			// 	fmt.Sprintf("../../tsv2-files/%s/%s", companyCode, folderName),
+			// )
+
+			currentDir, err := os.Getwd()
+
+			// Create the directory if it doesn't exist
+			if err != nil {
+
+				return fiber.NewError(
+					fiber.StatusInternalServerError,
+					"Error creating directory: "+err.Error(),
+				)
+			}
+			absPath := filepath.Join(currentDir, "..", "..", "tsv2-files", companyCode, folderName)
+
 			// Save the resized image to disk
 			filename := fmt.Sprintf(
 				"%s.%s",
@@ -58,6 +71,8 @@ func MultiUploadMiddleware(folderName string, attributes []string) fiber.Handler
 					"Error creating directory: "+err.Error(),
 				)
 			}
+
+			fmt.Println("Saved a file in: " + outputFilePath)
 
 			err = ctx.SaveFile(fileHeader, outputFilePath)
 			if err != nil {
