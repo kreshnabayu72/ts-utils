@@ -226,12 +226,10 @@ Example input:
 		Unit: "cm",
 	}
 */
-func BuildInsertOneQuery(table string, data interface{}) (query string, err error) {
-	var args []interface{}
-
+func BuildInsertOneQuery(table string, data interface{}) (query string, args []interface{}, err error) {
 	v := reflect.ValueOf(data)
 	if v.Kind() != reflect.Struct {
-		return "", fmt.Errorf("data must be a struct")
+		return "", args, fmt.Errorf("data must be a struct")
 	}
 
 	t := v.Type()
@@ -255,7 +253,7 @@ func BuildInsertOneQuery(table string, data interface{}) (query string, err erro
 		strings.Join(placeholders, ", "),
 	)
 
-	return query, nil
+	return query, args, nil
 }
 
 /*
