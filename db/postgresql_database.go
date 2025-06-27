@@ -16,7 +16,7 @@ var (
 )
 
 // ConnectPostgres initializes the PostgreSQL connection pool once
-func ConnectPostgres(dbName DBName) map[string]*pgxpool.Pool {
+func ConnectPostgres(dbName DBName) *pgxpool.Pool {
 	dbOnce.Do(func() {
 		postgresHost := os.Getenv("POSTGRES_HOST")
 		postgresUsername := os.Getenv("POSTGRES_USERNAME")
@@ -54,5 +54,5 @@ func ConnectPostgres(dbName DBName) map[string]*pgxpool.Pool {
 		log.Printf("Connected to PostgreSQL database: %s\n", dbName)
 	})
 
-	return pools
+	return pools[string(dbName)]
 }

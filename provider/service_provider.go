@@ -1,7 +1,6 @@
 package provider
 
 import (
-	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/mock"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/db"
@@ -10,7 +9,7 @@ import (
 
 type ServiceProvider interface {
 	MakeService(dbName db.DBName, collection string) service.Service
-	MakePostgreSqlService(pool *pgxpool.Pool, tableName string) service.PostgreSqlService
+	MakePostgreSqlService(dbName db.DBName, tableName string) service.PostgreSqlService
 }
 
 type ServiceProviderImpl struct{}
@@ -23,10 +22,10 @@ func (sf *ServiceProviderImpl) MakeService(
 }
 
 func (sf *ServiceProviderImpl) MakePostgreSqlService(
-	pool *pgxpool.Pool,
+	dbName db.DBName,
 	tableName string,
 ) service.PostgreSqlService {
-	return service.MakePostgreSqlService(pool, tableName)
+	return service.MakePostgreSqlService(dbName, tableName)
 }
 
 type MockServiceProvider struct {
@@ -42,9 +41,9 @@ func (m *MockServiceProvider) MakeService(
 }
 
 func (m *MockServiceProvider) MakePostgreSqlService(
-	pool *pgxpool.Pool,
+	dbName db.DBName,
 	tableName string,
 ) service.PostgreSqlService {
-	args := m.Called(pool, tableName)
+	args := m.Called(dbName, tableName)
 	return args.Get(0).(service.PostgreSqlService)
 }
