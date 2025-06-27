@@ -10,7 +10,7 @@ import (
 
 // Base Service PostgreSQL
 type PostgreSqlService interface {
-	SelectQuery(ctx context.Context, queryString string, args ...any) error
+	SelectQuery(v any, ctx context.Context, queryString string, args ...any) error
 }
 
 type BasePostgreSqlService struct {
