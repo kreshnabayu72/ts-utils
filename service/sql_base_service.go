@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 
+	"gitea.qwertysystem.net/BETS/ts-utils/db"
 	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -18,7 +19,9 @@ type BasePostgreSqlService struct {
 	TableName string
 }
 
-func MakePostgreSqlService(pool *pgxpool.Pool, tableName string) *BasePostgreSqlService {
+func MakePostgreSqlService(dbName db.DBName, tableName string) *BasePostgreSqlService {
+	pool := db.ConnectPostgres(dbName)
+
 	return &BasePostgreSqlService{Pool: pool, TableName: tableName}
 }
 
