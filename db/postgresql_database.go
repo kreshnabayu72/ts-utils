@@ -31,7 +31,7 @@ func ConnectPostgres(dbName DBName) *pgxpool.Pool {
 			postgresHost = "localhost:5432"
 		}
 
-		postgresUri := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=%s", postgresHost, postgresUsername, postgresPassword, dbName, postgresSslMode)
+		postgresUri := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=%s", postgresUsername, postgresPassword, postgresHost, dbName, postgresSslMode)
 
 		config, err := pgxpool.ParseConfig(postgresUri)
 		if err != nil {
