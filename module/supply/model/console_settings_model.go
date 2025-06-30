@@ -8,7 +8,8 @@ type DefaultCurrency struct {
 }
 
 type ReceptionAttrs struct {
-	TransactionTimeout int `json:"transactionTimeout" bson:"transactionTimeout"`
+	TransactionTimeout     int  `json:"transactionTimeout"     bson:"transactionTimeout"`
+	AllowAdminToPlaceItems bool `json:"allowAdminToPlaceItems" bson:"allowAdminToPlaceItems"`
 }
 
 type CheckoutAttrs struct {
