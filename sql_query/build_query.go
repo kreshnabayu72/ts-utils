@@ -35,7 +35,6 @@ func (s *SQLEloquentQuery) buildDeleteQuery() (string, []interface{}, error) {
 }
 
 // buildInsertQuery implements SQLBuilder.
-
 func (s *SQLEloquentQuery) buildInsertQuery() (string, []interface{}, error) {
 	if s.LastError != nil {
 		return "", nil, errors.New(s.LastError.Error())
@@ -81,7 +80,7 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 		}
 		dataQuery = append(dataQuery, fmt.Sprintf("OFFSET %d", s.Offset))
 
-		return FormatPaginateQuery(strings.Join(dataQuery, " "), strings.Join(countQuery, " ")), s.Args, nil
+		return PaginationQuery(strings.Join(dataQuery, " "), strings.Join(countQuery, " ")), s.Args, nil
 	}
 
 	result := strings.Join(dataQuery, " ")
