@@ -12,6 +12,7 @@ import (
 
 	"github.com/disintegration/imaging"
 	"github.com/gofiber/fiber/v2"
+	_ "golang.org/x/image/webp"
 )
 
 func GetFileType(headerValue string) (string, error) {
@@ -98,9 +99,21 @@ func SplitImageMiddleware(folderName string, attribute string) fiber.Handler {
 
 			companyCode := ctx.Locals(ContextKey("companyCode")).(string)
 
-			absPath, _ := filepath.Abs(
-				fmt.Sprintf("../../tsv2-files/%s/%s", companyCode, folderName),
-			)
+			// absPath, _ := filepath.Abs(
+			// 	fmt.Sprintf("../../tsv2-files/%s/%s", companyCode, folderName),
+			// )
+
+			currentDir, err := os.Getwd()
+
+			// Create the directory if it doesn't exist
+			if err != nil {
+
+				return fiber.NewError(
+					fiber.StatusInternalServerError,
+					"Error creating directory: "+err.Error(),
+				)
+			}
+			absPath := filepath.Join(currentDir, "..", "..", "tsv2-files", companyCode, folderName)
 
 			// Save the resized image to disk
 			filename := fmt.Sprintf(
@@ -120,7 +133,9 @@ func SplitImageMiddleware(folderName string, attribute string) fiber.Handler {
 				)
 			}
 
-			err := imaging.Save(resizedImg, outputFilePath)
+			fmt.Println("Saved a file in: " + outputFilePath)
+
+			err = imaging.Save(resizedImg, outputFilePath)
 			if err != nil {
 				return fiber.NewError(
 					fiber.StatusInternalServerError,

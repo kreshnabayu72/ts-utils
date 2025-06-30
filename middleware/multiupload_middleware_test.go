@@ -2,9 +2,6 @@ package middleware_test
 
 import (
 	"bytes"
-	"gitea.qwertysystem.net/BETS/ts-utils/middleware"
-	"github.com/stretchr/testify/assert"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"io"
 	"mime/multipart"
 	"net/http/httptest"
@@ -13,7 +10,12 @@ import (
 	"strings"
 	"testing"
 
+	"gitea.qwertysystem.net/BETS/ts-utils/middleware"
+	"github.com/stretchr/testify/assert"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+
 	"github.com/gofiber/fiber/v2"
+	_ "golang.org/x/image/webp"
 )
 
 func testMiddleware() fiber.Handler {
