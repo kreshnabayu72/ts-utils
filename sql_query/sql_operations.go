@@ -6,14 +6,15 @@ type SQLOperationsTypeEnum string
 
 const (
 	SQLOperationsTypeEnumUnknown    = SQLOperationsTypeEnum("unknown")
+	SQLOperationsTypeEnumPagination = SQLOperationsTypeEnum("pagination")
 	SQLOperationsTypeEnumFindOne    = SQLOperationsTypeEnum("findOne")
 	SQLOperationsTypeEnumFind       = SQLOperationsTypeEnum("find")
 	SQLOperationsTypeEnumInsertOne  = SQLOperationsTypeEnum("insertOne")
 	SQLOperationsTypeEnumInsertMany = SQLOperationsTypeEnum("insertMany")
 	SQLOperationsTypeEnumUpdateMany = SQLOperationsTypeEnum("updateMany")
 	SQLOperationsTypeEnumUpdateOne  = SQLOperationsTypeEnum("updateOne")
-	SQLOperationsTypeEnumDeleteMany = SQLOperationsTypeEnum("DeleteMany")
-	SQLOperationsTypeEnumDeleteOne  = SQLOperationsTypeEnum("DeleteOne")
+	SQLOperationsTypeEnumDeleteMany = SQLOperationsTypeEnum("deleteMany")
+	SQLOperationsTypeEnumDeleteOne  = SQLOperationsTypeEnum("deleteOne")
 )
 
 func GetSQLOperationType(query string) SQLOperationsTypeEnum {
@@ -24,40 +25,47 @@ func GetSQLOperationType(query string) SQLOperationsTypeEnum {
 		return SQLOperationsTypeEnumUnknown
 	}
 
+	// Handle paginated SELECT using CTE and json_agg
+	if strings.HasPrefix(normalized, "WITH") &&
+		strings.Contains(normalized, "JSON_AGG(PAGINATED") &&
+		strings.Contains(normalized, "COUNT FROM TOTAL_COUNT") {
+		return SQLOperationsTypeEnumPagination
+	}
+
 	switch words[0] {
 	case "SELECT":
 		if strings.Contains(normalized, "LIMIT 1") {
-			return "findOne"
+			return SQLOperationsTypeEnumFindOne
 		}
-		return "find"
+		return SQLOperationsTypeEnumFind
 
 	case "INSERT":
 		if strings.Count(normalized, "),(") > 0 {
-			return "insertMany"
+			return SQLOperationsTypeEnumInsertMany
 		}
-		return "insertOne"
+		return SQLOperationsTypeEnumInsertOne
 
 	case "UPDATE":
 		if strings.Contains(normalized, "WHERE") &&
 			strings.Contains(normalized, "IN (") {
-			return "updateMany"
+			return SQLOperationsTypeEnumUpdateMany
 		}
 		if strings.Contains(normalized, "WHERE") {
-			return "updateOne"
+			return SQLOperationsTypeEnumUpdateOne
 		}
-		return "updateMany" // fallback
+		return SQLOperationsTypeEnumUpdateMany // fallback
 
 	case "DELETE":
 		if strings.Contains(normalized, "WHERE") &&
 			strings.Contains(normalized, "IN (") {
-			return "deleteMany"
+			return SQLOperationsTypeEnumDeleteMany
 		}
 		if strings.Contains(normalized, "WHERE") {
-			return "deleteOne"
+			return SQLOperationsTypeEnumDeleteOne
 		}
-		return "deleteMany"
+		return SQLOperationsTypeEnumDeleteMany
 
 	default:
-		return "unknown"
+		return SQLOperationsTypeEnumUnknown
 	}
 }

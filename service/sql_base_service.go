@@ -26,12 +26,12 @@ func MakePostgreSqlService(dbName db.DBName, tableName string) *BasePostgreSqlSe
 	return &BasePostgreSqlService{Pool: pool, TableName: tableName}
 }
 
-// Select array of data, equivalent of Find()
+// Select array of data, equivalent of Find() or Aggregate()
 func (s *BasePostgreSqlService) SelectQuery(v any, ctx context.Context, queryString string, args ...any) error {
 	operationType := sql_query.GetSQLOperationType(queryString)
 
-	if operationType != sql_query.SQLOperationsTypeEnumFind {
-		return errors.New("Invalid query string: SelectQuery require 'SELECT' operation without 'LIMIT 1'")
+	if operationType != sql_query.SQLOperationsTypeEnumFind && operationType != sql_query.SQLOperationsTypeEnumPagination {
+		return errors.New("Invalid query string: SelectQuery require 'SELECT' operation without 'LIMIT 1' or Pagination Query")
 	}
 
 	rows, err := s.Pool.Query(context.Background(), queryString, args...)
@@ -49,14 +49,7 @@ func (s *BasePostgreSqlService) SelectQuery(v any, ctx context.Context, queryStr
 	return nil
 }
 
-func (s *BasePostgreSqlService) InsertOneQuery(ctx context.Context, data interface{}, args ...any) (interface{}, error) {
-	//dont need operationType checking cause its using BuildInsertOneQuery()
-
-	queryString, args, err := sql_query.BuildInsertOneQuery(s.TableName, data)
-	if err != nil {
-		return nil, err
-	}
-
+func (s *BasePostgreSqlService) InsertOneQuery(ctx context.Context, queryString string, args ...any) (interface{}, error) {
 	var resultId int
 
 	err2 := s.Pool.QueryRow(context.Background(), queryString, args...).Scan(&resultId)
