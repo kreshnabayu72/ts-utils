@@ -48,17 +48,17 @@ func ScanRows(res any, rows pgx.Rows) error {
 
 	return nil
 }
-func FormatPaginationResult[T any](result []dto.PaginationResult[T]) dto.PaginationResult[T] {
+func FormatPaginationResult[T any](result []dto.PaginationResult[T]) *dto.PaginationResult[T] {
 	if len(result) < 1 {
 		response := dto.PaginationResult[T]{
 			Data:         []T{},
 			TotalRecords: 0,
 		}
 
-		return response
+		return &response
 	}
 
-	return result[0]
+	return &result[0]
 }
 
 func GenerateArrayFilter[T comparable](filter *[]T) SQLCondition {
