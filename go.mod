@@ -10,6 +10,7 @@ require (
 	github.com/go-co-op/gocron/v2 v2.12.4
 	github.com/go-playground/universal-translator v0.18.1
 	github.com/gofiber/fiber/v2 v2.52.6
+	github.com/jackc/pgx/v5 v5.7.5
 	github.com/kittipat1413/go-common v0.9.1
 	github.com/rabbitmq/amqp091-go v1.10.0
 	github.com/stretchr/testify v1.10.0
@@ -55,7 +56,6 @@ require (
 	github.com/googleapis/gax-go/v2 v2.14.1 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
-	github.com/jackc/pgx/v5 v5.7.5 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/jonboulle/clockwork v0.4.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
@@ -109,10 +109,10 @@ require (
 	github.com/xuri/nfp v0.0.0-20240318013403-ab9948c2c4a7 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 // indirect
 	golang.org/x/crypto v0.38.0
-	golang.org/x/image v0.18.0 // indirect
+	golang.org/x/image v0.18.0
 	golang.org/x/net v0.40.0 // indirect
 	golang.org/x/sync v0.14.0 // indirect
 	golang.org/x/sys v0.33.0 // indirect
-	golang.org/x/text v0.25.0 // indirect
+	golang.org/x/text v0.25.0
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
