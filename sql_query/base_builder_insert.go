@@ -1,6 +1,7 @@
 package sql_query
 
 import (
+	"errors"
 	"fmt"
 
 	"reflect"
@@ -23,7 +24,7 @@ type insertBuilder struct {
 	*SQLEloquentQuery
 }
 
-// Insert implements SQLInsertChainBuilder.
+// Insert implements SQLInsertChainBuilder. (Only able to be called once)
 func (s *insertBuilder) Insert(values interface{}, returningColumns ...string) SQLInsertChainBuilder {
 	var args []interface{}
 
@@ -74,4 +75,21 @@ func NewSQLInsertBuilder(tableName string) SQLInsertInitBuilder {
 			Mode:        "insert",
 		},
 	}
+}
+
+// buildInsertQuery implements SQLBuilder.
+func (s *SQLEloquentQuery) buildInsertQuery() (string, []interface{}, error) {
+	if s.LastError != nil {
+		return "", nil, errors.New(s.LastError.Error())
+	}
+
+	if len(s.Filters) > 0 || s.UsePagination || len(s.OtherTables) > 0 {
+		return "", nil, errors.New("invalid insert query: cannot include filters, joins, or pagination")
+	}
+
+	if s.Columns != "" {
+		s.CustomQuery += " RETURNING " + s.Columns
+	}
+
+	return s.CustomQuery, s.Args, nil
 }

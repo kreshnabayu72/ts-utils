@@ -1,6 +1,7 @@
 package sql_query
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"strings"
@@ -16,7 +17,7 @@ type SQLUpdateInitBuilder interface {
 // e.g. .Update(...).From(...).Build()
 type SQLUpdateChainBuilder interface {
 	Where(filters map[string]SQLCondition) SQLUpdateChainBuilder
-	From(table string) SQLUpdateChainBuilder
+	From(tables []string) SQLUpdateChainBuilder
 
 	Build() (string, []interface{}, error)
 }
@@ -25,13 +26,13 @@ type updateBuilder struct {
 	*SQLEloquentQuery
 }
 
-// Where implements SQLUpdateChainBuilder.
+// Where implements SQLUpdateChainBuilder. (Accumulates previous value if called again)
 func (s *updateBuilder) Where(filters map[string]SQLCondition) SQLUpdateChainBuilder {
 	s.SQLEloquentQuery.sharedWhereQuery(filters)
 	return s
 }
 
-// Update implements SQLUpdateChainBuilder using reflection like Insert().
+// Update implements SQLUpdateChainBuilder using reflection like Insert(). (Only able to be called once)
 func (s *updateBuilder) Update(values interface{}, returningColumns ...string) SQLUpdateChainBuilder {
 	v := reflect.ValueOf(values)
 	if v.Kind() != reflect.Struct {
@@ -63,13 +64,15 @@ func (s *updateBuilder) Update(values interface{}, returningColumns ...string) S
 	return s
 }
 
-// From implements SQLUpdateChainBuilder.
-func (s *updateBuilder) From(table string) SQLUpdateChainBuilder {
-	if table == "" {
+// From implements SQLUpdateChainBuilder. (Overrides previous value if called again)
+func (s *updateBuilder) From(tables []string) SQLUpdateChainBuilder {
+	if len(tables) < 1 {
 		return s
 	}
 
-	s.OtherTables = append(s.OtherTables, fmt.Sprintf("FROM %s", table))
+	var otherTables []string
+	otherTables = append(otherTables, fmt.Sprintf("FROM %s", strings.Join(tables, ", ")))
+	s.OtherTables = otherTables
 	return s
 }
 
@@ -77,7 +80,7 @@ func NewSQLUpdateBuilder(tableName string) SQLUpdateInitBuilder {
 	return &updateBuilder{
 		&SQLEloquentQuery{
 			Table:       tableName,
-			Filters:     "",
+			Filters:     []string{},
 			OtherTables: []string{},
 			Columns:     "",
 			CustomQuery: "UPDATE",
@@ -85,4 +88,28 @@ func NewSQLUpdateBuilder(tableName string) SQLUpdateInitBuilder {
 			Mode:        "update",
 		},
 	}
+}
+
+// buildUpdateQuery implements SQLBuilder.
+func (s *SQLEloquentQuery) buildUpdateQuery() (string, []interface{}, error) {
+	if s.CustomQuery == "" {
+		return "", nil, errors.New("invalid update query: CustomQuery not set")
+	}
+
+	query := s.CustomQuery
+
+	if len(s.OtherTables) > 0 {
+		fromClause := strings.Join(s.OtherTables, " ")
+		query += " " + fromClause
+	}
+
+	if len(s.Filters) > 0 {
+		query += " " + fmt.Sprintf("WHERE %s", strings.Join(s.Filters, " AND "))
+	}
+
+	if s.Columns != "" {
+		query += " RETURNING " + s.Columns
+	}
+
+	return query, s.Args, nil
 }
