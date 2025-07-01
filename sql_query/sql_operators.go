@@ -11,6 +11,12 @@ const (
 	SQLOperatorGTE         SQLOperators = ">="
 	SQLOperatorLTE         SQLOperators = "<="
 
+	// Regex
+	SQLOperatorRegexCaseSensitive      SQLOperators = "~"
+	SQLOperatorRegexCaseInsensitive    SQLOperators = "~*"
+	SQLOperatorNotRegexCaseSensitive   SQLOperators = "!~"
+	SQLOperatorNotRegexCaseInsensitive SQLOperators = "!~*"
+
 	// Set
 	SQLOperatorIn    SQLOperators = "IN"
 	SQLOperatorNotIn SQLOperators = "NOT IN"
