@@ -1,4 +1,4 @@
-package functions
+package sql_query
 
 import (
 	"regexp"

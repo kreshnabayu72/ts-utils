@@ -1,6 +1,7 @@
 package sql_query
 
 import (
+	"errors"
 	"fmt"
 
 	"strings"
@@ -16,7 +17,7 @@ type SQLDeleteInitBuilder interface {
 // e.g. .Delete(...).Using(...).Where(...).Build()
 type SQLDeleteChainBuilder interface {
 	Where(filters map[string]SQLCondition) SQLDeleteChainBuilder
-	Using(table string) SQLDeleteChainBuilder
+	Using(tables []string) SQLDeleteChainBuilder
 
 	Build() (string, []interface{}, error)
 }
@@ -26,13 +27,13 @@ type deleteBuilder struct {
 	*SQLEloquentQuery
 }
 
-// Where implements SQLDeleteChainBuilder.
+// Where implements SQLDeleteChainBuilder. (Accumulates previous value if called again)
 func (s *deleteBuilder) Where(filters map[string]SQLCondition) SQLDeleteChainBuilder {
 	s.SQLEloquentQuery.sharedWhereQuery(filters)
 	return s
 }
 
-// Delete implements SQLDeleteChainBuilder.
+// Delete implements SQLDeleteChainBuilder. (Only able to be called once)
 func (s *deleteBuilder) Delete(returningColumns ...string) SQLDeleteChainBuilder {
 	if len(returningColumns) > 0 {
 		s.Columns = strings.Join(returningColumns, ",") // Columns for RETURNING (used in method Build)
@@ -47,13 +48,15 @@ func (s *deleteBuilder) Delete(returningColumns ...string) SQLDeleteChainBuilder
 	return s
 }
 
-// Using implements SQLDeleteChainBuilder.
-func (s *deleteBuilder) Using(table string) SQLDeleteChainBuilder {
-	if table == "" {
+// Using implements SQLDeleteChainBuilder. (Overrides previous value if called again)
+func (s *deleteBuilder) Using(tables []string) SQLDeleteChainBuilder {
+	if len(tables) < 1 {
 		return s
 	}
 
-	s.OtherTables = append(s.OtherTables, fmt.Sprintf("USING %s", table))
+	var otherTables []string
+	otherTables = append(otherTables, fmt.Sprintf("USING %s", strings.Join(tables, ", ")))
+	s.OtherTables = otherTables
 	return s
 }
 
@@ -61,7 +64,7 @@ func NewSQLDeleteBuilder(tableName string) SQLDeleteInitBuilder {
 	return &deleteBuilder{
 		&SQLEloquentQuery{
 			Table:       tableName,
-			Filters:     "",
+			Filters:     []string{},
 			OtherTables: []string{},
 			Columns:     "",
 			CustomQuery: "",
@@ -69,4 +72,32 @@ func NewSQLDeleteBuilder(tableName string) SQLDeleteInitBuilder {
 			Mode:        "delete",
 		},
 	}
+}
+
+// buildDeleteQuery implements SQLBuilder.
+func (s *SQLEloquentQuery) buildDeleteQuery() (string, []interface{}, error) {
+	if s.LastError != nil {
+		return "", nil, errors.New(s.LastError.Error())
+	}
+
+	if s.CustomQuery == "" {
+		return "", nil, errors.New("invalid update query: CustomQuery not set")
+	}
+
+	query := s.CustomQuery
+
+	if len(s.OtherTables) > 0 {
+		usingClause := strings.Join(s.OtherTables, " ")
+		query += " " + usingClause
+	}
+
+	if len(s.Filters) > 0 {
+		query += " " + fmt.Sprintf("WHERE %s", strings.Join(s.Filters, " AND "))
+	}
+
+	if s.Columns != "" {
+		query += " RETURNING " + s.Columns
+	}
+
+	return query, s.Args, nil
 }

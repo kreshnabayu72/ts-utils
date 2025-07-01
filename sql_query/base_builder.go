@@ -23,12 +23,12 @@ type QueryBuilder interface {
 // Base struct that contains params used by methods
 type SQLEloquentQuery struct {
 	Table       string
-	Filters     string
+	Filters     []string
 	OtherTables []string
 	Columns     string
 	Offset      int
 	Limit       int
-	SortBy      string
+	SortBy      []string
 
 	CustomQuery string
 
