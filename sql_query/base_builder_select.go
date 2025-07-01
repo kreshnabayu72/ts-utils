@@ -8,7 +8,7 @@ import (
 )
 
 // To ensure method .Select() has its own chaining methods
-// e.g. .Select(...).Join(...).Where(...).Build()
+// e.g. .Select(...)....).Where(...).Build()
 type SQLSelectChainBuilder interface {
 	Select(columns ...string) SQLSelectChainBuilder
 
@@ -16,6 +16,7 @@ type SQLSelectChainBuilder interface {
 	Search(keyword string, fields []string) SQLSelectChainBuilder
 	SetLimit(limit int) SQLSelectChainBuilder
 	Join(table string, onCondition string) SQLSelectChainBuilder
+	LeftJoin(table string, onCondition string) SQLSelectChainBuilder
 	Paginate(page, limit int) SQLSelectChainBuilder
 	OrderBy(sortBy []string, asc bool) SQLSelectChainBuilder
 
@@ -89,6 +90,16 @@ func (s *selectBuilder) Join(table string, onCondition string) SQLSelectChainBui
 	}
 
 	s.OtherTables = append(s.OtherTables, fmt.Sprintf("JOIN %s ON %s", table, onCondition))
+	return s
+}
+
+// Join implements SQLSelectChainBuilder. (Accumulates previous value if called again)
+func (s *selectBuilder) LeftJoin(table string, onCondition string) SQLSelectChainBuilder {
+	if table == "" {
+		return s
+	}
+
+	s.OtherTables = append(s.OtherTables, fmt.Sprintf("LEFT JOIN %s ON %s", table, onCondition))
 	return s
 }
 
