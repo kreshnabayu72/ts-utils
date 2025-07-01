@@ -49,9 +49,9 @@ func (s *insertBuilder) Insert(values interface{}, returningColumns ...string) S
 	}
 
 	if len(returningColumns) > 0 {
-		s.Columns = strings.Join(returningColumns, ",") // Columns for RETURNING (used in method Build)
+		s.Columns = returningColumns // Columns for RETURNING (used in method Build)
 	} else {
-		s.Columns = "id"
+		s.Columns = []string{"id"}
 	}
 
 	s.Args = args
@@ -69,7 +69,7 @@ func NewSQLInsertBuilder(tableName string) SQLInsertInitBuilder {
 	return &insertBuilder{
 		&SQLEloquentQuery{
 			Table:       tableName,
-			Columns:     "",
+			Columns:     []string{},
 			CustomQuery: "",
 			Args:        nil,
 			Mode:        "insert",
@@ -87,8 +87,8 @@ func (s *SQLEloquentQuery) buildInsertQuery() (string, []interface{}, error) {
 		return "", nil, errors.New("invalid insert query: cannot include filters, joins, or pagination")
 	}
 
-	if s.Columns != "" {
-		s.CustomQuery += " RETURNING " + s.Columns
+	if len(s.Columns) > 0 {
+		s.CustomQuery += " RETURNING " + strings.Join(s.Columns, ",")
 	}
 
 	return s.CustomQuery, s.Args, nil

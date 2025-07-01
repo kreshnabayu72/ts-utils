@@ -36,9 +36,9 @@ func (s *deleteBuilder) Where(filters map[string]SQLCondition) SQLDeleteChainBui
 // Delete implements SQLDeleteChainBuilder. (Only able to be called once)
 func (s *deleteBuilder) Delete(returningColumns ...string) SQLDeleteChainBuilder {
 	if len(returningColumns) > 0 {
-		s.Columns = strings.Join(returningColumns, ",") // Columns for RETURNING (used in method Build)
+		s.Columns = returningColumns
 	} else {
-		s.Columns = "id"
+		s.Columns = []string{"id"}
 	}
 
 	s.CustomQuery = fmt.Sprintf(
@@ -66,7 +66,7 @@ func NewSQLDeleteBuilder(tableName string) SQLDeleteInitBuilder {
 			Table:       tableName,
 			Filters:     []string{},
 			OtherTables: []string{},
-			Columns:     "",
+			Columns:     []string{},
 			CustomQuery: "",
 			Args:        nil,
 			Mode:        "delete",
@@ -95,8 +95,8 @@ func (s *SQLEloquentQuery) buildDeleteQuery() (string, []interface{}, error) {
 		query += " " + fmt.Sprintf("WHERE %s", strings.Join(s.Filters, " AND "))
 	}
 
-	if s.Columns != "" {
-		query += " RETURNING " + s.Columns
+	if len(s.Columns) > 0 {
+		s.CustomQuery += " RETURNING " + strings.Join(s.Columns, ",")
 	}
 
 	return query, s.Args, nil

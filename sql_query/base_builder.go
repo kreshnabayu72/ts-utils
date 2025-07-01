@@ -25,7 +25,7 @@ type SQLEloquentQuery struct {
 	Table       string
 	Filters     []string
 	OtherTables []string
-	Columns     string
+	Columns     []string
 	Offset      int
 	Limit       int
 	SortBy      []string

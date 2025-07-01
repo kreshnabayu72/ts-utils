@@ -54,9 +54,9 @@ func (s *updateBuilder) Update(values interface{}, returningColumns ...string) S
 	}
 
 	if len(returningColumns) > 0 {
-		s.Columns = strings.Join(returningColumns, ",")
+		s.Columns = returningColumns // Columns for RETURNING (used in method Build)
 	} else {
-		s.Columns = "id"
+		s.Columns = []string{"id"}
 	}
 
 	s.CustomQuery = fmt.Sprintf("UPDATE %s SET %s", s.Table, strings.Join(setClauses, ", "))
@@ -82,7 +82,7 @@ func NewSQLUpdateBuilder(tableName string) SQLUpdateInitBuilder {
 			Table:       tableName,
 			Filters:     []string{},
 			OtherTables: []string{},
-			Columns:     "",
+			Columns:     []string{"*"},
 			CustomQuery: "UPDATE",
 			Args:        nil,
 			Mode:        "update",
@@ -106,10 +106,8 @@ func (s *SQLEloquentQuery) buildUpdateQuery() (string, []interface{}, error) {
 	if len(s.Filters) > 0 {
 		query += " " + fmt.Sprintf("WHERE %s", strings.Join(s.Filters, " AND "))
 	}
-
-	if s.Columns != "" {
-		query += " RETURNING " + s.Columns
+	if len(s.Columns) > 0 {
+		s.CustomQuery += " RETURNING " + strings.Join(s.Columns, ",")
 	}
-
 	return query, s.Args, nil
 }
