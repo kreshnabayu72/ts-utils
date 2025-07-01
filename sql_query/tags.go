@@ -27,7 +27,7 @@ func ExtractJSONTags[T any](tableName string) []string {
 		} else if jsonTag == "_id" {
 			columns = append(columns, fmt.Sprintf("%s.%s as %s", tableName, "id", "_id"))
 		} else {
-			columns = append(columns, jsonTag)
+			columns = append(columns, fmt.Sprintf("%s.%s", tableName, jsonTag))
 		}
 	}
 
