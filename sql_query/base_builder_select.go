@@ -107,7 +107,7 @@ func (s *selectBuilder) SetLimit(limit int) SQLSelectChainBuilder {
 }
 
 func NewSQLSelectBuilder[T any](tableName string) SQLSelectChainBuilder {
-	columns := ExtractJSONTags[T]()
+	columns := ExtractJSONTags[T](tableName)
 
 	defaultColumns := "*"
 	if len(columns) > 0 {
