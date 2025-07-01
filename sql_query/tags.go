@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func ExtractJSONTags[T any](tableName string) []string {
+func ExtractJSONTags[T any]() []string {
 	var columns []string
 	typ := reflect.TypeOf((*T)(nil)).Elem()
 
@@ -14,6 +14,7 @@ func ExtractJSONTags[T any](tableName string) []string {
 		field := typ.Field(i)
 
 		rawJsonTag := field.Tag.Get("json")
+		columnTag := field.Tag.Get("column")
 		jsonTag := strings.ReplaceAll(rawJsonTag, ",omitempty", "")
 
 		if jsonTag == "" || jsonTag == "-" {
@@ -22,12 +23,14 @@ func ExtractJSONTags[T any](tableName string) []string {
 
 		snakeCaseKey := CamelToSnake(jsonTag)
 
-		if snakeCaseKey != jsonTag {
-			columns = append(columns, fmt.Sprintf("%s.%s as %s", tableName, snakeCaseKey, jsonTag))
+		if columnTag != "" {
+			columns = append(columns, fmt.Sprintf("%s as %s", columnTag, jsonTag))
+		} else if snakeCaseKey != jsonTag {
+			columns = append(columns, fmt.Sprintf("%s as %s", snakeCaseKey, jsonTag))
 		} else if jsonTag == "_id" {
-			columns = append(columns, fmt.Sprintf("%s.%s as %s", tableName, "id", "_id"))
+			columns = append(columns, fmt.Sprintf("%s as %s", "id", "_id"))
 		} else {
-			columns = append(columns, fmt.Sprintf("%s.%s", tableName, jsonTag))
+			columns = append(columns, jsonTag)
 		}
 	}
 

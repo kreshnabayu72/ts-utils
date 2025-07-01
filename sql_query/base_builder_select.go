@@ -51,9 +51,34 @@ func (s *selectBuilder) Search(keyword string, fields []string) SQLSelectChainBu
 	return s
 }
 
+func extractAlias(column string) string {
+	parts := strings.Split(strings.ToLower(column), " as ")
+	if len(parts) < 2 {
+		return "" // No alias
+	}
+	return strings.TrimSpace(parts[len(parts)-1])
+}
+
 // Select implements SQLSelectChainBuilder. (Only able to be called once)
 func (s *selectBuilder) Select(columns ...string) SQLSelectChainBuilder {
-	s.Columns = strings.Join(columns, ",")
+
+	for _, newCol := range columns {
+		newAlias := extractAlias(newCol)
+
+		// Check if alias exists in current list
+		replaced := false
+		for i, existing := range s.Columns {
+			if extractAlias(existing) == newAlias {
+				s.Columns[i] = newCol // Overwrite
+				replaced = true
+				break
+			}
+		}
+
+		if !replaced {
+			s.Columns = append(s.Columns, newCol)
+		}
+	}
 	return s
 }
 
@@ -107,13 +132,12 @@ func (s *selectBuilder) SetLimit(limit int) SQLSelectChainBuilder {
 }
 
 func NewSQLSelectBuilder[T any](tableName string) SQLSelectChainBuilder {
-	columns := ExtractJSONTags[T](tableName)
+	columns := ExtractJSONTags[T]()
 
-	defaultColumns := "*"
+	defaultColumns := []string{"*"}
 	if len(columns) > 0 {
-		defaultColumns = strings.Join(columns, ",")
+		defaultColumns = columns
 	}
-
 	return &selectBuilder{
 		&SQLEloquentQuery{
 			Table:         tableName,
@@ -133,14 +157,14 @@ func NewSQLSelectBuilder[T any](tableName string) SQLSelectChainBuilder {
 
 // buildSelectQuery implements SQLBuilder.
 func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
-	if s.Columns == "" {
+	if len(s.Columns) == 0 {
 		return "", nil, errors.New("select query must have columns")
 	}
 
 	var dataQuery []string
 	var countQuery []string
 
-	dataQuery = append(dataQuery, fmt.Sprintf("SELECT %s FROM %s", s.Columns, s.Table))
+	dataQuery = append(dataQuery, fmt.Sprintf("SELECT %s FROM %s", strings.Join(s.Columns, ","), s.Table))
 	countQuery = append(countQuery, fmt.Sprintf("SELECT COUNT(DISTINCT %s.id) FROM %s", s.Table, s.Table))
 
 	if len(s.OtherTables) > 0 {
