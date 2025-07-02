@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -11,9 +12,9 @@ type MockBasePostgreSqlService struct {
 	mock.Mock
 }
 
-func (m *MockBasePostgreSqlService) BaseService() *BasePostgreSqlService {
+func (m *MockBasePostgreSqlService) GetPool() *pgxpool.Pool {
 	arg := m.Called()
-	return arg.Get(0).(*BasePostgreSqlService)
+	return arg.Get(0).(*pgxpool.Pool)
 }
 func (m *MockBasePostgreSqlService) SelectMany(
 	v any,
