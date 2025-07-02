@@ -198,7 +198,6 @@ func (r *SendNotificationHelperImpl) SendNotificationToUsers(
 	notificationDataWithoutUser model.Notification,
 ) *entity.HttpError {
 
-	fmt.Printf("SEND NOTIFICATION TO USERS %v %v", userIds, notificationDataWithoutUser)
 	if len(userIds) == 0 {
 		return nil
 	}
@@ -247,11 +246,10 @@ func (r *SendNotificationHelperImpl) SendNotificationToUsers(
 		}
 	}
 
-	err = r.SendNotification(serviceProvider, companyCode, pendingNotifications)
+	sendNotifErr := r.SendNotification(serviceProvider, companyCode, pendingNotifications)
 
-	if err != nil {
-		fmt.Println("SendNotification ERROR: " + err.Error())
-		return entity.ToHttpError(err)
+	if sendNotifErr != nil {
+		return entity.ToHttpError(sendNotifErr)
 	}
 
 	mobileNotifErr := r.SendMobileNotification(notificationDataWithoutUser, fcmTokens)
@@ -323,6 +321,11 @@ func (r *SendNotificationHelperImpl) SendMobileNotification(data model.Notificat
 	client, err := app.Messaging(ctx)
 	if err != nil {
 		fmt.Printf("error getting Messaging client: %v\n", err)
+	}
+
+	if client == nil {
+		log.Println("Koneksi client gagal")
+		return nil
 	}
 
 	dataPayload := make(map[string]string)
