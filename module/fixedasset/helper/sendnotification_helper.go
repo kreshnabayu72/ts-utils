@@ -247,13 +247,20 @@ func (r *SendNotificationHelperImpl) SendNotificationToUsers(
 		}
 	}
 
+	err = r.SendNotification(serviceProvider, companyCode, pendingNotifications)
+
+	if err != nil {
+		fmt.Println("SendNotification ERROR: " + err.Error())
+		return entity.ToHttpError(err)
+	}
+
 	mobileNotifErr := r.SendMobileNotification(notificationDataWithoutUser, fcmTokens)
 
 	if mobileNotifErr != nil {
 		fmt.Println("MOBILE NOTIFICATION ERROR: " + mobileNotifErr.Error())
 	}
 
-	return r.SendNotification(serviceProvider, companyCode, pendingNotifications)
+	return nil
 }
 
 func (r *SendNotificationHelperImpl) SendNotification(
