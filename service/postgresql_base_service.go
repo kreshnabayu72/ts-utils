@@ -160,7 +160,7 @@ func (s *BasePostgreSqlService) SetTransaction(tx pgx.Tx) {
 	s.Transaction = tx
 }
 
-func UseTransactions(ctx context.Context, pool *pgxpool.Pool, fn func(tx pgx.Tx) (any, error)) (any, error) {
+func UseTransactions(ctx context.Context, pool PgxPoolInterface, fn func(tx pgx.Tx) (any, error)) (any, error) {
 	tx, err := pool.Begin(ctx)
 	if err != nil {
 		return nil, errors.New("Can't start transactions: " + err.Error())
