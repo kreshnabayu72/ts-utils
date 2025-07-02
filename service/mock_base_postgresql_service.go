@@ -11,9 +11,9 @@ type MockBasePostgreSqlService struct {
 	mock.Mock
 }
 
-func (m *MockBasePostgreSqlService) BaseService() BasePostgreSqlService {
+func (m *MockBasePostgreSqlService) BaseService() *BasePostgreSqlService {
 	arg := m.Called()
-	return arg.Get(0).(BasePostgreSqlService)
+	return arg.Get(0).(*BasePostgreSqlService)
 }
 func (m *MockBasePostgreSqlService) SelectMany(
 	v any,
