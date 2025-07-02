@@ -14,7 +14,7 @@ import (
 
 // Base Service PostgreSQL
 type PostgreSqlService interface {
-	BaseService() *BasePostgreSqlService
+	GetPool() *pgxpool.Pool
 	SelectMany(v any, ctx context.Context, queryString string, args ...any) error
 	SelectOne(v any, ctx context.Context, queryString string, args ...any) error
 	InsertOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
@@ -35,9 +35,9 @@ func MakePostgreSqlService(dbName db.DBName, tableName string) *BasePostgreSqlSe
 	return &BasePostgreSqlService{Pool: pool, TableName: tableName}
 }
 
-// Used for getting pool or transaction
-func (s *BasePostgreSqlService) BaseService() *BasePostgreSqlService {
-	return s
+// Used for getting pool
+func (s *BasePostgreSqlService) GetPool() *pgxpool.Pool {
+	return s.Pool
 }
 
 // Select array of data, equivalent of Find() or Aggregate()
