@@ -70,22 +70,19 @@ type MockPgxPool struct {
 	mock.Mock
 }
 
-// Mock Query(ctx, sql, args...)
+func (m *MockPgxPool) Exec(ctx context.Context, sql string, args ...any) (pgconn.CommandTag, error) {
+	called := m.Called(append([]interface{}{ctx, sql}, args...)...)
+	return called.Get(0).(pgconn.CommandTag), called.Error(1)
+}
+
 func (m *MockPgxPool) Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error) {
-	called := m.Called(ctx, sql, args)
+	called := m.Called(append([]interface{}{ctx, sql}, args...)...)
 	return called.Get(0).(pgx.Rows), called.Error(1)
 }
 
-// Mock QueryRow(ctx, sql, args...)
 func (m *MockPgxPool) QueryRow(ctx context.Context, sql string, args ...any) pgx.Row {
-	called := m.Called(ctx, sql, args)
+	called := m.Called(append([]interface{}{ctx, sql}, args...)...)
 	return called.Get(0).(pgx.Row)
-}
-
-// Mock Exec(ctx, sql, args...)
-func (m *MockPgxPool) Exec(ctx context.Context, sql string, args ...any) (pgconn.CommandTag, error) {
-	called := m.Called(ctx, sql, args)
-	return called.Get(0).(pgconn.CommandTag), called.Error(1)
 }
 
 // Mock Begin(ctx)
