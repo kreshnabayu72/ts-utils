@@ -197,6 +197,8 @@ func (r *SendNotificationHelperImpl) SendNotificationToUsers(
 	userIds []primitive.ObjectID,
 	notificationDataWithoutUser model.Notification,
 ) *entity.HttpError {
+
+	fmt.Printf("SEND NOTIFICATION TO USERS %v %v", userIds, notificationDataWithoutUser)
 	if len(userIds) == 0 {
 		return nil
 	}
