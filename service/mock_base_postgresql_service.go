@@ -94,6 +94,11 @@ func (m *MockPgxPool) Begin(ctx context.Context) (pgx.Tx, error) {
 	return called.Get(0).(pgx.Tx), called.Error(1)
 }
 
+// Mock Close()
+func (m *MockPgxPool) Close() {
+	return
+}
+
 type MockPgxTx struct {
 	mock.Mock
 }
