@@ -10,7 +10,6 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 // Base Service PostgreSQL
@@ -33,8 +32,6 @@ type PgxPoolInterface interface {
 	QueryRow(ctx context.Context, sql string, args ...any) pgx.Row
 	Exec(ctx context.Context, sql string, args ...any) (pgconn.CommandTag, error)
 
-	// Optional, if needed
-	Acquire(ctx context.Context) (*pgxpool.Conn, error)
 	Close()
 }
 
