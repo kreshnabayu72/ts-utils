@@ -20,6 +20,7 @@ type PostgreSqlService interface {
 	InsertOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
 	UpdateOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
 	DeleteOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
+	SetTransaction(tx pgx.Tx)
 }
 
 type BasePostgreSqlService struct {
