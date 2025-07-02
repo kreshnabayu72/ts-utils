@@ -2,11 +2,13 @@ package service
 
 import (
 	"context"
+	"errors"
 	"log"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/db"
 	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -20,8 +22,9 @@ type PostgreSqlService interface {
 }
 
 type BasePostgreSqlService struct {
-	Pool      *pgxpool.Pool
-	TableName string
+	Pool        *pgxpool.Pool
+	Transaction pgx.Tx
+	TableName   string
 }
 
 func MakePostgreSqlService(dbName db.DBName, tableName string) *BasePostgreSqlService {
@@ -32,7 +35,15 @@ func MakePostgreSqlService(dbName db.DBName, tableName string) *BasePostgreSqlSe
 
 // Select array of data, equivalent of Find() or Aggregate()
 func (s *BasePostgreSqlService) SelectMany(v any, ctx context.Context, queryString string, args ...any) error {
-	rows, err := s.Pool.Query(context.Background(), queryString, args...)
+	var rows pgx.Rows
+	var err error
+
+	if s.Transaction != nil {
+		rows, err = s.Transaction.Query(ctx, queryString, args...)
+	} else {
+		rows, err = s.Pool.Query(ctx, queryString, args...)
+	}
+
 	if err != nil {
 		return err
 	}
@@ -49,7 +60,15 @@ func (s *BasePostgreSqlService) SelectMany(v any, ctx context.Context, queryStri
 
 // Select array of data, equivalent of FindOne()
 func (s *BasePostgreSqlService) SelectOne(v any, ctx context.Context, queryString string, args ...any) error {
-	rows, err := s.Pool.Query(context.Background(), queryString, args...)
+	var rows pgx.Rows
+	var err error
+
+	if s.Transaction != nil {
+		rows, err = s.Transaction.Query(ctx, queryString, args...)
+	} else {
+		rows, err = s.Pool.Query(ctx, queryString, args...)
+	}
+
 	if err != nil {
 		return err
 	}
@@ -66,8 +85,14 @@ func (s *BasePostgreSqlService) SelectOne(v any, ctx context.Context, queryStrin
 
 func (s *BasePostgreSqlService) InsertOne(ctx context.Context, queryString string, args ...any) (interface{}, error) {
 	var resultId int
+	var err error
 
-	err := s.Pool.QueryRow(context.Background(), queryString, args...).Scan(&resultId)
+	if s.Transaction != nil {
+		err = s.Transaction.QueryRow(ctx, queryString, args...).Scan(&resultId)
+	} else {
+		err = s.Pool.QueryRow(ctx, queryString, args...).Scan(&resultId)
+	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -77,8 +102,14 @@ func (s *BasePostgreSqlService) InsertOne(ctx context.Context, queryString strin
 
 func (s *BasePostgreSqlService) UpdateOne(ctx context.Context, queryString string, args ...any) (interface{}, error) {
 	var resultId int
+	var err error
 
-	err := s.Pool.QueryRow(context.Background(), queryString, args...).Scan(&resultId)
+	if s.Transaction != nil {
+		err = s.Transaction.QueryRow(ctx, queryString, args...).Scan(&resultId)
+	} else {
+		err = s.Pool.QueryRow(ctx, queryString, args...).Scan(&resultId)
+	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -88,11 +119,43 @@ func (s *BasePostgreSqlService) UpdateOne(ctx context.Context, queryString strin
 
 func (s *BasePostgreSqlService) DeleteOne(ctx context.Context, queryString string, args ...any) (interface{}, error) {
 	var resultId int
+	var err error
 
-	err := s.Pool.QueryRow(context.Background(), queryString, args...).Scan(&resultId)
+	if s.Transaction != nil {
+		err = s.Transaction.QueryRow(ctx, queryString, args...).Scan(&resultId)
+	} else {
+		err = s.Pool.QueryRow(ctx, queryString, args...).Scan(&resultId)
+	}
+
 	if err != nil {
 		return nil, err
 	}
 
 	return resultId, nil
+}
+
+func (s *BasePostgreSqlService) SetTransaction(tx pgx.Tx) {
+	s.Transaction = tx
+}
+
+func UseTransactions(ctx context.Context, pool *pgxpool.Pool, fn func(tx pgx.Tx) (any, error)) (any, error) {
+	tx, err := pool.Begin(ctx)
+	if err != nil {
+		return nil, errors.New("Can't start transactions: " + err.Error())
+	}
+
+	defer func() {
+		tx.Rollback(ctx)
+	}()
+
+	result, err := fn(tx)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
