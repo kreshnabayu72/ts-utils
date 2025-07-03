@@ -7,16 +7,32 @@ import (
 	"os"
 	"sync"
 
+	"github.com/bwmarrin/snowflake"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 var (
-	pools  = make(map[string]*pgxpool.Pool)
-	dbOnce sync.Once
+	pools         = make(map[string]*pgxpool.Pool)
+	dbOnce        sync.Once
+	snowflakeOnce sync.Once
+	Node          *snowflake.Node
 )
+
+func InitSnowflake() {
+	snowflakeOnce.Do(func() {
+		var err error
+		Node, err = snowflake.NewNode(1) // 1 = node ID (range: 0–1023)
+		if err != nil {
+			log.Fatalf("failed to initialize snowflake node: %v", err)
+		}
+		fmt.Println("Snowflake node initialized")
+	})
+}
 
 // ConnectPostgres initializes the PostgreSQL connection pool once
 func ConnectPostgres(dbName DBName) *pgxpool.Pool {
+	InitSnowflake()
+
 	dbOnce.Do(func() {
 		postgresHost := os.Getenv("POSTGRES_HOST")
 		postgresUsername := os.Getenv("POSTGRES_USERNAME")

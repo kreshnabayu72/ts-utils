@@ -6,6 +6,8 @@ import (
 
 	"reflect"
 	"strings"
+
+	"gitea.qwertysystem.net/BETS/ts-utils/db"
 )
 
 // To ensure SQLInsertBuilder has its own initial methods
@@ -37,13 +39,18 @@ func (s *insertBuilder) Insert(values interface{}, returningColumns ...string) S
 	var columns []string
 	var placeholders []string
 
+	id := db.Node.Generate().Int64()
+	columns = append(columns, "id")
+	placeholders = append(placeholders, "$1")
+	args = append(args, id)
+
 	for i := 0; i < v.NumField(); i++ {
 		field := t.Field(i)
 		tag := field.Tag.Get("json")
 		if tag == "" || tag == "-" {
 			continue
 		}
-		columns = append(columns, tag)
+		columns = append(columns, CamelToSnake(tag))
 		placeholders = append(placeholders, fmt.Sprintf("$%d", len(args)+1))
 		args = append(args, v.Field(i).Interface())
 	}
