@@ -15,6 +15,7 @@ import (
 // Base Service PostgreSQL
 type PostgreSqlService interface {
 	GetPool() PgxPoolInterface
+	Count(ctx context.Context, queryString string, args ...any) (int, error)
 	SelectMany(v any, ctx context.Context, queryString string, args ...any) error
 	SelectOne(v any, ctx context.Context, queryString string, args ...any) error
 	InsertOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
