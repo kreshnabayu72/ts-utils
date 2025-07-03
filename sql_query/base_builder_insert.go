@@ -39,6 +39,8 @@ func (s *insertBuilder) Insert(values interface{}, returningColumns ...string) S
 	var columns []string
 	var placeholders []string
 
+	db.InitSnowflake() //prevents error in unit test (correct this if better method found) (Maybe mock snowflake idk)
+
 	id := db.Node.Generate().Int64()
 	columns = append(columns, "id")
 	placeholders = append(placeholders, "$1")

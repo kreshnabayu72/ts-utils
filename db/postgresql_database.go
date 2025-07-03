@@ -31,8 +31,6 @@ func InitSnowflake() {
 
 // ConnectPostgres initializes the PostgreSQL connection pool once
 func ConnectPostgres(dbName DBName) *pgxpool.Pool {
-	InitSnowflake()
-
 	dbOnce.Do(func() {
 		postgresHost := os.Getenv("POSTGRES_HOST")
 		postgresUsername := os.Getenv("POSTGRES_USERNAME")
