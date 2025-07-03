@@ -264,3 +264,13 @@ func PaginationQuery(dataQuery, totalQuery string) string {
 
 	return paginationQuery
 }
+
+func ArrayIncludes[T comparable](slice []T, value T) bool {
+	for _, each := range slice {
+		if each == value {
+			return true
+		}
+	}
+
+	return false
+}
