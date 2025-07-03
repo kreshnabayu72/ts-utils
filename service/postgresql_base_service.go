@@ -19,7 +19,9 @@ type PostgreSqlService interface {
 	SelectOne(v any, ctx context.Context, queryString string, args ...any) error
 	InsertOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
 	UpdateOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
+	UpdateMany(ctx context.Context, queryString string, args ...any) (int64, error)
 	DeleteOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
+	DeleteMany(ctx context.Context, queryString string, args ...any) (int64, error)
 	SetTransaction(tx pgx.Tx)
 }
 
@@ -136,6 +138,23 @@ func (s *BasePostgreSqlService) UpdateOne(ctx context.Context, queryString strin
 	return resultId, nil
 }
 
+func (s *BasePostgreSqlService) UpdateMany(ctx context.Context, queryString string, args ...any) (int64, error) {
+	var commandTag pgconn.CommandTag
+	var err error
+
+	if s.Transaction != nil {
+		commandTag, err = s.Transaction.Exec(ctx, queryString, args...)
+	} else {
+		commandTag, err = s.Pool.Exec(ctx, queryString, args...)
+	}
+
+	if err != nil {
+		return 0, err
+	}
+
+	return commandTag.RowsAffected(), nil
+}
+
 func (s *BasePostgreSqlService) DeleteOne(ctx context.Context, queryString string, args ...any) (interface{}, error) {
 	var resultId int
 	var err error
@@ -151,6 +170,23 @@ func (s *BasePostgreSqlService) DeleteOne(ctx context.Context, queryString strin
 	}
 
 	return resultId, nil
+}
+
+func (s *BasePostgreSqlService) DeleteMany(ctx context.Context, queryString string, args ...any) (int64, error) {
+	var commandTag pgconn.CommandTag
+	var err error
+
+	if s.Transaction != nil {
+		commandTag, err = s.Transaction.Exec(ctx, queryString, args...)
+	} else {
+		commandTag, err = s.Pool.Exec(ctx, queryString, args...)
+	}
+
+	if err != nil {
+		return 0, err
+	}
+
+	return commandTag.RowsAffected(), nil
 }
 
 func (s *BasePostgreSqlService) SetTransaction(tx pgx.Tx) {
