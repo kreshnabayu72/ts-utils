@@ -54,6 +54,15 @@ func (m *MockBasePostgreSqlService) UpdateOne(
 	return arg.Get(0), arg.Error(1)
 }
 
+func (m *MockBasePostgreSqlService) UpdateMany(
+	ctx context.Context,
+	queryString string,
+	args ...any,
+) (int64, error) {
+	arg := m.Called(ctx, queryString, args)
+	return arg.Get(0).(int64), arg.Error(1)
+}
+
 func (m *MockBasePostgreSqlService) DeleteOne(
 	ctx context.Context,
 	queryString string,
@@ -62,6 +71,16 @@ func (m *MockBasePostgreSqlService) DeleteOne(
 	arg := m.Called(ctx, queryString, args)
 	return arg.Get(0), arg.Error(1)
 }
+
+func (m *MockBasePostgreSqlService) DeleteMany(
+	ctx context.Context,
+	queryString string,
+	args ...any,
+) (int64, error) {
+	arg := m.Called(ctx, queryString, args)
+	return arg.Get(0).(int64), arg.Error(1)
+}
+
 func (m *MockBasePostgreSqlService) SetTransaction(tx pgx.Tx) {
 	m.Called(tx)
 }
