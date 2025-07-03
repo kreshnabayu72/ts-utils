@@ -28,7 +28,7 @@ type updateBuilder struct {
 
 // Where implements SQLUpdateChainBuilder. (Accumulates previous value if called again)
 func (s *updateBuilder) Where(filters map[string]SQLCondition) SQLUpdateChainBuilder {
-	s.SQLEloquentQuery.sharedWhereQuery(filters)
+	s.SQLEloquentQuery.sharedWhereQuery(filters, false)
 	return s
 }
 

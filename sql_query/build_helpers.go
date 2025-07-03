@@ -6,24 +6,46 @@ import (
 	"strings"
 )
 
-func (s *SQLEloquentQuery) sharedWhereQuery(filters map[string]SQLCondition) {
+func (s *SQLEloquentQuery) sharedWhereQuery(filters map[string]SQLCondition, isHavingClause bool) {
 	if len(filters) < 1 {
 		return
 	}
 
 	for column, each := range filters {
+		var clause string
 		if each.Value == nil || reflect.ValueOf(each.Value).IsZero() {
 			continue
 		}
 
+		t := reflect.TypeOf(each.Value)
+
 		if each.IsRef {
 			// products.user.id = users.id (reference)
-			s.Filters = append(s.Filters, fmt.Sprintf("%s %s %v", column, each.Operator, each.Value))
+			clause = fmt.Sprintf("%s %s %v", column, each.Operator, each.Value)
+		} else if t.Kind() == reflect.Slice {
+			// products.user.id IN ($1,$2) (each element in array became args)
+			v := reflect.ValueOf(each.Value)
+
+			literals := ""
+			for i := 0; i < v.Len(); i++ {
+				if i > 0 {
+					literals += ", "
+				}
+				literals += fmt.Sprintf("$%d", len(s.Args)+1)
+				s.Args = append(s.Args, v.Index(i).Interface())
+			}
+			clause = fmt.Sprintf("%s %s (%s)", column, each.Operator, literals)
 		} else {
 			// products.user.id = $1 (literal value with args)
 
-			s.Filters = append(s.Filters, fmt.Sprintf("%s %s $%d", column, each.Operator, len(s.Args)+1))
+			clause = fmt.Sprintf("%s %s $%d", column, each.Operator, len(s.Args)+1)
 			s.Args = append(s.Args, each.Value)
+		}
+
+		if isHavingClause {
+			s.HavingClauses = append(s.HavingClauses, clause)
+		} else {
+			s.Filters = append(s.Filters, clause)
 		}
 	}
 }

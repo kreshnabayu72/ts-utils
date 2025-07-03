@@ -29,7 +29,7 @@ type deleteBuilder struct {
 
 // Where implements SQLDeleteChainBuilder. (Accumulates previous value if called again)
 func (s *deleteBuilder) Where(filters map[string]SQLCondition) SQLDeleteChainBuilder {
-	s.SQLEloquentQuery.sharedWhereQuery(filters)
+	s.SQLEloquentQuery.sharedWhereQuery(filters, false)
 	return s
 }
 

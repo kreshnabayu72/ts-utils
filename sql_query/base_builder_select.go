@@ -29,7 +29,7 @@ type selectBuilder struct {
 
 // Where implements SQLSelectChainBuilder. (Accumulates previous value if called again)
 func (s *selectBuilder) Where(filters map[string]SQLCondition) SQLSelectChainBuilder {
-	s.SQLEloquentQuery.sharedWhereQuery(filters)
+	s.SQLEloquentQuery.sharedWhereQuery(filters, true)
 	return s
 }
 
