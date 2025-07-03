@@ -104,6 +104,24 @@ func (s *BasePostgreSqlService) SelectOne(v any, ctx context.Context, queryStrin
 	return nil
 }
 
+func (s *BasePostgreSqlService) Count(ctx context.Context, queryString string, args ...any) (int, error) {
+	var count int
+	var err error
+
+	if s.Transaction != nil {
+		err = s.Transaction.QueryRow(ctx, queryString, args...).Scan(&count)
+	} else {
+		err = s.Pool.QueryRow(ctx, queryString, args...).Scan(&count)
+	}
+
+	if err != nil {
+		log.Println("Count query failed:", err)
+		return 0, err
+	}
+
+	return count, nil
+}
+
 func (s *BasePostgreSqlService) InsertOne(ctx context.Context, queryString string, args ...any) (interface{}, error) {
 	var resultId int
 	var err error

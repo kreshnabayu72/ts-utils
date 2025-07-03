@@ -166,6 +166,26 @@ func NewSQLSelectBuilder[T any](tableName string) SQLSelectChainBuilder {
 	}
 }
 
+func NewSQLCountBuilder(tableName string) SQLSelectChainBuilder {
+	defaultColumns := []string{"COUNT(*)"}
+
+	return &selectBuilder{
+		&SQLEloquentQuery{
+			Table:         tableName,
+			Filters:       []string{},
+			OtherTables:   []string{},
+			Columns:       defaultColumns,
+			Limit:         0,
+			Offset:        0,
+			SortBy:        []string{},
+			CustomQuery:   "",
+			Args:          nil,
+			UsePagination: false,
+			Mode:          "select",
+		},
+	}
+}
+
 // buildSelectQuery implements SQLBuilder.
 func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 	if len(s.Columns) == 0 {
