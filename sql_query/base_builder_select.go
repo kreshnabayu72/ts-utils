@@ -3,12 +3,11 @@ package sql_query
 import (
 	"errors"
 	"fmt"
-
 	"strings"
 )
 
 // To ensure method .Select() has its own chaining methods
-// e.g. .Select(...)....).Where(...).Build()
+// e.g. .Select(...).Join(...).Where(...).Build()
 type SQLSelectChainBuilder interface {
 	Select(columns ...string) SQLSelectChainBuilder
 
@@ -19,6 +18,8 @@ type SQLSelectChainBuilder interface {
 	LeftJoin(table string, onCondition string) SQLSelectChainBuilder
 	Paginate(page, limit int) SQLSelectChainBuilder
 	OrderBy(sortBy []string, asc bool) SQLSelectChainBuilder
+	GroupBy(groupBy ...string) SQLSelectChainBuilder
+	Having(havingClauses map[string]SQLCondition) SQLSelectChainBuilder
 
 	Build() (string, []interface{}, error)
 }
@@ -29,7 +30,7 @@ type selectBuilder struct {
 
 // Where implements SQLSelectChainBuilder. (Accumulates previous value if called again)
 func (s *selectBuilder) Where(filters map[string]SQLCondition) SQLSelectChainBuilder {
-	s.SQLEloquentQuery.sharedWhereQuery(filters, true)
+	s.SQLEloquentQuery.sharedWhereQuery(filters, false)
 	return s
 }
 
@@ -52,17 +53,8 @@ func (s *selectBuilder) Search(keyword string, fields []string) SQLSelectChainBu
 	return s
 }
 
-func extractAlias(column string) string {
-	parts := strings.Split(strings.ToLower(column), " as ")
-	if len(parts) < 2 {
-		return "" // No alias
-	}
-	return strings.TrimSpace(parts[len(parts)-1])
-}
-
 // Select implements SQLSelectChainBuilder. (Only able to be called once)
 func (s *selectBuilder) Select(columns ...string) SQLSelectChainBuilder {
-
 	for _, newCol := range columns {
 		newAlias := extractAlias(newCol)
 
@@ -83,7 +75,7 @@ func (s *selectBuilder) Select(columns ...string) SQLSelectChainBuilder {
 	return s
 }
 
-// Join implements SQLSelectChainBuilder. (Accumulates previous value if called again)
+// JOIN is the equivalent of INNER JOIN
 func (s *selectBuilder) Join(table string, onCondition string) SQLSelectChainBuilder {
 	if table == "" {
 		return s
@@ -93,13 +85,24 @@ func (s *selectBuilder) Join(table string, onCondition string) SQLSelectChainBui
 	return s
 }
 
-// Join implements SQLSelectChainBuilder. (Accumulates previous value if called again)
 func (s *selectBuilder) LeftJoin(table string, onCondition string) SQLSelectChainBuilder {
 	if table == "" {
 		return s
 	}
 
 	s.OtherTables = append(s.OtherTables, fmt.Sprintf("LEFT JOIN %s ON %s", table, onCondition))
+	return s
+}
+
+// GroupBy implements SQLSelectChainBuilder. (Overrides previous value if called again)
+func (s *selectBuilder) GroupBy(groupBy ...string) SQLSelectChainBuilder {
+	s.Grouping = append(s.Grouping, groupBy...)
+	return s
+}
+
+// Having implements SQLSelectChainBuilder. (Overrides previous value if called again)
+func (s *selectBuilder) Having(havingClause map[string]SQLCondition) SQLSelectChainBuilder {
+	s.SQLEloquentQuery.sharedWhereQuery(havingClause, true)
 	return s
 }
 
@@ -186,17 +189,27 @@ func NewSQLCountBuilder(tableName string) SQLSelectChainBuilder {
 	}
 }
 
-// buildSelectQuery implements SQLBuilder.
+// buildSelectQuery implements SQLBuilder.\
 func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 	if len(s.Columns) == 0 {
 		return "", nil, errors.New("select query must have columns")
+	}
+
+	if len(s.Grouping) > 0 {
+		if err := validateGroupByColumns(s.Columns, s.Grouping); err != nil {
+			return "", nil, err
+		}
+	}
+
+	if len(s.HavingClauses) > 0 && len(s.Grouping) < 1 {
+		return "", nil, errors.New("HAVING clauses only allowed if GROUP BY clause is exists")
 	}
 
 	var dataQuery []string
 	var countQuery []string
 
 	dataQuery = append(dataQuery, fmt.Sprintf("SELECT %s FROM %s", strings.Join(s.Columns, ","), s.Table))
-	countQuery = append(countQuery, fmt.Sprintf("SELECT COUNT(DISTINCT %s.id) FROM %s", s.Table, s.Table))
+	countQuery = append(countQuery, fmt.Sprintf("SELECT COUNT(*) FROM %s", s.Table))
 
 	if len(s.OtherTables) > 0 {
 		joinClause := strings.Join(s.OtherTables, " ")
@@ -208,6 +221,16 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 		whereClause := fmt.Sprintf("WHERE %s", strings.Join(s.Filters, " AND "))
 		dataQuery = append(dataQuery, whereClause)
 		countQuery = append(countQuery, whereClause)
+	}
+
+	if len(s.Grouping) > 0 {
+		dataQuery = append(dataQuery, fmt.Sprintf("GROUP BY %s", strings.Join(s.Grouping, ", ")))
+		countQuery = append(countQuery, fmt.Sprintf("GROUP BY %s", strings.Join(s.Grouping, ", ")))
+	}
+
+	if len(s.HavingClauses) > 0 {
+		dataQuery = append(dataQuery, fmt.Sprintf("HAVING %s", strings.Join(s.HavingClauses, " AND ")))
+		countQuery = append(countQuery, fmt.Sprintf("HAVING %s", strings.Join(s.HavingClauses, " AND ")))
 	}
 
 	if len(s.SortBy) > 0 {
@@ -226,4 +249,28 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 
 	result := strings.Join(dataQuery, " ")
 	return result, s.Args, nil
+}
+
+// Internal Utils for builder select
+func extractAlias(column string) string {
+	parts := strings.Split(strings.ToLower(column), " as ")
+	if len(parts) < 2 {
+		return "" // No alias
+	}
+	return strings.TrimSpace(parts[len(parts)-1])
+}
+
+func validateGroupByColumns(availableColumns []string, groupByColumns []string) error {
+	var columnNames []string
+	for _, column := range availableColumns {
+		columnNames = append(columnNames, extractAlias(column))
+	}
+
+	for _, each := range groupByColumns {
+		if !ArrayIncludes(columnNames, strings.ToLower(each)) {
+			return errors.New("GROUP BY columns should exist in selected columns")
+		}
+	}
+
+	return nil
 }
