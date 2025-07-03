@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"time"
 )
 
 // To ensure SQLUpdateBuilder has its own initial methods
@@ -41,6 +42,7 @@ func (s *updateBuilder) Update(values interface{}, returningColumns ...string) S
 	}
 
 	t := v.Type()
+	var hasUpdatedAt bool
 	var setClauses []string
 
 	for i := 0; i < v.NumField(); i++ {
@@ -49,7 +51,13 @@ func (s *updateBuilder) Update(values interface{}, returningColumns ...string) S
 		if tag == "" || tag == "-" {
 			continue
 		}
-		setClauses = append(setClauses, fmt.Sprintf("%s = $%d", tag, len(s.Args)+1))
+
+		snake := CamelToSnake(tag)
+		if snake == "updated_at" {
+			hasUpdatedAt = true
+		}
+
+		setClauses = append(setClauses, fmt.Sprintf("%s = $%d", snake, len(s.Args)+1))
 		s.Args = append(s.Args, v.Field(i).Interface())
 	}
 
@@ -59,6 +67,10 @@ func (s *updateBuilder) Update(values interface{}, returningColumns ...string) S
 		s.Columns = []string{"id"}
 	}
 
+	if !hasUpdatedAt {
+		setClauses = append(setClauses, fmt.Sprintf("updated_at = $%d", len(s.Args)+1))
+		s.Args = append(s.Args, time.Now())
+	}
 	s.CustomQuery = fmt.Sprintf("UPDATE %s SET %s", s.Table, strings.Join(setClauses, ", "))
 
 	return s
@@ -103,9 +115,12 @@ func (s *SQLEloquentQuery) buildUpdateQuery() (string, []interface{}, error) {
 		query += " " + fromClause
 	}
 
-	if len(s.Filters) > 0 {
-		query += " " + fmt.Sprintf("WHERE %s", strings.Join(s.Filters, " AND "))
+	if len(s.Filters) < 1 {
+		return "", nil, errors.New("unsafe query: DELETE/UPDATE must have WHERE clause")
 	}
+
+	query += " " + fmt.Sprintf("WHERE %s", strings.Join(s.Filters, " AND "))
+
 	if len(s.Columns) > 0 {
 		s.CustomQuery += " RETURNING " + strings.Join(s.Columns, ",")
 	}
