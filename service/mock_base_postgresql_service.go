@@ -36,6 +36,11 @@ func (m *MockBasePostgreSqlService) SelectOne(
 	return arg.Error(0)
 }
 
+func (m *MockBasePostgreSqlService) Count(ctx context.Context, queryString string, args ...any) (int, error) {
+	arg := m.Called(ctx, queryString, args)
+	return arg.Get(0).(int), arg.Error(1)
+}
+
 func (m *MockBasePostgreSqlService) InsertOne(
 	ctx context.Context,
 	queryString string,
