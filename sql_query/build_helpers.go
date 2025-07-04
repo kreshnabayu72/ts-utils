@@ -7,11 +7,10 @@ import (
 )
 
 func (s *SQLEloquentQuery) sharedWhereQuery(filters map[string]SQLCondition, isHavingClause bool) {
-	fmt.Println("Sharedwhere")
 
 	for column, each := range filters {
 		var clause string
-		if each.Value == nil || reflect.ValueOf(each.Value).IsZero() {
+		if each.Value == nil {
 			continue
 		}
 
@@ -43,7 +42,6 @@ func (s *SQLEloquentQuery) sharedWhereQuery(filters map[string]SQLCondition, isH
 		if isHavingClause {
 			s.HavingClauses = append(s.HavingClauses, clause)
 		} else {
-			fmt.Println("APPEN CLAUSE TO FILTERS " + clause)
 			s.Filters = append(s.Filters, clause)
 		}
 	}
