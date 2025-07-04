@@ -217,7 +217,6 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 		countQuery = append(countQuery, joinClause)
 	}
 
-	fmt.Printf("LEN FILTERS %v\n", len(s.Filters))
 	if len(s.Filters) > 0 {
 		whereClause := fmt.Sprintf("WHERE %s", strings.Join(s.Filters, " AND "))
 		dataQuery = append(dataQuery, whereClause)
