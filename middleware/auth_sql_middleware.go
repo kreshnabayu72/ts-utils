@@ -41,14 +41,14 @@ func ValidateJWTSQL() fiber.Handler {
 			}
 
 			companyCode := claims["companyCode"].(string)
-			userId, _ := claims["id"].(int)
-			session, _ := claims["session"].(int)
-			company, _ := claims["company"].(int)
+			userId, _ := claims["id"].(float64)
+			session, _ := claims["session"].(float64)
+			company, _ := claims["company"].(float64)
 
-			ctx.Locals(UserKey, userId)
-			ctx.Locals(SessionKey, session)
+			ctx.Locals(UserKey, int(userId))
+			ctx.Locals(SessionKey, int(session))
 			ctx.Locals(CompanyCodeKey, companyCode)
-			ctx.Locals(Company, company)
+			ctx.Locals(Company, int(company))
 
 		} else {
 			return response.SendResponse(ctx, fiber.StatusBadRequest, nil, "Unauthorized")
