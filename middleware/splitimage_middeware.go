@@ -154,3 +154,112 @@ func SplitImageMiddleware(folderName string, attribute string) fiber.Handler {
 		return ctx.Next()
 	}
 }
+
+// global settings has different folder structure
+func SplitImageMiddlewareGlobalSettings(folderName string, attribute string) fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+		// Define sizes for resizing the image
+		sizes := []struct {
+			name          string
+			width, height int
+		}{
+			{"small", 300, 300},
+			{"medium", 600, 600},
+			{"large", 1200, 1200},
+		}
+
+		// Get the uploaded file, FormFile attribute
+		fileHeader, err := ctx.FormFile(attribute)
+		if err != nil {
+			for _, size := range sizes {
+				ctx.Locals(ContextKey(size.name), "")
+			}
+			return ctx.Next()
+		}
+
+		fmt.Println("Uploaded file size:", fileHeader.Size)
+		fmt.Println("Uploaded file type:", fileHeader.Header.Get("Content-Type"))
+
+		if fileType, err := GetFileType(fileHeader.Header.Get("Content-Type")); err == nil {
+			fmt.Println("Uploaded file type:", fileType) // prints "PNG"
+			ctx.Locals(FileExt, fileType)
+		} else {
+			// handle parse error
+			fmt.Println("Could not parse content type:", err)
+		}
+
+		ctx.Locals(FileSize, fileHeader.Size)
+		ctx.Locals(FileSizeString, GetFileSizeString(uint64(fileHeader.Size)))
+
+		file, err := fileHeader.Open()
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, "Error retrieving the file: "+err.Error())
+		}
+
+		defer file.Close()
+
+		// Decode the image
+		img, _, err := image.Decode(file)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, "Error decoding image: "+err.Error())
+		}
+
+		// Process and save resized images
+		fileNamePrefix := strconv.FormatInt(time.Now().Unix(), 10)
+		for _, size := range sizes {
+			// Resize the image to the specified dimensions
+			resizedImg := imaging.Resize(img, size.width, size.height, imaging.Lanczos)
+
+			companyCode := ctx.Locals(ContextKey("companyCode")).(string)
+
+			currentDir, err := os.Getwd()
+
+			// Create the directory if it doesn't exist
+			if err != nil {
+
+				return fiber.NewError(
+					fiber.StatusInternalServerError,
+					"Error creating directory: "+err.Error(),
+				)
+			}
+			absPath := filepath.Join(currentDir, "..", "..", "..", "..", "tsv2-files", companyCode, folderName)
+
+			// Save the resized image to disk
+			filename := fmt.Sprintf(
+				"%s.jpg",
+				fileNamePrefix+"-"+size.name,
+			)
+			outputFilePath := filepath.Join(
+				absPath,
+				filename,
+			)
+
+			// Create the directory if it doesn't exist
+			if err := os.MkdirAll(absPath, os.ModePerm); err != nil {
+				return fiber.NewError(
+					fiber.StatusInternalServerError,
+					"Error creating directory: "+err.Error(),
+				)
+			}
+
+			fmt.Println("Saved a file in: " + outputFilePath)
+
+			err = imaging.Save(resizedImg, outputFilePath)
+			if err != nil {
+				return fiber.NewError(
+					fiber.StatusInternalServerError,
+					"Error saving resized image: "+err.Error(),
+				)
+			}
+
+			key := ContextKey(size.name)
+			path := fmt.Sprintf("/%s/%s/%s", companyCode, folderName, filename)
+
+			ctx.Locals(key, path)
+		}
+
+		ctx.Locals(FileNameWithoutExt, fileNamePrefix)
+
+		return ctx.Next()
+	}
+}
