@@ -96,7 +96,7 @@ func (s *SQLEloquentQuery) buildDeleteQuery() (string, []interface{}, error) {
 	}
 
 	if len(s.Columns) > 0 {
-		s.CustomQuery += " RETURNING " + strings.Join(s.Columns, ",")
+		query += " RETURNING " + strings.Join(s.Columns, ",")
 	}
 
 	return query, s.Args, nil

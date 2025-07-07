@@ -122,7 +122,7 @@ func (s *SQLEloquentQuery) buildUpdateQuery() (string, []interface{}, error) {
 	query += " " + fmt.Sprintf("WHERE %s", strings.Join(s.Filters, " AND "))
 
 	if len(s.Columns) > 0 {
-		s.CustomQuery += " RETURNING " + strings.Join(s.Columns, ",")
+		query += " RETURNING " + strings.Join(s.Columns, ",")
 	}
 	return query, s.Args, nil
 }
