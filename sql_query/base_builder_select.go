@@ -154,7 +154,7 @@ func (s *selectBuilder) Paginate(query Pagination) SQLSelectChainBuilder {
 		s.SortBy = []string{}
 
 		for _, sort := range query.MultiSort {
-			s.OrderBy([]string{query.SortBy}, sort.SortOrder > 0)
+			s.OrderBy([]string{sort.SortBy}, sort.SortOrder > 0)
 		}
 	} else if len(query.DefaultSort) > 0 {
 		//Overwrite sortBy sortOrder
@@ -162,7 +162,7 @@ func (s *selectBuilder) Paginate(query Pagination) SQLSelectChainBuilder {
 		s.SortBy = []string{}
 
 		for _, sort := range query.DefaultSort {
-			s.OrderBy([]string{query.SortBy}, sort.SortOrder > 0)
+			s.OrderBy([]string{sort.SortBy}, sort.SortOrder > 0)
 		}
 	}
 
