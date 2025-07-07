@@ -16,7 +16,7 @@ type SQLSelectChainBuilder interface {
 	SetLimit(limit int) SQLSelectChainBuilder
 	Join(table string, onCondition string) SQLSelectChainBuilder
 	LeftJoin(table string, onCondition string) SQLSelectChainBuilder
-	Paginate(page, limit int) SQLSelectChainBuilder
+	Paginate(query Pagination) SQLSelectChainBuilder
 	OrderBy(sortBy []string, asc bool) SQLSelectChainBuilder
 	GroupBy(groupBy ...string) SQLSelectChainBuilder
 	Having(havingClauses map[string]SQLCondition) SQLSelectChainBuilder
@@ -119,18 +119,52 @@ func (s *selectBuilder) OrderBy(sortBy []string, asc bool) SQLSelectChainBuilder
 	return s
 }
 
+type Sort struct {
+	SortBy    string `json:"sortBy"`
+	SortOrder int    `json:"sortOrder"`
+}
+
+type Pagination struct {
+	Page        int    `json:"page"      transform:"int"`
+	Limit       int    `json:"limit"     transform:"int"`
+	SortBy      string `json:"sortBy"    transform:"string"`
+	SortOrder   int    `json:"sortOrder" transform:"int"`
+	MultiSort   []Sort `json:"multiSort"`
+	DefaultSort []Sort `json:"defaultSort"`
+}
+
 // Paginate implements SQLSelectChainBuilder. (Overrides previous value if called again)
-func (s *selectBuilder) Paginate(page int, limit int) SQLSelectChainBuilder {
+func (s *selectBuilder) Paginate(query Pagination) SQLSelectChainBuilder {
 	var normalizedPage int
-	if page > 0 {
-		normalizedPage = page - 1
+	if query.Page > 0 {
+		normalizedPage = query.Page - 1
 	} else {
 		normalizedPage = 0
 	}
 
 	s.UsePagination = true
-	s.Limit = limit
-	s.Offset = normalizedPage * limit
+	s.Limit = query.Limit
+	s.Offset = normalizedPage * query.Limit
+
+	if query.SortBy != "" && query.SortOrder != 0 {
+		s.OrderBy([]string{query.SortBy}, query.SortOrder > 0)
+	} else if len(query.MultiSort) > 0 {
+		//Overwrite sortBy sortOrder
+		//Functions: For nameWithSequence sort (split the sort into 2 sorts)
+		s.SortBy = []string{}
+
+		for _, sort := range query.MultiSort {
+			s.OrderBy([]string{query.SortBy}, sort.SortOrder > 0)
+		}
+	} else if len(query.DefaultSort) > 0 {
+		//Overwrite sortBy sortOrder
+		//Functions: If all other sorts not defined, define defaultsort
+		s.SortBy = []string{}
+
+		for _, sort := range query.DefaultSort {
+			s.OrderBy([]string{query.SortBy}, sort.SortOrder > 0)
+		}
+	}
 
 	return s
 }
