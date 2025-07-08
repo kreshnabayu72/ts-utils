@@ -45,17 +45,18 @@ func (s *selectBuilder) WhereOr(filters map[string]SQLCondition) SQLSelectChainB
 // Search implements SQLSelectChainBuilder. (Accumulates previous value if called again)
 func (s *selectBuilder) Search(keyword string, fields []string) SQLSelectChainBuilder {
 	if keyword != "" && len(fields) > 0 {
-		searchFilters := map[string]SQLCondition{}
+		var orClauses []string
+		orArgs := []interface{}{}
 
 		for _, field := range fields {
-			searchFilters[field] = SQLCondition{
-				Operator: "ILIKE",
-				Value:    "%" + keyword + "%",
-			}
+			orClauses = append(orClauses, fmt.Sprintf("%s ILIKE $%d", field, len(s.Args)+len(orArgs)+1))
+			orArgs = append(orArgs, "%"+keyword+"%")
 		}
 
-		// Use sharedWhereAndQuery internally to handle argIndex, Args, etc.
-		s.Where(searchFilters)
+		// Combine all clauses with OR inside parentheses
+		orClauseGroup := fmt.Sprintf("(%s)", strings.Join(orClauses, " OR "))
+		s.Filters = append(s.Filters, orClauseGroup)
+		s.Args = append(s.Args, orArgs...)
 	}
 
 	return s
