@@ -34,4 +34,7 @@ const (
 	// Range
 	SQLOperatorBetween    SQLOperators = "BETWEEN"
 	SQLOperatorNotBetween SQLOperators = "NOT BETWEEN"
+
+	SQLOperatorAny SQLOperators = "ANY"
+	SQLOperatorRaw SQLOperators = "__RAW__"
 )

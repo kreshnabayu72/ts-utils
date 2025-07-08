@@ -3,7 +3,6 @@ package sql_query
 import (
 	"errors"
 	"fmt"
-
 	"strings"
 )
 
@@ -17,6 +16,8 @@ type SQLDeleteInitBuilder interface {
 // e.g. .Delete(...).Using(...).Where(...).Build()
 type SQLDeleteChainBuilder interface {
 	Where(filters map[string]SQLCondition) SQLDeleteChainBuilder
+	WhereOr(filters map[string]SQLCondition) SQLDeleteChainBuilder
+
 	Using(tables []string) SQLDeleteChainBuilder
 
 	Build() (string, []interface{}, error)
@@ -29,7 +30,13 @@ type deleteBuilder struct {
 
 // Where implements SQLDeleteChainBuilder. (Accumulates previous value if called again)
 func (s *deleteBuilder) Where(filters map[string]SQLCondition) SQLDeleteChainBuilder {
-	s.SQLEloquentQuery.sharedWhereQuery(filters, false)
+	s.SQLEloquentQuery.sharedWhereAndQuery(filters, false)
+	return s
+}
+
+// WhereOr implements SQLDeleteChainBuilder. (Accumulates previous value if called again)
+func (s *deleteBuilder) WhereOr(filters map[string]SQLCondition) SQLDeleteChainBuilder {
+	s.SQLEloquentQuery.sharedWhereOrQuery(filters)
 	return s
 }
 

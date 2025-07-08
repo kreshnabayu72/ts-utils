@@ -18,6 +18,8 @@ type SQLUpdateInitBuilder interface {
 // e.g. .Update(...).From(...).Build()
 type SQLUpdateChainBuilder interface {
 	Where(filters map[string]SQLCondition) SQLUpdateChainBuilder
+	WhereOr(filters map[string]SQLCondition) SQLUpdateChainBuilder
+
 	From(tables []string) SQLUpdateChainBuilder
 
 	Build() (string, []interface{}, error)
@@ -29,7 +31,13 @@ type updateBuilder struct {
 
 // Where implements SQLUpdateChainBuilder. (Accumulates previous value if called again)
 func (s *updateBuilder) Where(filters map[string]SQLCondition) SQLUpdateChainBuilder {
-	s.SQLEloquentQuery.sharedWhereQuery(filters, false)
+	s.SQLEloquentQuery.sharedWhereAndQuery(filters, false)
+	return s
+}
+
+// WhereOr implements SQLUpdateChainBuilder. (Accumulates previous value if called again)
+func (s *updateBuilder) WhereOr(filters map[string]SQLCondition) SQLUpdateChainBuilder {
+	s.SQLEloquentQuery.sharedWhereOrQuery(filters)
 	return s
 }
 

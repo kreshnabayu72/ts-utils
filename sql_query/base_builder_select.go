@@ -3,6 +3,7 @@ package sql_query
 import (
 	"errors"
 	"fmt"
+	"sort"
 	"strings"
 )
 
@@ -12,6 +13,8 @@ type SQLSelectChainBuilder interface {
 	Select(columns ...string) SQLSelectChainBuilder
 
 	Where(filters map[string]SQLCondition) SQLSelectChainBuilder
+	WhereOr(filters map[string]SQLCondition) SQLSelectChainBuilder
+
 	Search(keyword string, fields []string) SQLSelectChainBuilder
 	SetLimit(limit int) SQLSelectChainBuilder
 	Join(table string, onCondition string) SQLSelectChainBuilder
@@ -30,7 +33,13 @@ type selectBuilder struct {
 
 // Where implements SQLSelectChainBuilder. (Accumulates previous value if called again)
 func (s *selectBuilder) Where(filters map[string]SQLCondition) SQLSelectChainBuilder {
-	s.SQLEloquentQuery.sharedWhereQuery(filters, false)
+	s.SQLEloquentQuery.sharedWhereAndQuery(filters, false)
+	return s
+}
+
+// WhereOr implements SQLSelectChainBuilder. (Accumulates previous value if called again)
+func (s *selectBuilder) WhereOr(filters map[string]SQLCondition) SQLSelectChainBuilder {
+	s.SQLEloquentQuery.sharedWhereOrQuery(filters)
 	return s
 }
 
@@ -76,6 +85,44 @@ func (s *selectBuilder) Select(columns ...string) SQLSelectChainBuilder {
 	return s
 }
 
+// SelectJSONAggregate implements SQLSelectChainBuilder
+func (s *selectBuilder) SelectJSONAggregate(alias string, dto any, useAggregate bool) SQLSelectChainBuilder {
+	if alias == "" {
+		alias = "json_result"
+	}
+
+	mappedJSON := MakeMapJSONTagsFromValue(dto)
+	if len(mappedJSON) == 0 {
+		return s
+	}
+
+	var keyValuePairs []string
+	var keys []string
+	for k := range mappedJSON {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	for _, jsonKey := range keys {
+		columnExpr := mappedJSON[jsonKey]
+		keyValuePairs = append(keyValuePairs,
+			fmt.Sprintf("'%s'", jsonKey),
+			columnExpr,
+		)
+	}
+
+	formattedColumn := fmt.Sprintf("json_agg(json_build_object(%s)) AS %s", strings.Join(keyValuePairs, ", "), alias)
+	if !useAggregate {
+		formattedColumn = fmt.Sprintf("json_build_object(%s) AS %s", strings.Join(keyValuePairs, ", "), alias)
+	}
+
+	s.Columns = append(
+		s.Columns,
+		formattedColumn,
+	)
+	return s
+}
+
 // JOIN is the equivalent of INNER JOIN
 func (s *selectBuilder) Join(table string, onCondition string) SQLSelectChainBuilder {
 	if table == "" {
@@ -103,7 +150,7 @@ func (s *selectBuilder) GroupBy(groupBy ...string) SQLSelectChainBuilder {
 
 // Having implements SQLSelectChainBuilder. (Overrides previous value if called again)
 func (s *selectBuilder) Having(havingClause map[string]SQLCondition) SQLSelectChainBuilder {
-	s.SQLEloquentQuery.sharedWhereQuery(havingClause, true)
+	s.SQLEloquentQuery.sharedWhereAndQuery(havingClause, true)
 	return s
 }
 
@@ -150,16 +197,16 @@ func (s *selectBuilder) Paginate(query Pagination) SQLSelectChainBuilder {
 	if query.SortBy != "" && query.SortOrder != 0 {
 		s.OrderBy([]string{query.SortBy}, query.SortOrder > 0)
 	} else if len(query.MultiSort) > 0 {
-		//Overwrite sortBy sortOrder
-		//Functions: For nameWithSequence sort (split the sort into 2 sorts)
+		// Overwrite sortBy sortOrder
+		// Functions: For nameWithSequence sort (split the sort into 2 sorts)
 		s.SortBy = []string{}
 
 		for _, sort := range query.MultiSort {
 			s.OrderBy([]string{sort.SortBy}, sort.SortOrder > 0)
 		}
 	} else if len(query.DefaultSort) > 0 {
-		//Overwrite sortBy sortOrder
-		//Functions: If all other sorts not defined, define defaultsort
+		// Overwrite sortBy sortOrder
+		// Functions: If all other sorts not defined, define defaultsort
 		s.SortBy = []string{}
 
 		for _, sort := range query.DefaultSort {
@@ -204,8 +251,12 @@ func NewSQLSelectBuilder[T any](tableName string) SQLSelectChainBuilder {
 	}
 }
 
-func NewSQLCountBuilder(tableName string) SQLSelectChainBuilder {
+func NewSQLCountBuilder(tableName string, fields ...string) SQLSelectChainBuilder {
 	defaultColumns := []string{"COUNT(*)"}
+
+	if len(fields) > 0 {
+		defaultColumns = []string{fmt.Sprintf("DISTINCT %s", strings.Join(fields, ","))}
+	}
 
 	return &selectBuilder{
 		&SQLEloquentQuery{

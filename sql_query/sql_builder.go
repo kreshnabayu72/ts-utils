@@ -22,9 +22,10 @@ type SQLBuilder struct {
 type SQLFilter map[string]SQLCondition
 
 type SQLCondition struct {
-	Operator SQLOperators // e.g., '=', '>', '<=', 'LIKE', 'IN', 'IS NULL'
-	Value    interface{}  // could be a single value, slice, or nil
-	IsRef bool // to determine whether WHERE is targeting literal value or reference
+	Operator  SQLOperators // e.g., '=', '>', '<=', 'LIKE', 'IN', 'IS NULL'
+	Value     interface{}  // could be a single value, slice, or nil
+	IsRef     bool         // to determine whether WHERE is targeting literal value or reference
+	ExtraArgs []interface{}
 }
 
 // New creates a new SQLBuilder for a given table
