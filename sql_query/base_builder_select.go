@@ -3,6 +3,7 @@ package sql_query
 import (
 	"errors"
 	"fmt"
+	"sort"
 	"strings"
 )
 
@@ -84,48 +85,41 @@ func (s *selectBuilder) Select(columns ...string) SQLSelectChainBuilder {
 	return s
 }
 
-// SelectJSONAggregate implements SQLSelectChainBuilder. (Only able to be called once)
-func (s *selectBuilder) SelectJSONAggregate(alias string, dto any) SQLSelectChainBuilder {
-	mappedJSON := MakeMapJSONTagsFromValue(dto)
+// SelectJSONAggregate implements SQLSelectChainBuilder
+func (s *selectBuilder) SelectJSONAggregate(alias string, dto any, useAggregate bool) SQLSelectChainBuilder {
+	if alias == "" {
+		alias = "json_result"
+	}
 
-	// Ambil pasangan key-value untuk json_build_object
+	mappedJSON := MakeMapJSONTagsFromValue(dto)
+	if len(mappedJSON) == 0 {
+		return s
+	}
+
 	var keyValuePairs []string
-	for jsonKey, columnExpr := range mappedJSON {
+	var keys []string
+	for k := range mappedJSON {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	for _, jsonKey := range keys {
+		columnExpr := mappedJSON[jsonKey]
 		keyValuePairs = append(keyValuePairs,
 			fmt.Sprintf("'%s'", jsonKey),
 			columnExpr,
 		)
 	}
 
-	if alias != "" {
-		alias = "json_result"
+	formattedColumn := fmt.Sprintf("json_agg(json_build_object(%s)) AS %s", strings.Join(keyValuePairs, ", "), alias)
+	if !useAggregate {
+		formattedColumn = fmt.Sprintf("json_build_object(%s) AS %s", strings.Join(keyValuePairs, ", "), alias)
 	}
 
 	s.Columns = append(
 		s.Columns,
-		fmt.Sprintf("json_agg(json_build_object(%s)) AS %s", strings.Join(keyValuePairs, ", "), alias),
+		formattedColumn,
 	)
-	return s
-}
-
-// SelectJSONAggregate implements SQLSelectChainBuilder. (Only able to be called once)
-func (s *selectBuilder) SelectJSONObject(alias string, dto any) SQLSelectChainBuilder {
-	mappedJSON := MakeMapJSONTagsFromValue(dto)
-
-	// Ambil pasangan key-value untuk json_build_object
-	var keyValuePairs []string
-	for jsonKey, columnExpr := range mappedJSON {
-		keyValuePairs = append(keyValuePairs,
-			fmt.Sprintf("'%s'", jsonKey),
-			columnExpr,
-		)
-	}
-
-	if alias != "" {
-		alias = "json_result"
-	}
-
-	s.Columns = append(s.Columns, fmt.Sprintf("json_build_object(%s) AS %s", strings.Join(keyValuePairs, ", "), alias))
 	return s
 }
 
