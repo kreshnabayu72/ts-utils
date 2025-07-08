@@ -49,9 +49,10 @@ func (s *insertBuilder) Insert(values interface{}, returningColumns ...string) S
 	for i := 0; i < v.NumField(); i++ {
 		field := t.Field(i)
 		tag := field.Tag.Get("json")
-		if tag == "" || tag == "-" {
+		if tag == "" || tag == "-" || tag == "id" {
 			continue
 		}
+
 		columns = append(columns, CamelToSnake(tag))
 		placeholders = append(placeholders, fmt.Sprintf("$%d", len(args)+1))
 		args = append(args, v.Field(i).Interface())
