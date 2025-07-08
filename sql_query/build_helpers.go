@@ -6,45 +6,106 @@ import (
 	"strings"
 )
 
-func (s *SQLEloquentQuery) sharedWhereQuery(filters map[string]SQLCondition, isHavingClause bool) {
-
+func (s *SQLEloquentQuery) sharedWhereAndQuery(
+	filters map[string]SQLCondition,
+	isHavingClause bool,
+) {
 	for column, each := range filters {
-		var clause string
-		if each.Value == nil {
+		// Skip value nil except for IS NULL / IS NOT NULL
+		if each.Value == nil &&
+			each.Operator != SQLOperatorIsNull &&
+			each.Operator != SQLOperatorIsNotNull {
 			continue
 		}
 
-		t := reflect.TypeOf(each.Value)
+		var clause string
 
-		if each.IsRef {
-			// products.user.id = users.id (reference)
-			clause = fmt.Sprintf("%s %s %v", column, each.Operator, each.Value)
-		} else if t.Kind() == reflect.Slice {
-			// products.user.id IN ($1,$2) (each element in array became args)
-			v := reflect.ValueOf(each.Value)
-
-			literals := ""
-			for i := 0; i < v.Len(); i++ {
-				if i > 0 {
-					literals += ", "
-				}
-				literals += fmt.Sprintf("$%d", len(s.Args)+1)
-				s.Args = append(s.Args, v.Index(i).Interface())
+		switch each.Operator {
+		/* ───────────────────── RAW ───────────────────── */
+		case SQLOperatorRaw:
+			// Value should be ready to use SQL query
+			raw, ok := each.Value.(string)
+			if !ok {
+				continue // atau panic
 			}
-			clause = fmt.Sprintf("%s %s (%s)", column, each.Operator, literals)
-		} else {
-			// products.user.id = $1 (literal value with args)
+			clause = raw
+			// If exists, ExtraArgs will be appended into main Args
+			if len(each.ExtraArgs) > 0 {
+				s.Args = append(s.Args, each.ExtraArgs...)
+			}
 
-			clause = fmt.Sprintf("%s %s $%d", column, each.Operator, len(s.Args)+1)
+		/* ───────────── IS NULL / IS NOT NULL ──────────── */
+		case SQLOperatorIsNull, SQLOperatorIsNotNull:
+			clause = fmt.Sprintf(`%s %s`, column, each.Operator)
+
+		/* ─────────────────── BETWEEN ──────────────────── */
+		case SQLOperatorBetween, SQLOperatorNotBetween:
+			v := reflect.ValueOf(each.Value)
+			if v.Kind() != reflect.Slice || v.Len() != 2 {
+				continue // Skip if length is not 2
+			}
+			clause = fmt.Sprintf(
+				`%s %s $%d AND $%d`,
+				column, each.Operator,
+				len(s.Args)+1, len(s.Args)+2,
+			)
+			s.Args = append(s.Args, v.Index(0).Interface(), v.Index(1).Interface())
+
+		/* ────────────────── = ANY($n) ─────────────────── */
+		case SQLOperatorAny:
+			clause = fmt.Sprintf(`%s = ANY($%d)`, column, len(s.Args)+1)
 			s.Args = append(s.Args, each.Value)
+
+		/* ──────────────────── DEFAULT ─────────────────── */
+		default:
+			// Reference to other columns like users.id = user_assets.user_id
+			if each.IsRef {
+				clause = fmt.Sprintf(`%s %s %v`, column, each.Operator, each.Value)
+				break
+			}
+
+			typ := reflect.TypeOf(each.Value)
+			if typ.Kind() == reflect.Slice {
+				// products.user.id IN ($1,$2) (each element in array became args)
+				// To expand placeholder usage for operator IN / NOT IN
+				v := reflect.ValueOf(each.Value)
+				if v.Len() == 0 {
+					continue
+				}
+				ph := make([]string, v.Len())
+				for i := 0; i < v.Len(); i++ {
+					ph[i] = fmt.Sprintf("$%d", len(s.Args)+1)
+					s.Args = append(s.Args, v.Index(i).Interface())
+				}
+				clause = fmt.Sprintf(`%s %s (%s)`, column, each.Operator, strings.Join(ph, ", "))
+			} else {
+				// Common operator, products.user.id = $1 (literal value with args)
+				clause = fmt.Sprintf(`%s %s $%d`, column, each.Operator, len(s.Args)+1)
+				s.Args = append(s.Args, each.Value)
+			}
 		}
 
+		// Insert to Where clause or Having clause based on given params
 		if isHavingClause {
 			s.HavingClauses = append(s.HavingClauses, clause)
 		} else {
 			s.Filters = append(s.Filters, clause)
 		}
 	}
+}
+
+func (s *SQLEloquentQuery) sharedWhereOrQuery(groups ...map[string]SQLCondition) {
+	orConditions := []string{}
+
+	for _, group := range groups {
+		inner := &SQLEloquentQuery{Args: s.Args}
+		inner.sharedWhereAndQuery(group, false)
+		orClause := fmt.Sprintf("(%s)", strings.Join(inner.Filters, " AND "))
+		orConditions = append(orConditions, orClause)
+		s.Args = inner.Args
+	}
+
+	s.Filters = append(s.Filters, fmt.Sprintf("(%s)", strings.Join(orConditions, " OR ")))
 }
 
 // flattenArgs handles []any or single value
