@@ -24,7 +24,7 @@ func ExtractJSONTags[T any]() []string {
 		snakeCaseKey := CamelToSnake(jsonTag)
 
 		if columnTag != "" {
-			columns = append(columns, fmt.Sprintf(`"%s" as "%s"`, columnTag, jsonTag))
+			columns = append(columns, fmt.Sprintf(`%s as "%s"`, columnTag, jsonTag))
 		} else if snakeCaseKey != jsonTag {
 			columns = append(columns, fmt.Sprintf(`"%s" as "%s"`, snakeCaseKey, jsonTag))
 		} else if jsonTag == "_id" {
