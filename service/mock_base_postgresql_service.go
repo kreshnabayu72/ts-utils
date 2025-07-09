@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 
+	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/stretchr/testify/mock"
@@ -49,6 +50,10 @@ func (m *MockBasePostgreSqlService) InsertOne(
 	arg := m.Called(ctx, queryString, args)
 	return arg.Get(0), arg.Error(1)
 }
+func (m *MockBasePostgreSqlService) InsertOneWithData(ctx context.Context, body interface{}) (interface{}, error) {
+	arg := m.Called(ctx, body)
+	return arg.Get(0), arg.Error(1)
+}
 
 func (m *MockBasePostgreSqlService) UpdateOne(
 	ctx context.Context,
@@ -74,6 +79,11 @@ func (m *MockBasePostgreSqlService) DeleteOne(
 	args ...any,
 ) (interface{}, error) {
 	arg := m.Called(ctx, queryString, args)
+	return arg.Get(0), arg.Error(1)
+}
+
+func (m *MockBasePostgreSqlService) DeleteOneWithFilter(ctx context.Context, filter map[string]sql_query.SQLCondition) (interface{}, error) {
+	arg := m.Called(ctx, filter)
 	return arg.Get(0), arg.Error(1)
 }
 
