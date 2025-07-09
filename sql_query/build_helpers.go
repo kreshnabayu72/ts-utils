@@ -8,7 +8,6 @@ import (
 
 func (s *SQLEloquentQuery) sharedWhereAndQuery(
 	filters map[string]SQLCondition,
-	isHavingClause bool,
 ) {
 	for column, each := range filters {
 		// Skip value nil except for IS NULL / IS NOT NULL
@@ -86,7 +85,9 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 		}
 
 		// Insert to Where clause or Having clause based on given params
-		if isHavingClause {
+		if s.useAggregation {
+			s.AggregationFilters = append(s.AggregationFilters, clause)
+		} else if s.useHaving {
 			s.HavingClauses = append(s.HavingClauses, clause)
 		} else {
 			s.Filters = append(s.Filters, clause)
@@ -99,7 +100,7 @@ func (s *SQLEloquentQuery) sharedWhereOrQuery(groups ...map[string]SQLCondition)
 
 	for _, group := range groups {
 		inner := &SQLEloquentQuery{Args: s.Args}
-		inner.sharedWhereAndQuery(group, false)
+		inner.sharedWhereAndQuery(group)
 		orClause := fmt.Sprintf("(%s)", strings.Join(inner.Filters, " AND "))
 		orConditions = append(orConditions, orClause)
 		s.Args = inner.Args
