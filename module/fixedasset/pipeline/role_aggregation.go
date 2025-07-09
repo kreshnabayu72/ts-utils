@@ -361,9 +361,17 @@ func SystemRolePermissionAggregation(
 	groupField string,
 	isFieldArray bool,
 	roleType string,
+	isGlobalRole ...bool,
 ) {
 	if groupField != "" && !strings.HasPrefix(groupField, "$") {
 		groupField = fmt.Sprintf("$%s", groupField)
+	}
+
+	var globalRole bool
+	if len(isGlobalRole) > 0 {
+		globalRole = isGlobalRole[0]
+	} else {
+		globalRole = false // default
 	}
 
 	builder.Set(bson.M{
@@ -387,7 +395,7 @@ func SystemRolePermissionAggregation(
 							},
 						},
 					},
-					"group._id" != "" && !isFieldArray,
+					"group._id" != "" && !isFieldArray && !globalRole,
 				).
 				OptionalMatch(
 					bson.M{
@@ -398,7 +406,7 @@ func SystemRolePermissionAggregation(
 							},
 						},
 					},
-					"group._id" != "" && isFieldArray,
+					"group._id" != "" && isFieldArray && !globalRole,
 				).
 				Build(),
 		}).

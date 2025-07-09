@@ -11,6 +11,8 @@ import (
 // e.g. .Select(...).Join(...).Where(...).Build()
 type SQLSelectChainBuilder interface {
 	Select(columns ...string) SQLSelectChainBuilder
+	SelectJSONAggregate(alias string, dto any, aggregateAsArray bool) SQLSelectChainBuilder
+	SelectJSONAggregateFunc(alias string, dto any, fn func(builder *SelectBuilder)) SQLSelectChainBuilder
 
 	Where(filters map[string]SQLCondition) SQLSelectChainBuilder
 	WhereOr(filters map[string]SQLCondition) SQLSelectChainBuilder
@@ -27,24 +29,24 @@ type SQLSelectChainBuilder interface {
 	Build() (string, []interface{}, error)
 }
 
-type selectBuilder struct {
+type SelectBuilder struct {
 	*SQLEloquentQuery
 }
 
 // Where implements SQLSelectChainBuilder. (Accumulates previous value if called again)
-func (s *selectBuilder) Where(filters map[string]SQLCondition) SQLSelectChainBuilder {
-	s.SQLEloquentQuery.sharedWhereAndQuery(filters, false)
+func (s *SelectBuilder) Where(filters map[string]SQLCondition) SQLSelectChainBuilder {
+	s.SQLEloquentQuery.sharedWhereAndQuery(filters)
 	return s
 }
 
 // WhereOr implements SQLSelectChainBuilder. (Accumulates previous value if called again)
-func (s *selectBuilder) WhereOr(filters map[string]SQLCondition) SQLSelectChainBuilder {
+func (s *SelectBuilder) WhereOr(filters map[string]SQLCondition) SQLSelectChainBuilder {
 	s.SQLEloquentQuery.sharedWhereOrQuery(filters)
 	return s
 }
 
 // Search implements SQLSelectChainBuilder. (Accumulates previous value if called again)
-func (s *selectBuilder) Search(keyword string, fields []string) SQLSelectChainBuilder {
+func (s *SelectBuilder) Search(keyword string, fields []string) SQLSelectChainBuilder {
 	if keyword != "" && len(fields) > 0 {
 		var orClauses []string
 		orArgs := []interface{}{}
@@ -64,7 +66,7 @@ func (s *selectBuilder) Search(keyword string, fields []string) SQLSelectChainBu
 }
 
 // Select implements SQLSelectChainBuilder. (Only able to be called once)
-func (s *selectBuilder) Select(columns ...string) SQLSelectChainBuilder {
+func (s *SelectBuilder) Select(columns ...string) SQLSelectChainBuilder {
 	for _, newCol := range columns {
 		newAlias := extractAlias(newCol)
 
@@ -86,7 +88,9 @@ func (s *selectBuilder) Select(columns ...string) SQLSelectChainBuilder {
 }
 
 // SelectJSONAggregate implements SQLSelectChainBuilder
-func (s *selectBuilder) SelectJSONAggregate(alias string, dto any, useAggregate bool) SQLSelectChainBuilder {
+func (s *SelectBuilder) SelectJSONAggregate(alias string, dto any, aggregateAsArray bool) SQLSelectChainBuilder {
+	s.useAggregation = true
+
 	if alias == "" {
 		alias = "json_result"
 	}
@@ -111,20 +115,37 @@ func (s *selectBuilder) SelectJSONAggregate(alias string, dto any, useAggregate 
 		)
 	}
 
-	formattedColumn := fmt.Sprintf("json_agg(json_build_object(%s)) AS %s", strings.Join(keyValuePairs, ", "), alias)
-	if !useAggregate {
-		formattedColumn = fmt.Sprintf("json_build_object(%s) AS %s", strings.Join(keyValuePairs, ", "), alias)
+	formattedColumn := fmt.Sprintf("json_agg(json_build_object(%s))", strings.Join(keyValuePairs, ", "))
+	if !aggregateAsArray {
+		formattedColumn = fmt.Sprintf("json_build_object(%s)", strings.Join(keyValuePairs, ", "))
 	}
+
+	s.AggregationAlias = alias
+	s.AggregationFields = formattedColumn
+	return s
+}
+
+// SelectJSONAggregate implements SQLSelectChainBuilder
+func (s *SelectBuilder) SelectJSONAggregateFunc(alias string, dto any, fn func(builder *SelectBuilder)) SQLSelectChainBuilder {
+	fn(s)
+	var formattedColumn string
+
+	fmt.Println("s.AggregationFilters", s.AggregationFilters)
+	if len(s.AggregationFilters) > 0 {
+		formattedColumn = fmt.Sprintf("%s FILTER (WHERE %s)", s.AggregationFields, strings.Join(s.AggregationFilters, ","))
+	}
+	fmt.Println("formattedColumn", formattedColumn)
 
 	s.Columns = append(
 		s.Columns,
-		formattedColumn,
+		fmt.Sprintf("%s AS %s", formattedColumn, s.AggregationAlias),
 	)
+
 	return s
 }
 
 // JOIN is the equivalent of INNER JOIN
-func (s *selectBuilder) Join(table string, onCondition string) SQLSelectChainBuilder {
+func (s *SelectBuilder) Join(table string, onCondition string) SQLSelectChainBuilder {
 	if table == "" {
 		return s
 	}
@@ -133,7 +154,7 @@ func (s *selectBuilder) Join(table string, onCondition string) SQLSelectChainBui
 	return s
 }
 
-func (s *selectBuilder) LeftJoin(table string, onCondition string) SQLSelectChainBuilder {
+func (s *SelectBuilder) LeftJoin(table string, onCondition string) SQLSelectChainBuilder {
 	if table == "" {
 		return s
 	}
@@ -143,19 +164,20 @@ func (s *selectBuilder) LeftJoin(table string, onCondition string) SQLSelectChai
 }
 
 // GroupBy implements SQLSelectChainBuilder. (Overrides previous value if called again)
-func (s *selectBuilder) GroupBy(groupBy ...string) SQLSelectChainBuilder {
+func (s *SelectBuilder) GroupBy(groupBy ...string) SQLSelectChainBuilder {
 	s.Grouping = append(s.Grouping, groupBy...)
 	return s
 }
 
 // Having implements SQLSelectChainBuilder. (Overrides previous value if called again)
-func (s *selectBuilder) Having(havingClause map[string]SQLCondition) SQLSelectChainBuilder {
-	s.SQLEloquentQuery.sharedWhereAndQuery(havingClause, true)
+func (s *SelectBuilder) Having(havingClause map[string]SQLCondition) SQLSelectChainBuilder {
+	s.useHaving = true
+	s.SQLEloquentQuery.sharedWhereAndQuery(havingClause)
 	return s
 }
 
 // OrderBy implements SQLSelectChainBuilder. (Accumulates with previous value if called again)
-func (s *selectBuilder) OrderBy(sortBy []string, asc bool) SQLSelectChainBuilder {
+func (s *SelectBuilder) OrderBy(sortBy []string, asc bool) SQLSelectChainBuilder {
 	direction := "ASC"
 
 	if !asc {
@@ -182,7 +204,7 @@ type Pagination struct {
 }
 
 // Paginate implements SQLSelectChainBuilder. (Overrides previous value if called again)
-func (s *selectBuilder) Paginate(query Pagination) SQLSelectChainBuilder {
+func (s *SelectBuilder) Paginate(query Pagination) SQLSelectChainBuilder {
 	var normalizedPage int
 	if query.Page > 0 {
 		normalizedPage = query.Page - 1
@@ -218,7 +240,7 @@ func (s *selectBuilder) Paginate(query Pagination) SQLSelectChainBuilder {
 }
 
 // SetLimit implements SQLSelectChainBuilder. (Overrides previous value if called again)
-func (s *selectBuilder) SetLimit(limit int) SQLSelectChainBuilder {
+func (s *SelectBuilder) SetLimit(limit int) SQLSelectChainBuilder {
 	var normalizedPage int
 
 	s.Limit = limit
@@ -234,7 +256,7 @@ func NewSQLSelectBuilder[T any](tableName string) SQLSelectChainBuilder {
 	if len(columns) > 0 {
 		defaultColumns = columns
 	}
-	return &selectBuilder{
+	return &SelectBuilder{
 		&SQLEloquentQuery{
 			Table:         tableName,
 			Filters:       []string{},
@@ -258,7 +280,7 @@ func NewSQLCountBuilder(tableName string, fields ...string) SQLSelectChainBuilde
 		defaultColumns = []string{fmt.Sprintf("DISTINCT %s", strings.Join(fields, ","))}
 	}
 
-	return &selectBuilder{
+	return &SelectBuilder{
 		&SQLEloquentQuery{
 			Table:         tableName,
 			Filters:       []string{},
