@@ -61,20 +61,14 @@ func UserAttributesAggregationBuilder(builder *sql_query.SelectBuilder, localFie
 
 func GetAssetIdFromAliasCodeAggregationBuilder(builder *sql_query.SelectBuilder, tableName string) {
 	res, args, err := sql_query.NewSQLSelectBuilder[fixed_asset_model.AliasCode](tableName).
-		Join("alias_codes ac", "1").
+		Join("alias_codes ac", "true").
 		Join("groups g", "g.id = a.group_id").
-		Join("categories c", "c.id = a.category_id").
+		Join("model_types mt", "mt.id = a.model_id").
+		Join("brand_categories bc", "bc.id = mt.brand_category_id").
+		Join("categories c", "c.id = bc.category_id").
 		Join("asset_names an", "an.id = a.name_id").
 		LeftJoin("alias_codes_data acd", "acd.alias_code_id = ac.id").
-		// SelectJSONAggregateFunc(func(b *sql_query.SelectBuilder) {
-		// 	b.SelectJSONAggregate("data", AliasCodeData{}, true).Where(map[string]sql_query.SQLCondition{
-		// 		"acd.is_checked": {
-		// 			Operator: sql_query.SQLOperatorEqual,
-		// 			Value:    true,
-		// 		},
-		// 	})
-		// }).
-		GroupBy("_id").
+		GroupBy("_id", "ac.separator").
 		SetLimit(1).
 		Build()
 	if err != nil {
