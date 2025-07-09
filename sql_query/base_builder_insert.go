@@ -53,7 +53,7 @@ func (s *insertBuilder) Insert(values interface{}, returningColumns ...string) S
 			continue
 		}
 
-		columns = append(columns, CamelToSnake(tag))
+		columns = append(columns, `"`+CamelToSnake(tag)+`"`)
 		placeholders = append(placeholders, fmt.Sprintf("$%d", len(args)+1))
 		args = append(args, v.Field(i).Interface())
 	}

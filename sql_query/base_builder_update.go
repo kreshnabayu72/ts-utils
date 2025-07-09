@@ -12,6 +12,8 @@ import (
 // e.g. UpdateBuilder(...).Update()...Rest
 type SQLUpdateInitBuilder interface {
 	Update(values interface{}, returningColumns ...string) SQLUpdateChainBuilder
+
+	Increment(values map[string]int, returningColumns ...string) SQLUpdateChainBuilder
 }
 
 // To ensure method .Update() has its own chaining methods
@@ -65,7 +67,7 @@ func (s *updateBuilder) Update(values interface{}, returningColumns ...string) S
 			hasUpdatedAt = true
 		}
 
-		setClauses = append(setClauses, fmt.Sprintf("%s = $%d", snake, len(s.Args)+1))
+		setClauses = append(setClauses, fmt.Sprintf(`"%s" = $%d`, snake, len(s.Args)+1))
 		s.Args = append(s.Args, v.Field(i).Interface())
 	}
 
@@ -81,6 +83,30 @@ func (s *updateBuilder) Update(values interface{}, returningColumns ...string) S
 	}
 	s.CustomQuery = fmt.Sprintf("UPDATE %s SET %s", s.Table, strings.Join(setClauses, ", "))
 
+	return s
+}
+
+// Increment is used to replace Update() for adding int value cause update cant handle that
+func (s *updateBuilder) Increment(values map[string]int, returningColumns ...string) SQLUpdateChainBuilder {
+	var setClauses []string
+
+	for key, val := range values {
+		snake := CamelToSnake(key)
+
+		setClauses = append(setClauses, fmt.Sprintf(`"%s" = "%s" + $%d`, snake, snake, len(s.Args)+1))
+		s.Args = append(s.Args, val)
+	}
+
+	if len(returningColumns) > 0 {
+		s.Columns = returningColumns
+	} else {
+		s.Columns = []string{"id"}
+	}
+
+	setClauses = append(setClauses, fmt.Sprintf(`"updated_at" = $%d`, len(s.Args)+1))
+	s.Args = append(s.Args, time.Now())
+
+	s.CustomQuery = fmt.Sprintf(`UPDATE %s SET %s`, s.Table, strings.Join(setClauses, ", "))
 	return s
 }
 
