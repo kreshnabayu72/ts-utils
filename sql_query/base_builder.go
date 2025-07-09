@@ -22,6 +22,10 @@ type QueryBuilder interface {
 
 // Base struct that contains params used by methods
 type SQLEloquentQuery struct {
+	AggregationAlias   string
+	AggregationFields  string
+	AggregationFilters []string
+
 	Table         string
 	Filters       []string
 	OtherTables   []string
@@ -35,11 +39,14 @@ type SQLEloquentQuery struct {
 	CustomQuery string
 
 	Args          []interface{}
-	argIndex      int
 	WhereParts    []string
 	UsePagination bool
 	Mode          SQLMode
 	LastError     error
+
+	argIndex       int
+	useAggregation bool
+	useHaving      bool
 }
 
 // Run respective build method based on given mode
