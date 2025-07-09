@@ -12,6 +12,8 @@ import (
 // e.g. UpdateBuilder(...).Update()...Rest
 type SQLUpdateInitBuilder interface {
 	Update(values interface{}, returningColumns ...string) SQLUpdateChainBuilder
+
+	Increment(values map[string]int, returningColumns ...string) SQLUpdateChainBuilder
 }
 
 // To ensure method .Update() has its own chaining methods
@@ -66,6 +68,49 @@ func (s *updateBuilder) Update(values interface{}, returningColumns ...string) S
 		}
 
 		setClauses = append(setClauses, fmt.Sprintf(`"%s" = $%d`, snake, len(s.Args)+1))
+		s.Args = append(s.Args, v.Field(i).Interface())
+	}
+
+	if len(returningColumns) > 0 {
+		s.Columns = returningColumns // Columns for RETURNING (used in method Build)
+	} else {
+		s.Columns = []string{"id"}
+	}
+
+	if !hasUpdatedAt {
+		setClauses = append(setClauses, fmt.Sprintf("updated_at = $%d", len(s.Args)+1))
+		s.Args = append(s.Args, time.Now())
+	}
+	s.CustomQuery = fmt.Sprintf("UPDATE %s SET %s", s.Table, strings.Join(setClauses, ", "))
+
+	return s
+}
+
+// Increment is used to replace Update() for adding int value cause update cant handle that
+func (s *updateBuilder) Increment(values map[string]int, returningColumns ...string) SQLUpdateChainBuilder {
+	v := reflect.ValueOf(values)
+	if v.Kind() != reflect.Struct {
+		s.LastError = fmt.Errorf("Update data must be a struct")
+		return s
+	}
+
+	t := v.Type()
+	var hasUpdatedAt bool
+	var setClauses []string
+
+	for i := 0; i < v.NumField(); i++ {
+		field := t.Field(i)
+		tag := field.Tag.Get("json")
+		if tag == "" || tag == "-" {
+			continue
+		}
+
+		snake := CamelToSnake(tag)
+		if snake == "updated_at" {
+			hasUpdatedAt = true
+		}
+
+		setClauses = append(setClauses, fmt.Sprintf(`"%s" = "%s"+$%d`, snake, snake, len(s.Args)+1))
 		s.Args = append(s.Args, v.Field(i).Interface())
 	}
 
