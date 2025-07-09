@@ -7,6 +7,7 @@ import (
 
 	"gitea.qwertysystem.net/BETS/ts-utils/db"
 	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
+	"gitea.qwertysystem.net/BETS/ts-utils/sql_query/common_builders"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -19,9 +20,11 @@ type PostgreSqlService interface {
 	SelectMany(v any, ctx context.Context, queryString string, args ...any) error
 	SelectOne(v any, ctx context.Context, queryString string, args ...any) error
 	InsertOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
+	InsertOneWithData(ctx context.Context, body interface{}) (interface{}, error)
 	UpdateOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
 	UpdateMany(ctx context.Context, queryString string, args ...any) (int64, error)
 	DeleteOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
+	DeleteOneWithFilter(ctx context.Context, filter map[string]sql_query.SQLCondition) (interface{}, error)
 	DeleteMany(ctx context.Context, queryString string, args ...any) (int64, error)
 	SetTransaction(tx pgx.Tx)
 }
@@ -103,6 +106,12 @@ func (s *BasePostgreSqlService) SelectOne(v any, ctx context.Context, queryStrin
 	}
 
 	return nil
+}
+
+func (s *BasePostgreSqlService) InsertOneWithData(ctx context.Context, body interface{}) (interface{}, error) {
+	queryString, args := common_builders.InsertOneBuilder(s.TableName, body)
+
+	return s.InsertOne(ctx, queryString, args...)
 }
 
 func (s *BasePostgreSqlService) Count(ctx context.Context, queryString string, args ...any) (int, error) {
@@ -189,6 +198,11 @@ func (s *BasePostgreSqlService) DeleteOne(ctx context.Context, queryString strin
 	}
 
 	return resultId, nil
+}
+func (s *BasePostgreSqlService) DeleteOneWithFilter(ctx context.Context, filter map[string]sql_query.SQLCondition) (interface{}, error) {
+	query, args := common_builders.DeleteBuilder(s.TableName, filter)
+
+	return s.DeleteOne(ctx, query, args...)
 }
 
 func (s *BasePostgreSqlService) DeleteMany(ctx context.Context, queryString string, args ...any) (int64, error) {
