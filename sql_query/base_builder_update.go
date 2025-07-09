@@ -88,44 +88,25 @@ func (s *updateBuilder) Update(values interface{}, returningColumns ...string) S
 
 // Increment is used to replace Update() for adding int value cause update cant handle that
 func (s *updateBuilder) Increment(values map[string]int, returningColumns ...string) SQLUpdateChainBuilder {
-	v := reflect.ValueOf(values)
-	if v.Kind() != reflect.Map {
-		s.LastError = fmt.Errorf("Update data must be a map")
-		return s
-	}
-
-	t := v.Type()
-	var hasUpdatedAt bool
 	var setClauses []string
 
-	for i := 0; i < v.NumField(); i++ {
-		field := t.Field(i)
-		tag := field.Tag.Get("json")
-		if tag == "" || tag == "-" {
-			continue
-		}
+	for key, val := range values {
+		snake := CamelToSnake(key)
 
-		snake := CamelToSnake(tag)
-		if snake == "updated_at" {
-			hasUpdatedAt = true
-		}
-
-		setClauses = append(setClauses, fmt.Sprintf(`"%s" = "%s"+$%d`, snake, snake, len(s.Args)+1))
-		s.Args = append(s.Args, v.Field(i).Interface())
+		setClauses = append(setClauses, fmt.Sprintf(`"%s" = "%s" + $%d`, snake, snake, len(s.Args)+1))
+		s.Args = append(s.Args, val)
 	}
 
 	if len(returningColumns) > 0 {
-		s.Columns = returningColumns // Columns for RETURNING (used in method Build)
+		s.Columns = returningColumns
 	} else {
 		s.Columns = []string{"id"}
 	}
 
-	if !hasUpdatedAt {
-		setClauses = append(setClauses, fmt.Sprintf("updated_at = $%d", len(s.Args)+1))
-		s.Args = append(s.Args, time.Now())
-	}
-	s.CustomQuery = fmt.Sprintf("UPDATE %s SET %s", s.Table, strings.Join(setClauses, ", "))
+	setClauses = append(setClauses, fmt.Sprintf(`"updated_at" = $%d`, len(s.Args)+1))
+	s.Args = append(s.Args, time.Now())
 
+	s.CustomQuery = fmt.Sprintf(`UPDATE %s SET %s`, s.Table, strings.Join(setClauses, ", "))
 	return s
 }
 
