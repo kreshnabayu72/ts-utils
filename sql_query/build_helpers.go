@@ -36,7 +36,7 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 
 		/* ───────────── IS NULL / IS NOT NULL ──────────── */
 		case SQLOperatorIsNull, SQLOperatorIsNotNull:
-			clause = fmt.Sprintf(`%s %s`, column, each.Operator)
+			clause = fmt.Sprintf(`"%s" %s`, column, each.Operator)
 
 		/* ─────────────────── BETWEEN ──────────────────── */
 		case SQLOperatorBetween, SQLOperatorNotBetween:
@@ -45,7 +45,7 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 				continue // Skip if length is not 2
 			}
 			clause = fmt.Sprintf(
-				`%s %s $%d AND $%d`,
+				`"%s" %s $%d AND $%d`,
 				column, each.Operator,
 				len(s.Args)+1, len(s.Args)+2,
 			)
@@ -53,14 +53,14 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 
 		/* ────────────────── = ANY($n) ─────────────────── */
 		case SQLOperatorAny:
-			clause = fmt.Sprintf(`%s = ANY($%d)`, column, len(s.Args)+1)
+			clause = fmt.Sprintf(`"%s" = ANY($%d)`, column, len(s.Args)+1)
 			s.Args = append(s.Args, each.Value)
 
 		/* ──────────────────── DEFAULT ─────────────────── */
 		default:
 			// Reference to other columns like users.id = user_assets.user_id
 			if each.IsRef {
-				clause = fmt.Sprintf(`%s %s %v`, column, each.Operator, each.Value)
+				clause = fmt.Sprintf(`"%s" %s %v`, column, each.Operator, each.Value)
 				break
 			}
 
@@ -77,10 +77,10 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 					ph[i] = fmt.Sprintf("$%d", len(s.Args)+1)
 					s.Args = append(s.Args, v.Index(i).Interface())
 				}
-				clause = fmt.Sprintf(`%s %s (%s)`, column, each.Operator, strings.Join(ph, ", "))
+				clause = fmt.Sprintf(`"%s" %s (%s)`, column, each.Operator, strings.Join(ph, ", "))
 			} else {
 				// Common operator, products.user.id = $1 (literal value with args)
-				clause = fmt.Sprintf(`%s %s $%d`, column, each.Operator, len(s.Args)+1)
+				clause = fmt.Sprintf(`"%s" %s $%d`, column, each.Operator, len(s.Args)+1)
 				s.Args = append(s.Args, each.Value)
 			}
 		}
