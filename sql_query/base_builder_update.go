@@ -89,8 +89,8 @@ func (s *updateBuilder) Update(values interface{}, returningColumns ...string) S
 // Increment is used to replace Update() for adding int value cause update cant handle that
 func (s *updateBuilder) Increment(values map[string]int, returningColumns ...string) SQLUpdateChainBuilder {
 	v := reflect.ValueOf(values)
-	if v.Kind() != reflect.Struct {
-		s.LastError = fmt.Errorf("Update data must be a struct")
+	if v.Kind() != reflect.Map {
+		s.LastError = fmt.Errorf("Update data must be a map")
 		return s
 	}
 
