@@ -65,7 +65,7 @@ func (s *updateBuilder) Update(values interface{}, returningColumns ...string) S
 			hasUpdatedAt = true
 		}
 
-		setClauses = append(setClauses, fmt.Sprintf("\"%s\" = $%d", snake, len(s.Args)+1))
+		setClauses = append(setClauses, fmt.Sprintf(`"%s" = $%d`, snake, len(s.Args)+1))
 		s.Args = append(s.Args, v.Field(i).Interface())
 	}
 
