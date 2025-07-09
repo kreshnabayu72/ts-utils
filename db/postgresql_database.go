@@ -13,7 +13,6 @@ import (
 
 var (
 	pools         = make(map[string]*pgxpool.Pool)
-	dbOnce        sync.Once
 	snowflakeOnce sync.Once
 	Node          *snowflake.Node
 )
@@ -31,42 +30,44 @@ func InitSnowflake() {
 
 // ConnectPostgres initializes the PostgreSQL connection pool once
 func ConnectPostgres(dbName DBName) *pgxpool.Pool {
-	dbOnce.Do(func() {
-		postgresHost := os.Getenv("POSTGRES_HOST")
-		postgresUsername := os.Getenv("POSTGRES_USERNAME")
-		postgresPassword := os.Getenv("POSTGRES_PASSWORD")
-		postgresSslMode := os.Getenv("POSTGRES_SSLMODE")
+	if pools[string(dbName)] != nil {
+		return pools[string(dbName)]
+	}
 
-		if postgresSslMode == "" {
-			postgresSslMode = "disable"
-		}
+	postgresHost := os.Getenv("POSTGRES_HOST")
+	postgresUsername := os.Getenv("POSTGRES_USERNAME")
+	postgresPassword := os.Getenv("POSTGRES_PASSWORD")
+	postgresSslMode := os.Getenv("POSTGRES_SSLMODE")
 
-		if postgresHost == "" {
-			postgresHost = "localhost:5432"
-		}
+	if postgresSslMode == "" {
+		postgresSslMode = "disable"
+	}
 
-		postgresUri := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=%s", postgresUsername, postgresPassword, postgresHost, dbName, postgresSslMode)
+	if postgresHost == "" {
+		postgresHost = "localhost:5432"
+	}
 
-		config, err := pgxpool.ParseConfig(postgresUri)
-		if err != nil {
-			log.Fatalf("Unable to parse PostgreSQL URI: %v", err)
-		}
+	postgresUri := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=%s", postgresUsername, postgresPassword, postgresHost, dbName, postgresSslMode)
 
-		pool, err := pgxpool.NewWithConfig(context.Background(), config)
-		if err != nil {
-			log.Fatalf("Unable to connect to PostgreSQL: %v", err)
-		}
+	config, err := pgxpool.ParseConfig(postgresUri)
+	if err != nil {
+		log.Fatalf("Unable to parse PostgreSQL URI: %v", err)
+	}
 
-		err = pool.Ping(context.Background())
-		if err != nil {
-			log.Fatalf("Unable to ping PostgreSQL: %v", err)
-		}
+	pool, err := pgxpool.NewWithConfig(context.Background(), config)
+	if err != nil {
+		log.Fatalf("Unable to connect to PostgreSQL: %v", err)
+	}
 
-		fmt.Println("PostgreSQL pool initialized!")
+	err = pool.Ping(context.Background())
+	if err != nil {
+		log.Fatalf("Unable to ping PostgreSQL: %v", err)
+	}
 
-		pools[string(dbName)] = pool
-		log.Printf("Connected to PostgreSQL database: %s\n", dbName)
-	})
+	fmt.Println("PostgreSQL pool initialized!")
+
+	pools[string(dbName)] = pool
+	log.Printf("Connected to PostgreSQL database: %s\n", dbName)
 
 	return pools[string(dbName)]
 }
