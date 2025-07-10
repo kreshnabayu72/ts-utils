@@ -5,6 +5,7 @@ import "time"
 type Asset struct {
 	ID int `json:"id" column:"id"`
 
+	AssetIDFull    string  `json:"assetIdFull"        column:"asset_id_full"`
 	AssetID        string  `json:"assetId"        column:"asset_id"`
 	NameID         int     `json:"nameId"         column:"name_id"`
 	SequenceNumber int     `json:"sequenceNumber" column:"sequence_number"`
