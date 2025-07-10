@@ -42,6 +42,11 @@ func (m *MockBasePostgreSqlService) Count(ctx context.Context, queryString strin
 	return arg.Get(0).(int), arg.Error(1)
 }
 
+func (m *MockBasePostgreSqlService) CountWithFilter(ctx context.Context, filter map[string]sql_query.SQLCondition) (int, error) {
+	arg := m.Called(ctx, filter)
+	return arg.Get(0).(int), arg.Error(1)
+}
+
 func (m *MockBasePostgreSqlService) InsertOne(
 	ctx context.Context,
 	queryString string,
@@ -61,6 +66,11 @@ func (m *MockBasePostgreSqlService) UpdateOne(
 	args ...any,
 ) (interface{}, error) {
 	arg := m.Called(ctx, queryString, args)
+	return arg.Get(0), arg.Error(1)
+}
+
+func (m *MockBasePostgreSqlService) UpdateOneWithData(ctx context.Context, query map[string]sql_query.SQLCondition, updateData interface{}) (interface{}, error) {
+	arg := m.Called(ctx, query, updateData)
 	return arg.Get(0), arg.Error(1)
 }
 
