@@ -8,11 +8,11 @@ type AssetName struct {
 	Code string `json:"code"       column:"code"`
 
 	// ─────── Add on ───────
-	AddOnRepairTicketing bool `json:"addOnRepairTicketing" column:"add_on_repair_ticketing"`
-	AddOnMaintenance     bool `json:"addOnMaintenance"     column:"add_on_maintenance"`
-	AddOnTracking        bool `json:"addOnTracking"        column:"add_on_tracking"`
-	AddOnAssetControl    bool `json:"addOnAssetControl"    column:"add_on_asset_control"`
-	AddOnAudit           bool `json:"addOnAudit"           column:"add_on_audit"`
+	AddOnRepairTicketing bool `json:"addOnRepairTicketing" column:"addon_repair_ticketing"`
+	AddOnMaintenance     bool `json:"addOnMaintenance"     column:"addon_maintenance"`
+	AddOnTracking        bool `json:"addOnTracking"        column:"addon_tracking"`
+	AddOnAssetControl    bool `json:"addOnAssetControl"    column:"addon_asset_control"`
+	AddOnAudit           bool `json:"addOnAudit"           column:"addon_audit"`
 
 	// ─────── References ───────
 	CategoryId          int `json:"categoryId"          column:"category_id"`
