@@ -15,10 +15,10 @@ type AssetName struct {
 	AddOnAudit           bool `json:"addonAudit"           column:"addon_audit"`
 
 	// ─────── References ───────
-	CategoryId          int `json:"categoryId"          column:"category_id"`
-	MeasurementId       int `json:"measurementId"       column:"measurement_id"`
-	DepreciationGroupId int `json:"depreciationGroupId" column:"depreciation_group_id"`
-	AccountCodeId       int `json:"accountCodeId"       column:"account_code_id"`
+	CategoryId          int  `json:"categoryId"          column:"category_id"`
+	MeasurementId       int  `json:"measurementId"       column:"measurement_id"`
+	DepreciationGroupId *int `json:"depreciationGroupId" column:"depreciation_group_id"`
+	AccountCodeId       *int `json:"accountCodeId"       column:"account_code_id"`
 
 	// ─────── Transactions policy ───────
 	TransactionsBorrow      bool `json:"transactionsBorrow"      column:"transactions_borrow"`
