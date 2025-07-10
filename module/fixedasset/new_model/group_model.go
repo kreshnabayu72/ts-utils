@@ -2,6 +2,8 @@ package new_model
 
 import "time"
 
+// UNFINISHED!
+// TODO: QUOTA, LICENSE, etc
 type Group struct {
 	ID       int    `json:"id"         column:"id"`
 	Name     string `json:"name"       column:"name"`

@@ -1,5 +1,25 @@
 package new_model
 
+type AssetStatus string
+
+const (
+	AssetStatusNonTransactional   AssetStatus = "Non-Transactional"
+	AssetStatusAvailable          AssetStatus = "Available"
+	AssetStatusAssigned           AssetStatus = "Assigned"
+	AssetStatusBorrowed           AssetStatus = "Borrowed"
+	AssetStatusDisposed           AssetStatus = "Disposed"
+	AssetStatusDamaged            AssetStatus = "Damaged"
+	AssetStatusMissing            AssetStatus = "Missing"
+	AssetStatusOnAssignProcess    AssetStatus = "On Assign Process"
+	AssetStatusOnBorrowingProcess AssetStatus = "On Borrowing Process"
+	AssetStatusOnDisposalProcess  AssetStatus = "On Disposal Process"
+	AssetStatusReportedDisposal   AssetStatus = "Reported Disposal"
+	AssetStatusOnTransfer         AssetStatus = "On Transfer"
+	AssetStatusExpiredLicense     AssetStatus = "Expired License"
+	AssetStatusTAGReported        AssetStatus = "TAG Reported"
+	AssetStatusTAGNotSet          AssetStatus = "TAG Not Set"
+)
+
 type CustomFieldType string
 
 const (
