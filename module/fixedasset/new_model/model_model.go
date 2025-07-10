@@ -5,7 +5,7 @@ import "time"
 type Model struct {
 	ID int `json:"id"         column:"id"`
 
-	BrandCategoryId string `json:"brandCategoryId"       column:"brand_category_id"`
+	BrandCategoryId int `json:"brandCategoryId"       column:"brand_category_id"`
 
 	IsDeleted            bool       `json:"isDeleted"            column:"is_deleted"`
 	DeleteFromDatabaseAt *time.Time `json:"deleteFromDatabaseAt" column:"delete_from_database_at"`
