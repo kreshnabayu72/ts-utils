@@ -7,34 +7,52 @@ import (
 )
 
 func ExtractJSONTags[T any]() []string {
-	var columns []string
+	var cols []string
+
 	typ := reflect.TypeOf((*T)(nil)).Elem()
+	if typ.Kind() != reflect.Struct {
+		return cols
+	}
 
 	for i := 0; i < typ.NumField(); i++ {
-		field := typ.Field(i)
+		f := typ.Field(i)
 
-		rawJsonTag := field.Tag.Get("json")
-		columnTag := field.Tag.Get("column")
-		jsonTag := strings.ReplaceAll(rawJsonTag, ",omitempty", "")
+		jsonTag := strings.TrimSuffix(f.Tag.Get("json"), ",omitempty")
+		columnTag := f.Tag.Get("column")
 
+		// Fast‑skip anything we don’t need to project.
 		if jsonTag == "" || jsonTag == "-" {
 			continue
 		}
 
-		snakeCaseKey := CamelToSnake(jsonTag)
+		var col string
+		switch {
+		// Special case: to receive _id as a column name
+		case jsonTag == "_id" && (columnTag == "" || columnTag == "id"):
+			col = `("id"::text) as "_id"`
 
-		if columnTag != "" {
-			columns = append(columns, fmt.Sprintf(`"%s" as "%s"`, columnTag, jsonTag))
-		} else if snakeCaseKey != jsonTag {
-			columns = append(columns, fmt.Sprintf(`"%s" as "%s"`, snakeCaseKey, jsonTag))
-		} else if jsonTag == "_id" {
-			columns = append(columns, `"id" as "_id"`)
-		} else {
-			columns = append(columns, fmt.Sprintf(`"%s"`, jsonTag))
+		// If there's no column tag, then column name will derive from JSON name
+		case columnTag == "":
+			snake := CamelToSnake(jsonTag)
+			if snake == jsonTag {
+				col = jsonTag
+			} else {
+				col = fmt.Sprintf(`"%s" as "%s"`, snake, jsonTag)
+			}
+
+		// Special case for foreign key column "tables.id" will cast to text
+		case strings.HasSuffix(columnTag, ".id"):
+			col = fmt.Sprintf(`("%s"::text) as "%s"`, columnTag, jsonTag)
+
+		// Just normal column name that use json as alias
+		default:
+			col = fmt.Sprintf(`"%s" as "%s"`, columnTag, jsonTag)
 		}
+
+		cols = append(cols, col)
 	}
 
-	return columns
+	return cols
 }
 
 func MakeMapJSONTags[T any]() map[string]string {

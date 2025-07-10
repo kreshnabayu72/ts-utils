@@ -49,7 +49,7 @@ func (s *insertBuilder) Insert(values interface{}, returningColumns ...string) S
 	for i := 0; i < v.NumField(); i++ {
 		field := t.Field(i)
 		tag := field.Tag.Get("json")
-		if tag == "" || tag == "-" || tag == "id" {
+		if tag == "" || tag == "-" || tag == "_id" || tag == "id" {
 			continue
 		}
 
