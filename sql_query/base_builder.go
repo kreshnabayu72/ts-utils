@@ -20,6 +20,15 @@ type QueryBuilder interface {
 	buildDeleteQuery() (string, []interface{}, error)
 }
 
+type SQLFilter map[string]SQLCondition
+
+type SQLCondition struct {
+	Operator  SQLOperators // e.g., '=', '>', '<=', 'LIKE', 'IN', 'IS NULL'
+	Value     interface{}  // could be a single value, slice, or nil
+	IsRef     bool         // to determine whether WHERE is targeting literal value or reference
+	ExtraArgs []interface{}
+}
+
 // Base struct that contains params used by methods
 type SQLEloquentQuery struct {
 	AggregationAlias   string
@@ -39,12 +48,10 @@ type SQLEloquentQuery struct {
 	CustomQuery string
 
 	Args          []interface{}
-	WhereParts    []string
 	UsePagination bool
 	Mode          SQLMode
 	LastError     error
 
-	argIndex       int
 	useAggregation bool
 	useHaving      bool
 }

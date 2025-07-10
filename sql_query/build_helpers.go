@@ -95,12 +95,12 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 	}
 }
 
-func (s *SQLEloquentQuery) sharedWhereOrQuery(groups ...map[string]SQLCondition) {
+func (s *SQLEloquentQuery) sharedWhereOrQuery(filters ...map[string]SQLCondition) {
 	orConditions := []string{}
 
-	for _, group := range groups {
+	for _, filter := range filters {
 		inner := &SQLEloquentQuery{Args: s.Args}
-		inner.sharedWhereAndQuery(group)
+		inner.sharedWhereAndQuery(filter)
 		orClause := fmt.Sprintf("(%s)", strings.Join(inner.Filters, " AND "))
 		orConditions = append(orConditions, orClause)
 		s.Args = inner.Args
@@ -109,37 +109,37 @@ func (s *SQLEloquentQuery) sharedWhereOrQuery(groups ...map[string]SQLCondition)
 	s.Filters = append(s.Filters, fmt.Sprintf("(%s)", strings.Join(orConditions, " OR ")))
 }
 
-// flattenArgs handles []any or single value
-func (b *SQLBuilder) flattenArgs(val interface{}) []interface{} {
-	v := reflect.ValueOf(val)
-	if v.Kind() == reflect.Slice {
-		args := make([]interface{}, v.Len())
-		for i := 0; i < v.Len(); i++ {
-			args[i] = v.Index(i).Interface()
-		}
-		return args
-	}
-	// fallback for single values
-	return []interface{}{val}
-}
+// // flattenArgs handles []any or single value
+// func (b *SQLBuilder) flattenArgs(val interface{}) []interface{} {
+// 	v := reflect.ValueOf(val)
+// 	if v.Kind() == reflect.Slice {
+// 		args := make([]interface{}, v.Len())
+// 		for i := 0; i < v.Len(); i++ {
+// 			args[i] = v.Index(i).Interface()
+// 		}
+// 		return args
+// 	}
+// 	// fallback for single values
+// 	return []interface{}{val}
+// }
 
-func (b *SQLBuilder) makePlaceholders(val interface{}) string {
-	v := reflect.ValueOf(val)
-	if v.Kind() != reflect.Slice {
-		return fmt.Sprintf("$%d", b.argIndex)
-	}
+// func (b *SQLBuilder) makePlaceholders(val interface{}) string {
+// 	v := reflect.ValueOf(val)
+// 	if v.Kind() != reflect.Slice {
+// 		return fmt.Sprintf("$%d", b.argIndex)
+// 	}
 
-	placeholders := make([]string, v.Len())
-	for i := 0; i < v.Len(); i++ {
-		placeholders[i] = fmt.Sprintf("$%d", b.argIndex+i)
-	}
-	return strings.Join(placeholders, ", ")
-}
+// 	placeholders := make([]string, v.Len())
+// 	for i := 0; i < v.Len(); i++ {
+// 		placeholders[i] = fmt.Sprintf("$%d", b.argIndex+i)
+// 	}
+// 	return strings.Join(placeholders, ", ")
+// }
 
-func (b *SQLBuilder) countArgs(val interface{}) int {
-	v := reflect.ValueOf(val)
-	if v.Kind() == reflect.Slice {
-		return v.Len()
-	}
-	return 1
-}
+// func (b *SQLBuilder) countArgs(val interface{}) int {
+// 	v := reflect.ValueOf(val)
+// 	if v.Kind() == reflect.Slice {
+// 		return v.Len()
+// 	}
+// 	return 1
+// }
