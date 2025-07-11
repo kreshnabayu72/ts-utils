@@ -75,6 +75,6 @@ func GetAssetIdFromAliasCodeAggregationBuilder(builder *sql_query.SelectBuilder,
 		log.Println(err)
 	}
 
-	builder.Columns = append(builder.Columns, res)
+	builder.Columns = append(builder.Columns, fmt.Sprintf("%s.assetId AS assetId", res))
 	builder.Args = append(builder.Args, args...)
 }

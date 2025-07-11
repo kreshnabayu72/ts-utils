@@ -3,8 +3,6 @@ package sql_query
 import (
 	"errors"
 	"fmt"
-	"reflect"
-	"sort"
 	"strings"
 )
 
@@ -12,8 +10,9 @@ import (
 // e.g. .Select(...).Join(...).Where(...).Build()
 type SQLSelectChainBuilder interface {
 	Select(columns ...string) SQLSelectChainBuilder
-	SelectJSONAggregate(alias string, dto any, aggregateAsArray bool) SQLSelectChainBuilder
-	SelectJSONAggregateFunc(alias string, dto any, fn func(builder *SelectBuilder)) SQLSelectChainBuilder
+	SelectJSONArrayElements(alias string, arrayElements []map[string]string) SQLSelectChainBuilder
+	SelectJSONAggregate(alias string, dto any, useAggregate bool) SQLSelectChainBuilder
+	SelectJSONAggregateFunc(fn func(builder *SelectBuilder)) SQLSelectChainBuilder
 
 	Where(filters map[string]SQLCondition) SQLSelectChainBuilder
 	WhereOr(filters map[string]SQLCondition) SQLSelectChainBuilder
@@ -85,71 +84,6 @@ func (s *SelectBuilder) Select(columns ...string) SQLSelectChainBuilder {
 			s.Columns = append(s.Columns, newCol)
 		}
 	}
-	return s
-}
-
-// SelectJSONAggregate implements SQLSelectChainBuilder
-func (s *SelectBuilder) SelectJSONAggregate(alias string, dto any, aggregateAsArray bool) SQLSelectChainBuilder {
-	s.useAggregation = true
-
-	if alias == "" {
-		alias = "json_result"
-	}
-
-	var mappedJSON map[string]string
-
-	v := reflect.ValueOf(dto)
-	if v.Kind() != reflect.Struct {
-		mappedJSON = dto.(map[string]string)
-	} else {
-		mappedJSON = MakeMapJSONTagsFromValue(dto)
-	}
-
-	if len(mappedJSON) == 0 {
-		return s
-	}
-
-	var keyValuePairs []string
-	var keys []string
-	for k := range mappedJSON {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-
-	for _, jsonKey := range keys {
-		columnExpr := mappedJSON[jsonKey]
-		keyValuePairs = append(keyValuePairs,
-			fmt.Sprintf("'%s'", jsonKey),
-			columnExpr,
-		)
-	}
-
-	formattedColumn := fmt.Sprintf("json_agg(json_build_object(%s))", strings.Join(keyValuePairs, ", "))
-	if !aggregateAsArray {
-		formattedColumn = fmt.Sprintf("json_build_object(%s)", strings.Join(keyValuePairs, ", "))
-	}
-
-	s.AggregationAlias = alias
-	s.AggregationFields = formattedColumn
-	return s
-}
-
-// SelectJSONAggregate implements SQLSelectChainBuilder
-func (s *SelectBuilder) SelectJSONAggregateFunc(alias string, dto any, fn func(builder *SelectBuilder)) SQLSelectChainBuilder {
-	fn(s)
-	var formattedColumn string
-
-	fmt.Println("s.AggregationFilters", s.AggregationFilters)
-	if len(s.AggregationFilters) > 0 {
-		formattedColumn = fmt.Sprintf("%s FILTER (WHERE %s)", s.AggregationFields, strings.Join(s.AggregationFilters, ","))
-	}
-	fmt.Println("formattedColumn", formattedColumn)
-
-	s.Columns = append(
-		s.Columns,
-		fmt.Sprintf("%s AS %s", formattedColumn, s.AggregationAlias),
-	)
-
 	return s
 }
 
