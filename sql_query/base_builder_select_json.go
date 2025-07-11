@@ -80,9 +80,6 @@ func (s *SelectBuilder) SelectJSONAggregate(alias string, dto any, aggregateAsAr
 
 // SelectJSONAggregate implements SQLSelectChainBuilder
 func (s *SelectBuilder) SelectJSONAggregateFunc(fn func(builder *SelectBuilder)) SQLSelectChainBuilder {
-	s.AggregationFields = ""
-	s.AggregationAlias = ""
-	s.AggregationFilters = []string{}
 	fn(s)
 	var formattedColumn string
 
@@ -97,5 +94,9 @@ func (s *SelectBuilder) SelectJSONAggregateFunc(fn func(builder *SelectBuilder))
 		fmt.Sprintf("%s AS %s", formattedColumn, s.AggregationAlias),
 	)
 
+	s.AggregationFields = ""
+	s.AggregationAlias = ""
+	s.AggregationFilters = []string{}
+	s.useAggregation = false
 	return s
 }
