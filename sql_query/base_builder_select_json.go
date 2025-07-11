@@ -87,7 +87,7 @@ func (s *SelectBuilder) SelectJSONAggregateFunc(fn func(builder *SelectBuilder))
 	var formattedColumn string
 
 	if len(s.AggregationFilters) > 0 {
-		formattedColumn = fmt.Sprintf("%s FILTER (WHERE %s)", s.AggregationFields, strings.Join(s.AggregationFilters, ","))
+		formattedColumn = fmt.Sprintf("%s FILTER (WHERE %s)", s.AggregationFields, strings.Join(s.AggregationFilters, " AND "))
 	} else {
 		formattedColumn = s.AggregationFields
 	}
