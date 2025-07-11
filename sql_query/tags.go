@@ -27,10 +27,6 @@ func ExtractJSONTags[T any]() []string {
 
 		var col string
 		switch {
-		// Special case: to receive _id as a column name
-		case jsonTag == "_id" && (columnTag == "" || columnTag == "id"):
-			col = `("id"::text) as "_id"`
-
 		// If there's no column tag, then column name will derive from JSON name
 		case columnTag == "":
 			snake := CamelToSnake(jsonTag)
@@ -39,10 +35,6 @@ func ExtractJSONTags[T any]() []string {
 			} else {
 				col = fmt.Sprintf(`"%s" as "%s"`, snake, jsonTag)
 			}
-
-		// Special case for foreign key column "tables.id" will cast to text
-		case strings.HasSuffix(columnTag, ".id"):
-			col = fmt.Sprintf(`("%s"::text) as "%s"`, columnTag, jsonTag)
 
 		// Just normal column name that use json as alias
 		default:
