@@ -10,6 +10,9 @@ type User struct {
 	Email                  string     `json:"email"                  column:"email"`
 	IsActive               bool       `json:"isActive"               column:"is_active"`
 	IsDefault              bool       `json:"isDefault"              column:"is_default"`
+	IsEmailConfirmed       bool       `json:"isEmailConfirmed"       column:"is_email_confirmed"`
+	ExpiryDate             *time.Time `json:"expiryDate" column:"expiry_date"`
+	IsExpired              bool       `json:"isExpired" column:"is_expired"`
 	Position               *string    `json:"position"               column:"position"`
 	Division               string     `json:"division"               column:"division"`
 	RFIDCode               *string    `json:"rfidCode"               column:"rfid_code"`
