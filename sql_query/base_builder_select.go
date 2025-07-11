@@ -258,13 +258,6 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 	if len(s.Columns) == 0 {
 		return "", nil, errors.New("select query must have columns")
 	}
-
-	// if len(s.Grouping) > 0 {
-	// 	if err := validateGroupByColumns(s.Columns, s.Grouping); err != nil {
-	// 		return "", nil, err
-	// 	}
-	// }
-
 	if len(s.HavingClauses) > 0 && len(s.Grouping) < 1 {
 		return "", nil, errors.New("HAVING clauses only allowed if GROUP BY clause is exists")
 	}
@@ -278,7 +271,7 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 	}
 
 	dataQuery = append(dataQuery, fmt.Sprintf("SELECT %s FROM %s", strings.Join(s.Columns, ","), s.Table))
-	countQuery = append(countQuery, fmt.Sprintf("SELECT COUNT(*) FROM %s", s.Table))
+	countQuery = dataQuery
 
 	if len(s.OtherTables) > 0 {
 		joinClause := strings.Join(s.OtherTables, " ")
