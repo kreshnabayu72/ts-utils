@@ -35,6 +35,7 @@ type SQLEloquentQuery struct {
 	AggregationFields  string
 	AggregationFilters []string
 
+	WithClauses   []string
 	Table         string
 	Filters       []string
 	OtherTables   []string
