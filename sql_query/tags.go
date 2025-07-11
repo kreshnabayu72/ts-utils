@@ -38,7 +38,7 @@ func ExtractJSONTags[T any]() []string {
 
 		// Just normal column name that use json as alias
 		default:
-			col = fmt.Sprintf(`"%s" as "%s"`, columnTag, jsonTag)
+			col = fmt.Sprintf(`%s as "%s"`, columnTag, jsonTag)
 		}
 
 		cols = append(cols, col)
