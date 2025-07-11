@@ -3,6 +3,7 @@ package sql_query
 import (
 	"errors"
 	"fmt"
+	"reflect"
 	"sort"
 	"strings"
 )
@@ -95,7 +96,15 @@ func (s *SelectBuilder) SelectJSONAggregate(alias string, dto any, aggregateAsAr
 		alias = "json_result"
 	}
 
-	mappedJSON := MakeMapJSONTagsFromValue(dto)
+	var mappedJSON map[string]string
+
+	v := reflect.ValueOf(dto)
+	if v.Kind() != reflect.Struct {
+		mappedJSON = dto.(map[string]string)
+	} else {
+		mappedJSON = MakeMapJSONTagsFromValue(dto)
+	}
+
 	if len(mappedJSON) == 0 {
 		return s
 	}
