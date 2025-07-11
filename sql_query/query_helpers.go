@@ -256,7 +256,10 @@ func PaginationQuery(dataQuery, totalQuery string) string {
 	paginationQuery := fmt.Sprintf(`
 		WITH
 			paginated AS (%s),
-			total AS (%s)
+			totalRow AS (%s),
+			total AS (
+				SELECT COUNT(*) FROM totalRow
+			)
 		SELECT
 			COALESCE((SELECT json_agg(paginated) FROM paginated), '[]') AS data,
 			(SELECT COUNT FROM total) AS totalRecords;
