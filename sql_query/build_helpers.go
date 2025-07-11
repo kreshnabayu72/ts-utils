@@ -79,7 +79,12 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 				clause = fmt.Sprintf(`"%s" %s (%s)`, column, each.Operator, strings.Join(ph, ", "))
 			} else {
 				// Common operator, products.user.id = $1 (literal value with args)
-				clause = fmt.Sprintf(`"%s" %s $%d`, column, each.Operator, len(s.Args)+1)
+				parts := strings.Split(column, ".")
+				for i, part := range parts {
+					parts[i] = fmt.Sprintf(`"%s"`, part)
+				}
+				quotedColumn := strings.Join(parts, ".")
+				clause = fmt.Sprintf(`%s %s $%d`, quotedColumn, each.Operator, len(s.Args)+1)
 				s.Args = append(s.Args, each.Value)
 			}
 		}
