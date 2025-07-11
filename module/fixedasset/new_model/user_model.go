@@ -8,6 +8,8 @@ type User struct {
 	LastName               string     `json:"lastName"               column:"last_name"`
 	FullName               string     `json:"fullName"               column:"full_name"`
 	Email                  string     `json:"email"                  column:"email"`
+	PhoneNumber            string     `json:"phoneNumber"                  column:"phone_number"`
+	PendingEmailChange     string     `json:"pendingEmailChange"                  column:"pending_email_change"`
 	IsActive               bool       `json:"isActive"               column:"is_active"`
 	IsDefault              bool       `json:"isDefault"              column:"is_default"`
 	IsEmailConfirmed       bool       `json:"isEmailConfirmed"       column:"is_email_confirmed"`
