@@ -246,11 +246,11 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 		return "", nil, errors.New("select query must have columns")
 	}
 
-	if len(s.Grouping) > 0 {
-		if err := validateGroupByColumns(s.Columns, s.Grouping); err != nil {
-			return "", nil, err
-		}
-	}
+	// if len(s.Grouping) > 0 {
+	// 	if err := validateGroupByColumns(s.Columns, s.Grouping); err != nil {
+	// 		return "", nil, err
+	// 	}
+	// }
 
 	if len(s.HavingClauses) > 0 && len(s.Grouping) < 1 {
 		return "", nil, errors.New("HAVING clauses only allowed if GROUP BY clause is exists")
