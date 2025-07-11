@@ -36,6 +36,10 @@ func ExtractJSONTags[T any]() []string {
 				col = fmt.Sprintf(`"%s" as "%s"`, snake, jsonTag)
 			}
 
+		case columnTag == "-":
+			//Some columns are generated from json_build_object,etc so it should be skipped here and use Select() instead
+			continue
+
 		// Just normal column name that use json as alias
 		default:
 			col = fmt.Sprintf(`%s as "%s"`, columnTag, jsonTag)
