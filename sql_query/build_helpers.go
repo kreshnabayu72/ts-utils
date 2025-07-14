@@ -90,9 +90,7 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 		}
 
 		// Insert to Where clause or Having clause based on given params
-		if s.useAggregation {
-			s.AggregationFilters = append(s.AggregationFilters, clause)
-		} else if s.useHaving {
+		if s.useHaving {
 			s.HavingClauses = append(s.HavingClauses, clause)
 		} else {
 			s.Filters = append(s.Filters, clause)

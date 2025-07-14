@@ -54,9 +54,7 @@ func AttributesAggregationBuilder(builder *sql_query.SelectBuilder, dto any, opt
 
 	joinType(options.TableName, fmt.Sprintf("%s.id = %s", options.TableName, options.LocalField))
 
-	builder.SelectJSONAggregateFunc(func(b *sql_query.SelectBuilder) {
-		b.SelectJSONAggregate(options.Alias, dto, options.UseArray)
-	})
+	builder.SelectJSONAggregate(options.Alias, dto, "", options.UseArray)
 }
 
 // Tested result WTF/MG/ELEC/LTP/0724/1

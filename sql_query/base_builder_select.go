@@ -10,10 +10,11 @@ import (
 // e.g. .Select(...).Join(...).Where(...).Build()
 type SQLSelectChainBuilder interface {
 	Select(columns ...string) SQLSelectChainBuilder
+	SelectCaseWhen(thenExpr, elseExpr, alias string, whenClause string, whenArgs ...interface{}) SQLSelectChainBuilder
 	SelectBoolOr(expr, alias string, args ...interface{}) SQLSelectChainBuilder
 	SelectJSONArrayElements(alias string, arrayElements []map[string]string) SQLSelectChainBuilder
-	SelectJSONAggregate(alias string, dto any, useAggregate bool) SQLSelectChainBuilder
-	SelectJSONAggregateFunc(fn func(builder *SelectBuilder)) SQLSelectChainBuilder
+	SelectJSONAggregate(alias string, dto any, condition string, asArrayAggregation bool) SQLSelectChainBuilder
+	SelectJSONAggregateFunc(alias string, fn func(builder *SelectBuilder)) SQLSelectChainBuilder
 
 	Where(filters map[string]SQLCondition) SQLSelectChainBuilder
 	WhereOr(filters map[string]SQLCondition) SQLSelectChainBuilder
@@ -93,6 +94,12 @@ func (s *SelectBuilder) Select(columns ...string) SQLSelectChainBuilder {
 func (s *SelectBuilder) SelectBoolOr(expr, alias string, args ...interface{}) SQLSelectChainBuilder {
 	s.Columns = append(s.Columns, fmt.Sprintf("bool_or(%s) AS %s", expr, alias))
 	s.Args = append(s.Args, args...)
+	return s
+}
+
+func (s *SelectBuilder) SelectCaseWhen(thenExpr, elseExpr, alias string, whenClause string, whenArgs ...interface{}) SQLSelectChainBuilder {
+	s.Columns = append(s.Columns, fmt.Sprintf("CASE WHEN %s THEN %s ELSE %s END AS %s", whenClause, thenExpr, elseExpr, alias))
+	s.Args = append(s.Args, whenArgs...)
 	return s
 }
 

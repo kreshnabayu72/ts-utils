@@ -31,9 +31,8 @@ type SQLCondition struct {
 
 // Base struct that contains params used by methods
 type SQLEloquentQuery struct {
-	AggregationAlias   string
-	AggregationFields  string
-	AggregationFilters []string
+	NestedAggregation []string
+	WrapAggregation   bool
 
 	WithClauses   []string
 	Table         string
