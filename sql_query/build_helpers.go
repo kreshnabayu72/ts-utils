@@ -3,6 +3,8 @@ package sql_query
 import (
 	"fmt"
 	"reflect"
+	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -110,6 +112,18 @@ func (s *SQLEloquentQuery) sharedWhereOrQuery(filters ...map[string]SQLCondition
 	}
 
 	s.Filters = append(s.Filters, fmt.Sprintf("(%s)", strings.Join(orConditions, " OR ")))
+}
+
+func shiftSQLPlaceholders(query string, offset int) string {
+	placeholderRegexp := regexp.MustCompile(`\$(\d+)`)
+	return placeholderRegexp.ReplaceAllStringFunc(query, func(placeholder string) string {
+		numStr := placeholder[1:]
+		num, err := strconv.Atoi(numStr)
+		if err != nil {
+			return placeholder // fallback to original if parse fails
+		}
+		return fmt.Sprintf("$%d", num+offset)
+	})
 }
 
 // // flattenArgs handles []any or single value
