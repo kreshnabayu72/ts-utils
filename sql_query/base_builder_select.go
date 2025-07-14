@@ -210,7 +210,14 @@ func (s *SelectBuilder) SetLimit(limit int) SQLSelectChainBuilder {
 
 func (s *SelectBuilder) WithCTEBuilder(cteName string, cteBuilder SQLSelectChainBuilder) SQLSelectChainBuilder {
 	cteQuery, cteArgs, _ := cteBuilder.Build()
-	s.WithClauses = append(s.WithClauses, fmt.Sprintf("WITH %s AS (%s)", cteName, cteQuery))
+
+	// Calculate the current argument offset
+	offset := len(s.Args)
+
+	// Shift the placeholders in the CTE query
+	shiftedCTEQuery := shiftSQLPlaceholders(cteQuery, offset)
+
+	s.WithClauses = append(s.WithClauses, fmt.Sprintf("%s AS (%s)", cteName, shiftedCTEQuery))
 	s.Args = append(s.Args, cteArgs...)
 
 	return s
@@ -273,8 +280,8 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 	var countQuery []string
 
 	if len(s.WithClauses) > 0 {
-		dataQuery = append(dataQuery, strings.Join(s.WithClauses, ", ")+"\n")
-		countQuery = append(countQuery, strings.Join(s.WithClauses, ", ")+"\n")
+		dataQuery = append(dataQuery, fmt.Sprintf("WITH %s", strings.Join(s.WithClauses, ", "))+"\n")
+		countQuery = append(countQuery, fmt.Sprintf("WITH %s", strings.Join(s.WithClauses, ", "))+"\n")
 	}
 
 	dataQuery = append(dataQuery, fmt.Sprintf("SELECT %s FROM %s", strings.Join(s.Columns, ","), s.Table))
