@@ -105,8 +105,8 @@ type Client struct {
 
 	AddOn AddOn `json:"addOn"   bson:"addOn"`
 
-	DateFormat  DateFormat         `json:"dateFormat" bson:"dateFormat"`
-	TimeFormat  bool               `json:"timeFormat" bson:"timeFormat"`
+	DateFormat  string             `json:"dateFormat" bson:"dateFormat"`
+	TimeFormat  string             `json:"timeFormat" bson:"timeFormat"`
 	TimeZone    string             `json:"timezone" bson:"timezone"`
 	Currency    Currency           `json:"currency" bson:"currency"`
 	Geolocation bool               `json:"geolocation" bson:"geolocation"`
@@ -118,13 +118,6 @@ type CompanyLicensePlan struct {
 	SupplyAsset model.PlanTypes `json:"supplyAsset" bson:"supplyAsset"`
 }
 
-type DateFormat struct {
-	Locale  string `json:"locale" bson:"locale"`
-	Year    string `json:"year" bson:"year"`
-	Month   string `json:"month" bson:"month"`
-	Day     string `json:"day" bson:"day"`
-	Weekday string `json:"weekday" bson:"weekday"`
-}
 type Currency struct {
 	Currency string `json:"currency" bson:"currency"`
 	Symbol   string `json:"symbol" bson:"symbol"`

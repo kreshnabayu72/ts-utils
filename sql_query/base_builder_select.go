@@ -10,9 +10,11 @@ import (
 // e.g. .Select(...).Join(...).Where(...).Build()
 type SQLSelectChainBuilder interface {
 	Select(columns ...string) SQLSelectChainBuilder
+	SelectCaseWhen(thenExpr, elseExpr, alias string, whenClause string, whenArgs ...interface{}) SQLSelectChainBuilder
+	SelectBoolOr(expr, alias string, args ...interface{}) SQLSelectChainBuilder
 	SelectJSONArrayElements(alias string, arrayElements []map[string]string) SQLSelectChainBuilder
-	SelectJSONAggregate(alias string, dto any, useAggregate bool) SQLSelectChainBuilder
-	SelectJSONAggregateFunc(fn func(builder *SelectBuilder)) SQLSelectChainBuilder
+	SelectJSONAggregate(alias string, dto any, condition string, asArrayAggregation bool) SQLSelectChainBuilder
+	SelectJSONAggregateFunc(alias string, fn func(builder *SelectBuilder)) SQLSelectChainBuilder
 
 	Where(filters map[string]SQLCondition) SQLSelectChainBuilder
 	WhereOr(filters map[string]SQLCondition) SQLSelectChainBuilder
@@ -25,6 +27,8 @@ type SQLSelectChainBuilder interface {
 	OrderBy(sortBy []string, asc bool) SQLSelectChainBuilder
 	GroupBy(groupBy ...string) SQLSelectChainBuilder
 	Having(havingClauses map[string]SQLCondition) SQLSelectChainBuilder
+
+	WithCTEBuilder(cteName string, cteBuilder SQLSelectChainBuilder) SQLSelectChainBuilder
 
 	Build() (string, []interface{}, error)
 }
@@ -84,6 +88,18 @@ func (s *SelectBuilder) Select(columns ...string) SQLSelectChainBuilder {
 			s.Columns = append(s.Columns, newCol)
 		}
 	}
+	return s
+}
+
+func (s *SelectBuilder) SelectBoolOr(expr, alias string, args ...interface{}) SQLSelectChainBuilder {
+	s.Columns = append(s.Columns, fmt.Sprintf("bool_or(%s) AS %s", expr, alias))
+	s.Args = append(s.Args, args...)
+	return s
+}
+
+func (s *SelectBuilder) SelectCaseWhen(thenExpr, elseExpr, alias string, whenClause string, whenArgs ...interface{}) SQLSelectChainBuilder {
+	s.Columns = append(s.Columns, fmt.Sprintf("CASE WHEN %s THEN %s ELSE %s END AS %s", whenClause, thenExpr, elseExpr, alias))
+	s.Args = append(s.Args, whenArgs...)
 	return s
 }
 
@@ -192,6 +208,21 @@ func (s *SelectBuilder) SetLimit(limit int) SQLSelectChainBuilder {
 	return s
 }
 
+func (s *SelectBuilder) WithCTEBuilder(cteName string, cteBuilder SQLSelectChainBuilder) SQLSelectChainBuilder {
+	cteQuery, cteArgs, _ := cteBuilder.Build()
+
+	// Calculate the current argument offset
+	offset := len(s.Args)
+
+	// Shift the placeholders in the CTE query
+	shiftedCTEQuery := shiftSQLPlaceholders(cteQuery, offset)
+
+	s.WithClauses = append(s.WithClauses, fmt.Sprintf("%s AS (%s)", cteName, shiftedCTEQuery))
+	s.Args = append(s.Args, cteArgs...)
+
+	return s
+}
+
 func NewSQLSelectBuilder[T any](tableName string) SQLSelectChainBuilder {
 	columns := ExtractJSONTags[T]()
 
@@ -216,12 +247,8 @@ func NewSQLSelectBuilder[T any](tableName string) SQLSelectChainBuilder {
 	}
 }
 
-func NewSQLCountBuilder(tableName string, fields ...string) SQLSelectChainBuilder {
+func NewSQLCountBuilder(tableName string) SQLSelectChainBuilder {
 	defaultColumns := []string{"COUNT(*)"}
-
-	if len(fields) > 0 {
-		defaultColumns = []string{fmt.Sprintf("DISTINCT %s", strings.Join(fields, ","))}
-	}
 
 	return &SelectBuilder{
 		&SQLEloquentQuery{
@@ -251,6 +278,11 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 
 	var dataQuery []string
 	var countQuery []string
+
+	if len(s.WithClauses) > 0 {
+		dataQuery = append(dataQuery, fmt.Sprintf("WITH %s", strings.Join(s.WithClauses, ", "))+"\n")
+		countQuery = append(countQuery, fmt.Sprintf("WITH %s", strings.Join(s.WithClauses, ", "))+"\n")
+	}
 
 	dataQuery = append(dataQuery, fmt.Sprintf("SELECT %s FROM %s", strings.Join(s.Columns, ","), s.Table))
 	countQuery = dataQuery
@@ -304,17 +336,17 @@ func extractAlias(column string) string {
 	return strings.TrimSpace(parts[len(parts)-1])
 }
 
-func validateGroupByColumns(availableColumns []string, groupByColumns []string) error {
-	var columnNames []string
-	for _, column := range availableColumns {
-		columnNames = append(columnNames, extractAlias(column))
-	}
+// func validateGroupByColumns(availableColumns []string, groupByColumns []string) error {
+// 	var columnNames []string
+// 	for _, column := range availableColumns {
+// 		columnNames = append(columnNames, extractAlias(column))
+// 	}
 
-	for _, each := range groupByColumns {
-		if !ArrayIncludes(columnNames, strings.ToLower(each)) {
-			return errors.New("GROUP BY columns should exist in selected columns")
-		}
-	}
+// 	for _, each := range groupByColumns {
+// 		if !util.ArrayIncludes(columnNames, strings.ToLower(each)) {
+// 			return errors.New("GROUP BY columns should exist in selected columns")
+// 		}
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
