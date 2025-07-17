@@ -2,6 +2,7 @@ package functions
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -75,6 +76,13 @@ func SaveFile(ctx *fiber.Ctx, folderName string, attribute string) (string, erro
 	path := fmt.Sprintf("/%s/%s/%s", companyCode, folderName, filename)
 
 	return path, nil
+}
+
+// Define a struct matching the response
+type UploadResponse struct {
+	Status  int      `json:"status"`
+	Message string   `json:"message"`
+	Data    []string `json:"data"`
 }
 
 // SaveFileWithName saves the uploaded file (if any) into
@@ -176,6 +184,11 @@ func SaveFileWithName(
 		return "", "", "", 0, "", fiber.NewError(resp.StatusCode, "Upload failed: "+string(respBody))
 	}
 
+	var uploadResp UploadResponse
+	if err := json.Unmarshal(respBody, &uploadResp); err != nil {
+		return "", "", "", 0, "", fiber.NewError(fiber.StatusInternalServerError, "Failed to parse upload response: "+err.Error())
+	}
+
 	//this batch is replaced
 	dst := filepath.Join(absPath, fileName)
 	if err := ctx.SaveFile(fileHeader, dst); err != nil {
@@ -190,6 +203,11 @@ func SaveFileWithName(
 
 	// 6. Return the public path
 	publicPath := fmt.Sprintf("/%s/%s/%s", companyCode, folderName, fileName)
+
+	if len(uploadResp.Data) > 0 {
+		publicPath = uploadResp.Data[0]
+	}
+
 	return publicPath, fileName, filetype, fileHeader.Size, middleware.GetFileSizeString(uint64(fileHeader.Size)), nil
 
 }
