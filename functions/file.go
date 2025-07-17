@@ -137,6 +137,10 @@ func SaveFileWithName(
 		return "", "", "", 0, "", fiber.NewError(fiber.StatusInternalServerError, "Cannot create form file part: "+err.Error())
 	}
 
+	//other form part
+	writer.WriteField("dirName", folderName)
+	writer.WriteField("filePrefix", folderName)
+
 	// Copy the uploaded file content into the request body
 	if _, err := io.Copy(part, src); err != nil {
 		return "", "", "", 0, "", fiber.NewError(fiber.StatusInternalServerError, "Cannot copy file: "+err.Error())
