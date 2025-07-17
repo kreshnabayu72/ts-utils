@@ -209,7 +209,6 @@ func SaveFileWithName(
 	}
 
 	return publicPath, fileName, filetype, fileHeader.Size, middleware.GetFileSizeString(uint64(fileHeader.Size)), nil
-
 }
 
 func DeleteFile(filePath string) error {
