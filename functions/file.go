@@ -1,8 +1,13 @@
 package functions
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"mime/multipart"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -73,6 +78,13 @@ func SaveFile(ctx *fiber.Ctx, folderName string, attribute string) (string, erro
 	return path, nil
 }
 
+// Define a struct matching the response
+type UploadResponse struct {
+	Status  int      `json:"status"`
+	Message string   `json:"message"`
+	Data    []string `json:"data"`
+}
+
 // SaveFileWithName saves the uploaded file (if any) into
 // ../../../../tsv2-files/{companyCode}/{folderName}/{fileName}.
 // If the provided fileName has no extension, the original file’s
@@ -115,6 +127,69 @@ func SaveFileWithName(
 	}
 
 	// 5. Save the file
+
+	// Open file from memory
+	src, err := fileHeader.Open()
+	if err != nil {
+		return "", "", "", 0, "", fiber.NewError(fiber.StatusInternalServerError, "Cannot open uploaded file: "+err.Error())
+	}
+	defer src.Close()
+
+	// Create multipart body
+	var b bytes.Buffer
+	writer := multipart.NewWriter(&b)
+
+	//other form part
+	writer.WriteField("dirName", folderName)
+	writer.WriteField("filePrefix", folderName)
+
+	// Create form file part named "files"
+	part, err := writer.CreateFormFile("files", fileHeader.Filename)
+	if err != nil {
+		return "", "", "", 0, "", fiber.NewError(fiber.StatusInternalServerError, "Cannot create form file part: "+err.Error())
+	}
+
+	// Copy the uploaded file content into the request body
+	if _, err := io.Copy(part, src); err != nil {
+		return "", "", "", 0, "", fiber.NewError(fiber.StatusInternalServerError, "Cannot copy file: "+err.Error())
+	}
+
+	writer.Close()
+
+	fileApi := os.Getenv("FILE_MANAGER_API")
+	req, err := http.NewRequest("POST", fmt.Sprintf("%v/api/file/upload", fileApi), &b)
+
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+
+	if err != nil {
+		return "", "", "", 0, "", fiber.NewError(fiber.StatusInternalServerError,
+			"Error saving file: "+err.Error())
+
+	}
+
+	// Forward authorization header if present
+	if auth := ctx.Get("Authorization"); auth != "" {
+		req.Header.Set("Authorization", auth)
+	}
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", "", "", 0, "", fiber.NewError(fiber.StatusInternalServerError, "Upload failed: "+err.Error())
+	}
+	defer resp.Body.Close()
+
+	respBody, _ := io.ReadAll(resp.Body)
+	if resp.StatusCode != http.StatusOK {
+		return "", "", "", 0, "", fiber.NewError(resp.StatusCode, "Upload failed: "+string(respBody))
+	}
+
+	var uploadResp UploadResponse
+	if err := json.Unmarshal(respBody, &uploadResp); err != nil {
+		return "", "", "", 0, "", fiber.NewError(fiber.StatusInternalServerError, "Failed to parse upload response: "+err.Error())
+	}
+
+	//this batch is replaced
 	dst := filepath.Join(absPath, fileName)
 	if err := ctx.SaveFile(fileHeader, dst); err != nil {
 		return "", "", "", 0, "", fiber.NewError(fiber.StatusInternalServerError,
@@ -128,6 +203,11 @@ func SaveFileWithName(
 
 	// 6. Return the public path
 	publicPath := fmt.Sprintf("/%s/%s/%s", companyCode, folderName, fileName)
+
+	if len(uploadResp.Data) > 0 {
+		publicPath = uploadResp.Data[0]
+	}
+
 	return publicPath, fileName, filetype, fileHeader.Size, middleware.GetFileSizeString(uint64(fileHeader.Size)), nil
 
 }
