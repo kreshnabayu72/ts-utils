@@ -1,8 +1,12 @@
 package functions
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"io"
+	"mime/multipart"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -115,6 +119,60 @@ func SaveFileWithName(
 	}
 
 	// 5. Save the file
+
+	// Open file from memory
+	src, err := fileHeader.Open()
+	if err != nil {
+		return "", "", "", 0, "", fiber.NewError(fiber.StatusInternalServerError, "Cannot open uploaded file: "+err.Error())
+	}
+	defer src.Close()
+
+	// Create multipart body
+	var b bytes.Buffer
+	writer := multipart.NewWriter(&b)
+
+	// Create form file part named "files"
+	part, err := writer.CreateFormFile("files", fileHeader.Filename)
+	if err != nil {
+		return "", "", "", 0, "", fiber.NewError(fiber.StatusInternalServerError, "Cannot create form file part: "+err.Error())
+	}
+
+	// Copy the uploaded file content into the request body
+	if _, err := io.Copy(part, src); err != nil {
+		return "", "", "", 0, "", fiber.NewError(fiber.StatusInternalServerError, "Cannot copy file: "+err.Error())
+	}
+
+	writer.Close()
+
+	fileApi := os.Getenv("FILE_MANAGER_API")
+	req, err := http.NewRequest("POST", fmt.Sprintf("%v/api/file/upload", fileApi), &b)
+
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+
+	if err != nil {
+		return "", "", "", 0, "", fiber.NewError(fiber.StatusInternalServerError,
+			"Error saving file: "+err.Error())
+
+	}
+
+	// Forward authorization header if present
+	if auth := ctx.Get("Authorization"); auth != "" {
+		req.Header.Set("Authorization", auth)
+	}
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", "", "", 0, "", fiber.NewError(fiber.StatusInternalServerError, "Upload failed: "+err.Error())
+	}
+	defer resp.Body.Close()
+
+	respBody, _ := io.ReadAll(resp.Body)
+	if resp.StatusCode != http.StatusOK {
+		return "", "", "", 0, "", fiber.NewError(resp.StatusCode, "Upload failed: "+string(respBody))
+	}
+
+	//this batch is replaced
 	dst := filepath.Join(absPath, fileName)
 	if err := ctx.SaveFile(fileHeader, dst); err != nil {
 		return "", "", "", 0, "", fiber.NewError(fiber.StatusInternalServerError,
