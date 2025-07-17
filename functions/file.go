@@ -139,15 +139,15 @@ func SaveFileWithName(
 	var b bytes.Buffer
 	writer := multipart.NewWriter(&b)
 
+	//other form part
+	writer.WriteField("dirName", folderName)
+	writer.WriteField("filePrefix", folderName)
+
 	// Create form file part named "files"
 	part, err := writer.CreateFormFile("files", fileHeader.Filename)
 	if err != nil {
 		return "", "", "", 0, "", fiber.NewError(fiber.StatusInternalServerError, "Cannot create form file part: "+err.Error())
 	}
-
-	//other form part
-	writer.WriteField("dirName", folderName)
-	writer.WriteField("filePrefix", folderName)
 
 	// Copy the uploaded file content into the request body
 	if _, err := io.Copy(part, src); err != nil {
