@@ -180,7 +180,7 @@ func SaveFileWithName(
 	defer resp.Body.Close()
 
 	respBody, _ := io.ReadAll(resp.Body)
-	if resp.StatusCode != http.StatusOK {
+	if resp.StatusCode != http.StatusCreated {
 		return "", "", "", 0, "", fiber.NewError(resp.StatusCode, "Upload failed: "+string(respBody))
 	}
 
