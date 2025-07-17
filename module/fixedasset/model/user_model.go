@@ -38,6 +38,7 @@ type User struct {
 	ProfilePictureSmall  *string                  `json:"profilePictureSmall"  bson:"profilePictureSmall"`
 	ProfilePictureMedium *string                  `json:"profilePictureMedium" bson:"profilePictureMedium"`
 	ProfilePictureBig    *string                  `json:"profilePictureBig"  bson:"profilePictureBig"`
+	ProfilePicture       *string                  `json:"profilePicture"  bson:"profilePicture"`
 	IsDeleted            bool                     `json:"isDeleted"            bson:"isDeleted"`
 	IsSubUser            bool                     `json:"isSubUser"            bson:"isSubUser"`
 	IsConfirmed          bool                     `json:"isConfirmed"          bson:"isConfirmed"`

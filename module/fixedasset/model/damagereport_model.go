@@ -19,9 +19,11 @@ type DamageReport struct {
 	AssetImageBig     *string                 `bson:"assetImageBig" json:"assetImageBig"`
 	AssetImageMedium  *string                 `bson:"assetImageMedium" json:"assetImageMedium"`
 	AssetImageSmall   *string                 `bson:"assetImageSmall" json:"assetImageSmall"`
+	AssetImage        *string                 `bson:"assetImage" json:"assetImage"`
 	DamageImageBig    *string                 `bson:"damageImageBig" json:"damageImageBig"`
 	DamageImageMedium *string                 `bson:"damageImageMedium" json:"damageImageMedium"`
 	DamageImageSmall  *string                 `bson:"damageImageSmall" json:"damageImageSmall"`
+	DamageImage       *string                 `bson:"damageImage" json:"damageImage"`
 	PreviousStatus    *string                 `bson:"previousStatus" json:"previousStatus"`
 	Status            string                  `bson:"status" json:"status"`
 	Notes             string                  `bson:"notes" json:"notes"`
