@@ -33,12 +33,8 @@ type Client struct {
 	AddonTracking             bool      `json:"addonTracking"               column:"addon_tracking"`
 	AddonAssetControl         bool      `json:"addonAssetControl"           column:"addon_asset_control"`
 	AddonAudit                bool      `json:"addonAudit"                  column:"addon_audit"`
-	DateFormatLocale          string    `json:"dateFormatLocale"            column:"date_format_locale"`
-	DateFormatYear            string    `json:"dateFormatYear"              column:"date_format_year"`
-	DateFormatMonth           string    `json:"dateFormatMonth"             column:"date_format_month"`
-	DateFormatDay             string    `json:"dateFormatDay"               column:"date_format_day"`
-	DateFormatWeekday         string    `json:"dateFormatWeekday"           column:"date_format_weekday"`
-	TimeFormat                bool      `json:"timeFormat"                  column:"time_format"`
+	DateFormat                string    `json:"dateFormat"            column:"date_format"`
+	TimeFormat                string    `json:"timeFormat"                  column:"time_format"`
 	Geolocation               bool      `json:"geolocation"                 column:"geolocation"`
 	TimeZone                  string    `json:"timeZone"                    column:"time_zone"`
 	Pin                       string    `json:"pin"                         column:"pin"`
