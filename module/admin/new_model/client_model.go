@@ -4,6 +4,7 @@ import "time"
 
 type Client struct {
 	ID                        int       `json:"_id"                         column:"id"`
+	GroupID                   int       `json:"groupId"						column:"group_id"`
 	Name                      string    `json:"name"                        column:"name"`
 	Status                    string    `json:"status"                      column:"status"` // TODO(refan): change this to an enum.
 	ClientId                  string    `json:"clientId"                    column:"client_id"`
