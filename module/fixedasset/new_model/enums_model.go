@@ -139,3 +139,17 @@ const (
 	TransactionRoleTypeApproval   TransactionRoleType = "Approval"
 	TransactionRoleTypeStaff      TransactionRoleType = "Staff"
 )
+
+type PlanTypes string
+
+const (
+	PlanBasic      = PlanTypes("Basic")
+	PlanStandard   = PlanTypes("Standard")
+	PlanEnterprise = PlanTypes("Enterprise")
+)
+
+var PlanEnum = map[string]PlanTypes{
+	"Basic":      PlanBasic,
+	"Standard":   PlanStandard,
+	"Enterprise": PlanEnterprise,
+}
