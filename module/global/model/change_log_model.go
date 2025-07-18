@@ -15,7 +15,7 @@ type Changelog struct {
 	Value         string             `json:"value"         bson:"value"`
 	ModifiedBy    string             `json:"modifiedBy"    bson:"modifiedBy"`
 	ModifiedById  primitive.ObjectID `json:"modifiedById"  bson:"modifiedById"`
-	ModifiedByKey int                `json:"modifiedByKey"  bson:"modifiedByKey"`
+	ModifiedByKey string             `json:"modifiedByKey"  bson:"modifiedByKey"`
 	Object        string             `json:"object"        bson:"object"`
 	ObjectId      primitive.ObjectID `json:"objectId"      bson:"objectId"`
 	ObjectKey     int                `json:"objectKey"      bson:"objectKey"`
