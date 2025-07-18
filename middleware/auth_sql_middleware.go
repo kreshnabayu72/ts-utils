@@ -13,7 +13,7 @@ import (
 // Middleware to validate JWT
 func ValidateJWTSQL() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		var jwtKey = []byte(os.Getenv("JWT_KEY"))
+		jwtKey := []byte(os.Getenv("JWT_KEY"))
 		tokenStr := ctx.Get("Authorization", "NOT_FOUND")
 		if tokenStr == "NOT_FOUND" {
 			return response.SendResponse(ctx, fiber.StatusBadRequest, nil, "Unauthorized")
@@ -30,7 +30,6 @@ func ValidateJWTSQL() fiber.Handler {
 			}
 			return jwtKey, nil
 		})
-
 		if err != nil {
 			return response.SendResponse(ctx, fiber.StatusBadRequest, nil, "Unauthorized")
 		}
@@ -41,14 +40,14 @@ func ValidateJWTSQL() fiber.Handler {
 			}
 
 			companyCode := claims["companyCode"].(string)
-			userId, _ := claims["id"].(float64)
+			userId, _ := claims["id"].(string)
 			session, _ := claims["session"].(float64)
-			company, _ := claims["company"].(float64)
+			company, _ := claims["company"].(string)
 
-			ctx.Locals(UserKey, int(userId))
+			ctx.Locals(UserKey, userId)
 			ctx.Locals(SessionKey, int(session))
 			ctx.Locals(CompanyCodeKey, companyCode)
-			ctx.Locals(Company, int(company))
+			ctx.Locals(Company, company)
 
 		} else {
 			return response.SendResponse(ctx, fiber.StatusBadRequest, nil, "Unauthorized")
