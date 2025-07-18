@@ -4,7 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/db"
-	new_model "gitea.qwertysystem.net/BETS/ts-utils/module/admin/new-model"
+	new_model "gitea.qwertysystem.net/BETS/ts-utils/module/admin/new_model"
 	"gitea.qwertysystem.net/BETS/ts-utils/response"
 	"gitea.qwertysystem.net/BETS/ts-utils/service"
 	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
