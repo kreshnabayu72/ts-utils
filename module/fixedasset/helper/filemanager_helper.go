@@ -57,8 +57,17 @@ func (f *FileManagerHelperImpl) CreateFileManager(
 		return entity.BadRequest("Company file storage is full")
 	}
 
-	_, err = clientService.UpdateOne(context.Background(), bson.M{"clientId": companyCode},
-		bson.M{"$inc": bson.M{"fileStorage.usedKB": data.FileSizeKb, "fileStorage.availableKB": -1 * data.FileSizeKb, fmt.Sprintf("fileStorage.%v", fileStorageAttribute): data.FileSizeKb}})
+	_, err = clientService.UpdateOne(
+		context.Background(),
+		bson.M{"clientId": companyCode},
+		bson.M{
+			"$inc": bson.M{
+				"fileStorage.usedKB":                                data.FileSizeKb,
+				"fileStorage.availableKB":                           -1 * data.FileSizeKb,
+				fmt.Sprintf("fileStorage.%v", fileStorageAttribute): data.FileSizeKb,
+			},
+		},
+	)
 	if err != nil {
 		return entity.InternalServerError(err.Error())
 	}
@@ -75,6 +84,7 @@ func (f *FileManagerHelperImpl) CreateFileManager(
 
 	return nil
 }
+
 func (f *FileManagerHelperImpl) DeleteFileManager(
 	serviceFactory utilprovider.ServiceProvider,
 	companyCode string,
@@ -107,8 +117,17 @@ func (f *FileManagerHelperImpl) DeleteFileManager(
 		return &entity.HttpError{}
 	}
 
-	_, err = clientService.UpdateOne(context.Background(), bson.M{"clientId": companyCode},
-		bson.M{"$inc": bson.M{"fileStorage.usedKB": -1 * data.FileSizeKb, "fileStorage.availableKB": data.FileSizeKb, fmt.Sprintf("fileStorage.%v", fileStorageAttribute): -1 * data.FileSizeKb}})
+	_, err = clientService.UpdateOne(
+		context.Background(),
+		bson.M{"clientId": companyCode},
+		bson.M{
+			"$inc": bson.M{
+				"fileStorage.usedKB":                                -1 * data.FileSizeKb,
+				"fileStorage.availableKB":                           data.FileSizeKb,
+				fmt.Sprintf("fileStorage.%v", fileStorageAttribute): -1 * data.FileSizeKb,
+			},
+		},
+	)
 	if err != nil {
 		return entity.InternalServerError(err.Error())
 	}
