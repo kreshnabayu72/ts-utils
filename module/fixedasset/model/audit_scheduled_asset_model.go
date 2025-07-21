@@ -29,22 +29,18 @@ type AuditAssetFoundByAttr struct {
 }
 
 type AuditScheduledAsset struct {
-	ID                     primitive.ObjectID      `json:"_id,omitempty" bson:"_id,omitempty"`
-	TransactionID          string                  `json:"transactionId" bson:"transactionId"`
-	Note                   string                  `json:"note" bson:"note"`
-	TagType                TagType                 `json:"tagType" bson:"tagType"`
-	Task                   primitive.ObjectID      `json:"task" bson:"task"`
-	Asset                  primitive.ObjectID      `json:"asset" bson:"asset"`
-	AssetGroup             model.AttributeEmbedded `json:"assetGroup" bson:"assetGroup"`
-	AssetImageSmall        *string                 `json:"assetImageSmall" bson:"assetImageSmall"`
-	AssetImageMedium       *string                 `json:"assetImageMedium" bson:"assetImageMedium"`
-	AssetImageBig          *string                 `json:"assetImageBig" bson:"assetImageBig"`
-	Address                *string                 `json:"address" bson:"address"`
-	Coordinate             *string                 `json:"coordinate" bson:"coordinate"`
-	ReportedImageSmall     *string                 `json:"reportedImageSmall" bson:"reportedImageSmall"`
-	ReportedImageMedium    *string                 `json:"reportedImageMedium" bson:"reportedImageMedium"`
-	ReportedImageBig       *string                 `json:"reportedImageBig" bson:"reportedImageBig"`
-	ReportedImage          AuditReportedImageAttr  `json:"reportedImage" bson:"reportedImage"`
+	ID            primitive.ObjectID      `json:"_id,omitempty" bson:"_id,omitempty"`
+	TransactionID string                  `json:"transactionId" bson:"transactionId"`
+	Note          string                  `json:"note" bson:"note"`
+	TagType       TagType                 `json:"tagType" bson:"tagType"`
+	Task          primitive.ObjectID      `json:"task" bson:"task"`
+	Asset         primitive.ObjectID      `json:"asset" bson:"asset"`
+	AssetGroup    model.AttributeEmbedded `json:"assetGroup" bson:"assetGroup"`
+	AssetImage    *string                 `json:"assetImage" bson:"assetImage"`
+	Address       *string                 `json:"address" bson:"address"`
+	Coordinate    *string                 `json:"coordinate" bson:"coordinate"`
+	ReportedImage *string                 `json:"reportedImage" bson:"reportedImage"`
+	// ReportedImage          AuditReportedImageAttr  `json:"reportedImage" bson:"reportedImage"`
 	AssetName              AssetNameEmbedAttr      `json:"assetName" bson:"assetName"`
 	AssetModel             model.AttributeEmbedded `json:"assetModel" bson:"assetModel"`
 	AssetBrand             model.AttributeEmbedded `json:"assetBrand" bson:"assetBrand"`

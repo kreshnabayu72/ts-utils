@@ -19,20 +19,18 @@ const (
 type BorrowingRequest struct {
 	ID primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
 
-	Transaction      primitive.ObjectID      `json:"transaction" bson:"transaction"`
-	TransactionId    string                  `json:"transactionId" bson:"transactionId"`
-	Asset            primitive.ObjectID      `json:"asset" bson:"asset"`
-	AssetId          string                  `json:"assetId" bson:"assetId"`
-	AssetParent      *primitive.ObjectID     `json:"assetParent" bson:"assetParent"`
-	AssetImageSmall  *string                 `json:"assetImageSmall" bson:"assetImageSmall"`
-	AssetImageMedium *string                 `json:"assetImageMedium" bson:"assetImageMedium"`
-	AssetImageBig    *string                 `json:"assetImageBig" bson:"assetImageBig"`
-	Status           BorrowingStatus         `json:"status" bson:"status"`
-	AssetName        AssetNameEmbedAttr      `json:"assetName" bson:"assetName"`
-	AssetCategory    model.AttributeEmbedded `json:"assetCategory" bson:"assetCategory"`
-	Group            model.AttributeEmbedded `json:"group" bson:"group"`
-	AssetBrand       model.AttributeEmbedded `json:"assetBrand" bson:"assetBrand"`
-	AssetModel       model.AttributeEmbedded `json:"assetModel" bson:"assetModel"`
+	Transaction   primitive.ObjectID      `json:"transaction" bson:"transaction"`
+	TransactionId string                  `json:"transactionId" bson:"transactionId"`
+	Asset         primitive.ObjectID      `json:"asset" bson:"asset"`
+	AssetId       string                  `json:"assetId" bson:"assetId"`
+	AssetParent   *primitive.ObjectID     `json:"assetParent" bson:"assetParent"`
+	AssetImage    *string                 `json:"assetImage" bson:"assetImage"`
+	Status        BorrowingStatus         `json:"status" bson:"status"`
+	AssetName     AssetNameEmbedAttr      `json:"assetName" bson:"assetName"`
+	AssetCategory model.AttributeEmbedded `json:"assetCategory" bson:"assetCategory"`
+	Group         model.AttributeEmbedded `json:"group" bson:"group"`
+	AssetBrand    model.AttributeEmbedded `json:"assetBrand" bson:"assetBrand"`
+	AssetModel    model.AttributeEmbedded `json:"assetModel" bson:"assetModel"`
 
 	Manager  model.UserEmbedded `json:"manager" bson:"manager"`
 	Borrower model.UserEmbedded `json:"borrower" bson:"borrower"`

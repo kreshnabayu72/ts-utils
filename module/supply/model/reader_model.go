@@ -10,9 +10,7 @@ import (
 
 type Reader struct {
 	ID               primitive.ObjectID      `json:"_id,omitempty"    bson:"_id,omitempty"`
-	ImageSmall       *string                 `json:"imageSmall"       bson:"imageSmall"`
-	ImageMedium      *string                 `json:"imageMedium"      bson:"imageMedium"`
-	ImageBig         *string                 `json:"imageBig"         bson:"imageBig"`
+	Image            *string                 `json:"image"         bson:"image"`
 	AliasName        *string                 `json:"aliasName"        bson:"aliasName"`
 	SerialNumber     string                  `json:"serialNumber"     bson:"serialNumber"`
 	Name             model.NameEmbedded      `json:"name"             bson:"name"`

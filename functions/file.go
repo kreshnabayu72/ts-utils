@@ -143,6 +143,10 @@ func SaveFileWithName(
 	writer.WriteField("dirName", folderName)
 	writer.WriteField("filePrefix", folderName)
 
+	if fileName != "" {
+		writer.WriteField("fileName", fileName)
+	}
+
 	// Create form file part named "files"
 	part, err := writer.CreateFormFile("files", fileHeader.Filename)
 	if err != nil {
@@ -164,7 +168,6 @@ func SaveFileWithName(
 	if err != nil {
 		return "", "", "", 0, "", fiber.NewError(fiber.StatusInternalServerError,
 			"Error saving file: "+err.Error())
-
 	}
 
 	// Forward authorization header if present
@@ -187,13 +190,6 @@ func SaveFileWithName(
 	var uploadResp UploadResponse
 	if err := json.Unmarshal(respBody, &uploadResp); err != nil {
 		return "", "", "", 0, "", fiber.NewError(fiber.StatusInternalServerError, "Failed to parse upload response: "+err.Error())
-	}
-
-	//this batch is replaced
-	dst := filepath.Join(absPath, fileName)
-	if err := ctx.SaveFile(fileHeader, dst); err != nil {
-		return "", "", "", 0, "", fiber.NewError(fiber.StatusInternalServerError,
-			"Error saving file: "+err.Error())
 	}
 
 	var filetype string

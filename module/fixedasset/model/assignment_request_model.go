@@ -19,18 +19,16 @@ const (
 type AssignmentRequest struct {
 	ID primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
 
-	Transaction      primitive.ObjectID      `json:"transaction" bson:"transaction"`
-	TransactionId    string                  `json:"transactionId" bson:"transactionId"`
-	Asset            primitive.ObjectID      `json:"asset" bson:"asset"`
-	AssetId          string                  `json:"assetId" bson:"assetId"`
-	AssetParent      *primitive.ObjectID     `json:"assetParent" bson:"assetParent"`
-	AssetImageSmall  *string                 `json:"assetImageSmall" bson:"assetImageSmall"`
-	AssetImageMedium *string                 `json:"assetImageMedium" bson:"assetImageMedium"`
-	AssetImageBig    *string                 `json:"assetImageBig" bson:"assetImageBig"`
-	Status           AssignmentStatus        `json:"status" bson:"status"`
-	AssetName        AssetNameEmbedAttr      `json:"assetName" bson:"assetName"`
-	AssetCategory    model.AttributeEmbedded `json:"assetCategory" bson:"assetCategory"`
-	Group            model.AttributeEmbedded `json:"group" bson:"group"`
+	Transaction   primitive.ObjectID      `json:"transaction" bson:"transaction"`
+	TransactionId string                  `json:"transactionId" bson:"transactionId"`
+	Asset         primitive.ObjectID      `json:"asset" bson:"asset"`
+	AssetId       string                  `json:"assetId" bson:"assetId"`
+	AssetParent   *primitive.ObjectID     `json:"assetParent" bson:"assetParent"`
+	AssetImage    *string                 `json:"assetImage" bson:"assetImage"`
+	Status        AssignmentStatus        `json:"status" bson:"status"`
+	AssetName     AssetNameEmbedAttr      `json:"assetName" bson:"assetName"`
+	AssetCategory model.AttributeEmbedded `json:"assetCategory" bson:"assetCategory"`
+	Group         model.AttributeEmbedded `json:"group" bson:"group"`
 
 	AssetBrand model.AttributeEmbedded `json:"assetBrand" bson:"assetBrand"`
 	AssetModel model.AttributeEmbedded `json:"assetModel" bson:"assetModel"`

@@ -21,17 +21,8 @@ type Asset struct {
 	MaintenanceStatus  *string                     `bson:"maintenanceStatus,omitempty"  json:"maintenanceStatus,omitempty"`
 	AuditStatus        *string                     `bson:"auditStatus,omitempty"        json:"auditStatus,omitempty"`
 	Tag                AssetTag                    `bson:"tag"                          json:"tag"`
-	FirstImageMedium   *string                     `bson:"firstImageMedium"   json:"firstImageMedium"`
-	FirstImageBig      *string                     `bson:"firstImageBig"      json:"firstImageBig"`
-	FirstImageSmall    *string                     `bson:"firstImageSmall"    json:"firstImageSmall"`
 	FirstImage         *string                     `bson:"firstImage"    json:"firstImage"`
-	SecondImageMedium  *string                     `bson:"secondImageMedium"  json:"secondImageMedium"`
-	SecondImageBig     *string                     `bson:"secondImageBig"     json:"secondImageBig"`
-	SecondImageSmall   *string                     `bson:"secondImageSmall"   json:"secondImageSmall"`
 	SecondImage        *string                     `bson:"secondImage"   json:"secondImage"`
-	DefaultImageMedium *string                     `bson:"defaultImageMedium"  json:"defaultImageMedium"`
-	DefaultImageBig    *string                     `bson:"defaultImageBig"     json:"defaultImageBig"`
-	DefaultImageSmall  *string                     `bson:"defaultImageSmall"   json:"defaultImageSmall"`
 	DefaultImage       *string                     `bson:"defaultImage"   json:"defaultImage"`
 	SetDefault         string                      `bson:"setDefault"         json:"setDefault"`
 	Status             string                      `bson:"status"                       json:"status"`

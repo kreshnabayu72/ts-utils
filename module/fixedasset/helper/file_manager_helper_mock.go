@@ -2,34 +2,31 @@ package helper
 
 import (
 	"gitea.qwertysystem.net/BETS/ts-utils/entity"
-	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/model"
+	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
 	utilprovider "gitea.qwertysystem.net/BETS/ts-utils/provider"
+	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
 	"github.com/stretchr/testify/mock"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type MockFileManagerHelper struct {
+type MockFileManagerHelperSQLImpl struct {
 	mock.Mock
 }
 
-func (m *MockFileManagerHelper) CreateFileManager(
+func (m *MockFileManagerHelperSQLImpl) CreateFileManagerSQL(
 	serviceFactory utilprovider.ServiceProvider,
 	companyCode string,
-	collection string,
-	data model.FileCommon,
-	fileStorageAttribute model.FileStorageAttribute,
+	data new_model.FileInStorage,
 ) *entity.HttpError {
-	args := m.Mock.Called(serviceFactory, companyCode, collection, data, fileStorageAttribute)
+	args := m.Called(serviceFactory, companyCode, data)
 	return args.Get(0).(*entity.HttpError)
 }
 
-func (m *MockFileManagerHelper) DeleteFileManager(
+func (m *MockFileManagerHelperSQLImpl) DeleteFileManagerSQL(
 	serviceFactory utilprovider.ServiceProvider,
 	companyCode string,
-	collection string,
-	filter primitive.M,
-	fileStorageAttribute model.FileStorageAttribute,
+	filter map[string]sql_query.SQLCondition,
+	fileType new_model.FileType,
 ) *entity.HttpError {
-	args := m.Mock.Called(serviceFactory, companyCode, collection, filter, fileStorageAttribute)
+	args := m.Called(serviceFactory, companyCode, filter, fileType)
 	return args.Get(0).(*entity.HttpError)
 }

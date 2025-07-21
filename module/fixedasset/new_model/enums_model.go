@@ -1,5 +1,12 @@
 package new_model
 
+type AssetDefaultImage string
+
+const (
+	AssetDefaultImageFirstImage  = TagType("first_image")
+	AssetDefaultImageSecondImage = TagType("second_image")
+)
+
 type AssetStatus string
 
 const (
@@ -153,3 +160,52 @@ var PlanEnum = map[string]PlanTypes{
 	"Standard":   PlanStandard,
 	"Enterprise": PlanEnterprise,
 }
+
+type CompanyStatus string
+
+const (
+	CompanyStatusActive   CompanyStatus = "Active"
+	CompanyStatusExpired  CompanyStatus = "Expired"
+	CompanyStatusArchived CompanyStatus = "Archived"
+)
+
+type CompanyOpenAPIStatus string
+
+const (
+	CompanyOpenAPIStatusApproved CompanyOpenAPIStatus = "Approved"
+	CompanyOpenAPIStatusWaiting  CompanyOpenAPIStatus = "Waiting for Approval"
+)
+
+type CompanyDepreciationMethod string
+
+const (
+	CompanyDepreciationMethodStraightLine           CompanyDepreciationMethod = "Straight Line"
+	CompanyDepreciationMethodDoubleDecliningBalance CompanyDepreciationMethod = "Double-Declining Balance"
+)
+
+type AttachmentType string
+
+const (
+	AttachmentTypePurchase AttachmentType = "Purchase"
+	AttachmentTypeProduct  AttachmentType = "Product"
+)
+
+type FileType string
+
+const (
+	FileTypeAttachment         FileType = "Attachment"
+	FileTypeDamage             FileType = "Damage"
+	FileTypeDisposal           FileType = "Disposal"
+	FileTypeRepairTicketing    FileType = "Repair Ticketing"
+	FileTypeMaintenanceRoutine FileType = "Maintenance Routine"
+)
+
+type TagStatus string
+
+const (
+	TagStatusAvailable      = TagType("Available")
+	TagStatusPaired         = TagType("Paired")
+	TagStatusReported       = TagType("Reported")
+	TagStatusDamagedMissing = TagType("Damaged / Missing")
+	TagStatusToBeReturned   = TagType("To be Returned")
+)

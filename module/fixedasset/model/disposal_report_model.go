@@ -16,19 +16,17 @@ const (
 )
 
 type DisposalReport struct {
-	ID               primitive.ObjectID      `json:"id,omitempty" bson:"_id,omitempty"`
-	Asset            primitive.ObjectID      `json:"asset" bson:"asset"`
-	AssetImageBig    string                  `json:"assetImageBig" bson:"assetImageBig"`
-	PreviousStatus   string                  `json:"previousStatus" bson:"previousStatus"`
-	IsDeleted        bool                    `json:"isDeleted" bson:"isDeleted"`
-	AssetImageMedium string                  `json:"assetImageMedium" bson:"assetImageMedium"`
-	AssetImageSmall  string                  `json:"assetImageSmall" bson:"assetImageSmall"`
-	AssetName        AssetNameEmbedAttr      `json:"assetName" bson:"assetName"`
-	AssetBrand       model.AttributeEmbedded `json:"assetBrand" bson:"assetBrand"`
-	AssetModel       model.AttributeEmbedded `json:"assetModel" bson:"assetModel"`
-	OriginGroup      model.AttributeEmbedded `json:"originGroup" bson:"originGroup"`
-	LastCondition    DisposalLastCondition   `json:"lastCondition" bson:"lastCondition"`
-	ReportedBy       model.UserEmbedded      `bson:"reportedBy" json:"reportedBy"`
+	ID             primitive.ObjectID      `json:"id,omitempty" bson:"_id,omitempty"`
+	Asset          primitive.ObjectID      `json:"asset" bson:"asset"`
+	AssetImage     string                  `json:"assetImage" bson:"assetImage"`
+	PreviousStatus string                  `json:"previousStatus" bson:"previousStatus"`
+	IsDeleted      bool                    `json:"isDeleted" bson:"isDeleted"`
+	AssetName      AssetNameEmbedAttr      `json:"assetName" bson:"assetName"`
+	AssetBrand     model.AttributeEmbedded `json:"assetBrand" bson:"assetBrand"`
+	AssetModel     model.AttributeEmbedded `json:"assetModel" bson:"assetModel"`
+	OriginGroup    model.AttributeEmbedded `json:"originGroup" bson:"originGroup"`
+	LastCondition  DisposalLastCondition   `json:"lastCondition" bson:"lastCondition"`
+	ReportedBy     model.UserEmbedded      `bson:"reportedBy" json:"reportedBy"`
 
 	Notes  string `json:"notes" bson:"notes"`
 	Reason string `json:"reason" bson:"reason"`
