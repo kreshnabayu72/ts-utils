@@ -4,7 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/db"
-	new_model "gitea.qwertysystem.net/BETS/ts-utils/module/admin/new-model"
+	"gitea.qwertysystem.net/BETS/ts-utils/dto"
 	"gitea.qwertysystem.net/BETS/ts-utils/response"
 	"gitea.qwertysystem.net/BETS/ts-utils/service"
 	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
@@ -37,11 +37,11 @@ func GetLicensePlanSQL() fiber.Handler {
 			return ctx.Next()
 		}
 
-		company := ctx.Locals(Company).(int)
+		company := ctx.Locals(Company).(string)
 
-		companyService := service.MakePostgreSqlService(db.AdminDBName, db.ClientModelName)
+		companyService := service.MakePostgreSqlService(db.AdminDBName, db.ClientTableName)
 
-		query, args, err := sql_query.NewSQLSelectBuilder[new_model.Client](db.ClientModelName).
+		query, args, err := sql_query.NewSQLSelectBuilder[dto.ClientPlan](db.ClientTableName).
 			Where(map[string]sql_query.SQLCondition{
 				"id": {
 					Operator: sql_query.SQLOperatorEqual,
@@ -55,7 +55,7 @@ func GetLicensePlanSQL() fiber.Handler {
 			return response.SendResponseWithError(ctx, fiber.StatusBadRequest, nil, "Invalid JWT", err)
 		}
 
-		companyData := new_model.Client{}
+		companyData := dto.ClientPlan{}
 		err = companyService.SelectOne(
 			&companyData,
 			ctx.UserContext(),
