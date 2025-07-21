@@ -11,13 +11,15 @@ type User struct {
 	PhoneNumber            string     `json:"phoneNumber"                  column:"phone_number"`
 	PendingEmailChange     string     `json:"pendingEmailChange"                  column:"pending_email_change"`
 	IsActive               bool       `json:"isActive"               column:"is_active"`
+	IsTemporary            bool       `json:"isTemporary"               column:"is_temporary"`
 	IsDefault              bool       `json:"isDefault"              column:"is_default"`
 	IsEmailConfirmed       bool       `json:"isEmailConfirmed"       column:"is_email_confirmed"`
 	ExpiryDate             *time.Time `json:"expiryDate" column:"expiry_date"`
 	IsExpired              bool       `json:"isExpired" column:"is_expired"`
 	Position               *string    `json:"position"               column:"position"`
 	Division               string     `json:"division"               column:"division"`
-	RFIDCode               *string    `json:"rfidCode"               column:"rfid_code"`
+	RfidCode               *string    `json:"rfidCode"               column:"rfid_code"`
+	RfidId                 *string    `json:"rfidId"               column:"rfid_id"`
 	ProfilePicture         *string    `json:"profilePicture"         column:"profile_picture"`
 	EmployeeId             *string    `json:"employeeId"             column:"employee_id"`
 	IsSubUser              bool       `json:"isSubUser"              column:"is_sub_user"`
