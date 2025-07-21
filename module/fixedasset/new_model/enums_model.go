@@ -1,5 +1,12 @@
 package new_model
 
+type AssetDefaultImage string
+
+const (
+	AssetDefaultImageFirstImage  = TagType("first_image")
+	AssetDefaultImageSecondImage = TagType("second_image")
+)
+
 type AssetStatus string
 
 const (
@@ -191,4 +198,14 @@ const (
 	FileTypeDisposal           FileType = "Disposal"
 	FileTypeRepairTicketing    FileType = "Repair Ticketing"
 	FileTypeMaintenanceRoutine FileType = "Maintenance Routine"
+)
+
+type TagStatus string
+
+const (
+	TagStatusAvailable      = TagType("Available")
+	TagStatusPaired         = TagType("Paired")
+	TagStatusReported       = TagType("Reported")
+	TagStatusDamagedMissing = TagType("Damaged / Missing")
+	TagStatusToBeReturned   = TagType("To be Returned")
 )
