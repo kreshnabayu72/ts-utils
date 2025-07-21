@@ -27,28 +27,25 @@ type User struct {
 		Code      string `json:"code" bson:"code"`
 		ShortCode string `json:"shortCode" bson:"shortCode"`
 	} `json:"rfid"                 bson:"rfid"`
-	DefaultGroup         *model.AttributeEmbedded `json:"defaultGroup"         bson:"defaultGroup"`
-	IsActive             bool                     `json:"isActive"             bson:"isActive"`
-	IsTemporary          bool                     `json:"isTemporary"          bson:"isTemporary"`
-	ExpiryDate           *time.Time               `json:"expiryDate"           bson:"expiryDate"`
-	IsAdmin              bool                     `json:"isAdmin"              bson:"isAdmin"`
-	PendingEmailChange   string                   `json:"pendingEmailChange"   bson:"pendingEmailChange"`
-	ModifiedBy           *model.UserEmbedded      `json:"modifiedBy"           bson:"modifiedBy"`
-	Parent               *primitive.ObjectID      `json:"parent"               bson:"parent"`
-	ProfilePictureSmall  *string                  `json:"profilePictureSmall"  bson:"profilePictureSmall"`
-	ProfilePictureMedium *string                  `json:"profilePictureMedium" bson:"profilePictureMedium"`
-	ProfilePictureBig    *string                  `json:"profilePictureBig"  bson:"profilePictureBig"`
-	ProfilePicture       *string                  `json:"profilePicture"  bson:"profilePicture"`
-	IsDeleted            bool                     `json:"isDeleted"            bson:"isDeleted"`
-	IsSubUser            bool                     `json:"isSubUser"            bson:"isSubUser"`
-	IsConfirmed          bool                     `json:"isConfirmed"          bson:"isConfirmed"`
-	IsDefault            bool                     `json:"isDefault"            bson:"isDefault"`
-	SubUserID            *string                  `json:"subUserId"            bson:"subUserId"`
-	ParentName           *string                  `json:"parentName"           bson:"parentName"`
-	TotalControl         *UserEmbeddedRole        `json:"totalControl"         bson:"totalControl"`
-	ReadOnly             *UserEmbeddedRole        `json:"readOnly"             bson:"readOnly"`
-	Access               []string                 `json:"access" bson:"access"`
-	FCMToken             string                   `json:"fcmToken"    bson:"fcmToken"`
-	CreatedAt            time.Time                `json:"createdAt"            bson:"createdAt"`
-	UpdatedAt            time.Time                `json:"updatedAt"            bson:"updatedAt"`
+	DefaultGroup       *model.AttributeEmbedded `json:"defaultGroup"         bson:"defaultGroup"`
+	IsActive           bool                     `json:"isActive"             bson:"isActive"`
+	IsTemporary        bool                     `json:"isTemporary"          bson:"isTemporary"`
+	ExpiryDate         *time.Time               `json:"expiryDate"           bson:"expiryDate"`
+	IsAdmin            bool                     `json:"isAdmin"              bson:"isAdmin"`
+	PendingEmailChange string                   `json:"pendingEmailChange"   bson:"pendingEmailChange"`
+	ModifiedBy         *model.UserEmbedded      `json:"modifiedBy"           bson:"modifiedBy"`
+	Parent             *primitive.ObjectID      `json:"parent"               bson:"parent"`
+	ProfilePicture     *string                  `json:"profilePicture"  bson:"profilePicture"`
+	IsDeleted          bool                     `json:"isDeleted"            bson:"isDeleted"`
+	IsSubUser          bool                     `json:"isSubUser"            bson:"isSubUser"`
+	IsConfirmed        bool                     `json:"isConfirmed"          bson:"isConfirmed"`
+	IsDefault          bool                     `json:"isDefault"            bson:"isDefault"`
+	SubUserID          *string                  `json:"subUserId"            bson:"subUserId"`
+	ParentName         *string                  `json:"parentName"           bson:"parentName"`
+	TotalControl       *UserEmbeddedRole        `json:"totalControl"         bson:"totalControl"`
+	ReadOnly           *UserEmbeddedRole        `json:"readOnly"             bson:"readOnly"`
+	Access             []string                 `json:"access" bson:"access"`
+	FCMToken           string                   `json:"fcmToken"    bson:"fcmToken"`
+	CreatedAt          time.Time                `json:"createdAt"            bson:"createdAt"`
+	UpdatedAt          time.Time                `json:"updatedAt"            bson:"updatedAt"`
 }

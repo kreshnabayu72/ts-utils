@@ -15,9 +15,7 @@ type TransferRequest struct {
 	Manager          model.UserEmbedded      `json:"manager" bson:"manager"`
 	OriginGroup      model.AttributeEmbedded `json:"originGroup" bson:"originGroup"`
 	DestinationGroup model.AttributeEmbedded `json:"destinationGroup" bson:"destinationGroup"`
-	AssetImageBig    string                  `json:"assetImageBig" bson:"assetImageBig"`
-	AssetImageMedium string                  `json:"assetImageMedium" bson:"assetImageMedium"`
-	AssetImageSmall  string                  `json:"assetImageSmall" bson:"assetImageSmall"`
+	AssetImage       string                  `json:"assetImage" bson:"assetImage"`
 	AssetName        AssetNameEmbedAttr      `json:"assetName" bson:"assetName"`
 	AssetBrand       model.AttributeEmbedded `json:"assetBrand" bson:"assetBrand"`
 	AssetModel       model.AttributeEmbedded `json:"assetModel" bson:"assetModel"`
