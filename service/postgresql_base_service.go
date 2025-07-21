@@ -23,7 +23,7 @@ type PostgreSqlService interface {
 	InsertOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
 	InsertOneWithData(ctx context.Context, body interface{}) (interface{}, error)
 	UpdateOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
-	UpdateOneWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}) (interface{}, error)
+	UpdateOneWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}, returningColumn ...string) (interface{}, error)
 	UpdateMany(ctx context.Context, queryString string, args ...any) (int64, error)
 	DeleteOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
 	DeleteOneWithFilter(ctx context.Context, filter map[string]sql_query.SQLCondition) (interface{}, error)
@@ -173,10 +173,12 @@ func (s *BasePostgreSqlService) UpdateOne(ctx context.Context, queryString strin
 
 	return resultId, nil
 }
-func (s *BasePostgreSqlService) UpdateOneWithData(ctx context.Context, query map[string]sql_query.SQLCondition, updateData interface{}) (interface{}, error) {
+
+func (s *BasePostgreSqlService) UpdateOneWithData(ctx context.Context, query map[string]sql_query.SQLCondition, updateData interface{}, returningColumn ...string) (interface{}, error) {
 	queryString, args := common_builders.UpdateBuilder(s.TableName,
 		query,
 		updateData,
+		returningColumn...,
 	)
 
 	return s.UpdateOne(ctx, queryString, args...)
@@ -215,6 +217,7 @@ func (s *BasePostgreSqlService) DeleteOne(ctx context.Context, queryString strin
 
 	return resultId, nil
 }
+
 func (s *BasePostgreSqlService) DeleteOneWithFilter(ctx context.Context, filter map[string]sql_query.SQLCondition) (interface{}, error) {
 	query, args := common_builders.DeleteBuilder(s.TableName, filter)
 
