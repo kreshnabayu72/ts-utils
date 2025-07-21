@@ -175,3 +175,20 @@ const (
 	CompanyDepreciationMethodStraightLine           CompanyDepreciationMethod = "Straight Line"
 	CompanyDepreciationMethodDoubleDecliningBalance CompanyDepreciationMethod = "Double-Declining Balance"
 )
+
+type AttachmentType string
+
+const (
+	AttachmentTypePurchase AttachmentType = "Purchase"
+	AttachmentTypeProduct  AttachmentType = "Product"
+)
+
+type FileType string
+
+const (
+	FileTypeAttachment         FileType = "Attachment"
+	FileTypeDamage             FileType = "Damage"
+	FileTypeDisposal           FileType = "Disposal"
+	FileTypeRepairTicketing    FileType = "Repair Ticketing"
+	FileTypeMaintenanceRoutine FileType = "Maintenance Routine"
+)

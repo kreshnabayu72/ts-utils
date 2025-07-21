@@ -73,12 +73,12 @@ type Company struct {
 	CurrencyLabel       string `json:"currencyLabel" column:"currency_label"`
 
 	// ─────── File Storage ───────
-	FileStorageTotalKB           int `json:"fileStorageTotalKB" column:"file_storage_total_kb"`
-	FileStorageAvailableKB       int `json:"fileStorageAvailableKB" column:"file_storage_available_kb"`
-	FileStorageUsedKB            int `json:"fileStorageUsedKB" column:"file_storage_used_kb"`
-	FileStorageAttachmentKB      int `json:"fileStorageAttachmentKB" column:"file_storage_attachment_kb"`
-	FileStorageDamagedKB         int `json:"fileStorageDamagedKB" column:"file_storage_damaged_kb"`
-	FileStorageDisposalKB        int `json:"fileStorageDisposalKB" column:"file_storage_disposal_kb"`
-	FileStorageRepairTicketingKB int `json:"fileStorageRepairTicketingKB" column:"file_storage_repair_ticketing_kb"`
-	FileStorageRoutineKB         int `json:"fileStorageRoutineKB" column:"file_storage_routine_kb"`
+	FileStorageTotalKB           float64 `json:"fileStorageTotalKB" column:"file_storage_total_kb"`
+	FileStorageAvailableKB       float64 `json:"fileStorageAvailableKB" column:"file_storage_available_kb"`
+	FileStorageUsedKB            float64 `json:"fileStorageUsedKB" column:"file_storage_used_kb"`
+	FileStorageAttachmentKB      float64 `json:"fileStorageAttachmentKB" column:"file_storage_attachment_kb"`
+	FileStorageDamagedKB         float64 `json:"fileStorageDamagedKB" column:"file_storage_damaged_kb"`
+	FileStorageDisposalKB        float64 `json:"fileStorageDisposalKB" column:"file_storage_disposal_kb"`
+	FileStorageRepairTicketingKB float64 `json:"fileStorageRepairTicketingKB" column:"file_storage_repair_ticketing_kb"`
+	FileStorageRoutineKB         float64 `json:"fileStorageRoutineKB" column:"file_storage_routine_kb"`
 }
