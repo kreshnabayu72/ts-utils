@@ -13,7 +13,7 @@ import (
 type SQLUpdateInitBuilder interface {
 	Update(values interface{}, returningColumns ...string) SQLUpdateChainBuilder
 
-	Increment(values map[string]int, returningColumns ...string) SQLUpdateChainBuilder
+	Increment(values map[string]any, returningColumns ...string) SQLUpdateChainBuilder
 }
 
 // To ensure method .Update() has its own chaining methods
@@ -44,7 +44,10 @@ func (s *updateBuilder) WhereOr(filters map[string]SQLCondition) SQLUpdateChainB
 }
 
 // Update implements SQLUpdateChainBuilder using reflection like Insert(). (Only able to be called once)
-func (s *updateBuilder) Update(values interface{}, returningColumns ...string) SQLUpdateChainBuilder {
+func (s *updateBuilder) Update(
+	values interface{},
+	returningColumns ...string,
+) SQLUpdateChainBuilder {
 	v := reflect.ValueOf(values)
 	if v.Kind() != reflect.Struct {
 		s.LastError = fmt.Errorf("Update data must be a struct")
@@ -87,13 +90,19 @@ func (s *updateBuilder) Update(values interface{}, returningColumns ...string) S
 }
 
 // Increment is used to replace Update() for adding int value cause update cant handle that
-func (s *updateBuilder) Increment(values map[string]int, returningColumns ...string) SQLUpdateChainBuilder {
+func (s *updateBuilder) Increment(
+	values map[string]any,
+	returningColumns ...string,
+) SQLUpdateChainBuilder {
 	var setClauses []string
 
 	for key, val := range values {
 		snake := CamelToSnake(key)
 
-		setClauses = append(setClauses, fmt.Sprintf(`"%s" = "%s" + $%d`, snake, snake, len(s.Args)+1))
+		setClauses = append(
+			setClauses,
+			fmt.Sprintf(`"%s" = "%s" + $%d`, snake, snake, len(s.Args)+1),
+		)
 		s.Args = append(s.Args, val)
 	}
 
