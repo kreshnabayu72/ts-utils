@@ -1,81 +1,84 @@
 package new_model
 
-import (
-	"time"
-
-	"go.mongodb.org/mongo-driver/bson/primitive"
-)
-
-// Possible values: "Straight-Line" | "Double-Declining Balance"
-type DepreciationMethod string
-
-type FileStorage struct {
-	UsedKB            float64 `json:"usedKB"            bson:"usedKB"`
-	AvailableKB       float64 `json:"availableKB"       bson:"availableKB"`
-	TotalKB           float64 `json:"totalKB"           bson:"totalKB"`
-	AttachmentKB      float64 `json:"attachmentKB"            bson:"attachmentKB"`
-	DamagedKB         float64 `json:"damagedKB"         bson:"damagedKB"`
-	DisposalKB        float64 `json:"disposalKB"        bson:"disposalKB"`
-	RepairTicketingKB float64 `json:"repairTicketingKB" bson:"repairTicketingKB"`
-	RoutineKB         float64 `json:"routineKB"         bson:"routineKB"`
-}
-
-type FileStorageAttribute string
-
-const (
-	FileStorageAttributeAttachment = FileStorageAttribute("attachmentKB")
-	FileStorageAttributeDamaged    = FileStorageAttribute("damagedKB")
-	FileStorageAttributeDisposal   = FileStorageAttribute("disposalKB")
-)
-
-type AuditAttrs struct {
-	MaxGracePeriod int `json:"maxGracePeriod"            bson:"maxGracePeriod"`
-}
-type BorrowingAttrs struct {
-	MaxBorrowingTime     int `json:"maxBorrowingTime"            bson:"maxBorrowingTime"`
-	DefaultBorrowingTime int `json:"defaultBorrowingTime"            bson:"defaultBorrowingTime"`
-	ConfirmationTimeout  int `json:"confirmationTimeout"            bson:"confirmationTimeout"`
-	TransactionTimeout   int `json:"transactionTimeout"            bson:"transactionTimeout"`
-}
-type TransferAttrs struct {
-	TransactionTimeout    int `json:"transactionTimeout"            bson:"transactionTimeout"`
-	AssetControlToMissing int `json:"assetControlToMissing"            bson:"assetControlToMissing"`
-}
-type DisposalAttrs struct {
-	TransactionTimeout int `json:"transactionTimeout"            bson:"transactionTimeout"`
-}
-type AssetControlAttrs struct {
-	Pin int `json:"pin"            bson:"pin"`
-}
-type LicensePlan struct {
-	FixedAsset  PlanTypes `json:"fixedAsset"            bson:"fixedAsset"`
-	SupplyAsset PlanTypes `json:"supplyAsset"            bson:"supplyAsset"`
-}
-
-type LicenseAmounts struct {
-	Total     int `json:"total" bson:"total"`
-	Managed   int `json:"managed" bson:"managed"`
-	Unmanaged int `json:"unmanaged" bson:"unmanaged"`
-	Available int `json:"available" bson:"available"`
-}
-
-type LicenseAttrs struct {
-	ConcurrentUser int            `json:"concurrentUser" bson:"concurrentUser"`
-	FixedAsset     LicenseAmounts `json:"fixedAsset" bson:"fixedAsset"`
-}
+import "time"
 
 type Company struct {
-	ID                        primitive.ObjectID `json:"_id"                       bson:"_id"`
-	DepreciationMethod        DepreciationMethod `json:"depreciationMethod"        bson:"depreciationMethod"`
-	PendingDepreciationMethod DepreciationMethod `json:"pendingDepreciationMethod" bson:"pendingDepreciationMethod"`
-	FileStorage               FileStorage        `json:"fileStorage"               bson:"fileStorage"`
-	AuditAttrs                AuditAttrs         `json:"auditAttrs"                bson:"auditAttrs"`
-	BorrowingAttrs            BorrowingAttrs     `json:"borrowingAttrs"            bson:"borrowingAttrs"`
-	TransferAttrs             TransferAttrs      `json:"transferAttrs"             bson:"transferAttrs"`
-	DisposalAttrs             DisposalAttrs      `json:"disposalAttrs"             bson:"disposalAttrs"`
-	AssetControlAttrs         AssetControlAttrs  `json:"assetControlAttrs"         bson:"assetControlAttrs"`
-	Plan                      *LicensePlan       `json:"plan"                      bson:"plan"`
-	License                   LicenseAttrs       `json:"license"                   bson:"license"`
-	CreatedAt                 time.Time          `json:"createdAt"                 bson:"createdAt"`
-	UpdatedAt                 time.Time          `json:"updatedAt"                 bson:"updatedAt"`
+	ID int `json:"id" column:"id"`
+
+	// ─────── Company Information ───────
+	Name               string        `json:"name" column:"name"`
+	ClientID           string        `json:"clientId"  column:"client_id"`
+	Status             CompanyStatus `json:"status" column:"status"`
+	Email              string        `json:"email" column:"email"`
+	IsEmailConfirmed   bool          `json:"isEmailConfirmed" column:"is_email_confirmed"`
+	Country            string        `json:"country" column:"country"`
+	State              string        `json:"state" column:"state"`
+	City               string        `json:"city" column:"city"`
+	ZIP                string        `json:"zip" column:"zip"`
+	PhoneNumber        string        `json:"phoneNumber" column:"phone_number"`
+	Fax                string        `json:"fax" column:"fax"`
+	Address            string        `json:"address" column:"address"`
+	ContactPersonName  string        `json:"contactPersonName" column:"contact_person_name"`
+	ContactPersonEmail string        `json:"contactPersonEmail" column:"contact_person_email"`
+	PendingEmailChange *string       `json:"pendingEmailChange" column:"pending_email_change"`
+	Image              *string       `json:"image" column:"image"`
+	GroupID            int           `json:"groupId" column:"group_id"`
+	ModifiedByID       int           `json:"modifiedById" column:"modified_by_id"`
+	PartnerID          int           `json:"partnerId" column:"partner_id"`
+	ExpiredAt          time.Time     `json:"expiredAt" column:"expired_at"`
+	CreatedAt          time.Time     `json:"createdAt" column:"created_at"`
+	UpdatedAt          time.Time     `json:"updatedAt" column:"updated_at"`
+
+	// ─────── Open API Settings ───────
+	OpenAPIStatus      *CompanyOpenAPIStatus `json:"openApiStatus" column:"open_api_status"`
+	OpenAPIRequestedAt *time.Time            `json:"openApiRequestedAt" column:"open_api_requested_at"`
+	OpenAPIApprovedAt  *time.Time            `json:"openApiApprovedAt" column:"open_api_approved_at"`
+
+	// ─────── License Plan ───────
+	PlanFixedAsset  PlanTypes `json:"planFixedAsset" column:"plan_fixed_asset"`
+	PlanSupplyAsset PlanTypes `json:"planSupplyAsset" column:"plan_supply_asset"`
+	PlanInventory   PlanTypes `json:"planInventory" column:"plan_inventory"`
+
+	// ─────── Deprec Method ───────
+	DepreciationMethod        CompanyDepreciationMethod  `json:"depreciationMethod" column:"depreciation_method"`
+	PendingDepreciationMethod *CompanyDepreciationMethod `json:"pendingDepreciationMethod" column:"pending_depreciation_method"`
+
+	// ─────── Add On Status ───────
+	AddOnRepairTicketing bool `json:"addOnRepairTicketing" column:"add_on_repair_ticketing"`
+	AddOnMaintenance     bool `json:"addOnMaintenance" column:"add_on_maintenance"`
+	AddOnTracking        bool `json:"addOnTracking" column:"add_on_tracking"`
+	AddOnAssetControl    bool `json:"addOnAssetControl" column:"add_on_asset_control"`
+	AddOnAudit           bool `json:"addOnAudit" column:"add_on_audit"`
+
+	// ─────── Transaction Settings ───────
+	AuditAttrsMaxGracePeriod           int `json:"auditAttrsMaxGracePeriod" column:"audit_attrs_max_grace_period"`
+	TransferAttrsTransactionTimeout    int `json:"transferAttrsTransactionTimeout" column:"transfer_attrs_transaction_timeout"`
+	TransferAttrsAssetControlToMissing int `json:"transferAttrsAssetControlToMissing" column:"transfer_attrs_asset_control_to_missing"`
+	BorrowingAttrsMaxBorrowingTime     int `json:"borrowingAttrsMaxBorrowingTime" column:"borrowing_attrs_max_borrowing_time"`
+	BorrowingAttrsDefaultBorrowingTime int `json:"borrowingAttrsDefaultBorrowingTime" column:"borrowing_attrs_default_borrowing_time"`
+	BorrowingAttrsConfirmationTimeout  int `json:"borrowingAttrsConfirmationTimeout" column:"borrowing_attrs_confirmation_timeout"`
+	BorrowingAttrsTransactionTimeout   int `json:"borrowingAttrsTransactionTimeout" column:"borrowing_attrs_transaction_timeout"`
+	DisposalAttrsTransactionTimeout    int `json:"disposalAttrsTransactionTimeout" column:"disposal_attrs_transaction_timeout"`
+
+	// ─────── General Settings ───────
+	LoginSessionMinutes int    `json:"loginSessionMinutes" column:"login_session_minutes"`
+	DateFormat          string `json:"dateFormat" column:"date_format"`
+	TimeFormat          string `json:"timeFormat" column:"time_format"`
+	Geolocation         bool   `json:"geolocation" column:"geolocation"`
+	TimeZone            string `json:"timeZone" column:"time_zone"`
+	PIN                 string `json:"pin" column:"pin"`
+	CurrencySymbol      string `json:"currencySymbol" column:"currency_symbol"`
+	CurrencyCurrency    string `json:"currencyCurrency" column:"currency_currency"`
+	CurrencyLocale      string `json:"currencyLocale" column:"currency_locale"`
+	CurrencyLabel       string `json:"currencyLabel" column:"currency_label"`
+
+	// ─────── File Storage ───────
+	FileStorageTotalKB           int `json:"fileStorageTotalKB" column:"file_storage_total_kb"`
+	FileStorageAvailableKB       int `json:"fileStorageAvailableKB" column:"file_storage_available_kb"`
+	FileStorageUsedKB            int `json:"fileStorageUsedKB" column:"file_storage_used_kb"`
+	FileStorageAttachmentKB      int `json:"fileStorageAttachmentKB" column:"file_storage_attachment_kb"`
+	FileStorageDamagedKB         int `json:"fileStorageDamagedKB" column:"file_storage_damaged_kb"`
+	FileStorageDisposalKB        int `json:"fileStorageDisposalKB" column:"file_storage_disposal_kb"`
+	FileStorageRepairTicketingKB int `json:"fileStorageRepairTicketingKB" column:"file_storage_repair_ticketing_kb"`
+	FileStorageRoutineKB         int `json:"fileStorageRoutineKB" column:"file_storage_routine_kb"`
 }
