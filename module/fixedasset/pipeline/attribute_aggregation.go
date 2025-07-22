@@ -245,5 +245,12 @@ func GetAssetIdFromAliasCode(
 					},
 				},
 			},
+			"name.aliasCode": bson.M{
+				"$cond": bson.A{
+					bson.M{"$eq": bson.A{"$aliasCode", nil}},
+					"$name.aliasCode",
+					"$assetId",
+				},
+			},
 		})
 }
