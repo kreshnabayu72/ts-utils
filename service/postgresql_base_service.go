@@ -24,7 +24,8 @@ type PostgreSqlService interface {
 	InsertOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
 	InsertOneWithData(ctx context.Context, body interface{}) (interface{}, error)
 	UpdateOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
-	UpdateOneWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}, returningColumn ...string) (interface{}, error)
+	UpdateOneWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}) (interface{}, error)
+	UpdateOneWithDataAndReturning(ctx context.Context, v any, query map[string]sql_query.SQLCondition, body interface{}, returning ...string) error
 	UpdateMany(ctx context.Context, queryString string, args ...any) (int64, error)
 	DeleteOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
 	DeleteOneWithFilter(ctx context.Context, filter map[string]sql_query.SQLCondition) (interface{}, error)
@@ -180,14 +181,23 @@ func (s *BasePostgreSqlService) UpdateOne(ctx context.Context, queryString strin
 	return resultId, nil
 }
 
-func (s *BasePostgreSqlService) UpdateOneWithData(ctx context.Context, query map[string]sql_query.SQLCondition, updateData interface{}, returningColumn ...string) (interface{}, error) {
+func (s *BasePostgreSqlService) UpdateOneWithData(ctx context.Context, query map[string]sql_query.SQLCondition, updateData interface{}) (interface{}, error) {
+	queryString, args := common_builders.UpdateBuilder(s.TableName,
+		query,
+		updateData,
+	)
+
+	return s.UpdateOne(ctx, queryString, args...)
+}
+
+func (s *BasePostgreSqlService) UpdateOneWithDataAndReturning(v any, ctx context.Context, query map[string]sql_query.SQLCondition, updateData interface{}, returningColumn ...string) error {
 	queryString, args := common_builders.UpdateBuilder(s.TableName,
 		query,
 		updateData,
 		returningColumn...,
 	)
 
-	return s.UpdateOne(ctx, queryString, args...)
+	return s.SelectOne(v, ctx, queryString, args...)
 }
 
 func (s *BasePostgreSqlService) UpdateMany(ctx context.Context, queryString string, args ...any) (int64, error) {
