@@ -9,14 +9,14 @@ import (
 	util_db "gitea.qwertysystem.net/BETS/ts-utils/db"
 	"gitea.qwertysystem.net/BETS/ts-utils/entity"
 	"gitea.qwertysystem.net/BETS/ts-utils/middleware"
-	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/model"
+	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
 	"gitea.qwertysystem.net/BETS/ts-utils/service"
 	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
 	"github.com/gofiber/fiber/v2"
 )
 
 // Group filter can be "$in":[] or "$eq":"" or just empty bson.M{}
-func CheckSystemRolePermissionSQL(ctx *fiber.Ctx, permissionKey model.PermissionType, resourceTypes []model.RoleType, groupFilter sql_query.SQLCondition) *entity.HttpError {
+func CheckSystemRolePermissionSQL(ctx *fiber.Ctx, permissionKey new_model.PermissionType, resourceTypes []new_model.SystemRoleAttribute, groupFilter sql_query.SQLCondition) *entity.HttpError {
 	// Get userId from Locals in Fiber context
 	userId, ok := ctx.Locals(middleware.UserKey).(string)
 	if !ok {
@@ -76,8 +76,8 @@ func CheckGroupPermissionSQL(
 	loggedInUser *string,
 	dataFilter map[string]sql_query.SQLCondition,
 	groupIdField string,
-	permissions []model.PermissionType,
-	systemRoleTypes []model.RoleType,
+	permissions []new_model.PermissionType,
+	systemRoleTypes []new_model.SystemRoleAttribute,
 ) error {
 	filter := map[string]sql_query.SQLCondition{
 		"usr.user_id": {
@@ -137,8 +137,8 @@ func CheckTransactionRoleMultiGroupPermissionsSQL(
 	loggedInUser *string,
 	dataFilter map[string]sql_query.SQLCondition,
 	groupIdField string,
-	transactionType []model.TransactionGroupAttribute,
-	roleType []model.TransactionRoleType,
+	transactionType []new_model.TransactionRoleAttribute,
+	roleType []new_model.TransactionRoleType,
 ) error {
 	filter := map[string]sql_query.SQLCondition{
 		"usr.user_id": {
@@ -198,8 +198,8 @@ func CheckTransactionRoleMultiGroupPermissionsSQL(
 func CheckTransactionRolePermissionSQL(
 	ctx *fiber.Ctx,
 	groupIdFilter sql_query.SQLCondition,
-	transactionType []model.TransactionGroupAttribute,
-	roleType []model.TransactionRoleType,
+	transactionType []new_model.TransactionRoleAttribute,
+	roleType []new_model.TransactionRoleType,
 ) error {
 	// Get userId from Locals in Fiber context
 	userId, ok := ctx.Locals(middleware.UserKey).(string)
