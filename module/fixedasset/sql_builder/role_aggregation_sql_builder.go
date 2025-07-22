@@ -1,11 +1,15 @@
 package sql_builder
 
 import (
+	"context"
 	"fmt"
+	"log"
 
+	"gitea.qwertysystem.net/BETS/ts-utils/db"
 	fixedasset_model "gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/model"
 	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
 	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
+	"github.com/jackc/pgx/v5"
 )
 
 type TransactionRoleRestriction struct {
@@ -847,4 +851,44 @@ func RolePermissionAggregation(
 		"",
 		false,
 	)
+}
+
+func FindUserSystemRoles[T any](
+	v T,
+	ctx context.Context,
+	companyCode string,
+	loggedInUserId int,
+) error {
+	dbName := db.FixedAssetDBName.CompanyDBName(companyCode)
+	pool := db.ConnectPostgres(dbName)
+
+	var rows pgx.Rows
+	var err error
+
+	queryString, args, _ := sql_query.NewSQLSelectBuilder[T]("user_system_roles").
+		Where(map[string]sql_query.SQLCondition{
+			"user_id": {
+				Operator: sql_query.SQLOperatorEqual,
+				Value:    loggedInUserId,
+			},
+			"is_active": {
+				Operator: sql_query.SQLOperatorEqual,
+				Value:    true,
+			},
+		}).
+		Build()
+
+	rows, err = pool.Query(ctx, queryString, args...)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	err = sql_query.ScanRowsArray(v, rows)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	return nil
 }
