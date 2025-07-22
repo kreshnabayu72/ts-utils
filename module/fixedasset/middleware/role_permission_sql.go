@@ -3,14 +3,14 @@ package middleware
 import (
 	"gitea.qwertysystem.net/BETS/ts-utils/middleware"
 	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/helper"
-	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/model"
+	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
 	"gitea.qwertysystem.net/BETS/ts-utils/response"
 	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
 	"github.com/gofiber/fiber/v2"
 )
 
 // Not filtered by group
-func GlobalSystemRoleRestrictionSQL(permission model.PermissionType, resourceTypes []model.RoleType) fiber.Handler {
+func GlobalSystemRoleRestrictionSQL(permission new_model.PermissionType, resourceTypes []new_model.SystemRoleAttribute) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		isTest := c.Locals(middleware.IsTest)
 		if isTest != nil {
@@ -50,7 +50,7 @@ func TotalControlRoleRestrictionSQL() fiber.Handler {
 }
 
 // Not filtered by group
-func TransactionRoleRestrictionSQL(roleTypes []model.TransactionRoleType, transactionAttributes []model.TransactionGroupAttribute) fiber.Handler {
+func TransactionRoleRestrictionSQL(roleTypes []new_model.TransactionRoleType, transactionAttributes []new_model.TransactionRoleAttribute) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		isTest := c.Locals(middleware.IsTest)
 		if isTest != nil {
@@ -82,12 +82,12 @@ func AssetListRoleRestrictionSQL() fiber.Handler {
 		err := helper.CheckTransactionRolePermissionSQL(c, sql_query.SQLCondition{
 			Operator: sql_query.SQLOperatorIsNotNull,
 		},
-			[]model.TransactionGroupAttribute{model.TGABorrowingRole, model.TGADisposalRole, model.TGATransferRole, model.TGAAuditRole, model.TGAMaintenanceRole, model.TGARepairRole, model.TGATrackingRole, model.TGADamagedRole, model.TGAMissingRole},
-			[]model.TransactionRoleType{model.TRTManager, model.TRTMonitoring, model.TRTStaff})
+			[]new_model.TransactionRoleAttribute{new_model.TransactionRoleAttributeBorrowing, new_model.TransactionRoleAttributeDisposal, new_model.TransactionRoleAttributeTransfer, new_model.TransactionRoleAttributeAudit, new_model.TransactionRoleAttributeMaintenance, new_model.TransactionRoleAttributeRepair, new_model.TransactionRoleAttributeTracking, new_model.TransactionRoleAttributeDamaged, new_model.TransactionRoleAttributeMissing},
+			[]new_model.TransactionRoleType{new_model.TransactionRoleTypeManager, new_model.TransactionRoleTypeMonitoring, new_model.TransactionRoleTypeStaff})
 
 		// Check permissions based on the provided permissionKey and resourceTypes
-		systErr := helper.CheckSystemRolePermissionSQL(c, model.PermissionView,
-			[]model.RoleType{model.RTTag, model.RTPurchaseInformation, model.RTRegisterAsset, model.RTPurchaseDocument, model.RTDepreciationGroup, model.RTDepreciationMethod},
+		systErr := helper.CheckSystemRolePermissionSQL(c, new_model.PermissionView,
+			[]new_model.SystemRoleAttribute{new_model.SystemRoleAttributeTag, new_model.SystemRoleAttributePurchaseInfo, new_model.SystemRoleAttributeRegisterAsset, new_model.SystemRoleAttributePurchaseDocument, new_model.SystemRoleAttributeDepreciationGroup, new_model.SystemRoleAttributeDepreciationMethod},
 			sql_query.SQLCondition{
 				Operator: sql_query.SQLOperatorIsNotNull,
 			})
