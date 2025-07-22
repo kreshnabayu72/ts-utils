@@ -25,7 +25,7 @@ type PostgreSqlService interface {
 	InsertOneWithData(ctx context.Context, body interface{}) (interface{}, error)
 	UpdateOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
 	UpdateOneWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}) (interface{}, error)
-	UpdateOneWithDataAndReturning(ctx context.Context, v any, query map[string]sql_query.SQLCondition, body interface{}, returning ...string) error
+	UpdateOneWithDataAndReturning(v any, ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}, returning ...string) error
 	UpdateMany(ctx context.Context, queryString string, args ...any) (int64, error)
 	DeleteOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
 	DeleteOneWithFilter(ctx context.Context, filter map[string]sql_query.SQLCondition) (interface{}, error)
@@ -51,7 +51,7 @@ type BasePostgreSqlService struct {
 	TableName   string
 }
 
-func MakePostgreSqlService(dbName db.DBName, tableName string) *BasePostgreSqlService {
+func MakePostgreSqlService(dbName db.DBName, tableName string) PostgreSqlService {
 	pool := db.ConnectPostgres(dbName)
 
 	return &BasePostgreSqlService{Pool: pool, TableName: tableName}
