@@ -66,6 +66,15 @@ const (
 	TagTypeNonTAG = TagType("Non TAG")
 )
 
+type PermissionType string
+
+const (
+	PermissionCreate PermissionType = "create"
+	PermissionUpdate PermissionType = "update"
+	PermissionDelete PermissionType = "delete"
+	PermissionView   PermissionType = "view"
+)
+
 type SystemRoleName string
 
 const (
