@@ -5,7 +5,7 @@ import "time"
 // UNFINISHED!
 // TODO: QUOTA, LICENSE, etc
 type Group struct {
-	ID       int    `json:"id"         column:"id"`
+	ID       int    `json:"_id"         column:"id"`
 	Name     string `json:"name"       column:"name"`
 	Code     string `json:"code"       column:"code"`
 	ParentId int    `json:"parentId"  column:"parent_id"`
