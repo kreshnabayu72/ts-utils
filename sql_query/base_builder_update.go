@@ -191,7 +191,6 @@ func (s *updateBuilder) extractUpdateFields(v reflect.Value) ([]string, bool) {
 		if val.Kind() == reflect.Struct && field.Type != reflect.TypeOf(time.Time{}) {
 			childClauses, childHasUpdated := s.extractUpdateFields(val)
 			setClauses = append(setClauses, childClauses...)
-			s.Args = append(s.Args, val.Interface())
 			if childHasUpdated {
 				hasUpdatedAt = true
 			}
@@ -199,6 +198,7 @@ func (s *updateBuilder) extractUpdateFields(v reflect.Value) ([]string, bool) {
 		}
 
 		setClauses = append(setClauses, fmt.Sprintf(`%s = $%d`, col, len(s.Args)+1))
+		s.Args = append(s.Args, val.Interface())
 
 		if col == "updated_at" {
 			hasUpdatedAt = true
