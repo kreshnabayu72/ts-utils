@@ -16,6 +16,7 @@ import (
 // Base Service PostgreSQL
 type PostgreSqlService interface {
 	GetPool() PgxPoolInterface
+	GetTableName() string
 	Count(ctx context.Context, queryString string, args ...any) (int, error)
 	CountWithFilter(ctx context.Context, filter map[string]sql_query.SQLCondition) (int, error)
 	SelectMany(v any, ctx context.Context, queryString string, args ...any) error
@@ -58,6 +59,11 @@ func MakePostgreSqlService(dbName db.DBName, tableName string) *BasePostgreSqlSe
 // Used for getting pool
 func (s *BasePostgreSqlService) GetPool() PgxPoolInterface {
 	return s.Pool
+}
+
+// Used for getting tablename of this service
+func (s *BasePostgreSqlService) GetTableName() string {
+	return s.TableName
 }
 
 // Select array of data, equivalent of Find() or Aggregate()

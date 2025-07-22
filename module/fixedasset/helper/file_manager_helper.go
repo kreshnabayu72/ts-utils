@@ -44,7 +44,7 @@ func (f *FileManagerHelperImpl) CreateFileManagerSQL(
 	// Check if the company exists
 	queryStr, args, _ := sql_query.NewSQLSelectBuilder[int](db.ClientTableName).
 		Where(map[string]sql_query.SQLCondition{
-			"cleint_id": {
+			"client_id": {
 				Operator: sql_query.SQLOperatorEqual,
 				Value:    companyCode,
 			},
