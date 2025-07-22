@@ -5,11 +5,11 @@ import "time"
 type ImportCustomField struct {
 	ID int `json:"id" column:"id"`
 
-	Name         string              `json:"name"          column:"name"`
-	Type         CustomFieldType     `json:"type"          column:"type"`
-	DataType     CustomFieldDataType `json:"dataType"     column:"data_type"`
-	OptionValue  string              `json:"optionValue"  column:"option_value"`
 	IsRequired   string              `json:"isRequired"   column:"is_required"`
+	OptionValue  string              `json:"optionValue"  column:"option_value"`
+	DataType     CustomFieldDataType `json:"dataType"     column:"data_type"`
+	Type         CustomFieldType     `json:"type"          column:"type"`
+	Name         string              `json:"name"          column:"name"`
 	Category     string              `json:"category"      column:"category"`
 	CategoryCode string              `json:"categoryCode" column:"category_code"` // not used in basic
 

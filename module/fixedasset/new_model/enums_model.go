@@ -218,3 +218,37 @@ const (
 	TagStatusDamagedMissing = TagType("Damaged / Missing")
 	TagStatusToBeReturned   = TagType("To be Returned")
 )
+
+type ModuleAccess string
+
+const (
+	ModuleAccessFixedAsset     = TagType("Fixed Asset")
+	ModuleAccessSettingsPortal = TagType("Settings Portal")
+	ModuleAccessAdminConsole   = TagType("Admin Console")
+	ModuleAccessSupplyAsset    = TagType("Supply Asset")
+)
+
+type LicenseModuleType string
+
+const (
+	LicenseModuleTypeFixedAsset         = TagType("Fixed Asset")
+	LicenseModuleTypeAssetControl       = TagType("+Asset Control")
+	LicenseModuleTypeMaintenanceRoutine = TagType("+Maintenance Routine")
+	LicenseModuleTypeRepairTicketing    = TagType("+Repair Ticketing")
+	LicenseModuleTypeTracking           = TagType("+Tracking")
+)
+
+type LicensePurchaseType string
+
+const (
+	LicensePurchaseTypePurchase = TagType("Purchase")
+	LicensePurchaseTypeTrial    = TagType("Trial")
+)
+
+type LicenseUseType string
+
+const (
+	LicenseUseTypeExtend     = TagType("Extend")
+	LicenseUseTypeAdditional = TagType("Additional")
+	LicenseUseTypeNew        = TagType("New")
+)
