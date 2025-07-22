@@ -292,3 +292,83 @@ const (
 	AssetReportSourceTracking    AssetReportSource = "Tracking Asset"
 	AssetReportSourceMaintenance AssetReportSource = "Maintenance Asset"
 )
+
+type AssignmentTransactionStatus string
+
+const (
+	AssignmentTransactionStatusWaitingForApproval AssignmentTransactionStatus = "Waiting for Approval"
+	AssignmentTransactionStatusWaitingForHandover AssignmentTransactionStatus = "Waiting for Handover"
+	AssignmentTransactionStatusAssigned           AssignmentTransactionStatus = "Assigned"
+	AssignmentTransactionStatusUnassigned         AssignmentTransactionStatus = "Unassigned"
+	AssignmentTransactionStatusRejected           AssignmentTransactionStatus = "Rejected"
+)
+
+type AssignmentRequestStatus string
+
+const (
+	AssignmentRequestStatusWaitingForApproval    AssignmentRequestStatus = "Waiting for Approval"
+	AssignmentRequestStatusWaitingForHandover    AssignmentRequestStatus = "Waiting for Handover"
+	AssignmentRequestStatusAssigned              AssignmentRequestStatus = "Assigned"
+	AssignmentRequestStatusUnassigned            AssignmentRequestStatus = "Unassigned"
+	AssignmentRequestStatusApproved              AssignmentRequestStatus = "Approved"
+	AssignmentRequestStatusRejected              AssignmentRequestStatus = "Rejected"
+	AssignmentRequestStatusDamaged               AssignmentRequestStatus = "Damaged"
+	AssignmentRequestStatusMissing               AssignmentRequestStatus = "Missing"
+	AssignmentRequestStatusReportedDamagedByUser AssignmentRequestStatus = "Reported Damaged By User"
+	AssignmentRequestStatusReportedMissingByUser AssignmentRequestStatus = "Reported Missing By User"
+	AssignmentRequestStatusReportedDisposal      AssignmentRequestStatus = "Reported Disposal"
+	AssignmentRequestStatusOnDisposalProcess     AssignmentRequestStatus = "On Disposal Process"
+	AssignmentRequestStatusDisposed              AssignmentRequestStatus = "Disposed"
+)
+
+type BorrowingTransactionStatus string
+
+const (
+	BorrowingTransactionStatusWaitingForApproval BorrowingTransactionStatus = "Waiting for Approval"
+	BorrowingTransactionStatusWaitingForHandover BorrowingTransactionStatus = "Waiting for Handover"
+	BorrowingTransactionStatusBorrowed           BorrowingTransactionStatus = "Borrowed"
+	BorrowingTransactionStatusReturned           BorrowingTransactionStatus = "Returned"
+	BorrowingTransactionStatusExtendApproval     BorrowingTransactionStatus = "Extend Approval"
+	BorrowingTransactionStatusRequestExtension   BorrowingTransactionStatus = "Request Extension"
+	BorrowingTransactionStatusRejected           BorrowingTransactionStatus = "Rejected"
+)
+
+type BorrowingRequestStatus string
+
+const (
+	BorrowingRequestStatusWaitingForApproval        BorrowingRequestStatus = "Waiting for Approval"
+	BorrowingRequestStatusWaitingForHandover        BorrowingRequestStatus = "Waiting for Handover"
+	BorrowingRequestStatusBorrowed                  BorrowingRequestStatus = "Borrowed"
+	BorrowingRequestStatusReturned                  BorrowingRequestStatus = "Returned"
+	BorrowingRequestStatusApproved                  BorrowingRequestStatus = "Approved"
+	BorrowingRequestStatusRejected                  BorrowingRequestStatus = "Rejected"
+	BorrowingRequestStatusDamaged                   BorrowingRequestStatus = "Damaged"
+	BorrowingRequestStatusMissing                   BorrowingRequestStatus = "Missing"
+	BorrowingRequestStatusReportedDamagedByBorrower BorrowingRequestStatus = "Reported Damaged By Borrower"
+	BorrowingRequestStatusReportedMissingByBorrower BorrowingRequestStatus = "Reported Missing By Borrower"
+	BorrowingRequestStatusReportedDisposal          BorrowingRequestStatus = "Reported Disposal"
+	BorrowingRequestStatusOnDisposalProcess         BorrowingRequestStatus = "On Disposal Process"
+	BorrowingRequestStatusDisposed                  BorrowingRequestStatus = "Disposed"
+)
+
+type ApprovalStatus string
+
+const (
+	ApprovalStatusNeedApproval     ApprovalStatus = "Need Approval"
+	ApprovalStatusFinishedApproval ApprovalStatus = "Finished Approval"
+	ApprovalStatusPending          ApprovalStatus = "Pending"
+)
+
+type ApprovalType string
+
+const (
+	ApprovalTypeOr  ApprovalType = "Or"
+	ApprovalTypeAnd ApprovalType = "And"
+)
+
+type AssignmentPrelistType string
+
+const (
+	AssignmentPrelistTypeOr  AssignmentPrelistType = "Assign"
+	AssignmentPrelistTypeAnd AssignmentPrelistType = "Unassign"
+)
