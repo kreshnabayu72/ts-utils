@@ -81,6 +81,17 @@ func (m *MockBasePostgreSqlService) UpdateOneWithData(ctx context.Context, query
 	return arg.Get(0), arg.Error(1)
 }
 
+func (m *MockBasePostgreSqlService) UpdateOneWithDataAndReturning(
+	v any,
+	ctx context.Context,
+	query map[string]sql_query.SQLCondition,
+	body interface{},
+	returning ...string,
+) error {
+	arg := m.Called(v, ctx, query, body, returning)
+	return arg.Error(0)
+}
+
 func (m *MockBasePostgreSqlService) UpdateMany(
 	ctx context.Context,
 	queryString string,
