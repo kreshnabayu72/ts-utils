@@ -892,3 +892,55 @@ func FindUserSystemRoles[T any](
 
 	return nil
 }
+
+type GroupFieldAndAttributeName struct {
+	Field         string // origin_group.id / destination_group.id
+	AttributeName string // Origin / Destination (For isDestinationManager)
+}
+
+func TransactionRoleMultipleGroupAggregation(
+	builder *sql_query.SelectBuilder,
+	loggedInUserId int,
+	groupFieldsAndAttribute []GroupFieldAndAttributeName,
+	transactionGroupAttribute new_model.TransactionRoleAttribute,
+	roleTypes []new_model.TransactionRoleType,
+) {
+	builder.
+		LeftJoin(
+			"user_transaction_roles utr",
+			fmt.Sprintf(
+				"utr.user_id = %d AND utr.is_active = true utr.role_attribute = %s",
+				loggedInUserId,
+				transactionGroupAttribute,
+			),
+		)
+
+	if len(roleTypes) > 0 {
+		builder.Where(map[string]sql_query.SQLCondition{
+			"utr\".\"role_type": {
+				Operator: sql_query.SQLOperatorIn,
+				Value:    roleTypes,
+				IsRef:    true,
+			},
+		})
+	}
+
+	for _, groupField := range groupFieldsAndAttribute {
+		builder.SelectBoolOr(
+			fmt.Sprintf(
+				"utr.group_id = '%s' AND utr.role_type = '%s'",
+				groupField.Field,
+				new_model.TransactionRoleTypeManager,
+			),
+			fmt.Sprintf("is%sManager", groupField.AttributeName),
+		)
+		builder.SelectBoolOr(
+			fmt.Sprintf(
+				"utr.group_id = '%s' AND utr.role_type = '%s'",
+				groupField.Field,
+				new_model.TransactionRoleTypeMonitoring,
+			),
+			fmt.Sprintf("is%sMonitoring", groupField.AttributeName),
+		)
+	}
+}
