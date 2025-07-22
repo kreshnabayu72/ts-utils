@@ -41,6 +41,5 @@ type User struct {
 type UserAttribute struct {
 	ID        string `json:"_id,omitempty" column:"id::text"`
 	FullName  string `json:"fullName"      column:"concat_ws(' ', first_name, last_name)"`
-	Key       int    `json:"key"           column:"key"`
 	IsDefault bool   `json:"isDefault"     column:"is_default"`
 }

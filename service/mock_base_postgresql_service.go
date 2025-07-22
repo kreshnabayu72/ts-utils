@@ -17,6 +17,12 @@ func (m *MockBasePostgreSqlService) GetPool() PgxPoolInterface {
 	arg := m.Called()
 	return arg.Get(0).(PgxPoolInterface)
 }
+
+func (m *MockBasePostgreSqlService) GetTableName() string {
+	arg := m.Called()
+	return arg.Get(0).(string)
+}
+
 func (m *MockBasePostgreSqlService) SelectMany(
 	v any,
 	ctx context.Context,
@@ -55,6 +61,7 @@ func (m *MockBasePostgreSqlService) InsertOne(
 	arg := m.Called(ctx, queryString, args)
 	return arg.Get(0), arg.Error(1)
 }
+
 func (m *MockBasePostgreSqlService) InsertOneWithData(ctx context.Context, body interface{}) (interface{}, error) {
 	arg := m.Called(ctx, body)
 	return arg.Get(0), arg.Error(1)
@@ -72,6 +79,17 @@ func (m *MockBasePostgreSqlService) UpdateOne(
 func (m *MockBasePostgreSqlService) UpdateOneWithData(ctx context.Context, query map[string]sql_query.SQLCondition, updateData interface{}) (interface{}, error) {
 	arg := m.Called(ctx, query, updateData)
 	return arg.Get(0), arg.Error(1)
+}
+
+func (m *MockBasePostgreSqlService) UpdateOneWithDataAndReturning(
+	v any,
+	ctx context.Context,
+	query map[string]sql_query.SQLCondition,
+	body interface{},
+	returning ...string,
+) error {
+	arg := m.Called(v, ctx, query, body, returning)
+	return arg.Error(0)
 }
 
 func (m *MockBasePostgreSqlService) UpdateMany(
