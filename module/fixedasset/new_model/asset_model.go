@@ -3,7 +3,7 @@ package new_model
 import "time"
 
 type Asset struct {
-	ID int `json:"id" column:"id"`
+	ID int `json:"_id" column:"id"`
 
 	AssetIDFull    string            `json:"assetIdFull"        column:"asset_id_full"`
 	AssetID        string            `json:"assetId"        column:"asset_id"`

@@ -3,7 +3,7 @@ package new_model
 import "time"
 
 type ImportBrand struct {
-	ID  int `json:"id"            column:"id"`
+	ID  int `json:"_id"            column:"id"`
 	Key int `json:"key"           column:"key"`
 
 	Name         string `json:"name"          column:"name"`

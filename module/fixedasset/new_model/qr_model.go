@@ -3,7 +3,7 @@ package new_model
 import "time"
 
 type Qr struct {
-	ID int `json:"id"         column:"id"`
+	ID int `json:"_id"         column:"id"`
 
 	Code   string    `json:"code"       column:"code"`
 	Status TagStatus `json:"status"       column:"status"`

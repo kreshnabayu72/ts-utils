@@ -3,8 +3,8 @@ package new_model
 type AssetDefaultImage string
 
 const (
-	AssetDefaultImageFirstImage  = TagType("first_image")
-	AssetDefaultImageSecondImage = TagType("second_image")
+	AssetDefaultImageFirstImage  = AssetDefaultImage("first_image")
+	AssetDefaultImageSecondImage = AssetDefaultImage("second_image")
 )
 
 type AssetStatus string
@@ -212,43 +212,83 @@ const (
 type TagStatus string
 
 const (
-	TagStatusAvailable      = TagType("Available")
-	TagStatusPaired         = TagType("Paired")
-	TagStatusReported       = TagType("Reported")
-	TagStatusDamagedMissing = TagType("Damaged / Missing")
-	TagStatusToBeReturned   = TagType("To be Returned")
+	TagStatusAvailable      = TagStatus("Available")
+	TagStatusPaired         = TagStatus("Paired")
+	TagStatusReported       = TagStatus("Reported")
+	TagStatusDamagedMissing = TagStatus("Damaged / Missing")
+	TagStatusToBeReturned   = TagStatus("To be Returned")
 )
 
 type ModuleAccess string
 
 const (
-	ModuleAccessFixedAsset     = TagType("Fixed Asset")
-	ModuleAccessSettingsPortal = TagType("Settings Portal")
-	ModuleAccessAdminConsole   = TagType("Admin Console")
-	ModuleAccessSupplyAsset    = TagType("Supply Asset")
+	ModuleAccessFixedAsset     = ModuleAccess("Fixed Asset")
+	ModuleAccessSettingsPortal = ModuleAccess("Settings Portal")
+	ModuleAccessAdminConsole   = ModuleAccess("Admin Console")
+	ModuleAccessSupplyAsset    = ModuleAccess("Supply Asset")
 )
 
 type LicenseModuleType string
 
 const (
-	LicenseModuleTypeFixedAsset         = TagType("Fixed Asset")
-	LicenseModuleTypeAssetControl       = TagType("+Asset Control")
-	LicenseModuleTypeMaintenanceRoutine = TagType("+Maintenance Routine")
-	LicenseModuleTypeRepairTicketing    = TagType("+Repair Ticketing")
-	LicenseModuleTypeTracking           = TagType("+Tracking")
+	LicenseModuleTypeFixedAsset         = LicenseModuleType("Fixed Asset")
+	LicenseModuleTypeAssetControl       = LicenseModuleType("+Asset Control")
+	LicenseModuleTypeMaintenanceRoutine = LicenseModuleType("+Maintenance Routine")
+	LicenseModuleTypeRepairTicketing    = LicenseModuleType("+Repair Ticketing")
+	LicenseModuleTypeTracking           = LicenseModuleType("+Tracking")
 )
 
 type LicensePurchaseType string
 
 const (
-	LicensePurchaseTypePurchase = TagType("Purchase")
-	LicensePurchaseTypeTrial    = TagType("Trial")
+	LicensePurchaseTypePurchase = LicensePurchaseType("Purchase")
+	LicensePurchaseTypeTrial    = LicensePurchaseType("Trial")
 )
 
 type LicenseUseType string
 
 const (
-	LicenseUseTypeExtend     = TagType("Extend")
-	LicenseUseTypeAdditional = TagType("Additional")
-	LicenseUseTypeNew        = TagType("New")
+	LicenseUseTypeExtend     = LicenseUseType("Extend")
+	LicenseUseTypeAdditional = LicenseUseType("Additional")
+	LicenseUseTypeNew        = LicenseUseType("New")
+)
+
+type ReaderStatus string
+
+const (
+	ReaderStatusAvailable = ReaderStatus("Available")
+	ReaderStatusDamaged   = ReaderStatus("Damaged")
+	ReaderStatusMissing   = ReaderStatus("Missing")
+)
+
+type DamageReportStatus string
+
+const (
+	DamageReportStatusDamaged           = DamageReportStatus("Damaged")
+	DamageReportStatusRepaired          = DamageReportStatus("Repaired")
+	DamageReportStatusReportedDisposal  = DamageReportStatus("Reported Disposal")
+	DamageReportStatusOnDisposalProcess = DamageReportStatus("On Disposal Process")
+	DamageReportStatusDisposed          = DamageReportStatus("Disposed")
+)
+
+type MissingReportStatus string
+
+const (
+	MissingReportStatusMissing           MissingReportStatus = "Missing"
+	MissingReportStatusFound             MissingReportStatus = "Found"
+	MissingReportStatusReportedDisposal  MissingReportStatus = "Reported Disposal"
+	MissingReportStatusOnDisposalProcess MissingReportStatus = "On Disposal Process"
+	MissingReportStatusDisposed          MissingReportStatus = "Disposed"
+)
+
+type AssetReportSource string
+
+const (
+	AssetReportSourceAvailable   AssetReportSource = "Available Asset"
+	AssetReportSourceAudit       AssetReportSource = "Audit Asset"
+	AssetReportSourceBorrowed    AssetReportSource = "Borrowed Asset"
+	AssetReportSourceAssigned    AssetReportSource = "Assigned Asset"
+	AssetReportSourceTransfer    AssetReportSource = "Transfer Asset"
+	AssetReportSourceTracking    AssetReportSource = "Tracking Asset"
+	AssetReportSourceMaintenance AssetReportSource = "Maintenance Asset"
 )
