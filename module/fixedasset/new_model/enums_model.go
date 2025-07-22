@@ -1,5 +1,12 @@
 package new_model
 
+type AssetDefaultImage string
+
+const (
+	AssetDefaultImageFirstImage  = AssetDefaultImage("first_image")
+	AssetDefaultImageSecondImage = AssetDefaultImage("second_image")
+)
+
 type AssetStatus string
 
 const (
@@ -57,6 +64,15 @@ const (
 	TagTypeRFID   = TagType("RFID")
 	TagTypeRFIDQR = TagType("RFID & QR")
 	TagTypeNonTAG = TagType("Non TAG")
+)
+
+type PermissionType string
+
+const (
+	PermissionCreate PermissionType = "create"
+	PermissionUpdate PermissionType = "update"
+	PermissionDelete PermissionType = "delete"
+	PermissionView   PermissionType = "view"
 )
 
 type SystemRoleName string
@@ -191,4 +207,88 @@ const (
 	FileTypeDisposal           FileType = "Disposal"
 	FileTypeRepairTicketing    FileType = "Repair Ticketing"
 	FileTypeMaintenanceRoutine FileType = "Maintenance Routine"
+)
+
+type TagStatus string
+
+const (
+	TagStatusAvailable      = TagStatus("Available")
+	TagStatusPaired         = TagStatus("Paired")
+	TagStatusReported       = TagStatus("Reported")
+	TagStatusDamagedMissing = TagStatus("Damaged / Missing")
+	TagStatusToBeReturned   = TagStatus("To be Returned")
+)
+
+type ModuleAccess string
+
+const (
+	ModuleAccessFixedAsset     = ModuleAccess("Fixed Asset")
+	ModuleAccessSettingsPortal = ModuleAccess("Settings Portal")
+	ModuleAccessAdminConsole   = ModuleAccess("Admin Console")
+	ModuleAccessSupplyAsset    = ModuleAccess("Supply Asset")
+)
+
+type LicenseModuleType string
+
+const (
+	LicenseModuleTypeFixedAsset         = LicenseModuleType("Fixed Asset")
+	LicenseModuleTypeAssetControl       = LicenseModuleType("+Asset Control")
+	LicenseModuleTypeMaintenanceRoutine = LicenseModuleType("+Maintenance Routine")
+	LicenseModuleTypeRepairTicketing    = LicenseModuleType("+Repair Ticketing")
+	LicenseModuleTypeTracking           = LicenseModuleType("+Tracking")
+)
+
+type LicensePurchaseType string
+
+const (
+	LicensePurchaseTypePurchase = LicensePurchaseType("Purchase")
+	LicensePurchaseTypeTrial    = LicensePurchaseType("Trial")
+)
+
+type LicenseUseType string
+
+const (
+	LicenseUseTypeExtend     = LicenseUseType("Extend")
+	LicenseUseTypeAdditional = LicenseUseType("Additional")
+	LicenseUseTypeNew        = LicenseUseType("New")
+)
+
+type ReaderStatus string
+
+const (
+	ReaderStatusAvailable = ReaderStatus("Available")
+	ReaderStatusDamaged   = ReaderStatus("Damaged")
+	ReaderStatusMissing   = ReaderStatus("Missing")
+)
+
+type DamageReportStatus string
+
+const (
+	DamageReportStatusDamaged           = DamageReportStatus("Damaged")
+	DamageReportStatusRepaired          = DamageReportStatus("Repaired")
+	DamageReportStatusReportedDisposal  = DamageReportStatus("Reported Disposal")
+	DamageReportStatusOnDisposalProcess = DamageReportStatus("On Disposal Process")
+	DamageReportStatusDisposed          = DamageReportStatus("Disposed")
+)
+
+type MissingReportStatus string
+
+const (
+	MissingReportStatusMissing           MissingReportStatus = "Missing"
+	MissingReportStatusFound             MissingReportStatus = "Found"
+	MissingReportStatusReportedDisposal  MissingReportStatus = "Reported Disposal"
+	MissingReportStatusOnDisposalProcess MissingReportStatus = "On Disposal Process"
+	MissingReportStatusDisposed          MissingReportStatus = "Disposed"
+)
+
+type AssetReportSource string
+
+const (
+	AssetReportSourceAvailable   AssetReportSource = "Available Asset"
+	AssetReportSourceAudit       AssetReportSource = "Audit Asset"
+	AssetReportSourceBorrowed    AssetReportSource = "Borrowed Asset"
+	AssetReportSourceAssigned    AssetReportSource = "Assigned Asset"
+	AssetReportSourceTransfer    AssetReportSource = "Transfer Asset"
+	AssetReportSourceTracking    AssetReportSource = "Tracking Asset"
+	AssetReportSourceMaintenance AssetReportSource = "Maintenance Asset"
 )

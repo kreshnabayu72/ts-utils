@@ -21,6 +21,7 @@ type SQLUpdateInitBuilder interface {
 type SQLUpdateChainBuilder interface {
 	Where(filters map[string]SQLCondition) SQLUpdateChainBuilder
 	WhereOr(filters map[string]SQLCondition) SQLUpdateChainBuilder
+	Return(columns ...string) SQLUpdateChainBuilder
 
 	From(tables []string) SQLUpdateChainBuilder
 
@@ -43,48 +44,33 @@ func (s *updateBuilder) WhereOr(filters map[string]SQLCondition) SQLUpdateChainB
 	return s
 }
 
+func (s *updateBuilder) Return(column ...string) SQLUpdateChainBuilder {
+	s.Columns = append(s.Columns, column...)
+	return s
+}
+
 // Update implements SQLUpdateChainBuilder using reflection like Insert(). (Only able to be called once)
-func (s *updateBuilder) Update(
-	values interface{},
-	returningColumns ...string,
-) SQLUpdateChainBuilder {
+func (s *updateBuilder) Update(values interface{}, returningColumns ...string) SQLUpdateChainBuilder {
 	v := reflect.ValueOf(values)
 	if v.Kind() != reflect.Struct {
 		s.LastError = fmt.Errorf("Update data must be a struct")
 		return s
 	}
 
-	t := v.Type()
-	var hasUpdatedAt bool
-	var setClauses []string
+	setClauses, hasUpdatedAt := s.extractUpdateFields(v)
 
-	for i := 0; i < v.NumField(); i++ {
-		field := t.Field(i)
-		tag := field.Tag.Get("json")
-		if tag == "" || tag == "-" {
-			continue
-		}
-
-		snake := CamelToSnake(tag)
-		if snake == "updated_at" {
-			hasUpdatedAt = true
-		}
-
-		setClauses = append(setClauses, fmt.Sprintf(`"%s" = $%d`, snake, len(s.Args)+1))
-		s.Args = append(s.Args, v.Field(i).Interface())
+	if !hasUpdatedAt {
+		setClauses = append(setClauses, fmt.Sprintf(`"updated_at" = $%d`, len(s.Args)+1))
+		s.Args = append(s.Args, time.Now())
 	}
 
+	s.CustomQuery = fmt.Sprintf(`UPDATE %s SET %s`, s.Table, strings.Join(setClauses, ", "))
+
 	if len(returningColumns) > 0 {
-		s.Columns = returningColumns // Columns for RETURNING (used in method Build)
+		s.Columns = returningColumns
 	} else {
 		s.Columns = []string{"id"}
 	}
-
-	if !hasUpdatedAt {
-		setClauses = append(setClauses, fmt.Sprintf("updated_at = $%d", len(s.Args)+1))
-		s.Args = append(s.Args, time.Now())
-	}
-	s.CustomQuery = fmt.Sprintf("UPDATE %s SET %s", s.Table, strings.Join(setClauses, ", "))
 
 	return s
 }
@@ -168,4 +154,56 @@ func (s *SQLEloquentQuery) buildUpdateQuery() (string, []interface{}, error) {
 		query += " RETURNING " + strings.Join(s.Columns, ",")
 	}
 	return query, s.Args, nil
+}
+
+func (s *updateBuilder) extractUpdateFields(v reflect.Value) ([]string, bool) {
+	var setClauses []string
+	var hasUpdatedAt bool
+
+	t := v.Type()
+
+	for i := 0; i < v.NumField(); i++ {
+		field := t.Field(i)
+		val := v.Field(i)
+
+		// Skip unexported or invalid fields
+		if !val.IsValid() || !val.CanInterface() {
+			continue
+		}
+
+		// Handle ignored fields
+		jsonTag := field.Tag.Get("json")
+		if jsonTag == "-" {
+			continue
+		}
+
+		// Use column tag > json tag > field name
+		col := field.Tag.Get("column")
+		if col == "" {
+			if jsonTag != "" {
+				col = CamelToSnake(jsonTag)
+			} else {
+				col = CamelToSnake(field.Name)
+			}
+		}
+
+		// Recurse into nested structs (excluding time.Time)
+		if val.Kind() == reflect.Struct && field.Type != reflect.TypeOf(time.Time{}) {
+			childClauses, childHasUpdated := s.extractUpdateFields(val)
+			setClauses = append(setClauses, childClauses...)
+			if childHasUpdated {
+				hasUpdatedAt = true
+			}
+			continue
+		}
+
+		setClauses = append(setClauses, fmt.Sprintf(`%s = $%d`, col, len(s.Args)+1))
+		s.Args = append(s.Args, val.Interface())
+
+		if col == "updated_at" {
+			hasUpdatedAt = true
+		}
+	}
+
+	return setClauses, hasUpdatedAt
 }

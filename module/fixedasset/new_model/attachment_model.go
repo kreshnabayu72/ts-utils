@@ -3,7 +3,7 @@ package new_model
 import "time"
 
 type Attachment struct {
-	ID        int            `json:"id" column:"id"`
+	ID        int            `json:"_id" column:"id"`
 	AssetID   int            `json:"assetId" column:"asset_id"`
 	Type      AttachmentType `json:"type" column:"type"`
 	Name      string         `json:"name" column:"name"`

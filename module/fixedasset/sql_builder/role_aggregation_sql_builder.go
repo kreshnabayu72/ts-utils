@@ -23,7 +23,7 @@ type RoleRestrictionOptions struct {
 }
 
 type UserSystemRole struct {
-	ID       string                    `json:"id" column:"usr.id::text"`
+	ID       string                    `json:"_id" column:"usr.id::text"`
 	GroupID  string                    `json:"group_id" column:"usr.group_id"`
 	RoleType fixedasset_model.RoleType `json:"role_attribute" column:"usr.role_attribute"`
 	Create   bool                      `json:"create" column:"usr.permission_create"`
@@ -33,7 +33,7 @@ type UserSystemRole struct {
 }
 
 type UserTransactionRole struct {
-	ID                        string                                     `json:"id" column:"utr.id::text"`
+	ID                        string                                     `json:"_id" column:"utr.id::text"`
 	GroupID                   string                                     `json:"group_id" column:"utr.group_id"`
 	RoleType                  fixedasset_model.TransactionRoleType       `json:"role_type" column:"utr.role_type"`
 	TransactionGroupAttribute fixedasset_model.TransactionGroupAttribute `json:"role_attribute" column:"utr.role_attribute"`

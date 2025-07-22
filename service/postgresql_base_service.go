@@ -16,6 +16,7 @@ import (
 // Base Service PostgreSQL
 type PostgreSqlService interface {
 	GetPool() PgxPoolInterface
+	GetTableName() string
 	Count(ctx context.Context, queryString string, args ...any) (int, error)
 	CountWithFilter(ctx context.Context, filter map[string]sql_query.SQLCondition) (int, error)
 	SelectMany(v any, ctx context.Context, queryString string, args ...any) error
@@ -23,7 +24,8 @@ type PostgreSqlService interface {
 	InsertOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
 	InsertOneWithData(ctx context.Context, body interface{}) (interface{}, error)
 	UpdateOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
-	UpdateOneWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}, returningColumn ...string) (interface{}, error)
+	UpdateOneWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}) (interface{}, error)
+	UpdateOneWithDataAndReturning(v any, ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}, returning ...string) error
 	UpdateMany(ctx context.Context, queryString string, args ...any) (int64, error)
 	DeleteOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
 	DeleteOneWithFilter(ctx context.Context, filter map[string]sql_query.SQLCondition) (interface{}, error)
@@ -49,7 +51,7 @@ type BasePostgreSqlService struct {
 	TableName   string
 }
 
-func MakePostgreSqlService(dbName db.DBName, tableName string) *BasePostgreSqlService {
+func MakePostgreSqlService(dbName db.DBName, tableName string) PostgreSqlService {
 	pool := db.ConnectPostgres(dbName)
 
 	return &BasePostgreSqlService{Pool: pool, TableName: tableName}
@@ -58,6 +60,11 @@ func MakePostgreSqlService(dbName db.DBName, tableName string) *BasePostgreSqlSe
 // Used for getting pool
 func (s *BasePostgreSqlService) GetPool() PgxPoolInterface {
 	return s.Pool
+}
+
+// Used for getting tablename of this service
+func (s *BasePostgreSqlService) GetTableName() string {
+	return s.TableName
 }
 
 // Select array of data, equivalent of Find() or Aggregate()
@@ -174,14 +181,23 @@ func (s *BasePostgreSqlService) UpdateOne(ctx context.Context, queryString strin
 	return resultId, nil
 }
 
-func (s *BasePostgreSqlService) UpdateOneWithData(ctx context.Context, query map[string]sql_query.SQLCondition, updateData interface{}, returningColumn ...string) (interface{}, error) {
+func (s *BasePostgreSqlService) UpdateOneWithData(ctx context.Context, query map[string]sql_query.SQLCondition, updateData interface{}) (interface{}, error) {
+	queryString, args := common_builders.UpdateBuilder(s.TableName,
+		query,
+		updateData,
+	)
+
+	return s.UpdateOne(ctx, queryString, args...)
+}
+
+func (s *BasePostgreSqlService) UpdateOneWithDataAndReturning(v any, ctx context.Context, query map[string]sql_query.SQLCondition, updateData interface{}, returningColumn ...string) error {
 	queryString, args := common_builders.UpdateBuilder(s.TableName,
 		query,
 		updateData,
 		returningColumn...,
 	)
 
-	return s.UpdateOne(ctx, queryString, args...)
+	return s.SelectOne(v, ctx, queryString, args...)
 }
 
 func (s *BasePostgreSqlService) UpdateMany(ctx context.Context, queryString string, args ...any) (int64, error) {
