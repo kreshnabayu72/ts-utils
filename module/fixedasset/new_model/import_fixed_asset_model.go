@@ -3,7 +3,7 @@ package new_model
 import "time"
 
 type ImportFixedAsset struct {
-	ID  int `json:"id"  column:"id"`
+	ID  int `json:"_id"  column:"id"`
 	Key int `json:"key" column:"key"`
 
 	Group       string `json:"group"       column:"group"`

@@ -3,7 +3,7 @@ package new_model
 import "time"
 
 type Brand struct {
-	ID   int    `json:"id"         column:"id"`
+	ID   int    `json:"_id"         column:"id"`
 	Name string `json:"name"       column:"name"`
 
 	IsDeleted            bool       `json:"isDeleted"            column:"is_deleted"`

@@ -3,7 +3,7 @@ package new_model
 import "time"
 
 type FileInStorage struct {
-	ID                   int       `json:"id" column:"id"`
+	ID                   int       `json:"_id" column:"id"`
 	AttachmentID         *int      `json:"attachmentId" column:"attachment_id"`
 	AssetID              int       `json:"assetId" column:"asset_id"`
 	ModifiedByID         int       `json:"modifiedById" column:"modified_by_id"`

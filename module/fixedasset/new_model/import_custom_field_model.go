@@ -3,7 +3,7 @@ package new_model
 import "time"
 
 type ImportCustomField struct {
-	ID int `json:"id" column:"id"`
+	ID int `json:"_id" column:"id"`
 
 	IsRequired   string              `json:"isRequired"   column:"is_required"`
 	OptionValue  string              `json:"optionValue"  column:"option_value"`
