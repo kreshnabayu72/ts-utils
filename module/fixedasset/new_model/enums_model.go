@@ -418,7 +418,45 @@ const (
 type DisposalLastCondition string
 
 const (
-	DisposalLastConditionOrigin  DisposalLastCondition = "No Salvage Value"
-	DisposalLastConditionMissing DisposalLastCondition = "Missing"
-	DisposalLastConditionDamaged DisposalLastCondition = "Damaged"
+	DisposalLastConditionNoSalvageValue DisposalLastCondition = "No Salvage Value"
+	DisposalLastConditionMissing        DisposalLastCondition = "Missing"
+	DisposalLastConditionDamaged        DisposalLastCondition = "Damaged"
+)
+
+type DisposalMethod string
+
+const (
+	DisposalMethodDonate    DisposalMethod = "Donate"
+	DisposalMethodSell      DisposalMethod = "Sell"
+	DisposalMethodDestroy   DisposalMethod = "Destroy"
+	DisposalMethodClearance DisposalMethod = "Clearance"
+)
+
+type DisposalTransactionStatus string
+
+const (
+	DisposalTransactionStatusWaitingForApproval     DisposalTransactionStatus = "Waiting for Approval"
+	DisposalTransactionStatusWaitingForVerification DisposalTransactionStatus = "Waiting for Verification"
+	DisposalTransactionStatusOnProgress             DisposalTransactionStatus = "On Progress"
+	DisposalTransactionStatusCompletionApproval     DisposalTransactionStatus = "Completion Approval"
+	DisposalTransactionStatusCompleted              DisposalTransactionStatus = "Completed"
+	DisposalTransactionStatusRejected               DisposalTransactionStatus = "Rejected"
+)
+
+type DisposalRequestStatus string
+
+const (
+	DisposalRequestStatusWaitingForApproval     DisposalRequestStatus = "Waiting for Approval"
+	DisposalRequestStatusWaitingForVerification DisposalRequestStatus = "Waiting for Verification"
+	DisposalRequestStatusOnProgress             DisposalRequestStatus = "On Progress"
+	DisposalRequestStatusCompleted              DisposalRequestStatus = "Completed"
+	DisposalRequestStatusApproved               DisposalRequestStatus = "Approved"
+	DisposalRequestStatusRejected               DisposalRequestStatus = "Rejected"
+)
+
+type DisposalGroupType string
+
+const (
+	DisposalGroupTypeOrigin   DisposalGroupType = "Origin"
+	DisposalGroupTypeDisposal DisposalGroupType = "Disposal"
 )

@@ -9,7 +9,7 @@ type TransferApproval struct {
 	Level      int               `json:"level" column:"level"`
 	Status     ApprovalStatus    `json:"status" column:"status"`
 	IsApproved *bool             `json:"isApproved" column:"is_approved"`
-	Notes      string            `json:"notes" column:"notes"`
+	Notes      *string           `json:"notes" column:"notes"`
 	Type       ApprovalType      `json:"type" column:"type"`
 	GroupType  TransferGroupType `json:"groupType" column:"group_type"`
 	ApprovedAt *time.Time        `json:"approvedAt" column:"approved_at"`
