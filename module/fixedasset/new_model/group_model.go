@@ -10,8 +10,8 @@ type Group struct {
 	Level *int `json:"level" column:"level"`
 
 	IsDisposable        bool `json:"isDisposable" column:"is_disposable"`
-	ParentID            *int `json:"parentId" column:"parent_id"`
-	ParentQuotaSourceID *int `json:"parentQuotaSourceId" column:"parent_quota_source_id"`
+	ParentID            int  `json:"parentId" column:"parent_id"`
+	ParentQuotaSourceID int  `json:"parentQuotaSourceId" column:"parent_quota_source_id"`
 
 	BorrowingRoleManagedByParent       bool `json:"borrowingRoleManagedByParent" column:"borrowing_role_managed_by_parent"`
 	TransferRoleManagedByParent        bool `json:"transferRoleManagedByParent" column:"transfer_role_managed_by_parent"`
