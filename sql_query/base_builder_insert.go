@@ -13,6 +13,10 @@ import (
 // e.g. InsertBuilder(...).Insert()...Rest
 type SQLInsertInitBuilder interface {
 	Insert(values interface{}, returningColumns ...string) SQLInsertChainBuilder
+
+	insertSingle(v reflect.Value, returningColumns ...string) SQLInsertChainBuilder
+	insertMany(slice reflect.Value, returningColumns ...string) SQLInsertChainBuilder
+	preBuild(columns, valuePlaceholders []string, returningColumns ...string)
 }
 
 // To ensure method .Insert() has its own chaining methods
@@ -32,7 +36,7 @@ func (s *insertBuilder) Insert(values interface{}, returningColumns ...string) S
 	// Slice case
 	if v.Kind() == reflect.Slice {
 		if v.Len() == 0 {
-			s.LastError = errors.New("cannot insert empty slice")
+			s.LastError = errors.New("cannot insert with empty slice")
 			return s
 		}
 
