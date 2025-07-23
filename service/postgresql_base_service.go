@@ -60,7 +60,8 @@ func MakePostgreSqlService(dbName db.DBName, tableName string) PostgreSqlService
 	return &BasePostgreSqlService{Pool: pool, TableName: tableName}
 }
 
-// To show query for debugging; 0 = query only, 1 = query + args, other than that is fallback to default 0
+// To show query for debugging in dev mode; 0 = query only, 1 = query + args, other than that is fallback to default 0
+// Remove its usage in production
 func (s *BasePostgreSqlService) Debug(level ...int) {
 	if len(level) > 0 && sql_query.ArrayIncludes([]int{0, 1}, level[0]) {
 		s.debugLevel = level[0]
