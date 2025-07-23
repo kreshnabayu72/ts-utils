@@ -3,7 +3,6 @@ package sql_query
 import (
 	"errors"
 	"fmt"
-
 	"reflect"
 	"strings"
 
@@ -28,50 +27,30 @@ type insertBuilder struct {
 
 // Insert implements SQLInsertChainBuilder. (Only able to be called once)
 func (s *insertBuilder) Insert(values interface{}, returningColumns ...string) SQLInsertChainBuilder {
-	var args []interface{}
-
 	v := reflect.ValueOf(values)
-	if v.Kind() != reflect.Struct {
-		s.LastError = fmt.Errorf("Insert data must be a struct")
-	}
 
-	t := v.Type()
-	var columns []string
-	var placeholders []string
-
-	db.InitSnowflake() //prevents error in unit test (correct this if better method found) (Maybe mock snowflake idk)
-
-	id := db.Node.Generate().Int64()
-	columns = append(columns, "id")
-	placeholders = append(placeholders, "$1")
-	args = append(args, id)
-
-	for i := 0; i < v.NumField(); i++ {
-		field := t.Field(i)
-		tag := field.Tag.Get("json")
-		if tag == "" || tag == "-" || tag == "_id" || tag == "id" {
-			continue
+	// Slice case
+	if v.Kind() == reflect.Slice {
+		if v.Len() == 0 {
+			s.LastError = errors.New("cannot insert empty slice")
+			return s
 		}
 
-		columns = append(columns, `"`+CamelToSnake(tag)+`"`)
-		placeholders = append(placeholders, fmt.Sprintf("$%d", len(args)+1))
-		args = append(args, v.Field(i).Interface())
+		firstElem := v.Index(0)
+		if firstElem.Kind() != reflect.Struct {
+			s.LastError = errors.New("insert slice must contain structs")
+			return s
+		}
+
+		return s.insertMany(v, returningColumns...)
 	}
 
-	if len(returningColumns) > 0 {
-		s.Columns = returningColumns // Columns for RETURNING (used in method Build)
-	} else {
-		s.Columns = []string{"id"}
+	// Single struct case
+	if v.Kind() == reflect.Struct {
+		return s.insertSingle(v, returningColumns...)
 	}
 
-	s.Args = args
-
-	s.CustomQuery = fmt.Sprintf(
-		"INSERT INTO %s (%s) VALUES (%s)",
-		s.Table,
-		strings.Join(columns, ", "),
-		strings.Join(placeholders, ", "),
-	)
+	s.LastError = errors.New("insert values must be struct or slice of struct")
 	return s
 }
 
@@ -102,4 +81,101 @@ func (s *SQLEloquentQuery) buildInsertQuery() (string, []interface{}, error) {
 	}
 
 	return s.CustomQuery, s.Args, nil
+}
+
+func (s *insertBuilder) insertSingle(v reflect.Value, returningColumns ...string) SQLInsertChainBuilder {
+	var args []interface{}
+	var columns []string
+	var placeholders []string
+
+	db.InitSnowflake() // prevents error in unit test (correct this if better method found) (Maybe mock snowflake idk)
+	id := db.Node.Generate().Int64()
+	columns = append(columns, "id")
+	placeholders = append(placeholders, "$1")
+	args = append(args, id)
+
+	t := v.Type()
+	for i := 0; i < v.NumField(); i++ {
+		field := t.Field(i)
+		tag := field.Tag.Get("json")
+		if ArrayIncludes([]string{"", "-", "_id", "id"}, tag) {
+			continue
+		}
+
+		columns = append(columns, `"`+CamelToSnake(tag)+`"`)
+		args = append(args, v.Field(i).Interface())
+		placeholders = append(placeholders, fmt.Sprintf("$%d", len(args)))
+	}
+
+	s.Args = args
+	s.preBuild(columns, placeholders)
+
+	return s
+}
+
+func (s *insertBuilder) insertMany(slice reflect.Value, returningColumns ...string) SQLInsertChainBuilder {
+	var args []interface{}
+	var columns []string
+	var valuePlaceholders []string
+
+	db.InitSnowflake() // prevents error in unit test (correct this if better method found) (Maybe mock snowflake idk)
+
+	for i := 0; i < slice.Len(); i++ {
+		v := slice.Index(i)
+		t := v.Type()
+
+		if i == 0 {
+			// Setup column list once
+			columns = append(columns, "id")
+			for j := 0; j < t.NumField(); j++ {
+				field := t.Field(j)
+				tag := field.Tag.Get("json")
+				if ArrayIncludes([]string{"", "-", "_id", "id"}, tag) {
+					continue
+				}
+				columns = append(columns, `"`+CamelToSnake(tag)+`"`)
+			}
+		}
+
+		var rowPlaceholders []string
+
+		// Add ID
+		id := db.Node.Generate().Int64()
+		args = append(args, id)
+		startIndex := len(args)
+		rowPlaceholders = append(rowPlaceholders, fmt.Sprintf("$%d", startIndex))
+
+		// Add fields
+		for j := 0; j < t.NumField(); j++ {
+			field := t.Field(j)
+			tag := field.Tag.Get("json")
+			if ArrayIncludes([]string{"", "-", "_id", "id"}, tag) {
+				continue
+			}
+			args = append(args, v.Field(j).Interface())
+			rowPlaceholders = append(rowPlaceholders, fmt.Sprintf("$%d", len(args)))
+		}
+
+		valuePlaceholders = append(valuePlaceholders, fmt.Sprintf("(%s)", strings.Join(rowPlaceholders, ", ")))
+	}
+
+	s.Args = args
+	s.preBuild(columns, valuePlaceholders)
+
+	return s
+}
+
+func (s *insertBuilder) preBuild(columns, valuePlaceholders []string, returningColumns ...string) {
+	if len(returningColumns) > 0 {
+		s.Columns = returningColumns
+	} else {
+		s.Columns = []string{"id"}
+	}
+
+	s.CustomQuery = fmt.Sprintf(
+		"INSERT INTO %s (%s) VALUES %s",
+		s.Table,
+		strings.Join(columns, ", "),
+		strings.Join(valuePlaceholders, ", "),
+	)
 }
