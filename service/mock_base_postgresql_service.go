@@ -70,6 +70,10 @@ func (m *MockBasePostgreSqlService) InsertOneWithData(ctx context.Context, body 
 	arg := m.Called(ctx, body)
 	return arg.Get(0), arg.Error(1)
 }
+func (m *MockBasePostgreSqlService) InsertManyWithData(ctx context.Context, body []interface{}) (interface{}, error) {
+	arg := m.Called(ctx, body)
+	return arg.Get(0), arg.Error(1)
+}
 
 func (m *MockBasePostgreSqlService) UpdateOne(
 	ctx context.Context,
