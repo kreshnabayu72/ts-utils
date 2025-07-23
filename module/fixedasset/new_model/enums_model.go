@@ -372,3 +372,53 @@ const (
 	AssignmentPrelistTypeOr  AssignmentPrelistType = "Assign"
 	AssignmentPrelistTypeAnd AssignmentPrelistType = "Unassign"
 )
+
+type TransferTransactionStatus string
+
+const (
+	TransferTransactionStatusWaitingForApproval TransferTransactionStatus = "Waiting for Approval"
+	TransferTransactionStatusWaitingForHandover TransferTransactionStatus = "Waiting for Handover"
+	TransferTransactionStatusCompleted          TransferTransactionStatus = "Completed"
+	TransferTransactionStatusRejected           TransferTransactionStatus = "Rejected"
+)
+
+type TransferRequestStatus string
+
+const (
+	TransferRequestStatusWaitingForApproval TransferRequestStatus = "Waiting for Approval"
+	TransferRequestStatusWaitingForHandover TransferRequestStatus = "Waiting for Handover"
+	TransferRequestStatusCompleted          TransferRequestStatus = "Completed"
+	TransferRequestStatusApproved           TransferRequestStatus = "Approved"
+	TransferRequestStatusRejected           TransferRequestStatus = "Rejected"
+)
+
+type TransferRequestAssetTagStatus string
+
+const (
+	TransferRequestAssetTagStatusVerified    TransferRequestAssetTagStatus = "Verified"
+	TransferRequestAssetTagStatusUnverified  TransferRequestAssetTagStatus = "Unverified"
+	TransferRequestAssetTagStatusTAGReported TransferRequestAssetTagStatus = "TAG Reported"
+)
+
+type TransferRequestAssetStatus string
+
+const (
+	TransferRequestAssetStatusNormal  TransferRequestAssetStatus = "Normal"
+	TransferRequestAssetStatusDamaged TransferRequestAssetStatus = "Damaged"
+	TransferRequestAssetStatusMissing TransferRequestAssetStatus = "Missing"
+)
+
+type TransferGroupType string
+
+const (
+	TransferGroupTypeOrigin      TransferGroupType = "Origin"
+	TransferGroupTypeDestination TransferGroupType = "Destination"
+)
+
+type DisposalLastCondition string
+
+const (
+	DisposalLastConditionOrigin  DisposalLastCondition = "No Salvage Value"
+	DisposalLastConditionMissing DisposalLastCondition = "Missing"
+	DisposalLastConditionDamaged DisposalLastCondition = "Damaged"
+)
