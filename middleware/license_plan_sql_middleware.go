@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"fmt"
+
 	"github.com/gofiber/fiber/v2"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/db"
@@ -52,7 +54,7 @@ func GetLicensePlanSQL() fiber.Handler {
 			SetLimit(1).
 			Build()
 		if err != nil {
-			return response.SendResponseWithError(ctx, fiber.StatusBadRequest, nil, "Invalid JWT", err)
+			return response.SendResponseWithError(ctx, fiber.StatusBadRequest, nil, "Invalid JWT", err.Error())
 		}
 
 		companyData := dto.ClientPlan{}
@@ -63,7 +65,9 @@ func GetLicensePlanSQL() fiber.Handler {
 			args...,
 		)
 		if err != nil {
-			return response.SendResponseWithError(ctx, fiber.StatusBadRequest, nil, "Invalid JWT", err)
+			fmt.Println("Jwt query: " + query)
+			fmt.Printf("Jwt args: %v\n", args)
+			return response.SendResponseWithError(ctx, fiber.StatusBadRequest, nil, "Invalid JWT", err.Error())
 		}
 
 		// Save plan in context.
