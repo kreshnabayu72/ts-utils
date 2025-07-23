@@ -13,6 +13,10 @@ type MockBasePostgreSqlService struct {
 	mock.Mock
 }
 
+func (m *MockBasePostgreSqlService) Debug(level ...int) {
+	m.Called(level)
+	return
+}
 func (m *MockBasePostgreSqlService) GetPool() PgxPoolInterface {
 	arg := m.Called()
 	return arg.Get(0).(PgxPoolInterface)
@@ -63,6 +67,10 @@ func (m *MockBasePostgreSqlService) InsertOne(
 }
 
 func (m *MockBasePostgreSqlService) InsertOneWithData(ctx context.Context, body interface{}) (interface{}, error) {
+	arg := m.Called(ctx, body)
+	return arg.Get(0), arg.Error(1)
+}
+func (m *MockBasePostgreSqlService) InsertManyWithData(ctx context.Context, body []interface{}) (interface{}, error) {
 	arg := m.Called(ctx, body)
 	return arg.Get(0), arg.Error(1)
 }
