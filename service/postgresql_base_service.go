@@ -136,7 +136,7 @@ func (s *BasePostgreSqlService) SelectOne(v any, ctx context.Context, queryStrin
 }
 
 func (s *BasePostgreSqlService) InsertOneWithData(ctx context.Context, body interface{}) (interface{}, error) {
-	queryString, args := common_builders.InsertOneBuilder(s.TableName, body)
+	queryString, args := common_builders.InsertBuilder(s.TableName, body)
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	return s.InsertOne(ctx, queryString, args...)
