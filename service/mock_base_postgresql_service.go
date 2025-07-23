@@ -13,6 +13,10 @@ type MockBasePostgreSqlService struct {
 	mock.Mock
 }
 
+func (m *MockBasePostgreSqlService) Debug(level ...int) {
+	m.Called(level)
+	return
+}
 func (m *MockBasePostgreSqlService) GetPool() PgxPoolInterface {
 	arg := m.Called()
 	return arg.Get(0).(PgxPoolInterface)
