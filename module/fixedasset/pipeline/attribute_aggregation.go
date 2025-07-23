@@ -54,6 +54,7 @@ func LookupAttributesAggregation(
 					"name":     1,
 					"key":      1,
 					"fullPath": 1,
+					"code":     1,
 				}).
 				Build(),
 		}).Unwind(bson.M{"path": fmt.Sprintf("$%s", as), "preserveNullAndEmptyArrays": preserveNullAndEmptyArrays})
