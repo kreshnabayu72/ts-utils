@@ -177,7 +177,7 @@ func (s *insertBuilder) preBuild(columns, valuePlaceholders []string, returningC
 	}
 
 	s.CustomQuery = fmt.Sprintf(
-		"INSERT INTO %s (%s) VALUES %s",
+		"INSERT INTO %s (%s) VALUES (%s)",
 		s.Table,
 		strings.Join(columns, ", "),
 		strings.Join(valuePlaceholders, ", "),
