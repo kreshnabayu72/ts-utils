@@ -5,9 +5,13 @@ import (
 )
 
 type AliasCodeData struct {
-	Name      string `json:"name" column:"name"`
-	IsChecked bool   `json:"isChecked" column:"is_checked"`
-	Value     string `json:"value" column:"value"`
+	ID          string    `column:"id"`
+	AliasCodeID string    `column:"alias_code_id"`
+	Name        string    `json:"name" column:"name"`
+	IsChecked   bool      `json:"isChecked" column:"is_checked"`
+	Value       string    `json:"value" column:"value"`
+	CreatedAt   time.Time `column:"created_at" json:"createdAt"`
+	UpdatedAt   time.Time `column:"updated_at" json:"updatedAt"`
 }
 
 type AliasCode struct {
