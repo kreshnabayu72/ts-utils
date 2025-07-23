@@ -60,15 +60,15 @@ func MakePostgreSqlService(dbName db.DBName, tableName string) PostgreSqlService
 	return &BasePostgreSqlService{Pool: pool, TableName: tableName}
 }
 
-// To show query for debugging in dev mode; 0 = query only, 1 = query + args, other than that is fallback to default 0
+// To show query for debugging in dev mode; 0 = off, 1 = query only, 2 = query + args, other than that is fallback to default 1
 // Remove its usage in production
 func (s *BasePostgreSqlService) Debug(level ...int) {
-	if len(level) > 0 && sql_query.ArrayIncludes([]int{0, 1}, level[0]) {
+	if len(level) > 0 && sql_query.ArrayIncludes([]int{1, 2}, level[0]) {
 		s.debugLevel = level[0]
 		return
 	}
 
-	s.debugLevel = 0
+	s.debugLevel = 1
 }
 
 // Used for getting pool
@@ -320,9 +320,9 @@ func UseTransactions(ctx context.Context, pool PgxPoolInterface, fn func(tx pgx.
 
 func shouldShowQuery(level int, query string, args ...any) {
 	switch level {
-	case 0:
-		log.Println("query", query)
 	case 1:
+		log.Println("query", query)
+	case 2:
 		log.Println("query and args", query, args)
 	}
 }
