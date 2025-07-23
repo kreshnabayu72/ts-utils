@@ -8,7 +8,8 @@ import (
 
 func UpdateBuilder(tableName string, query map[string]sql_query.SQLCondition, body interface{}, returningColumn ...string) (string, []interface{}) {
 	res, args, err := sql_query.NewSQLUpdateBuilder(tableName).
-		Update(body, returningColumn...).
+		Update(body).
+		Return(returningColumn...).
 		Where(query).
 		Build()
 	if err != nil {
