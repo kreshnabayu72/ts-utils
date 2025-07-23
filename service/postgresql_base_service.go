@@ -15,6 +15,7 @@ import (
 
 // Base Service PostgreSQL
 type PostgreSqlService interface {
+	Debug(level ...int)
 	GetPool() PgxPoolInterface
 	GetTableName() string
 	Count(ctx context.Context, queryString string, args ...any) (int, error)
@@ -49,12 +50,25 @@ type BasePostgreSqlService struct {
 	Pool        PgxPoolInterface
 	Transaction pgx.Tx
 	TableName   string
+
+	debugLevel int
 }
 
 func MakePostgreSqlService(dbName db.DBName, tableName string) PostgreSqlService {
 	pool := db.ConnectPostgres(dbName)
 
 	return &BasePostgreSqlService{Pool: pool, TableName: tableName}
+}
+
+// To show query for debugging in dev mode; 0 = off, 1 = query only, 2 = query + args, other than that is fallback to default 1
+// Remove its usage in production
+func (s *BasePostgreSqlService) Debug(level ...int) {
+	if len(level) > 0 && sql_query.ArrayIncludes([]int{1, 2}, level[0]) {
+		s.debugLevel = level[0]
+		return
+	}
+
+	s.debugLevel = 1
 }
 
 // Used for getting pool
@@ -69,6 +83,8 @@ func (s *BasePostgreSqlService) GetTableName() string {
 
 // Select array of data, equivalent of Find() or Aggregate()
 func (s *BasePostgreSqlService) SelectMany(v any, ctx context.Context, queryString string, args ...any) error {
+	shouldShowQuery(s.debugLevel, queryString, args...)
+
 	var rows pgx.Rows
 	var err error
 
@@ -94,6 +110,8 @@ func (s *BasePostgreSqlService) SelectMany(v any, ctx context.Context, queryStri
 
 // Select array of data, equivalent of FindOne()
 func (s *BasePostgreSqlService) SelectOne(v any, ctx context.Context, queryString string, args ...any) error {
+	shouldShowQuery(s.debugLevel, queryString, args...)
+
 	var rows pgx.Rows
 	var err error
 
@@ -119,11 +137,14 @@ func (s *BasePostgreSqlService) SelectOne(v any, ctx context.Context, queryStrin
 
 func (s *BasePostgreSqlService) InsertOneWithData(ctx context.Context, body interface{}) (interface{}, error) {
 	queryString, args := common_builders.InsertOneBuilder(s.TableName, body)
+	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	return s.InsertOne(ctx, queryString, args...)
 }
 
 func (s *BasePostgreSqlService) Count(ctx context.Context, queryString string, args ...any) (int, error) {
+	shouldShowQuery(s.debugLevel, queryString, args...)
+
 	var count int
 	var err error
 
@@ -142,12 +163,15 @@ func (s *BasePostgreSqlService) Count(ctx context.Context, queryString string, a
 }
 
 func (s *BasePostgreSqlService) CountWithFilter(ctx context.Context, filter map[string]sql_query.SQLCondition) (int, error) {
-	query, args := common_builders.CountBuilder(s.TableName, filter)
+	queryString, args := common_builders.CountBuilder(s.TableName, filter)
+	shouldShowQuery(s.debugLevel, queryString, args...)
 
-	return s.Count(ctx, query, args...)
+	return s.Count(ctx, queryString, args...)
 }
 
 func (s *BasePostgreSqlService) InsertOne(ctx context.Context, queryString string, args ...any) (interface{}, error) {
+	shouldShowQuery(s.debugLevel, queryString, args...)
+
 	var resultId int
 	var err error
 
@@ -165,6 +189,8 @@ func (s *BasePostgreSqlService) InsertOne(ctx context.Context, queryString strin
 }
 
 func (s *BasePostgreSqlService) UpdateOne(ctx context.Context, queryString string, args ...any) (interface{}, error) {
+	shouldShowQuery(s.debugLevel, queryString, args...)
+
 	var resultId int
 	var err error
 
@@ -186,6 +212,7 @@ func (s *BasePostgreSqlService) UpdateOneWithData(ctx context.Context, query map
 		query,
 		updateData,
 	)
+	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	return s.UpdateOne(ctx, queryString, args...)
 }
@@ -196,11 +223,14 @@ func (s *BasePostgreSqlService) UpdateOneWithDataAndReturning(v any, ctx context
 		updateData,
 		returningColumn...,
 	)
+	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	return s.SelectOne(v, ctx, queryString, args...)
 }
 
 func (s *BasePostgreSqlService) UpdateMany(ctx context.Context, queryString string, args ...any) (int64, error) {
+	shouldShowQuery(s.debugLevel, queryString, args...)
+
 	var commandTag pgconn.CommandTag
 	var err error
 
@@ -218,6 +248,8 @@ func (s *BasePostgreSqlService) UpdateMany(ctx context.Context, queryString stri
 }
 
 func (s *BasePostgreSqlService) DeleteOne(ctx context.Context, queryString string, args ...any) (interface{}, error) {
+	shouldShowQuery(s.debugLevel, queryString, args...)
+
 	var resultId int
 	var err error
 
@@ -235,12 +267,15 @@ func (s *BasePostgreSqlService) DeleteOne(ctx context.Context, queryString strin
 }
 
 func (s *BasePostgreSqlService) DeleteOneWithFilter(ctx context.Context, filter map[string]sql_query.SQLCondition) (interface{}, error) {
-	query, args := common_builders.DeleteBuilder(s.TableName, filter)
+	queryString, args := common_builders.DeleteBuilder(s.TableName, filter)
+	shouldShowQuery(s.debugLevel, queryString, args...)
 
-	return s.DeleteOne(ctx, query, args...)
+	return s.DeleteOne(ctx, queryString, args...)
 }
 
 func (s *BasePostgreSqlService) DeleteMany(ctx context.Context, queryString string, args ...any) (int64, error) {
+	shouldShowQuery(s.debugLevel, queryString, args...)
+
 	var commandTag pgconn.CommandTag
 	var err error
 
@@ -281,4 +316,13 @@ func UseTransactions(ctx context.Context, pool PgxPoolInterface, fn func(tx pgx.
 	}
 
 	return result, nil
+}
+
+func shouldShowQuery(level int, query string, args ...any) {
+	switch level {
+	case 1:
+		log.Println("query", query)
+	case 2:
+		log.Println("query and args", query, args)
+	}
 }
