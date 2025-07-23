@@ -24,6 +24,7 @@ type PostgreSqlService interface {
 	SelectOne(v any, ctx context.Context, queryString string, args ...any) error
 	InsertOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
 	InsertOneWithData(ctx context.Context, body interface{}) (interface{}, error)
+	InsertManyWithData(ctx context.Context, body []interface{}) (interface{}, error)
 	UpdateOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
 	UpdateOneWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}) (interface{}, error)
 	UpdateOneWithDataAndReturning(v any, ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}, returning ...string) error
@@ -136,6 +137,13 @@ func (s *BasePostgreSqlService) SelectOne(v any, ctx context.Context, queryStrin
 }
 
 func (s *BasePostgreSqlService) InsertOneWithData(ctx context.Context, body interface{}) (interface{}, error) {
+	queryString, args := common_builders.InsertBuilder(s.TableName, body)
+	shouldShowQuery(s.debugLevel, queryString, args...)
+
+	return s.InsertOne(ctx, queryString, args...)
+}
+
+func (s *BasePostgreSqlService) InsertManyWithData(ctx context.Context, body []interface{}) (interface{}, error) {
 	queryString, args := common_builders.InsertBuilder(s.TableName, body)
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
