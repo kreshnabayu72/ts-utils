@@ -9,7 +9,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type UseCaseFunc[T any] func(ctx context.Context) (T, error)
+type UseCaseFunc[T any] func(ctx context.Context) (T, *entity.HttpError)
 
 // RunWithTimeout runs a use case with timeout and handles Fiber response to avoid rewrite in every usecase calls in controller
 func RunWithTimeout[T any](

@@ -909,7 +909,7 @@ func TransactionRoleMultipleGroupAggregation(
 		LeftJoin(
 			"user_transaction_roles utr",
 			fmt.Sprintf(
-				"utr.user_id = %d AND utr.is_active = true utr.role_attribute = %s",
+				"utr.user_id = %d AND utr.is_active = true AND utr.role_attribute = %s",
 				loggedInUserId,
 				transactionGroupAttribute,
 			),
@@ -942,5 +942,169 @@ func TransactionRoleMultipleGroupAggregation(
 			),
 			fmt.Sprintf("is%sMonitoring", groupField.AttributeName),
 		)
+	}
+}
+
+func transactionRoleMultiPermissionAggregationCTE(
+	loggedInUserId int,
+) sql_query.SQLSelectChainBuilder {
+	return sql_query.NewSQLSelectBuilder[UserTransactionRole](
+		"user_transaction_roles utr",
+	).
+		Where(map[string]sql_query.SQLCondition{
+			"utr\".\"user_id": {
+				Operator: sql_query.SQLOperatorEqual,
+				Value:    loggedInUserId,
+			},
+			"utr\".\"is_active": {
+				Operator: sql_query.SQLOperatorEqual,
+				Value:    true,
+			},
+			"utr\".\"role_type": {
+				Operator: sql_query.SQLOperatorIn,
+				Value:    []string{"Monitoring", "Manager"},
+			},
+			"utr\".\"role_attribute": {
+				Operator: sql_query.SQLOperatorIn,
+				Value: []new_model.TransactionRoleAttribute{
+					new_model.TransactionRoleAttributeBorrowing,
+					new_model.TransactionRoleAttributeTransfer,
+					new_model.TransactionRoleAttributeDisposal,
+				},
+			},
+		}).
+		Select("utr.group_id").
+		SelectJSONAggregate(
+			"manager",
+			map[string]string{
+				"borrowing": fmt.Sprintf(
+					"BOOL_OR(utr.role_type = '%s' AND utr.role_attribute = '%s')",
+					new_model.TransactionRoleTypeManager,
+					new_model.TransactionRoleAttributeBorrowing,
+				),
+				"transfer": fmt.Sprintf(
+					"BOOL_OR(utr.role_type = '%s' AND utr.role_attribute = '%s')",
+					new_model.TransactionRoleTypeManager,
+					new_model.TransactionRoleAttributeTransfer,
+				),
+				"disposal": fmt.Sprintf(
+					"BOOL_OR(utr.role_type = '%s' AND utr.role_attribute = '%s')",
+					new_model.TransactionRoleTypeManager,
+					new_model.TransactionRoleAttributeDisposal,
+				),
+			},
+			"",
+			false,
+		).
+		SelectJSONAggregate(
+			"monitoring",
+			map[string]string{
+				"borrowing": fmt.Sprintf(
+					"BOOL_OR(utr.role_type = '%s' AND utr.role_attribute = '%s')",
+					new_model.TransactionRoleTypeMonitoring,
+					new_model.TransactionRoleAttributeBorrowing,
+				),
+				"transfer": fmt.Sprintf(
+					"BOOL_OR(utr.role_type = '%s' AND utr.role_attribute = '%s')",
+					new_model.TransactionRoleTypeMonitoring,
+					new_model.TransactionRoleAttributeTransfer,
+				),
+				"disposal": fmt.Sprintf(
+					"BOOL_OR(utr.role_type = '%s' AND utr.role_attribute = '%s')",
+					new_model.TransactionRoleTypeMonitoring,
+					new_model.TransactionRoleAttributeDisposal,
+				),
+			},
+			"",
+			false,
+		).
+		GroupBy("utr.group_id")
+}
+
+func TransactionRoleMultiPermissionAggregation(
+	builder *sql_query.SelectBuilder,
+	loggedInUserId int,
+	groupColumn string,
+) {
+	cteBuilder := transactionRoleMultiPermissionAggregationCTE(loggedInUserId)
+	builder.WithCTEBuilder("user_transaction_roles_cte", cteBuilder)
+	builder.LeftJoin(
+		"user_transaction_roles_cte utr",
+		fmt.Sprintf("utr.group_id = %s", groupColumn),
+	)
+	builder.Select(
+		"\"utr\".\"manager\" AS manager",
+		"\"utr\".\"monitoring\" AS monitoring",
+	)
+}
+
+func RoleRestrictionAggregation(
+	builder *sql_query.SelectBuilder,
+	loggedInUserId int,
+	groupColumn string,
+	filterOptions RoleRestrictionOptions,
+) {
+	if filterOptions.TransactionRole != nil {
+		joinCondition := fmt.Sprintf(
+			"utr.user_id = %d AND utr.is_active = true",
+			loggedInUserId,
+		)
+		if groupColumn != "" {
+			joinCondition += fmt.Sprintf(" AND utr.group_id = %s", groupColumn)
+		}
+
+		builder.
+			Join(
+				"user_transaction_roles utr",
+				joinCondition,
+			).
+			Where(map[string]sql_query.SQLCondition{
+				"utr\".\"role_type": {
+					Operator: sql_query.SQLOperatorIn,
+					Value:    filterOptions.TransactionRole.ManageType,
+					IsRef:    true,
+				},
+			})
+	}
+
+	if filterOptions.SystemRole != nil {
+		joinCondition := fmt.Sprintf(
+			"usr.user_id = %d AND usr.is_active = true AND usr.role_name = '%s'",
+			loggedInUserId,
+			filterOptions.SystemRole.RoleType,
+		)
+		if groupColumn != "" {
+			joinCondition += fmt.Sprintf(" AND usr.group_id = %s", groupColumn)
+		}
+
+		builder.
+			Join(
+				"user_system_roles usr",
+				joinCondition,
+			).
+			WhereOr(
+				map[string]sql_query.SQLCondition{
+					"usr\".\"permission_create": {
+						Operator: sql_query.SQLOperatorEqual,
+						Value:    filterOptions.SystemRole.Permissions.Create,
+						IsRef:    true,
+					},
+					"usr\".\"permission_view": {
+						Operator: sql_query.SQLOperatorEqual,
+						Value:    filterOptions.SystemRole.Permissions.View,
+						IsRef:    true,
+					},
+					"usr\".\"permission_update": {
+						Operator: sql_query.SQLOperatorEqual,
+						Value:    filterOptions.SystemRole.Permissions.Update,
+						IsRef:    true,
+					},
+					"usr\".\"permission_delete": {
+						Operator: sql_query.SQLOperatorEqual,
+						Value:    filterOptions.SystemRole.Permissions.Delete,
+						IsRef:    true,
+					},
+				},
+			)
 	}
 }
