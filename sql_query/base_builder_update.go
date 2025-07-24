@@ -20,7 +20,7 @@ import (
 // e.g. UpdateBuilder(...).Update()...Rest
 type SQLUpdateInitBuilder interface {
 	Update(values interface{}) SQLUpdateChainBuilder
-	UpdateMany(values interface{}, rowIdentifier string) SQLUpdateChainBuilder
+	UpdateEach(values interface{}, rowIdentifier string) SQLUpdateChainBuilder
 
 	Increment(values map[string]any) SQLUpdateChainBuilder
 }
@@ -82,13 +82,13 @@ func (s *updateBuilder) Update(values interface{}) SQLUpdateChainBuilder {
 	return s
 }
 
-// UpdateMany implements SQLUpdateChainBuilder using reflection like Insert(). (Only able to be called once)
+// UpdateEach implements SQLUpdateChainBuilder using reflection like Insert(). (Only able to be called once)
 // Example of expected result:
 // UPDATE alias_codes
 // SET is_checked = v.is_checked, value = v.value, updated_at = v.updated_at
 // FROM (VALUES ($1, $2, $3), ($4, $5, $6), ...more row) as v(name, is_checked, value, updated_at)
 // WHERE name = v.name
-func (s *updateBuilder) UpdateMany(values interface{}, rowIdentifier string) SQLUpdateChainBuilder {
+func (s *updateBuilder) UpdateEach(values interface{}, rowIdentifier string) SQLUpdateChainBuilder {
 	v := reflect.ValueOf(values)
 
 	// Slice data, plus length checking
@@ -111,7 +111,7 @@ func (s *updateBuilder) UpdateMany(values interface{}, rowIdentifier string) SQL
 
 	// Generate clauses for everything in slice, then stored in main array
 	var setClauses, valueClauses, placeholders []string
-	mappedSet, mappedValue, mappedPlaceholders := s.updateManyClausesGenerator(v, rowIdentifier)
+	mappedSet, mappedValue, mappedPlaceholders := s.updateEachClausesGenerator(v, rowIdentifier)
 	setClauses = append(setClauses, mappedSet...)
 	valueClauses = append(valueClauses, mappedValue...)
 	placeholders = append(placeholders, mappedPlaceholders...)
@@ -201,7 +201,7 @@ func (s *SQLEloquentQuery) buildUpdateQuery() (string, []interface{}, error) {
 // setClauses contains: [value = v.value, ...etc].
 // valueClauses contains: [value, ...etc].
 // valuePlaceholders contains: [($1, $2, $3, ...etc), ($4, $5, ...etc), ...etc]
-func (s *updateBuilder) updateManyClausesGenerator(slice reflect.Value, rowIdentifier string) ([]string, []string, []string) {
+func (s *updateBuilder) updateEachClausesGenerator(slice reflect.Value, rowIdentifier string) ([]string, []string, []string) {
 	var shouldInsertUpdatedAt bool
 	var args []interface{}
 	var setClauses, valueClauses, valuePlaceholders []string
