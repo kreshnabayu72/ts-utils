@@ -17,6 +17,7 @@ func (m *MockBasePostgreSqlService) Debug(level ...int) {
 	m.Called(level)
 	return
 }
+
 func (m *MockBasePostgreSqlService) GetPool() PgxPoolInterface {
 	arg := m.Called()
 	return arg.Get(0).(PgxPoolInterface)
@@ -66,10 +67,20 @@ func (m *MockBasePostgreSqlService) InsertOne(
 	return arg.Get(0), arg.Error(1)
 }
 
+func (m *MockBasePostgreSqlService) InsertMany(
+	ctx context.Context,
+	queryString string,
+	args ...any,
+) (int64, error) {
+	arg := m.Called(ctx, queryString, args)
+	return arg.Get(0).(int64), arg.Error(1)
+}
+
 func (m *MockBasePostgreSqlService) InsertOneWithData(ctx context.Context, body interface{}) (interface{}, error) {
 	arg := m.Called(ctx, body)
 	return arg.Get(0), arg.Error(1)
 }
+
 func (m *MockBasePostgreSqlService) InsertManyWithData(ctx context.Context, body []interface{}) (interface{}, error) {
 	arg := m.Called(ctx, body)
 	return arg.Get(0), arg.Error(1)
@@ -106,6 +117,11 @@ func (m *MockBasePostgreSqlService) UpdateMany(
 	args ...any,
 ) (int64, error) {
 	arg := m.Called(ctx, queryString, args)
+	return arg.Get(0).(int64), arg.Error(1)
+}
+
+func (m *MockBasePostgreSqlService) UpdateManyWithData(ctx context.Context, rowIdentifier string, query map[string]sql_query.SQLCondition, updateData []interface{}) (int64, error) {
+	arg := m.Called(ctx, rowIdentifier, query, updateData)
 	return arg.Get(0).(int64), arg.Error(1)
 }
 

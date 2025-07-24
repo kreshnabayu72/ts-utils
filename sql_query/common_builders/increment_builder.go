@@ -12,7 +12,8 @@ func IncrementBuilder(
 	body map[string]any,
 ) (string, []interface{}) {
 	res, args, err := sql_query.NewSQLUpdateBuilder(tableName).
-		Increment(body, "id").
+		Increment(body).
+		Return("id").
 		Where(query).
 		Build()
 	if err != nil {
