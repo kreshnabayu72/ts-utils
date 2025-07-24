@@ -84,7 +84,7 @@ func (s *SelectBuilder) SelectJSONAggregate(alias string, dto any, condition str
 }
 
 // SelectJSONAggregate implements SQLSelectChainBuilder
-func (s *SelectBuilder) SelectJSONAggregateFunc(alias string, fn func(builder *SelectBuilder)) SQLSelectChainBuilder {
+func (s *SelectBuilder) SelectJSONAggregateFunc(alias string, fn func(builder *SelectBuilder), asArray ...bool) SQLSelectChainBuilder {
 	if alias == "" {
 		alias = "json_result"
 	}
@@ -92,9 +92,14 @@ func (s *SelectBuilder) SelectJSONAggregateFunc(alias string, fn func(builder *S
 	s.WrapAggregation = true
 	fn(s)
 
+	wrapper := "json_build_object"
+	if len(asArray) > 0 && asArray[0] == true {
+		wrapper = "json_agg"
+	}
+
 	s.Columns = append(
 		s.Columns,
-		fmt.Sprintf("json_build_object(%s) AS %s", strings.Join(s.NestedAggregation, ", "), alias),
+		fmt.Sprintf("%s(%s) AS %s", wrapper, strings.Join(s.NestedAggregation, ", "), alias),
 	)
 
 	s.WrapAggregation = false
