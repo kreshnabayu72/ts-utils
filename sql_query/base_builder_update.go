@@ -221,10 +221,10 @@ func (s *updateBuilder) updateEachClausesGenerator(slice reflect.Value, rowIdent
 
 				// If column tag is equal with rowIdentifier given by param, then it should not append into set clauses, only append to value clauses for WHERE condition
 				if columnTag == rowIdentifier {
-					valueClauses = append(valueClauses, columnTag)
+					valueClauses = append(valueClauses, fmt.Sprintf(`"%s"`, columnTag))
 				} else {
 					setClauses = append(setClauses, fmt.Sprintf(`"%s" = v."%s"`, columnTag, columnTag))
-					valueClauses = append(valueClauses, columnTag)
+					valueClauses = append(valueClauses, fmt.Sprintf(`"%s"`, columnTag))
 				}
 			}
 
@@ -237,8 +237,10 @@ func (s *updateBuilder) updateEachClausesGenerator(slice reflect.Value, rowIdent
 
 		// Add fields
 		for j := 0; j < t.NumField(); j++ {
+			field := t.Field(j)
+			transformTag := field.Tag.Get("transform")
 			args = append(args, v.Field(j).Interface())
-			rowPlaceholders = append(rowPlaceholders, fmt.Sprintf("$%d", len(args)))
+			rowPlaceholders = append(rowPlaceholders, fmt.Sprintf("$%d::%s", len(args), transformTag))
 		}
 
 		// Append every placeholders to main array that will be returned

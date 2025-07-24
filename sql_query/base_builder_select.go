@@ -13,7 +13,7 @@ type SQLSelectChainBuilder interface {
 	SelectCaseWhen(thenExpr, elseExpr, alias string, whenClause string, whenArgs ...interface{}) SQLSelectChainBuilder
 	SelectBoolOr(expr, alias string, args ...interface{}) SQLSelectChainBuilder
 	SelectJSONArrayElements(alias string, arrayElements []map[string]string) SQLSelectChainBuilder
-	SelectJSONAggregate(alias string, dto any, condition string, asArrayAggregation bool) SQLSelectChainBuilder
+	SelectJSONAggregate(alias string, dto any, condition string, asArrayAggregation bool, orderByClauses ...string) SQLSelectChainBuilder
 	SelectJSONAggregateFunc(alias string, fn func(builder *SelectBuilder)) SQLSelectChainBuilder
 
 	Where(filters map[string]SQLCondition) SQLSelectChainBuilder
