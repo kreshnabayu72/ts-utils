@@ -20,7 +20,7 @@ import (
 // e.g. UpdateBuilder(...).Update()...Rest
 type SQLUpdateInitBuilder interface {
 	Update(values interface{}) SQLUpdateChainBuilder
-	UpdateMany(values interface{}, rowIdentifier string) SQLUpdateChainBuilder
+	UpdateEach(values interface{}, rowIdentifier string) SQLUpdateChainBuilder
 
 	Increment(values map[string]any) SQLUpdateChainBuilder
 }
@@ -53,9 +53,10 @@ func (s *updateBuilder) WhereOr(filters map[string]SQLCondition) SQLUpdateChainB
 	return s
 }
 
+// Return implements SQLUpdateChainBuilder. (Only able to be called once, overrides previous values if re-called)
 func (s *updateBuilder) Return(column ...string) SQLUpdateChainBuilder {
 	if len(column) > 0 {
-		s.Columns = append(s.Columns, column...)
+		s.Columns = column
 	} else {
 		s.Columns = []string{"id"}
 	}
@@ -73,8 +74,7 @@ func (s *updateBuilder) Update(values interface{}) SQLUpdateChainBuilder {
 	setClauses, hasUpdatedAt := s.extractUpdateFields(v)
 
 	if !hasUpdatedAt {
-		setClauses = append(setClauses, fmt.Sprintf(`"updated_at" = $%d`, len(s.Args)+1))
-		s.Args = append(s.Args, time.Now())
+		setClauses = append(setClauses, `"updated_at" = NOW()`)
 	}
 
 	s.CustomQuery = fmt.Sprintf(`UPDATE %s SET %s`, s.Table, strings.Join(setClauses, ", "))
@@ -82,13 +82,13 @@ func (s *updateBuilder) Update(values interface{}) SQLUpdateChainBuilder {
 	return s
 }
 
-// UpdateMany implements SQLUpdateChainBuilder using reflection like Insert(). (Only able to be called once)
+// UpdateEach implements SQLUpdateChainBuilder using reflection like Insert(). (Only able to be called once)
 // Example of expected result:
 // UPDATE alias_codes
 // SET is_checked = v.is_checked, value = v.value, updated_at = v.updated_at
 // FROM (VALUES ($1, $2, $3), ($4, $5, $6), ...more row) as v(name, is_checked, value, updated_at)
 // WHERE name = v.name
-func (s *updateBuilder) UpdateMany(values interface{}, rowIdentifier string) SQLUpdateChainBuilder {
+func (s *updateBuilder) UpdateEach(values interface{}, rowIdentifier string) SQLUpdateChainBuilder {
 	v := reflect.ValueOf(values)
 
 	// Slice data, plus length checking
@@ -107,11 +107,11 @@ func (s *updateBuilder) UpdateMany(values interface{}, rowIdentifier string) SQL
 	// Main condition to make sure each row assigned by their respective value by matching row identifier
 	// Example input key is "id"/"name", value is given in slice data with column tag same as input key (rowIdentifier), operator is equal
 	// Assume v is aliased VALUES, example output id = v.id or could be name = v.name if this column is unique
-	s.Filters = append(s.Filters, fmt.Sprintf(`"%s" = v."%s"`, rowIdentifier, rowIdentifier))
+	s.Filters = append(s.Filters, fmt.Sprintf(`%s."%s" = v."%s"`, s.Table, rowIdentifier, rowIdentifier))
 
 	// Generate clauses for everything in slice, then stored in main array
 	var setClauses, valueClauses, placeholders []string
-	mappedSet, mappedValue, mappedPlaceholders := s.updateManyClausesGenerator(v, rowIdentifier)
+	mappedSet, mappedValue, mappedPlaceholders := s.updateEachClausesGenerator(v, rowIdentifier)
 	setClauses = append(setClauses, mappedSet...)
 	valueClauses = append(valueClauses, mappedValue...)
 	placeholders = append(placeholders, mappedPlaceholders...)
@@ -138,8 +138,7 @@ func (s *updateBuilder) Increment(
 		s.Args = append(s.Args, val)
 	}
 
-	setClauses = append(setClauses, fmt.Sprintf(`"updated_at" = $%d`, len(s.Args)+1))
-	s.Args = append(s.Args, time.Now())
+	setClauses = append(setClauses, `"updated_at" = NOW()`)
 
 	s.CustomQuery = fmt.Sprintf(`UPDATE %s SET %s`, s.Table, strings.Join(setClauses, ", "))
 	return s
@@ -163,7 +162,7 @@ func NewSQLUpdateBuilder(tableName string) SQLUpdateInitBuilder {
 			Table:       tableName,
 			Filters:     []string{},
 			OtherTables: []string{},
-			Columns:     []string{"*"},
+			Columns:     []string{},
 			CustomQuery: "UPDATE",
 			Args:        nil,
 			Mode:        "update",
@@ -192,7 +191,10 @@ func (s *SQLEloquentQuery) buildUpdateQuery() (string, []interface{}, error) {
 
 	if len(s.Columns) > 0 {
 		query += " RETURNING " + strings.Join(s.Columns, ",")
+	} else {
+		query += " RETURNING id"
 	}
+
 	return query, s.Args, nil
 }
 
@@ -201,8 +203,7 @@ func (s *SQLEloquentQuery) buildUpdateQuery() (string, []interface{}, error) {
 // setClauses contains: [value = v.value, ...etc].
 // valueClauses contains: [value, ...etc].
 // valuePlaceholders contains: [($1, $2, $3, ...etc), ($4, $5, ...etc), ...etc]
-func (s *updateBuilder) updateManyClausesGenerator(slice reflect.Value, rowIdentifier string) ([]string, []string, []string) {
-	var shouldInsertUpdatedAt bool
+func (s *updateBuilder) updateEachClausesGenerator(slice reflect.Value, rowIdentifier string) ([]string, []string, []string) {
 	var args []interface{}
 	var setClauses, valueClauses, valuePlaceholders []string
 
@@ -228,9 +229,7 @@ func (s *updateBuilder) updateManyClausesGenerator(slice reflect.Value, rowIdent
 			}
 
 			if ok := ArrayIncludes(valueClauses, "updated_at"); !ok {
-				setClauses = append(setClauses, `"updated_at" = v."updated_at"`)
-				valueClauses = append(valueClauses, "updated_at")
-				shouldInsertUpdatedAt = true
+				setClauses = append(setClauses, `"updated_at" = NOW()`)
 			}
 		}
 
@@ -239,12 +238,6 @@ func (s *updateBuilder) updateManyClausesGenerator(slice reflect.Value, rowIdent
 		// Add fields
 		for j := 0; j < t.NumField(); j++ {
 			args = append(args, v.Field(j).Interface())
-			rowPlaceholders = append(rowPlaceholders, fmt.Sprintf("$%d", len(args)))
-		}
-
-		// Append updated_at value to the last index if missing column updated_at
-		if shouldInsertUpdatedAt {
-			args = append(args, time.Now())
 			rowPlaceholders = append(rowPlaceholders, fmt.Sprintf("$%d", len(args)))
 		}
 

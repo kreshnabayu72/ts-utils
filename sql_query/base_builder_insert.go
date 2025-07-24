@@ -112,7 +112,7 @@ func (s *insertBuilder) insertSingle(v reflect.Value, returningColumns ...string
 	}
 
 	s.Args = args
-	s.preBuild(columns, placeholders)
+	s.preBuild(columns, placeholders, returningColumns...)
 
 	return s
 }
@@ -164,7 +164,7 @@ func (s *insertBuilder) insertMany(slice reflect.Value, returningColumns ...stri
 	}
 
 	s.Args = args
-	s.preBuild(columns, valuePlaceholders)
+	s.preBuild(columns, valuePlaceholders, returningColumns...)
 
 	return s
 }
