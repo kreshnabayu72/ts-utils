@@ -31,7 +31,7 @@ func (s *SelectBuilder) SelectJSONArrayElements(alias string, arrayElements []ma
 }
 
 // SelectJSONAggregate implements SQLSelectChainBuilder
-func (s *SelectBuilder) SelectJSONAggregate(alias string, dto any, condition string, asArrayAggregation bool) SQLSelectChainBuilder {
+func (s *SelectBuilder) SelectJSONAggregate(alias string, dto any, condition string, asArrayAggregation bool, orderByClauses ...string) SQLSelectChainBuilder {
 	var mappedJSON map[string]string
 
 	v := reflect.ValueOf(dto)
@@ -62,7 +62,11 @@ func (s *SelectBuilder) SelectJSONAggregate(alias string, dto any, condition str
 
 	var formattedColumn string
 	if asArrayAggregation {
-		formattedColumn = fmt.Sprintf("json_agg(json_build_object(%s))", strings.Join(keyValuePairs, ", "))
+		orderBy := ""
+		if len(orderByClauses) > 0 {
+			orderBy = fmt.Sprintf(" %s", orderByClauses[0])
+		}
+		formattedColumn = fmt.Sprintf("json_agg(json_build_object(%s)%s)", strings.Join(keyValuePairs, ", "), orderBy)
 		if condition != "" {
 			formattedColumn = fmt.Sprintf("%s FILTER (WHERE %s)", formattedColumn, condition)
 		}
@@ -84,7 +88,7 @@ func (s *SelectBuilder) SelectJSONAggregate(alias string, dto any, condition str
 }
 
 // SelectJSONAggregate implements SQLSelectChainBuilder
-func (s *SelectBuilder) SelectJSONAggregateFunc(alias string, fn func(builder *SelectBuilder), asArray ...bool) SQLSelectChainBuilder {
+func (s *SelectBuilder) SelectJSONAggregateFunc(alias string, fn func(builder *SelectBuilder)) SQLSelectChainBuilder {
 	if alias == "" {
 		alias = "json_result"
 	}
@@ -92,14 +96,9 @@ func (s *SelectBuilder) SelectJSONAggregateFunc(alias string, fn func(builder *S
 	s.WrapAggregation = true
 	fn(s)
 
-	wrapper := "json_build_object"
-	if len(asArray) > 0 && asArray[0] == true {
-		wrapper = "json_agg"
-	}
-
 	s.Columns = append(
 		s.Columns,
-		fmt.Sprintf("%s(%s) AS %s", wrapper, strings.Join(s.NestedAggregation, ", "), alias),
+		fmt.Sprintf("json_build_object(%s) AS %s", strings.Join(s.NestedAggregation, ", "), alias),
 	)
 
 	s.WrapAggregation = false
