@@ -2,6 +2,8 @@ package new_model
 
 import (
 	"time"
+
+	fixed_asset_model "gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
 )
 
 type User struct {
@@ -13,12 +15,13 @@ type User struct {
 	IsActive  bool   `json:"isActive" column:"is_active"`
 	IsDefault bool   `json:"isDefault" column:"is_default"`
 
-	PositionID     *int    `json:"positionId" column:"position_id"`
-	DivisionID     int     `json:"divisionId" column:"division_id"`
-	RfidCode       *string `json:"rfidCode" column:"rfid_code"`
-	ProfilePicture *string `json:"profilePicture" column:"profile_picture"`
-	EmployeeID     *string `json:"employeeId" column:"employee_id"`
-	ModifiedBy     int     `json:"modifiedById" column:"modified_by_id"`
+	PositionID     *int                             `json:"positionId" column:"position_id"`
+	DivisionID     int                              `json:"divisionId" column:"division_id"`
+	RfidCode       *string                          `json:"rfidCode" column:"rfid_code"`
+	ProfilePicture *string                          `json:"profilePicture" column:"profile_picture"`
+	EmployeeID     *string                          `json:"employeeId" column:"employee_id"`
+	Access         []fixed_asset_model.ModuleAccess `json:"access" column:"access"`
+	ModifiedBy     int                              `json:"modifiedById" column:"modified_by_id"`
 
 	CreatedAt *time.Time `json:"createdAt" column:"created_at"`
 	UpdatedAt *time.Time `json:"updatedAt" column:"updated_at"`
