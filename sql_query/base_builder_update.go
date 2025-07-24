@@ -53,9 +53,10 @@ func (s *updateBuilder) WhereOr(filters map[string]SQLCondition) SQLUpdateChainB
 	return s
 }
 
+// Return implements SQLUpdateChainBuilder. (Only able to be called once, overrides previous values if re-called)
 func (s *updateBuilder) Return(column ...string) SQLUpdateChainBuilder {
 	if len(column) > 0 {
-		s.Columns = append(s.Columns, column...)
+		s.Columns = column
 	} else {
 		s.Columns = []string{"id"}
 	}
@@ -163,7 +164,7 @@ func NewSQLUpdateBuilder(tableName string) SQLUpdateInitBuilder {
 			Table:       tableName,
 			Filters:     []string{},
 			OtherTables: []string{},
-			Columns:     []string{"*"},
+			Columns:     []string{},
 			CustomQuery: "UPDATE",
 			Args:        nil,
 			Mode:        "update",
@@ -192,7 +193,10 @@ func (s *SQLEloquentQuery) buildUpdateQuery() (string, []interface{}, error) {
 
 	if len(s.Columns) > 0 {
 		query += " RETURNING " + strings.Join(s.Columns, ",")
+	} else {
+		query += " RETURNING id"
 	}
+
 	return query, s.Args, nil
 }
 
