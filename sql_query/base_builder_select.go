@@ -14,7 +14,7 @@ type SQLSelectChainBuilder interface {
 	SelectBoolOr(expr, alias string, args ...interface{}) SQLSelectChainBuilder
 	SelectJSONArrayElements(alias string, arrayElements []map[string]string) SQLSelectChainBuilder
 	SelectJSONAggregate(alias string, dto any, condition string, asArrayAggregation bool, orderByClauses ...string) SQLSelectChainBuilder
-	SelectJSONAggregateFunc(alias string, fn func(builder *SelectBuilder), asArray ...bool) SQLSelectChainBuilder
+	SelectJSONAggregateFunc(alias string, fn func(builder *SelectBuilder)) SQLSelectChainBuilder
 
 	Where(filters map[string]SQLCondition) SQLSelectChainBuilder
 	WhereOr(filters map[string]SQLCondition) SQLSelectChainBuilder
