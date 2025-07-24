@@ -64,7 +64,7 @@ func (s *SelectBuilder) SelectJSONAggregate(alias string, dto any, condition str
 	if asArrayAggregation {
 		orderBy := ""
 		if len(orderByClauses) > 0 {
-			orderBy = fmt.Sprintf(" %s", orderByClauses[0])
+			orderBy = fmt.Sprintf(" ORDER BY %s", orderByClauses[0])
 		}
 		formattedColumn = fmt.Sprintf("json_agg(json_build_object(%s)%s)", strings.Join(keyValuePairs, ", "), orderBy)
 		if condition != "" {
