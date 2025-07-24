@@ -74,8 +74,7 @@ func (s *updateBuilder) Update(values interface{}) SQLUpdateChainBuilder {
 	setClauses, hasUpdatedAt := s.extractUpdateFields(v)
 
 	if !hasUpdatedAt {
-		setClauses = append(setClauses, fmt.Sprintf(`"updated_at" = $%d`, len(s.Args)+1))
-		s.Args = append(s.Args, "NOW()")
+		setClauses = append(setClauses, `"updated_at" = NOW()`)
 	}
 
 	s.CustomQuery = fmt.Sprintf(`UPDATE %s SET %s`, s.Table, strings.Join(setClauses, ", "))
@@ -139,8 +138,7 @@ func (s *updateBuilder) Increment(
 		s.Args = append(s.Args, val)
 	}
 
-	setClauses = append(setClauses, fmt.Sprintf(`"updated_at" = $%d`, len(s.Args)+1))
-	s.Args = append(s.Args, "NOW()")
+	setClauses = append(setClauses, `"updated_at" = NOW()`)
 
 	s.CustomQuery = fmt.Sprintf(`UPDATE %s SET %s`, s.Table, strings.Join(setClauses, ", "))
 	return s
@@ -206,7 +204,6 @@ func (s *SQLEloquentQuery) buildUpdateQuery() (string, []interface{}, error) {
 // valueClauses contains: [value, ...etc].
 // valuePlaceholders contains: [($1, $2, $3, ...etc), ($4, $5, ...etc), ...etc]
 func (s *updateBuilder) updateEachClausesGenerator(slice reflect.Value, rowIdentifier string) ([]string, []string, []string) {
-	var shouldInsertUpdatedAt bool
 	var args []interface{}
 	var setClauses, valueClauses, valuePlaceholders []string
 
@@ -232,9 +229,7 @@ func (s *updateBuilder) updateEachClausesGenerator(slice reflect.Value, rowIdent
 			}
 
 			if ok := ArrayIncludes(valueClauses, "updated_at"); !ok {
-				setClauses = append(setClauses, `"updated_at" = v."updated_at"`)
-				valueClauses = append(valueClauses, "updated_at")
-				shouldInsertUpdatedAt = true
+				setClauses = append(setClauses, `"updated_at" = NOW()`)
 			}
 		}
 
@@ -243,12 +238,6 @@ func (s *updateBuilder) updateEachClausesGenerator(slice reflect.Value, rowIdent
 		// Add fields
 		for j := 0; j < t.NumField(); j++ {
 			args = append(args, v.Field(j).Interface())
-			rowPlaceholders = append(rowPlaceholders, fmt.Sprintf("$%d", len(args)))
-		}
-
-		// Append updated_at value to the last index if missing column updated_at
-		if shouldInsertUpdatedAt {
-			args = append(args, "NOW()")
 			rowPlaceholders = append(rowPlaceholders, fmt.Sprintf("$%d", len(args)))
 		}
 
