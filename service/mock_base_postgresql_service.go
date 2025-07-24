@@ -100,6 +100,11 @@ func (m *MockBasePostgreSqlService) UpdateOneWithData(ctx context.Context, query
 	return arg.Get(0), arg.Error(1)
 }
 
+func (m *MockBasePostgreSqlService) UpdateManyWithData(ctx context.Context, query map[string]sql_query.SQLCondition, updateData interface{}) (interface{}, error) {
+	arg := m.Called(ctx, query, updateData)
+	return arg.Get(0).(int64), arg.Error(1)
+}
+
 func (m *MockBasePostgreSqlService) UpdateOneWithDataAndReturning(
 	v any,
 	ctx context.Context,
@@ -120,7 +125,7 @@ func (m *MockBasePostgreSqlService) UpdateMany(
 	return arg.Get(0).(int64), arg.Error(1)
 }
 
-func (m *MockBasePostgreSqlService) UpdateManyWithData(ctx context.Context, rowIdentifier string, query map[string]sql_query.SQLCondition, updateData []interface{}) (int64, error) {
+func (m *MockBasePostgreSqlService) UpdateEachWithData(ctx context.Context, rowIdentifier string, query map[string]sql_query.SQLCondition, updateData []interface{}) (int64, error) {
 	arg := m.Called(ctx, rowIdentifier, query, updateData)
 	return arg.Get(0).(int64), arg.Error(1)
 }
