@@ -245,7 +245,6 @@ func GenerateNameWithSequenceSort(defaultSort Sort, paginationQuery *PaginationQ
 
 	if paginationQuery.SortBy == nameWithSequenceAttribute {
 		nameSort = []Sort{{SortBy: nameAttribute, SortOrder: paginationQuery.SortOrder}, {SortBy: sequenceAttribute, SortOrder: paginationQuery.SortOrder}}
+		paginationQuery.MultiSort = nameSort
 	}
-
-	paginationQuery.MultiSort = nameSort
 }
