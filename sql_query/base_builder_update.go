@@ -206,12 +206,12 @@ func (s *SQLEloquentQuery) buildUpdateQuery() (string, []interface{}, error) {
 // valueClauses contains: [value, ...etc].
 // valuePlaceholders contains: [($1, $2, $3, ...etc), ($4, $5, ...etc), ...etc]
 func (s *updateBuilder) updateEachClausesGenerator(slice reflect.Value, rowIdentifier string) ([]string, []string, []string) {
-	var shouldInsertUpdatedAt bool
 	var args []interface{}
 	var setClauses, valueClauses, valuePlaceholders []string
 
 	// Loop through slice
 	for i := 0; i < slice.Len(); i++ {
+		var shouldInsertUpdatedAt bool
 		v := slice.Index(i)
 		t := v.Type()
 
