@@ -221,10 +221,10 @@ func (s *updateBuilder) updateEachClausesGenerator(slice reflect.Value, rowIdent
 
 				// If column tag is equal with rowIdentifier given by param, then it should not append into set clauses, only append to value clauses for WHERE condition
 				if columnTag == rowIdentifier {
-					valueClauses = append(valueClauses, columnTag)
+					valueClauses = append(valueClauses, fmt.Sprintf(`"%s"`, columnTag))
 				} else {
 					setClauses = append(setClauses, fmt.Sprintf(`"%s" = v."%s"`, columnTag, columnTag))
-					valueClauses = append(valueClauses, columnTag)
+					valueClauses = append(valueClauses, fmt.Sprintf(`"%s"`, columnTag))
 				}
 			}
 
