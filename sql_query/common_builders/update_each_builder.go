@@ -6,9 +6,9 @@ import (
 	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
 )
 
-func UpdateManyBuilder(tableName string, rowIdentifier string, query map[string]sql_query.SQLCondition, body interface{}) (string, []interface{}) {
+func UpdateEachBuilder(tableName string, rowIdentifier string, query map[string]sql_query.SQLCondition, body interface{}) (string, []interface{}) {
 	res, args, err := sql_query.NewSQLUpdateBuilder(tableName).
-		UpdateMany(body, rowIdentifier).
+		UpdateEach(body, rowIdentifier).
 		Return("id").
 		Where(query).
 		Build()

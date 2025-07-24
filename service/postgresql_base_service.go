@@ -297,7 +297,7 @@ func (s *BasePostgreSqlService) UpdateManyWithData(ctx context.Context, query ma
 }
 
 func (s *BasePostgreSqlService) UpdateEachWithData(ctx context.Context, rowIdentifier string, query map[string]sql_query.SQLCondition, updateData interface{}) (int64, error) {
-	queryString, args := common_builders.UpdateManyBuilder(s.TableName,
+	queryString, args := common_builders.UpdateEachBuilder(s.TableName,
 		rowIdentifier,
 		query,
 		updateData,
