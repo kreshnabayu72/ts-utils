@@ -108,7 +108,7 @@ func (s *updateBuilder) UpdateEach(values interface{}, rowIdentifier string) SQL
 	// Main condition to make sure each row assigned by their respective value by matching row identifier
 	// Example input key is "id"/"name", value is given in slice data with column tag same as input key (rowIdentifier), operator is equal
 	// Assume v is aliased VALUES, example output id = v.id or could be name = v.name if this column is unique
-	s.Filters = append(s.Filters, fmt.Sprintf(`"%s" = v."%s"`, rowIdentifier, rowIdentifier))
+	s.Filters = append(s.Filters, fmt.Sprintf(`%s."%s" = v."%s"`, s.Table, rowIdentifier, rowIdentifier))
 
 	// Generate clauses for everything in slice, then stored in main array
 	var setClauses, valueClauses, placeholders []string
@@ -206,12 +206,12 @@ func (s *SQLEloquentQuery) buildUpdateQuery() (string, []interface{}, error) {
 // valueClauses contains: [value, ...etc].
 // valuePlaceholders contains: [($1, $2, $3, ...etc), ($4, $5, ...etc), ...etc]
 func (s *updateBuilder) updateEachClausesGenerator(slice reflect.Value, rowIdentifier string) ([]string, []string, []string) {
-	var shouldInsertUpdatedAt bool
 	var args []interface{}
 	var setClauses, valueClauses, valuePlaceholders []string
 
 	// Loop through slice
 	for i := 0; i < slice.Len(); i++ {
+		var shouldInsertUpdatedAt bool
 		v := slice.Index(i)
 		t := v.Type()
 
