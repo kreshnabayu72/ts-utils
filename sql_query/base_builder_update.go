@@ -238,8 +238,15 @@ func (s *updateBuilder) updateManyClausesGenerator(slice reflect.Value, rowIdent
 
 		// Add fields
 		for j := 0; j < t.NumField(); j++ {
-			args = append(args, v.Field(j).Interface())
-			rowPlaceholders = append(rowPlaceholders, fmt.Sprintf("$%d", len(args)))
+			field := t.Field(j)
+			columnTag := field.Tag.Get("column")
+
+			if columnTag == rowIdentifier {
+				args = append(args, v.Field(j).Interface())
+			} else {
+				args = append(args, v.Field(j).Interface())
+				rowPlaceholders = append(rowPlaceholders, fmt.Sprintf("$%d", len(args)))
+			}
 		}
 
 		// Append updated_at value to the last index if missing column updated_at
