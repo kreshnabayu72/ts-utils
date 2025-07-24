@@ -28,24 +28,8 @@ func (m *MockBasePostgreSqlService) GetTableName() string {
 	return arg.Get(0).(string)
 }
 
-func (m *MockBasePostgreSqlService) SelectMany(
-	v any,
-	ctx context.Context,
-	queryString string,
-	args ...any,
-) error {
-	arg := m.Called(v, ctx, queryString, args)
-	return arg.Error(0)
-}
-
-func (m *MockBasePostgreSqlService) SelectOne(
-	v any,
-	ctx context.Context,
-	queryString string,
-	args ...any,
-) error {
-	arg := m.Called(v, ctx, queryString, args)
-	return arg.Error(0)
+func (m *MockBasePostgreSqlService) SetTransaction(tx pgx.Tx) {
+	m.Called(tx)
 }
 
 func (m *MockBasePostgreSqlService) Count(ctx context.Context, queryString string, args ...any) (int, error) {
@@ -58,12 +42,37 @@ func (m *MockBasePostgreSqlService) CountWithFilter(ctx context.Context, filter 
 	return arg.Get(0).(int), arg.Error(1)
 }
 
+func (m *MockBasePostgreSqlService) SelectOne(
+	v any,
+	ctx context.Context,
+	queryString string,
+	args ...any,
+) error {
+	arg := m.Called(v, ctx, queryString, args)
+	return arg.Error(0)
+}
+
+func (m *MockBasePostgreSqlService) SelectMany(
+	v any,
+	ctx context.Context,
+	queryString string,
+	args ...any,
+) error {
+	arg := m.Called(v, ctx, queryString, args)
+	return arg.Error(0)
+}
+
 func (m *MockBasePostgreSqlService) InsertOne(
 	ctx context.Context,
 	queryString string,
 	args ...any,
 ) (interface{}, error) {
 	arg := m.Called(ctx, queryString, args)
+	return arg.Get(0), arg.Error(1)
+}
+
+func (m *MockBasePostgreSqlService) InsertOneWithData(ctx context.Context, body interface{}) (interface{}, error) {
+	arg := m.Called(ctx, body)
 	return arg.Get(0), arg.Error(1)
 }
 
@@ -74,11 +83,6 @@ func (m *MockBasePostgreSqlService) InsertMany(
 ) (int64, error) {
 	arg := m.Called(ctx, queryString, args)
 	return arg.Get(0).(int64), arg.Error(1)
-}
-
-func (m *MockBasePostgreSqlService) InsertOneWithData(ctx context.Context, body interface{}) (interface{}, error) {
-	arg := m.Called(ctx, body)
-	return arg.Get(0), arg.Error(1)
 }
 
 func (m *MockBasePostgreSqlService) InsertManyWithData(ctx context.Context, body interface{}) (interface{}, error) {
@@ -95,14 +99,9 @@ func (m *MockBasePostgreSqlService) UpdateOne(
 	return arg.Get(0), arg.Error(1)
 }
 
-func (m *MockBasePostgreSqlService) UpdateOneWithData(ctx context.Context, query map[string]sql_query.SQLCondition, updateData interface{}) (interface{}, error) {
-	arg := m.Called(ctx, query, updateData)
+func (m *MockBasePostgreSqlService) UpdateOneWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}) (interface{}, error) {
+	arg := m.Called(ctx, query, body)
 	return arg.Get(0), arg.Error(1)
-}
-
-func (m *MockBasePostgreSqlService) UpdateManyWithData(ctx context.Context, query map[string]sql_query.SQLCondition, updateData interface{}) (interface{}, error) {
-	arg := m.Called(ctx, query, updateData)
-	return arg.Get(0).(int64), arg.Error(1)
 }
 
 func (m *MockBasePostgreSqlService) UpdateOneWithDataAndReturning(
@@ -125,8 +124,13 @@ func (m *MockBasePostgreSqlService) UpdateMany(
 	return arg.Get(0).(int64), arg.Error(1)
 }
 
-func (m *MockBasePostgreSqlService) UpdateEachWithData(ctx context.Context, rowIdentifier string, query map[string]sql_query.SQLCondition, updateData interface{}) (int64, error) {
-	arg := m.Called(ctx, rowIdentifier, query, updateData)
+func (m *MockBasePostgreSqlService) UpdateManyWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}) (int64, error) {
+	arg := m.Called(ctx, query, body)
+	return arg.Get(0).(int64), arg.Error(1)
+}
+
+func (m *MockBasePostgreSqlService) UpdateEachWithData(ctx context.Context, rowIdentifier string, query map[string]sql_query.SQLCondition, body interface{}) (int64, error) {
+	arg := m.Called(ctx, rowIdentifier, query, body)
 	return arg.Get(0).(int64), arg.Error(1)
 }
 
@@ -151,10 +155,6 @@ func (m *MockBasePostgreSqlService) DeleteMany(
 ) (int64, error) {
 	arg := m.Called(ctx, queryString, args)
 	return arg.Get(0).(int64), arg.Error(1)
-}
-
-func (m *MockBasePostgreSqlService) SetTransaction(tx pgx.Tx) {
-	m.Called(tx)
 }
 
 type MockPgxPool struct {

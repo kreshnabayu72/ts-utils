@@ -34,8 +34,8 @@ type PostgreSqlService interface {
 	UpdateOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
 	UpdateOneWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}) (interface{}, error)
 	UpdateOneWithDataAndReturning(v any, ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}, returning ...string) error
-	UpdateManyWithData(ctx context.Context, query map[string]sql_query.SQLCondition, updateData interface{}) (int64, error)
 	UpdateMany(ctx context.Context, queryString string, args ...any) (int64, error)
+	UpdateManyWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}) (int64, error)
 	UpdateEachWithData(ctx context.Context, rowIdentifier string, query map[string]sql_query.SQLCondition, body interface{}) (int64, error)
 
 	DeleteOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
