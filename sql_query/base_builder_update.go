@@ -75,7 +75,7 @@ func (s *updateBuilder) Update(values interface{}) SQLUpdateChainBuilder {
 
 	if !hasUpdatedAt {
 		setClauses = append(setClauses, fmt.Sprintf(`"updated_at" = $%d`, len(s.Args)+1))
-		s.Args = append(s.Args, time.Now())
+		s.Args = append(s.Args, "NOW()")
 	}
 
 	s.CustomQuery = fmt.Sprintf(`UPDATE %s SET %s`, s.Table, strings.Join(setClauses, ", "))
@@ -140,7 +140,7 @@ func (s *updateBuilder) Increment(
 	}
 
 	setClauses = append(setClauses, fmt.Sprintf(`"updated_at" = $%d`, len(s.Args)+1))
-	s.Args = append(s.Args, time.Now())
+	s.Args = append(s.Args, "NOW()")
 
 	s.CustomQuery = fmt.Sprintf(`UPDATE %s SET %s`, s.Table, strings.Join(setClauses, ", "))
 	return s
@@ -248,7 +248,7 @@ func (s *updateBuilder) updateEachClausesGenerator(slice reflect.Value, rowIdent
 
 		// Append updated_at value to the last index if missing column updated_at
 		if shouldInsertUpdatedAt {
-			args = append(args, time.Now())
+			args = append(args, "NOW()")
 			rowPlaceholders = append(rowPlaceholders, fmt.Sprintf("$%d", len(args)))
 		}
 
