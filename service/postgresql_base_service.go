@@ -28,9 +28,10 @@ type PostgreSqlService interface {
 	InsertManyWithData(ctx context.Context, body []interface{}) (interface{}, error)
 	UpdateOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
 	UpdateOneWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}) (interface{}, error)
+	UpdateManyWithData(ctx context.Context, query map[string]sql_query.SQLCondition, updateData interface{}) (int64, error)
 	UpdateOneWithDataAndReturning(v any, ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}, returning ...string) error
 	UpdateMany(ctx context.Context, queryString string, args ...any) (int64, error)
-	UpdateManyWithData(ctx context.Context, rowIdentifier string, query map[string]sql_query.SQLCondition, body []interface{}) (int64, error)
+	UpdateEachWithData(ctx context.Context, rowIdentifier string, query map[string]sql_query.SQLCondition, body []interface{}) (int64, error)
 	DeleteOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
 	DeleteOneWithFilter(ctx context.Context, filter map[string]sql_query.SQLCondition) (interface{}, error)
 	DeleteMany(ctx context.Context, queryString string, args ...any) (int64, error)
@@ -227,7 +228,17 @@ func (s *BasePostgreSqlService) UpdateOneWithData(ctx context.Context, query map
 	return s.UpdateOne(ctx, queryString, args...)
 }
 
-func (s *BasePostgreSqlService) UpdateManyWithData(ctx context.Context, rowIdentifier string, query map[string]sql_query.SQLCondition, updateData []interface{}) (int64, error) {
+func (s *BasePostgreSqlService) UpdateManyWithData(ctx context.Context, query map[string]sql_query.SQLCondition, updateData interface{}) (int64, error) {
+	queryString, args := common_builders.UpdateBuilder(s.TableName,
+		query,
+		updateData,
+	)
+	shouldShowQuery(s.debugLevel, queryString, args...)
+
+	return s.UpdateMany(ctx, queryString, args...)
+}
+
+func (s *BasePostgreSqlService) UpdateEachWithData(ctx context.Context, rowIdentifier string, query map[string]sql_query.SQLCondition, updateData []interface{}) (int64, error) {
 	queryString, args := common_builders.UpdateManyBuilder(s.TableName,
 		rowIdentifier,
 		query,
