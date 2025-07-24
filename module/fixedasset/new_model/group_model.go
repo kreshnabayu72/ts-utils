@@ -6,6 +6,7 @@ type Group struct {
 	ID   int     `json:"id" column:"id"`
 	Name string  `json:"name" column:"name"`
 	Code *string `json:"code" column:"code"`
+	Key  int     `json:"key"  column:"key"`
 
 	Level *int `json:"level" column:"level"`
 

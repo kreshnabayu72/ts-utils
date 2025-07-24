@@ -7,6 +7,7 @@ type Category struct {
 	Name     string `json:"name"       column:"name"`
 	Code     string `json:"code"       column:"code"`
 	ParentId int    `json:"parentId"  column:"parent_id"`
+	Key      int    `json:"key"  column:"key"`
 
 	IsDeleted            bool       `json:"isDeleted"            column:"is_deleted"`
 	DeleteFromDatabaseAt *time.Time `json:"deleteFromDatabaseAt" column:"delete_from_database_at"`
