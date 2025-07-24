@@ -18,24 +18,29 @@ type PostgreSqlService interface {
 	Debug(level ...int)
 	GetPool() PgxPoolInterface
 	GetTableName() string
+	SetTransaction(tx pgx.Tx)
+
 	Count(ctx context.Context, queryString string, args ...any) (int, error)
 	CountWithFilter(ctx context.Context, filter map[string]sql_query.SQLCondition) (int, error)
+
 	SelectMany(v any, ctx context.Context, queryString string, args ...any) error
 	SelectOne(v any, ctx context.Context, queryString string, args ...any) error
+
 	InsertOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
-	InsertMany(ctx context.Context, queryString string, args ...any) (int64, error)
 	InsertOneWithData(ctx context.Context, body interface{}) (interface{}, error)
-	InsertManyWithData(ctx context.Context, body []interface{}) (interface{}, error)
+	InsertMany(ctx context.Context, queryString string, args ...any) (int64, error)
+	InsertManyWithData(ctx context.Context, body interface{}) (interface{}, error)
+
 	UpdateOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
 	UpdateOneWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}) (interface{}, error)
-	UpdateManyWithData(ctx context.Context, query map[string]sql_query.SQLCondition, updateData interface{}) (int64, error)
 	UpdateOneWithDataAndReturning(v any, ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}, returning ...string) error
+	UpdateManyWithData(ctx context.Context, query map[string]sql_query.SQLCondition, updateData interface{}) (int64, error)
 	UpdateMany(ctx context.Context, queryString string, args ...any) (int64, error)
-	UpdateEachWithData(ctx context.Context, rowIdentifier string, query map[string]sql_query.SQLCondition, body []interface{}) (int64, error)
+	UpdateEachWithData(ctx context.Context, rowIdentifier string, query map[string]sql_query.SQLCondition, body interface{}) (int64, error)
+
 	DeleteOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
 	DeleteOneWithFilter(ctx context.Context, filter map[string]sql_query.SQLCondition) (interface{}, error)
 	DeleteMany(ctx context.Context, queryString string, args ...any) (int64, error)
-	SetTransaction(tx pgx.Tx)
 }
 
 type PgxPoolInterface interface {
@@ -85,72 +90,8 @@ func (s *BasePostgreSqlService) GetTableName() string {
 	return s.TableName
 }
 
-// Select array of data, equivalent of Find() or Aggregate()
-func (s *BasePostgreSqlService) SelectMany(v any, ctx context.Context, queryString string, args ...any) error {
-	shouldShowQuery(s.debugLevel, queryString, args...)
-
-	var rows pgx.Rows
-	var err error
-
-	if s.Transaction != nil {
-		rows, err = s.Transaction.Query(ctx, queryString, args...)
-	} else {
-		rows, err = s.Pool.Query(ctx, queryString, args...)
-	}
-
-	if err != nil {
-		return err
-	}
-	defer rows.Close()
-
-	err = sql_query.ScanRowsArray(v, rows)
-	if err != nil {
-		log.Println(err)
-		return err
-	}
-
-	return nil
-}
-
-// Select array of data, equivalent of FindOne()
-func (s *BasePostgreSqlService) SelectOne(v any, ctx context.Context, queryString string, args ...any) error {
-	shouldShowQuery(s.debugLevel, queryString, args...)
-
-	var rows pgx.Rows
-	var err error
-
-	if s.Transaction != nil {
-		rows, err = s.Transaction.Query(ctx, queryString, args...)
-	} else {
-		rows, err = s.Pool.Query(ctx, queryString, args...)
-	}
-
-	if err != nil {
-		return err
-	}
-	defer rows.Close()
-
-	err = sql_query.ScanRowObject(v, rows)
-	if err != nil {
-		log.Println(err)
-		return err
-	}
-
-	return nil
-}
-
-func (s *BasePostgreSqlService) InsertOneWithData(ctx context.Context, body interface{}) (interface{}, error) {
-	queryString, args := common_builders.InsertBuilder(s.TableName, body)
-	shouldShowQuery(s.debugLevel, queryString, args...)
-
-	return s.InsertOne(ctx, queryString, args...)
-}
-
-func (s *BasePostgreSqlService) InsertManyWithData(ctx context.Context, body []interface{}) (interface{}, error) {
-	queryString, args := common_builders.InsertBuilder(s.TableName, body)
-	shouldShowQuery(s.debugLevel, queryString, args...)
-
-	return s.InsertMany(ctx, queryString, args...)
+func (s *BasePostgreSqlService) SetTransaction(tx pgx.Tx) {
+	s.Transaction = tx
 }
 
 func (s *BasePostgreSqlService) Count(ctx context.Context, queryString string, args ...any) (int, error) {
@@ -180,6 +121,60 @@ func (s *BasePostgreSqlService) CountWithFilter(ctx context.Context, filter map[
 	return s.Count(ctx, queryString, args...)
 }
 
+// Select array of data, equivalent of FindOne()
+func (s *BasePostgreSqlService) SelectOne(v any, ctx context.Context, queryString string, args ...any) error {
+	shouldShowQuery(s.debugLevel, queryString, args...)
+
+	var rows pgx.Rows
+	var err error
+
+	if s.Transaction != nil {
+		rows, err = s.Transaction.Query(ctx, queryString, args...)
+	} else {
+		rows, err = s.Pool.Query(ctx, queryString, args...)
+	}
+
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	err = sql_query.ScanRowObject(v, rows)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	return nil
+}
+
+// Select array of data, equivalent of Find() or Aggregate()
+func (s *BasePostgreSqlService) SelectMany(v any, ctx context.Context, queryString string, args ...any) error {
+	shouldShowQuery(s.debugLevel, queryString, args...)
+
+	var rows pgx.Rows
+	var err error
+
+	if s.Transaction != nil {
+		rows, err = s.Transaction.Query(ctx, queryString, args...)
+	} else {
+		rows, err = s.Pool.Query(ctx, queryString, args...)
+	}
+
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	err = sql_query.ScanRowsArray(v, rows)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	return nil
+}
+
 func (s *BasePostgreSqlService) InsertOne(ctx context.Context, queryString string, args ...any) (interface{}, error) {
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
@@ -197,6 +192,39 @@ func (s *BasePostgreSqlService) InsertOne(ctx context.Context, queryString strin
 	}
 
 	return resultId, nil
+}
+
+func (s *BasePostgreSqlService) InsertOneWithData(ctx context.Context, body interface{}) (interface{}, error) {
+	queryString, args := common_builders.InsertBuilder(s.TableName, body)
+	shouldShowQuery(s.debugLevel, queryString, args...)
+
+	return s.InsertOne(ctx, queryString, args...)
+}
+
+func (s *BasePostgreSqlService) InsertMany(ctx context.Context, queryString string, args ...any) (int64, error) {
+	shouldShowQuery(s.debugLevel, queryString, args...)
+
+	var commandTag pgconn.CommandTag
+	var err error
+
+	if s.Transaction != nil {
+		commandTag, err = s.Transaction.Exec(ctx, queryString, args...)
+	} else {
+		commandTag, err = s.Pool.Exec(ctx, queryString, args...)
+	}
+
+	if err != nil {
+		return 0, err
+	}
+
+	return commandTag.RowsAffected(), nil
+}
+
+func (s *BasePostgreSqlService) InsertManyWithData(ctx context.Context, body interface{}) (interface{}, error) {
+	queryString, args := common_builders.InsertBuilder(s.TableName, body)
+	shouldShowQuery(s.debugLevel, queryString, args...)
+
+	return s.InsertMany(ctx, queryString, args...)
 }
 
 func (s *BasePostgreSqlService) UpdateOne(ctx context.Context, queryString string, args ...any) (interface{}, error) {
@@ -228,27 +256,6 @@ func (s *BasePostgreSqlService) UpdateOneWithData(ctx context.Context, query map
 	return s.UpdateOne(ctx, queryString, args...)
 }
 
-func (s *BasePostgreSqlService) UpdateManyWithData(ctx context.Context, query map[string]sql_query.SQLCondition, updateData interface{}) (int64, error) {
-	queryString, args := common_builders.UpdateBuilder(s.TableName,
-		query,
-		updateData,
-	)
-	shouldShowQuery(s.debugLevel, queryString, args...)
-
-	return s.UpdateMany(ctx, queryString, args...)
-}
-
-func (s *BasePostgreSqlService) UpdateEachWithData(ctx context.Context, rowIdentifier string, query map[string]sql_query.SQLCondition, updateData []interface{}) (int64, error) {
-	queryString, args := common_builders.UpdateManyBuilder(s.TableName,
-		rowIdentifier,
-		query,
-		updateData,
-	)
-	shouldShowQuery(s.debugLevel, queryString, args...)
-
-	return s.UpdateMany(ctx, queryString, args...)
-}
-
 func (s *BasePostgreSqlService) UpdateOneWithDataAndReturning(v any, ctx context.Context, query map[string]sql_query.SQLCondition, updateData interface{}, returningColumn ...string) error {
 	queryString, args := common_builders.UpdateBuilder(s.TableName,
 		query,
@@ -258,25 +265,6 @@ func (s *BasePostgreSqlService) UpdateOneWithDataAndReturning(v any, ctx context
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	return s.SelectOne(v, ctx, queryString, args...)
-}
-
-func (s *BasePostgreSqlService) InsertMany(ctx context.Context, queryString string, args ...any) (int64, error) {
-	shouldShowQuery(s.debugLevel, queryString, args...)
-
-	var commandTag pgconn.CommandTag
-	var err error
-
-	if s.Transaction != nil {
-		commandTag, err = s.Transaction.Exec(ctx, queryString, args...)
-	} else {
-		commandTag, err = s.Pool.Exec(ctx, queryString, args...)
-	}
-
-	if err != nil {
-		return 0, err
-	}
-
-	return commandTag.RowsAffected(), nil
 }
 
 func (s *BasePostgreSqlService) UpdateMany(ctx context.Context, queryString string, args ...any) (int64, error) {
@@ -296,6 +284,27 @@ func (s *BasePostgreSqlService) UpdateMany(ctx context.Context, queryString stri
 	}
 
 	return commandTag.RowsAffected(), nil
+}
+
+func (s *BasePostgreSqlService) UpdateManyWithData(ctx context.Context, query map[string]sql_query.SQLCondition, updateData interface{}) (int64, error) {
+	queryString, args := common_builders.UpdateBuilder(s.TableName,
+		query,
+		updateData,
+	)
+	shouldShowQuery(s.debugLevel, queryString, args...)
+
+	return s.UpdateMany(ctx, queryString, args...)
+}
+
+func (s *BasePostgreSqlService) UpdateEachWithData(ctx context.Context, rowIdentifier string, query map[string]sql_query.SQLCondition, updateData interface{}) (int64, error) {
+	queryString, args := common_builders.UpdateManyBuilder(s.TableName,
+		rowIdentifier,
+		query,
+		updateData,
+	)
+	shouldShowQuery(s.debugLevel, queryString, args...)
+
+	return s.UpdateMany(ctx, queryString, args...)
 }
 
 func (s *BasePostgreSqlService) DeleteOne(ctx context.Context, queryString string, args ...any) (interface{}, error) {
@@ -341,10 +350,6 @@ func (s *BasePostgreSqlService) DeleteMany(ctx context.Context, queryString stri
 	}
 
 	return commandTag.RowsAffected(), nil
-}
-
-func (s *BasePostgreSqlService) SetTransaction(tx pgx.Tx) {
-	s.Transaction = tx
 }
 
 func UseTransactions(ctx context.Context, pool PgxPoolInterface, fn func(tx pgx.Tx) (any, error)) (any, error) {
