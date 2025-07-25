@@ -128,7 +128,7 @@ func (s *insertBuilder) insertSingle(v reflect.Value) SQLInsertChainBuilder {
 	}
 
 	s.Args = args
-	s.preBuild(columns, placeholders)
+	s.preBuild(columns, []string{fmt.Sprintf("(%s)", strings.Join(placeholders, ", "))})
 
 	return s
 }
@@ -205,7 +205,7 @@ func (s *insertBuilder) insertMany(slice reflect.Value) SQLInsertChainBuilder {
 
 func (s *insertBuilder) preBuild(columns, valuePlaceholders []string) {
 	s.CustomQuery = fmt.Sprintf(
-		"INSERT INTO %s (%s) VALUES (%s)",
+		"INSERT INTO %s (%s) VALUES %s",
 		s.Table,
 		strings.Join(columns, ", "),
 		strings.Join(valuePlaceholders, ", "),
