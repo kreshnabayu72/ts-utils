@@ -192,7 +192,7 @@ func (s *SQLEloquentQuery) buildUpdateQuery() (string, []interface{}, error) {
 	if len(s.Columns) > 0 {
 		query += " RETURNING " + strings.Join(s.Columns, ",")
 	} else {
-		query += " RETURNING id"
+		query += " RETURNING id::text"
 	}
 
 	return query, s.Args, nil
