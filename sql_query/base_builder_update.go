@@ -292,7 +292,7 @@ func (s *updateBuilder) extractUpdateFields(v reflect.Value) ([]string, bool) {
 			continue
 		}
 
-		setClauses = append(setClauses, fmt.Sprintf(`%s = $%d`, col, len(s.Args)+1))
+		setClauses = append(setClauses, fmt.Sprintf(`"%s" = $%d`, col, len(s.Args)+1))
 		s.Args = append(s.Args, val.Interface())
 
 		if col == "updated_at" {
