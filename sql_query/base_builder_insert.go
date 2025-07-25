@@ -107,12 +107,18 @@ func (s *insertBuilder) insertSingle(v reflect.Value) SQLInsertChainBuilder {
 	t := v.Type()
 	for i := 0; i < v.NumField(); i++ {
 		field := t.Field(i)
-		tag := field.Tag.Get("json")
-		if ArrayIncludes([]string{"", "-", "_id", "id"}, tag) {
+		jsonTag := field.Tag.Get("json")
+		columnTag := field.Tag.Get("column")
+
+		if ArrayIncludes([]string{"", "-", "_id", "id"}, jsonTag) {
 			continue
 		}
 
-		columns = append(columns, `"`+CamelToSnake(tag)+`"`)
+		setTag := CamelToSnake(jsonTag)
+		if columnTag != "" {
+			setTag = columnTag
+		}
+		columns = append(columns, `"`+setTag+`"`)
 		args = append(args, v.Field(i).Interface())
 		placeholders = append(placeholders, fmt.Sprintf("$%d", len(args)))
 	}
@@ -139,11 +145,18 @@ func (s *insertBuilder) insertMany(slice reflect.Value) SQLInsertChainBuilder {
 			columns = append(columns, "id")
 			for j := 0; j < t.NumField(); j++ {
 				field := t.Field(j)
-				tag := field.Tag.Get("json")
-				if ArrayIncludes([]string{"", "-", "_id", "id"}, tag) {
+				jsonTag := field.Tag.Get("json")
+				columnTag := field.Tag.Get("column")
+
+				if ArrayIncludes([]string{"", "-", "_id", "id"}, jsonTag) {
 					continue
 				}
-				columns = append(columns, `"`+CamelToSnake(tag)+`"`)
+
+				setTag := CamelToSnake(jsonTag)
+				if columnTag != "" {
+					setTag = columnTag
+				}
+				columns = append(columns, `"`+setTag+`"`)
 			}
 		}
 
