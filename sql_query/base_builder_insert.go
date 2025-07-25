@@ -179,10 +179,17 @@ func (s *insertBuilder) insertMany(slice reflect.Value) SQLInsertChainBuilder {
 		// Add fields
 		for j := 0; j < t.NumField(); j++ {
 			field := t.Field(j)
-			tag := field.Tag.Get("json")
-			if ArrayIncludes([]string{"", "-", "_id", "id"}, tag) {
+			jsonTag := field.Tag.Get("json")
+			columnTag := field.Tag.Get("column")
+
+			if ArrayIncludes([]string{"_id", "id"}, jsonTag) || columnTag == "id" {
 				continue
 			}
+
+			if ArrayIncludes([]string{"", "-"}, jsonTag) && ArrayIncludes([]string{"", "-"}, columnTag) {
+				continue
+			}
+
 			args = append(args, v.Field(j).Interface())
 			rowPlaceholders = append(rowPlaceholders, fmt.Sprintf("$%d", len(args)))
 		}
