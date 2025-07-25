@@ -90,6 +90,11 @@ func (m *MockBasePostgreSqlService) InsertManyWithData(ctx context.Context, body
 	return arg.Get(0), arg.Error(1)
 }
 
+func (m *MockBasePostgreSqlService) InsertManyWithDataAndReturning(v any, ctx context.Context, body interface{}, returningColumn ...string) error {
+	arg := m.Called(v, ctx, body, returningColumn)
+	return arg.Error(1)
+}
+
 func (m *MockBasePostgreSqlService) UpdateOne(
 	ctx context.Context,
 	queryString string,
