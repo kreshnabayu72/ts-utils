@@ -30,6 +30,7 @@ type PostgreSqlService interface {
 	InsertOneWithData(ctx context.Context, body interface{}) (interface{}, error)
 	InsertMany(ctx context.Context, queryString string, args ...any) (int64, error)
 	InsertManyWithData(ctx context.Context, body interface{}) (interface{}, error)
+	InsertManyWithDataAndReturning(v any, ctx context.Context, body interface{}, returning ...string) error
 
 	UpdateOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
 	UpdateOneWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}) (interface{}, error)
@@ -227,6 +228,16 @@ func (s *BasePostgreSqlService) InsertManyWithData(ctx context.Context, body int
 	return s.InsertMany(ctx, queryString, args...)
 }
 
+func (s *BasePostgreSqlService) InsertManyWithDataAndReturning(v any, ctx context.Context, body interface{}, returningColumn ...string) error {
+	queryString, args := common_builders.InsertBuilder(
+		s.TableName,
+		body,
+	)
+	shouldShowQuery(s.debugLevel, queryString, args...)
+
+	return s.SelectMany(v, ctx, queryString, args...)
+}
+
 func (s *BasePostgreSqlService) UpdateOne(ctx context.Context, queryString string, args ...any) (interface{}, error) {
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
@@ -246,20 +257,20 @@ func (s *BasePostgreSqlService) UpdateOne(ctx context.Context, queryString strin
 	return resultId, nil
 }
 
-func (s *BasePostgreSqlService) UpdateOneWithData(ctx context.Context, query map[string]sql_query.SQLCondition, updateData interface{}) (interface{}, error) {
+func (s *BasePostgreSqlService) UpdateOneWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}) (interface{}, error) {
 	queryString, args := common_builders.UpdateBuilder(s.TableName,
 		query,
-		updateData,
+		body,
 	)
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	return s.UpdateOne(ctx, queryString, args...)
 }
 
-func (s *BasePostgreSqlService) UpdateOneWithDataAndReturning(v any, ctx context.Context, query map[string]sql_query.SQLCondition, updateData interface{}, returningColumn ...string) error {
+func (s *BasePostgreSqlService) UpdateOneWithDataAndReturning(v any, ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}, returningColumn ...string) error {
 	queryString, args := common_builders.UpdateBuilder(s.TableName,
 		query,
-		updateData,
+		body,
 		returningColumn...,
 	)
 	shouldShowQuery(s.debugLevel, queryString, args...)
@@ -286,21 +297,21 @@ func (s *BasePostgreSqlService) UpdateMany(ctx context.Context, queryString stri
 	return commandTag.RowsAffected(), nil
 }
 
-func (s *BasePostgreSqlService) UpdateManyWithData(ctx context.Context, query map[string]sql_query.SQLCondition, updateData interface{}) (int64, error) {
+func (s *BasePostgreSqlService) UpdateManyWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}) (int64, error) {
 	queryString, args := common_builders.UpdateBuilder(s.TableName,
 		query,
-		updateData,
+		body,
 	)
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	return s.UpdateMany(ctx, queryString, args...)
 }
 
-func (s *BasePostgreSqlService) UpdateEachWithData(ctx context.Context, rowIdentifier string, query map[string]sql_query.SQLCondition, updateData interface{}) (int64, error) {
+func (s *BasePostgreSqlService) UpdateEachWithData(ctx context.Context, rowIdentifier string, query map[string]sql_query.SQLCondition, body interface{}) (int64, error) {
 	queryString, args := common_builders.UpdateEachBuilder(s.TableName,
 		rowIdentifier,
 		query,
-		updateData,
+		body,
 	)
 	shouldShowQuery(s.debugLevel, queryString, args...)
 

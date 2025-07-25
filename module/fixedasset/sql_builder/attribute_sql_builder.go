@@ -20,29 +20,30 @@ type AliasCode struct {
 }
 
 type Brand struct {
-	ID   string `column:"brands.id" json:"_id,omitempty"`
+	ID   string `column:"brands.id::text" json:"_id,omitempty"`
 	Name string `column:"brands.name" json:"name"`
 }
 
 type Category struct {
-	ID   string `column:"categories.id" json:"_id,omitempty"`
+	ID   string `column:"categories.id::text" json:"_id,omitempty"`
 	Name string `column:"categories.name" json:"name"`
+	Key  int    `column:"categories.key" json:"key"`
 }
 
 type BrandCategory struct {
-	ID         string `column:"models.id" json:"_id,omitempty"`
-	BrandID    string `column:"brands.id" json:"brandId"`
+	ID         string `column:"models.id::text" json:"_id,omitempty"`
+	BrandID    string `column:"brands.id::text" json:"brandId"`
 	CategoryID string `column:"categories.id" json:"categoryId"`
 }
 
 type Model struct {
-	ID              string `column:"models.id" json:"_id,omitempty"`
-	BrandCategoryID string `column:"brand_categories.id" json:"brandCategoryId"`
+	ID              string `column:"models.id::text" json:"_id,omitempty"`
+	BrandCategoryID string `column:"brand_categories.id::text" json:"brandCategoryId"`
 	Name            string `column:"models.name" json:"name"`
 }
 
 type Group struct {
-	ID   string `column:"groups.id" json:"_id,omitempty"`
+	ID   string `column:"groups.id::text" json:"_id,omitempty"`
 	Name string `column:"groups.name" json:"name"`
 }
 
