@@ -110,7 +110,11 @@ func (s *insertBuilder) insertSingle(v reflect.Value) SQLInsertChainBuilder {
 		jsonTag := field.Tag.Get("json")
 		columnTag := field.Tag.Get("column")
 
-		if ArrayIncludes([]string{"", "-", "_id", "id"}, jsonTag) {
+		if ArrayIncludes([]string{"_id", "id"}, jsonTag) || columnTag == "id" {
+			continue
+		}
+
+		if ArrayIncludes([]string{"", "-"}, jsonTag) && ArrayIncludes([]string{"", "-"}, columnTag) {
 			continue
 		}
 
@@ -148,7 +152,11 @@ func (s *insertBuilder) insertMany(slice reflect.Value) SQLInsertChainBuilder {
 				jsonTag := field.Tag.Get("json")
 				columnTag := field.Tag.Get("column")
 
-				if ArrayIncludes([]string{"", "-", "_id", "id"}, jsonTag) {
+				if ArrayIncludes([]string{"_id", "id"}, jsonTag) || columnTag == "id" {
+					continue
+				}
+
+				if ArrayIncludes([]string{"", "-"}, jsonTag) && ArrayIncludes([]string{"", "-"}, columnTag) {
 					continue
 				}
 
