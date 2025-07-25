@@ -179,7 +179,7 @@ func (s *BasePostgreSqlService) SelectMany(v any, ctx context.Context, queryStri
 func (s *BasePostgreSqlService) InsertOne(ctx context.Context, queryString string, args ...any) (interface{}, error) {
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
-	var resultId int
+	var resultId string
 	var err error
 
 	if s.Transaction != nil {
@@ -241,7 +241,7 @@ func (s *BasePostgreSqlService) InsertManyWithDataAndReturning(v any, ctx contex
 func (s *BasePostgreSqlService) UpdateOne(ctx context.Context, queryString string, args ...any) (interface{}, error) {
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
-	var resultId int
+	var resultId string
 	var err error
 
 	if s.Transaction != nil {
@@ -321,7 +321,7 @@ func (s *BasePostgreSqlService) UpdateEachWithData(ctx context.Context, rowIdent
 func (s *BasePostgreSqlService) DeleteOne(ctx context.Context, queryString string, args ...any) (interface{}, error) {
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
-	var resultId int
+	var resultId string
 	var err error
 
 	if s.Transaction != nil {
