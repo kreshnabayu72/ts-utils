@@ -39,6 +39,11 @@ func (s *insertBuilder) Insert(values interface{}, returningColumns ...string) S
 
 	v := reflect.ValueOf(values)
 
+	if v.Kind() != reflect.Slice && v.Kind() != reflect.Struct {
+		s.LastError = errors.New("insert values must be struct or slice of struct")
+		return s
+	}
+
 	// Slice case
 	if v.Kind() == reflect.Slice {
 		if v.Len() == 0 {
@@ -56,12 +61,7 @@ func (s *insertBuilder) Insert(values interface{}, returningColumns ...string) S
 	}
 
 	// Single struct case
-	if v.Kind() == reflect.Struct {
-		return s.insertSingle(v)
-	}
-
-	s.LastError = errors.New("insert values must be struct or slice of struct")
-	return s
+	return s.insertSingle(v)
 }
 
 func NewSQLInsertBuilder(tableName string) SQLInsertInitBuilder {
