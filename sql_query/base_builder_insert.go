@@ -14,9 +14,9 @@ import (
 type SQLInsertInitBuilder interface {
 	Insert(values interface{}, returningColumns ...string) SQLInsertChainBuilder
 
-	insertSingle(v reflect.Value, returningColumns ...string) SQLInsertChainBuilder
-	insertMany(slice reflect.Value, returningColumns ...string) SQLInsertChainBuilder
-	preBuild(columns, valuePlaceholders []string, returningColumns ...string)
+	insertSingle(v reflect.Value) SQLInsertChainBuilder
+	insertMany(slice reflect.Value) SQLInsertChainBuilder
+	preBuild(columns, valuePlaceholders []string)
 }
 
 // To ensure method .Insert() has its own chaining methods
@@ -31,6 +31,12 @@ type insertBuilder struct {
 
 // Insert implements SQLInsertChainBuilder. (Only able to be called once)
 func (s *insertBuilder) Insert(values interface{}, returningColumns ...string) SQLInsertChainBuilder {
+	if len(returningColumns) > 0 {
+		s.Columns = returningColumns
+	} else {
+		s.Columns = []string{"id"}
+	}
+
 	v := reflect.ValueOf(values)
 
 	// Slice case
@@ -46,12 +52,12 @@ func (s *insertBuilder) Insert(values interface{}, returningColumns ...string) S
 			return s
 		}
 
-		return s.insertMany(v, returningColumns...)
+		return s.insertMany(v)
 	}
 
 	// Single struct case
 	if v.Kind() == reflect.Struct {
-		return s.insertSingle(v, returningColumns...)
+		return s.insertSingle(v)
 	}
 
 	s.LastError = errors.New("insert values must be struct or slice of struct")
@@ -87,7 +93,7 @@ func (s *SQLEloquentQuery) buildInsertQuery() (string, []interface{}, error) {
 	return s.CustomQuery, s.Args, nil
 }
 
-func (s *insertBuilder) insertSingle(v reflect.Value, returningColumns ...string) SQLInsertChainBuilder {
+func (s *insertBuilder) insertSingle(v reflect.Value) SQLInsertChainBuilder {
 	var args []interface{}
 	var columns []string
 	var placeholders []string
@@ -112,12 +118,12 @@ func (s *insertBuilder) insertSingle(v reflect.Value, returningColumns ...string
 	}
 
 	s.Args = args
-	s.preBuild(columns, placeholders, returningColumns...)
+	s.preBuild(columns, placeholders)
 
 	return s
 }
 
-func (s *insertBuilder) insertMany(slice reflect.Value, returningColumns ...string) SQLInsertChainBuilder {
+func (s *insertBuilder) insertMany(slice reflect.Value) SQLInsertChainBuilder {
 	var args []interface{}
 	var columns []string
 	var valuePlaceholders []string
@@ -164,18 +170,12 @@ func (s *insertBuilder) insertMany(slice reflect.Value, returningColumns ...stri
 	}
 
 	s.Args = args
-	s.preBuild(columns, valuePlaceholders, returningColumns...)
+	s.preBuild(columns, valuePlaceholders)
 
 	return s
 }
 
-func (s *insertBuilder) preBuild(columns, valuePlaceholders []string, returningColumns ...string) {
-	if len(returningColumns) > 0 {
-		s.Columns = returningColumns
-	} else {
-		s.Columns = []string{"id"}
-	}
-
+func (s *insertBuilder) preBuild(columns, valuePlaceholders []string) {
 	s.CustomQuery = fmt.Sprintf(
 		"INSERT INTO %s (%s) VALUES (%s)",
 		s.Table,
