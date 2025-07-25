@@ -192,7 +192,7 @@ func (s *SQLEloquentQuery) buildUpdateQuery() (string, []interface{}, error) {
 	if len(s.Columns) > 0 {
 		query += " RETURNING " + strings.Join(s.Columns, ",")
 	} else {
-		query += " RETURNING id"
+		query += " RETURNING id::text"
 	}
 
 	return query, s.Args, nil
@@ -292,7 +292,7 @@ func (s *updateBuilder) extractUpdateFields(v reflect.Value) ([]string, bool) {
 			continue
 		}
 
-		setClauses = append(setClauses, fmt.Sprintf(`%s = $%d`, col, len(s.Args)+1))
+		setClauses = append(setClauses, fmt.Sprintf(`"%s" = $%d`, col, len(s.Args)+1))
 		s.Args = append(s.Args, val.Interface())
 
 		if col == "updated_at" {
