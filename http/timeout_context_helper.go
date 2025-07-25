@@ -42,6 +42,7 @@ func RunWithTimeout[T any](
 	timeout time.Duration,
 	useCase UseCaseFunc[T],
 	successMessage string,
+	successCode int,
 ) error {
 	ctxWithTimeout, cancel := context.WithTimeout(ctx.UserContext(), timeout)
 	defer cancel()
@@ -70,6 +71,6 @@ func RunWithTimeout[T any](
 	case err := <-errorChan:
 		return response.SendResponse(ctx, err.Code, nil, err.Message)
 	case res := <-resultChan:
-		return response.SendResponse(ctx, fiber.StatusOK, res, successMessage)
+		return response.SendResponse(ctx, successCode, res, successMessage)
 	}
 }
