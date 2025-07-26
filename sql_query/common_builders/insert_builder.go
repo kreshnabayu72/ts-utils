@@ -6,9 +6,9 @@ import (
 	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
 )
 
-func InsertBuilder(tableName string, body interface{}) (string, []interface{}) {
+func InsertBuilder(tableName string, body interface{}, returningColumn ...string) (string, []interface{}) {
 	res, args, err := sql_query.NewSQLInsertBuilder(tableName).
-		Insert(body, "id").
+		Insert(body, returningColumn...).
 		Build()
 	if err != nil {
 		log.Println(err)
