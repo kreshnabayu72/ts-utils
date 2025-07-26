@@ -28,6 +28,7 @@ type SQLUpdateInitBuilder interface {
 // To ensure method .Update() has its own chaining methods
 // e.g. .Update(...).From(...).Build()
 type SQLUpdateChainBuilder interface {
+	Conflict(constraint, do string) SQLUpdateChainBuilder
 	Where(filters map[string]SQLCondition) SQLUpdateChainBuilder
 	WhereOr(filters map[string]SQLCondition) SQLUpdateChainBuilder
 	Return(columns ...string) SQLUpdateChainBuilder
@@ -60,6 +61,12 @@ func (s *updateBuilder) Return(column ...string) SQLUpdateChainBuilder {
 	} else {
 		s.Columns = []string{"id"}
 	}
+	return s
+}
+
+// Update implements SQLUpdateChainBuilder. (Only able to be called once, will override previous call)
+func (s *updateBuilder) Conflict(constraint, do string) SQLUpdateChainBuilder {
+	s.ConflictClause = fmt.Sprintf(" ON CONFLICT %s DO %s", constraint, do)
 	return s
 }
 
