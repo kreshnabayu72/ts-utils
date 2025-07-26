@@ -231,24 +231,41 @@ func BuildInsertManyQuery(table string, dataSlice interface{}) (query string, er
 
 func GenerateArrayFilter[T comparable](filter *[]T) SQLCondition {
 	if filter == nil {
-		return SQLCondition{
-			Operator: SQLOperatorNotEqual,
-			Value:    "----THIS WILL ALWAYS BE TRUE-----",
-		}
-	}
-
-	var varType = reflect.TypeOf(*filter).Kind()
-
-	if varType == reflect.Slice {
-		return SQLCondition{
-			Operator: SQLOperatorIn,
-			Value:    *filter,
+		var zeroVal T
+		switch any(zeroVal).(type) {
+		case string:
+			return SQLCondition{
+				Operator: SQLOperatorNotEqual,
+				Value:    "__never_used_random_string__",
+			}
+		case int, int32, int64:
+			return SQLCondition{
+				Operator: SQLOperatorNotEqual,
+				Value:    -999999999,
+			}
+		case float32, float64:
+			return SQLCondition{
+				Operator: SQLOperatorNotEqual,
+				Value:    -99999999.99,
+			}
+		case bool:
+			// return "column IN (true, false)" to match all rows
+			return SQLCondition{
+				Operator: SQLOperatorIn,
+				Value:    []bool{true, false},
+			}
+		default:
+			// fallback: column = column
+			return SQLCondition{
+				Operator: SQLOperatorEqual,
+				Value:    zeroVal,
+			}
 		}
 	}
 
 	return SQLCondition{
-		Operator: SQLOperatorNotEqual,
-		Value:    "----THIS WILL ALWAYS BE TRUE-----",
+		Operator: SQLOperatorIn,
+		Value:    *filter,
 	}
 }
 
