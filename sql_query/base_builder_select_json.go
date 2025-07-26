@@ -70,13 +70,13 @@ func (s *SelectBuilder) SelectJSONAggregate(alias string, dto any, condition str
 		if condition != "" {
 			formattedColumn = fmt.Sprintf("%s FILTER (WHERE %s)", formattedColumn, condition)
 		}
-		formattedColumn = fmt.Sprintf("%s AS %s", formattedColumn, alias)
 	} else {
 		formattedColumn = fmt.Sprintf("json_build_object(%s)", strings.Join(keyValuePairs, ", "))
 		if condition != "" {
-			formattedColumn = fmt.Sprintf("%s, CASE WHEN %s THEN %s ELSE NULL END", alias, condition, formattedColumn)
+			formattedColumn = fmt.Sprintf("CASE WHEN %s THEN %s ELSE NULL END", condition, formattedColumn)
 		}
 	}
+	formattedColumn = fmt.Sprintf("%s AS %s", formattedColumn, alias)
 
 	if s.WrapAggregation && !asArrayAggregation {
 		s.NestedAggregation = append(s.NestedAggregation, formattedColumn)
