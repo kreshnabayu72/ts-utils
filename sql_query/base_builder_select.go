@@ -9,6 +9,9 @@ import (
 // To ensure method .Select() has its own chaining methods
 // e.g. .Select(...).Join(...).Where(...).Build()
 type SQLSelectChainBuilder interface {
+	GetCurrentArgIndex() int
+	AddArgs(arg ...interface{}) SQLSelectChainBuilder
+
 	Select(columns ...string) SQLSelectChainBuilder
 	SelectCaseWhen(thenExpr, elseExpr, alias string, whenClause string, whenArgs ...interface{}) SQLSelectChainBuilder
 	SelectBoolOr(expr, alias string, args ...interface{}) SQLSelectChainBuilder
@@ -46,6 +49,15 @@ func (s *SelectBuilder) Where(filters map[string]SQLCondition) SQLSelectChainBui
 // WhereOr implements SQLSelectChainBuilder. (Accumulates previous value if called again)
 func (s *SelectBuilder) WhereOr(filters map[string]SQLCondition) SQLSelectChainBuilder {
 	s.SQLEloquentQuery.sharedWhereOrQuery(filters)
+	return s
+}
+
+func (s *SelectBuilder) GetCurrentArgIndex() int {
+	return len(s.Args)
+}
+
+func (s *SelectBuilder) AddArgs(arg ...interface{}) SQLSelectChainBuilder {
+	s.Args = append(s.Args, arg...)
 	return s
 }
 
