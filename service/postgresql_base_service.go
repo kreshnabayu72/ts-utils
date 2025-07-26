@@ -233,6 +233,7 @@ func (s *BasePostgreSqlService) InsertManyWithDataAndReturning(v any, ctx contex
 	queryString, args := common_builders.InsertBuilder(
 		s.TableName,
 		body,
+		returningColumn...,
 	)
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
