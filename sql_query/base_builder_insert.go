@@ -22,11 +22,18 @@ type SQLInsertInitBuilder interface {
 // To ensure method .Insert() has its own chaining methods
 // e.g. .Insert(...).Build()
 type SQLInsertChainBuilder interface {
+	Conflict(constraint, do string) SQLInsertChainBuilder
 	Build() (string, []interface{}, error)
 }
 
 type insertBuilder struct {
 	*SQLEloquentQuery
+}
+
+// Insert implements SQLInsertChainBuilder. (Only able to be called once, will override previous call)
+func (s *insertBuilder) Conflict(constraint, do string) SQLInsertChainBuilder {
+	s.ConflictClause = fmt.Sprintf(" ON CONFLICT %s DO %s", constraint, do)
+	return s
 }
 
 // Insert implements SQLInsertChainBuilder. (Only able to be called once)
@@ -88,6 +95,10 @@ func (s *SQLEloquentQuery) buildInsertQuery() (string, []interface{}, error) {
 
 	if len(s.Columns) > 0 {
 		s.CustomQuery += " RETURNING " + strings.Join(s.Columns, ",")
+	}
+
+	if s.ConflictClause != "" {
+		s.CustomQuery += s.ConflictClause
 	}
 
 	return s.CustomQuery, s.Args, nil

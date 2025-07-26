@@ -34,16 +34,17 @@ type SQLEloquentQuery struct {
 	NestedAggregation []string
 	WrapAggregation   bool
 
-	WithClauses   []string
-	Table         string
-	Filters       []string
-	OtherTables   []string
-	Columns       []string
-	Offset        int
-	Limit         int
-	SortBy        []string
-	Grouping      []string
-	HavingClauses []string
+	ConflictClause string
+	WithClauses    []string
+	Table          string
+	Filters        []string
+	OtherTables    []string
+	Columns        []string
+	Offset         int
+	Limit          int
+	SortBy         []string
+	Grouping       []string
+	HavingClauses  []string
 
 	CustomQuery string
 

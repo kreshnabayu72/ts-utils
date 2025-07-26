@@ -162,11 +162,6 @@ func (m *MockBasePostgreSqlService) DeleteMany(
 	return arg.Get(0).(int64), arg.Error(1)
 }
 
-func (m *MockBasePostgreSqlService) DeleteManyWithFilter(ctx context.Context, filter map[string]sql_query.SQLCondition) (int64, error) {
-	arg := m.Called(ctx, filter)
-	return arg.Get(0).(int64), arg.Error(1)
-}
-
 type MockPgxPool struct {
 	mock.Mock
 }
