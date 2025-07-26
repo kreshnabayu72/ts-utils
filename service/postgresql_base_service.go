@@ -42,6 +42,7 @@ type PostgreSqlService interface {
 	DeleteOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
 	DeleteOneWithFilter(ctx context.Context, filter map[string]sql_query.SQLCondition) (interface{}, error)
 	DeleteMany(ctx context.Context, queryString string, args ...any) (int64, error)
+	DeleteManyWithFilter(ctx context.Context, filter map[string]sql_query.SQLCondition) (int64, error)
 }
 
 type PgxPoolInterface interface {
@@ -361,6 +362,13 @@ func (s *BasePostgreSqlService) DeleteMany(ctx context.Context, queryString stri
 	}
 
 	return commandTag.RowsAffected(), nil
+}
+
+func (s *BasePostgreSqlService) DeleteManyWithFilter(ctx context.Context, filter map[string]sql_query.SQLCondition) (int64, error) {
+	queryString, args := common_builders.DeleteBuilder(s.TableName, filter)
+	shouldShowQuery(s.debugLevel, queryString, args...)
+
+	return s.DeleteMany(ctx, queryString, args...)
 }
 
 func UseTransactions(ctx context.Context, pool PgxPoolInterface, fn func(tx pgx.Tx) (any, error)) (any, error) {
