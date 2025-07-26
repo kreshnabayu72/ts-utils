@@ -226,7 +226,7 @@ func (s *SelectBuilder) WithCTEBuilder(cteName string, cteBuilder SQLSelectChain
 func NewSQLSelectBuilder[T any](tableName string) SQLSelectChainBuilder {
 	columns := ExtractJSONTags[T]()
 
-	defaultColumns := []string{"*"}
+	defaultColumns := []string{}
 	if len(columns) > 0 {
 		defaultColumns = columns
 	}
@@ -269,11 +269,12 @@ func NewSQLCountBuilder(tableName string) SQLSelectChainBuilder {
 
 // buildSelectQuery implements SQLBuilder.\
 func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
-	if len(s.Columns) == 0 {
-		return "", nil, errors.New("select query must have columns")
-	}
 	if len(s.HavingClauses) > 0 && len(s.Grouping) < 1 {
 		return "", nil, errors.New("HAVING clauses only allowed if GROUP BY clause is exists")
+	}
+
+	if len(s.Columns) == 0 {
+		s.Columns = append(s.Columns, "*")
 	}
 
 	var dataQuery []string
