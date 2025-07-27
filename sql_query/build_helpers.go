@@ -97,7 +97,11 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 				for i, part := range parts {
 					parts[i] = fmt.Sprintf(`"%s"`, part)
 				}
-				quotedColumn := strings.Join(parts, ".")
+				quotedColumn := column
+				if !strings.Contains(column, "(") {
+					quotedColumn = strings.Join(parts, ".")
+				}
+
 				clause = fmt.Sprintf(`%s %s $%d`, quotedColumn, each.Operator, len(s.Args)+1)
 				s.Args = append(s.Args, each.Value)
 			}
