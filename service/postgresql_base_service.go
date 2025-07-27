@@ -254,7 +254,13 @@ func (s *BasePostgreSqlService) InsertOneWithData(ctx context.Context, body inte
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	if len(returnOption) > 0 && returnOption[0].Destination != nil {
-		return nil, s.SelectOne(returnOption[0].Destination, ctx, queryString, args...)
+		dest := returnOption[0].Destination
+		v := reflect.ValueOf(dest)
+		if v.Kind() != reflect.Ptr || v.IsNil() {
+			return nil, fmt.Errorf("destination must be a non-nil pointer")
+		}
+
+		return nil, s.SelectOne(dest, ctx, queryString, args...)
 	}
 	return s.InsertOne(ctx, queryString, args...)
 }
@@ -315,11 +321,11 @@ func (s *BasePostgreSqlService) InsertManyWithData(ctx context.Context, body int
 		err := s.SelectMany(returnOption[0].Destination, ctx, queryString, args...)
 
 		val := reflect.ValueOf(returnOption[0].Destination)
-		if val.Kind() == reflect.Ptr && val.Elem().Kind() == reflect.Slice {
-			return int64(val.Elem().Len()), err
+		if val.Kind() != reflect.Ptr || val.IsNil() || val.Elem().Kind() != reflect.Slice {
+			return 0, fmt.Errorf("destination must be a non-nil pointer to slice")
 		}
 
-		return 0, fmt.Errorf("destination must be pointer to slice")
+		return int64(val.Elem().Len()), err
 	}
 	return s.InsertMany(ctx, queryString, args...)
 }
@@ -382,7 +388,13 @@ func (s *BasePostgreSqlService) UpdateOneWithData(ctx context.Context, query map
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	if len(returnOption) > 0 && returnOption[0].Destination != nil {
-		return nil, s.SelectOne(returnOption[0].Destination, ctx, queryString, args...)
+		dest := returnOption[0].Destination
+		v := reflect.ValueOf(dest)
+		if v.Kind() != reflect.Ptr || v.IsNil() {
+			return nil, fmt.Errorf("destination must be a non-nil pointer")
+		}
+
+		return nil, s.SelectOne(dest, ctx, queryString, args...)
 	}
 	return s.UpdateOne(ctx, queryString, args...)
 }
@@ -447,11 +459,11 @@ func (s *BasePostgreSqlService) UpdateManyWithData(ctx context.Context, query ma
 		err := s.SelectMany(returnOption[0].Destination, ctx, queryString, args...)
 
 		val := reflect.ValueOf(returnOption[0].Destination)
-		if val.Kind() == reflect.Ptr && val.Elem().Kind() == reflect.Slice {
-			return int64(val.Elem().Len()), err
+		if val.Kind() != reflect.Ptr || val.IsNil() || val.Elem().Kind() != reflect.Slice {
+			return 0, fmt.Errorf("destination must be a non-nil pointer to slice")
 		}
 
-		return 0, fmt.Errorf("destination must be pointer to slice")
+		return int64(val.Elem().Len()), err
 	}
 	return s.UpdateMany(ctx, queryString, args...)
 }
