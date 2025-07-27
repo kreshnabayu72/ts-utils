@@ -53,8 +53,9 @@ type SQLEloquentQuery struct {
 	Mode          SQLMode
 	LastError     error
 
-	useAggregation bool
-	useHaving      bool
+	useAggregation    bool
+	useHaving         bool
+	excludeEmptyValue bool
 }
 
 // Run respective build method based on given mode

@@ -28,6 +28,7 @@ type SQLUpdateInitBuilder interface {
 // To ensure method .Update() has its own chaining methods
 // e.g. .Update(...).From(...).Build()
 type SQLUpdateChainBuilder interface {
+	ExcludeEmpty() SQLUpdateChainBuilder
 	Conflict(constraint, do string) SQLUpdateChainBuilder
 	Where(filters map[string]SQLCondition) SQLUpdateChainBuilder
 	WhereOr(filters map[string]SQLCondition) SQLUpdateChainBuilder
@@ -51,6 +52,16 @@ func (s *updateBuilder) Where(filters map[string]SQLCondition) SQLUpdateChainBui
 // WhereOr implements SQLUpdateChainBuilder. (Accumulates previous value if called again)
 func (s *updateBuilder) WhereOr(filters map[string]SQLCondition) SQLUpdateChainBuilder {
 	s.SQLEloquentQuery.sharedWhereOrQuery(filters)
+	return s
+}
+
+// By default, the Update builder includes all fields, even if their values are zero or nil.
+// Calling this method tells the builder to skip fields with zero values when generating the SET clause.
+//
+// Note: This option only affects single-row Update operations.
+// It has no effect on bulk UPDATE, because all rows in those operations must have the same set of columns.
+func (s *updateBuilder) ExcludeEmpty() SQLUpdateChainBuilder {
+	s.excludeEmptyValue = true
 	return s
 }
 
@@ -318,6 +329,10 @@ func (s *updateBuilder) extractUpdateFields(v reflect.Value) ([]string, bool) {
 	for i := 0; i < v.NumField(); i++ {
 		field := t.Field(i)
 		val := v.Field(i)
+
+		if val.IsZero() && s.excludeEmptyValue {
+			continue
+		}
 
 		// Skip unexported or invalid fields
 		if !val.IsValid() || !val.CanInterface() {
