@@ -22,12 +22,23 @@ type SQLInsertInitBuilder interface {
 // To ensure method .Insert() has its own chaining methods
 // e.g. .Insert(...).Build()
 type SQLInsertChainBuilder interface {
+	ExcludeEmpty() SQLInsertChainBuilder
 	Conflict(constraint, do string) SQLInsertChainBuilder
 	Build() (string, []interface{}, error)
 }
 
 type insertBuilder struct {
 	*SQLEloquentQuery
+}
+
+// By default, the Insert builder includes all fields, even if their values are zero or nil.
+// Calling this method tells the builder to skip fields with zero values when generating the SET clause.
+//
+// Note: This option only affects single-row Insert operations.
+// It has no effect on bulk INSERT, because all rows in those operations must have the same set of columns.
+func (s *insertBuilder) ExcludeEmpty() SQLInsertChainBuilder {
+	s.excludeEmptyValue = true
+	return s
 }
 
 // Insert implements SQLInsertChainBuilder. (Only able to be called once, will override previous call)
@@ -141,6 +152,12 @@ func (s *insertBuilder) insertSingle(v reflect.Value) SQLInsertChainBuilder {
 	t := v.Type()
 	for i := 0; i < v.NumField(); i++ {
 		field := t.Field(i)
+		val := v.Field(i)
+
+		if val.IsZero() && s.excludeEmptyValue {
+			continue
+		}
+
 		jsonTag := field.Tag.Get("json")
 		columnTag := field.Tag.Get("column")
 
@@ -157,7 +174,7 @@ func (s *insertBuilder) insertSingle(v reflect.Value) SQLInsertChainBuilder {
 			setTag = columnTag
 		}
 		columns = append(columns, `"`+setTag+`"`)
-		args = append(args, v.Field(i).Interface())
+		args = append(args, val.Interface())
 		placeholders = append(placeholders, fmt.Sprintf("$%d", len(args)))
 	}
 
