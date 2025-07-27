@@ -224,9 +224,26 @@ func (s *BasePostgreSqlService) InsertOne(ctx context.Context, queryString strin
 	return resultId, nil
 }
 
-// InsertOneWithData builds and executes an INSERT query from the provided
-// struct body. If returnOption is provided, specific columns will be returned
-// and scanned into the given destination.
+// InsertOneWithData builds and executes an INSERT query for a single row,
+// using a struct or map (`body`) as the data source.
+//
+// Parameters:
+//
+//	ctx         - Context for timeout/cancellation propagation.
+//	body        - Struct or map representing columns and values to insert
+//	              (for struct, uses `column` tags).
+//	returnOption (optional) - Variadic ReturningConfig to specify:
+//	    • Column      - Slice of columns to include in RETURNING clause.
+//	    • Destination - Pointer to a struct to scan the inserted row.
+//
+// Behavior:
+//   - If returnOption is not provided → Executes INSERT ... RETURNING id, returns inserted ID.
+//   - If returnOption is provided with Destination → Executes INSERT ... RETURNING <columns>
+//     and scans the row into the given struct, returning nil as the first return value.
+//
+// Returns:
+//   - interface{} → Inserted ID (string) or nil (if Destination is provided).
+//   - error       → Any error encountered during query building, execution, or scanning.
 func (s *BasePostgreSqlService) InsertOneWithData(ctx context.Context, body interface{}, returnOption ...ReturningConfig) (interface{}, error) {
 	returnColumn := []string{}
 
@@ -263,9 +280,28 @@ func (s *BasePostgreSqlService) InsertMany(ctx context.Context, queryString stri
 	return commandTag.RowsAffected(), nil
 }
 
-// InsertManyWithData builds and executes an INSERT query for multiple rows
-// from the given slice of structs. It can optionally return inserted data
-// if returnOption is provided.
+// InsertManyWithData builds and executes an INSERT query for multiple rows,
+// using a slice of structs or maps (`body`) as the data source.
+//
+// Parameters:
+//
+//	ctx         - Context for timeout/cancellation propagation.
+//	body        - Slice of structs or maps representing rows to insert.
+//	returnOption (optional) - Variadic ReturningConfig to specify:
+//	    • Column      - Slice of columns to include in RETURNING clause.
+//	    • Destination - Pointer to a slice to scan all inserted rows.
+//
+// Behavior:
+//   - If returnOption is not provided → Executes INSERT and returns rows affected.
+//   - If returnOption is provided with Destination → Executes INSERT ... RETURNING <columns>,
+//     scans the rows into Destination, and returns the length of the slice.
+//
+// Returns:
+//   - interface{} → Either int64 (rows affected) or int64 (len of scanned rows).
+//   - error       → Any error encountered during query building, execution, or scanning.
+//
+// Notes:
+//   - Destination must be a pointer to a slice (e.g., *[]YourDTO), otherwise it returns an error.
 func (s *BasePostgreSqlService) InsertManyWithData(ctx context.Context, body interface{}, returnOption ...ReturningConfig) (interface{}, error) {
 	returnColumn := []string{}
 
@@ -309,8 +345,29 @@ func (s *BasePostgreSqlService) UpdateOne(ctx context.Context, queryString strin
 	return resultId, nil
 }
 
-// UpdateOneWithData builds and executes an UPDATE query from a filter map
-// and a struct body. It supports returnOption to fetch specific returning columns.
+// UpdateOneWithData builds and executes an UPDATE query using a filter map (`query`)
+// and a struct or map as the update body (`body`).
+//
+// Parameters:
+//
+//	ctx         - The request context for cancellation and deadlines.
+//	query       - A map of column names to SQLCondition objects used in the WHERE clause.
+//	body        - A struct or map representing the columns to update (uses `column` tags for structs).
+//	returnOption (optional) - A variadic argument of ReturningConfig that defines:
+//	    • Column      - A slice of column names to include in the RETURNING clause.
+//	    • Destination - A pointer to a struct where the returned row will be scanned.
+//	                    If Destination is nil, the method returns the updated row's ID as string.
+//
+// Behavior:
+//   - If returnOption is not provided → executes UPDATE ... RETURNING id and returns the ID (string).
+//   - If returnOption is provided but Destination is nil → still executes UPDATE and returns the ID.
+//   - If returnOption is provided with Destination → scans the updated row into Destination
+//     and returns nil as the first return value (caller uses Destination for data).
+//
+// Returns:
+//   - interface{}: The updated row's ID (string) if no Destination is provided.
+//     nil if Destination is provided (caller reads from Destination).
+//   - error:       Any error encountered during query building, execution, or scanning.
 func (s *BasePostgreSqlService) UpdateOneWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}, returnOption ...ReturningConfig) (interface{}, error) {
 	returnColumn := []string{}
 
@@ -351,9 +408,28 @@ func (s *BasePostgreSqlService) UpdateMany(ctx context.Context, queryString stri
 	return commandTag.RowsAffected(), nil
 }
 
-// UpdateManyWithData builds and executes an UPDATE query for multiple rows
-// using the provided filter and struct body.
-// If returnOption is provided, it can return updated data.
+// UpdateManyWithData builds and executes an UPDATE query that may affect multiple rows.
+// It supports returning and scanning the updated rows into a destination slice.
+//
+// Parameters:
+//
+//	ctx         - The request context for cancellation and deadlines.
+//	query       - A map of column names to SQLCondition objects used in the WHERE clause.
+//	body        - A struct or map representing the columns to update (uses `column` tags for structs).
+//	returnOption (optional) - A variadic argument of ReturningConfig that defines:
+//	    • Column      - Slice of column names to include in RETURNING.
+//	    • Destination - Pointer to a slice where all updated rows will be scanned.
+//
+// Behavior:
+//   - If no returnOption is provided → executes UPDATE and returns the number of rows affected.
+//   - If returnOption is provided with Destination → executes UPDATE ... RETURNING columns
+//     and scans all updated rows into Destination (which must be a pointer to a slice).
+//     The returned int64 equals the length of the slice.
+//   - If Destination is not a pointer to a slice → returns an error.
+//
+// Returns:
+//   - int64: Number of rows affected. If Destination is provided, this equals len(Destination).
+//   - error: Any error encountered during query building, execution, or scanning.
 func (s *BasePostgreSqlService) UpdateManyWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}, returnOption ...ReturningConfig) (int64, error) {
 	returnColumn := []string{}
 
