@@ -3,7 +3,9 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
+	"reflect"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/db"
 	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
@@ -12,6 +14,11 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 )
+
+type ReturningConfig struct {
+	Column      []string
+	Destination any
+}
 
 // Base Service PostgreSQL
 type PostgreSqlService interface {
@@ -23,20 +30,18 @@ type PostgreSqlService interface {
 	Count(ctx context.Context, queryString string, args ...any) (int, error)
 	CountWithFilter(ctx context.Context, filter map[string]sql_query.SQLCondition) (int, error)
 
-	SelectMany(v any, ctx context.Context, queryString string, args ...any) error
 	SelectOne(v any, ctx context.Context, queryString string, args ...any) error
+	SelectMany(v any, ctx context.Context, queryString string, args ...any) error
 
 	InsertOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
-	InsertOneWithData(ctx context.Context, body interface{}) (interface{}, error)
+	InsertOneWithData(ctx context.Context, body interface{}, returnOption ...ReturningConfig) (interface{}, error)
 	InsertMany(ctx context.Context, queryString string, args ...any) (int64, error)
-	InsertManyWithData(ctx context.Context, body interface{}) (interface{}, error)
-	InsertManyWithDataAndReturning(v any, ctx context.Context, body interface{}, returning ...string) error
+	InsertManyWithData(ctx context.Context, body interface{}, returnOption ...ReturningConfig) (interface{}, error)
 
 	UpdateOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
-	UpdateOneWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}) (interface{}, error)
-	UpdateOneWithDataAndReturning(v any, ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}, returning ...string) error
+	UpdateOneWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}, returnOption ...ReturningConfig) (interface{}, error)
 	UpdateMany(ctx context.Context, queryString string, args ...any) (int64, error)
-	UpdateManyWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}) (int64, error)
+	UpdateManyWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}, returnOption ...ReturningConfig) (int64, error)
 	UpdateEachWithData(ctx context.Context, rowIdentifier string, query map[string]sql_query.SQLCondition, body interface{}) (int64, error)
 
 	DeleteOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
@@ -46,14 +51,18 @@ type PostgreSqlService interface {
 }
 
 type PgxPoolInterface interface {
-	// Connection control
+	// Begin starts a new database transaction and returns a pgx.Tx.
 	Begin(ctx context.Context) (pgx.Tx, error)
 
-	// Query execution
+	// Query executes a SQL query and returns pgx.Rows for multiple row results.
 	Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error)
+	// QueryRow executes a SQL query that returns a single row.
 	QueryRow(ctx context.Context, sql string, args ...any) pgx.Row
+	// Exec executes a SQL command (INSERT/UPDATE/DELETE)
+	// and returns a pgconn.CommandTag containing rows affected.
 	Exec(ctx context.Context, sql string, args ...any) (pgconn.CommandTag, error)
 
+	// Close closes the database pool connection.
 	Close()
 }
 
@@ -71,7 +80,14 @@ func MakePostgreSqlService(dbName db.DBName, tableName string) PostgreSqlService
 	return &BasePostgreSqlService{Pool: pool, TableName: tableName}
 }
 
-// To show query for debugging in dev mode; 0 = off, 1 = query only, 2 = query + args, other than that is fallback to default 1
+// Debug sets the debug level for printing executed SQL queries.
+// Level:
+//
+//	0 → no logs
+//	1 → log queries
+//	2 → log queries and arguments
+//
+// Defaults to level 1 if an invalid level is passed.
 // Remove its usage in production
 func (s *BasePostgreSqlService) Debug(level ...int) {
 	if len(level) > 0 && sql_query.ArrayIncludes([]int{1, 2}, level[0]) {
@@ -82,20 +98,24 @@ func (s *BasePostgreSqlService) Debug(level ...int) {
 	s.debugLevel = 1
 }
 
-// Used for getting pool
+// GetPool returns the underlying connection pool (PgxPoolInterface)
+// used by this service.
 func (s *BasePostgreSqlService) GetPool() PgxPoolInterface {
 	return s.Pool
 }
 
-// Used for getting tablename of this service
+// GetTableName returns the table name of the service.
 func (s *BasePostgreSqlService) GetTableName() string {
 	return s.TableName
 }
 
+// SetTransaction assigns an active transaction (pgx.Tx) to the service.
+// If a transaction is set, all queries will be executed within it.
 func (s *BasePostgreSqlService) SetTransaction(tx pgx.Tx) {
 	s.Transaction = tx
 }
 
+// Count executes a SELECT COUNT(*) query and returns the number of rows.
 func (s *BasePostgreSqlService) Count(ctx context.Context, queryString string, args ...any) (int, error) {
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
@@ -116,6 +136,8 @@ func (s *BasePostgreSqlService) Count(ctx context.Context, queryString string, a
 	return count, nil
 }
 
+// CountWithFilter builds a COUNT query using SQLCondition filters
+// and executes it.
 func (s *BasePostgreSqlService) CountWithFilter(ctx context.Context, filter map[string]sql_query.SQLCondition) (int, error) {
 	queryString, args := common_builders.CountBuilder(s.TableName, filter)
 	shouldShowQuery(s.debugLevel, queryString, args...)
@@ -123,7 +145,9 @@ func (s *BasePostgreSqlService) CountWithFilter(ctx context.Context, filter map[
 	return s.Count(ctx, queryString, args...)
 }
 
-// Select array of data, equivalent of FindOne()
+// SelectOne executes a SELECT query that returns a single row
+// and scans the result into the provided struct pointer v
+// (e.g., *dto.GetLoggedInUser).
 func (s *BasePostgreSqlService) SelectOne(v any, ctx context.Context, queryString string, args ...any) error {
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
@@ -150,7 +174,9 @@ func (s *BasePostgreSqlService) SelectOne(v any, ctx context.Context, queryStrin
 	return nil
 }
 
-// Select array of data, equivalent of Find() or Aggregate()
+// SelectMany executes a SELECT query that returns multiple rows
+// and scans the results into the provided slice pointer v
+// (e.g., *[]dto.GetCustomFieldsResponse).
 func (s *BasePostgreSqlService) SelectMany(v any, ctx context.Context, queryString string, args ...any) error {
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
@@ -177,6 +203,8 @@ func (s *BasePostgreSqlService) SelectMany(v any, ctx context.Context, queryStri
 	return nil
 }
 
+// InsertOne executes an INSERT ... RETURNING id query
+// and returns the inserted row ID.
 func (s *BasePostgreSqlService) InsertOne(ctx context.Context, queryString string, args ...any) (interface{}, error) {
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
@@ -196,13 +224,26 @@ func (s *BasePostgreSqlService) InsertOne(ctx context.Context, queryString strin
 	return resultId, nil
 }
 
-func (s *BasePostgreSqlService) InsertOneWithData(ctx context.Context, body interface{}) (interface{}, error) {
-	queryString, args := common_builders.InsertBuilder(s.TableName, body)
+// InsertOneWithData builds and executes an INSERT query from the provided
+// struct body. If returnOption is provided, specific columns will be returned
+// and scanned into the given destination.
+func (s *BasePostgreSqlService) InsertOneWithData(ctx context.Context, body interface{}, returnOption ...ReturningConfig) (interface{}, error) {
+	returnColumn := []string{}
+
+	if len(returnOption) > 0 {
+		returnColumn = append(returnColumn, returnOption[0].Column...)
+	}
+	queryString, args := common_builders.InsertBuilder(s.TableName, body, returnColumn...)
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
+	if len(returnOption) > 0 && returnOption[0].Destination != nil {
+		return nil, s.SelectOne(returnOption[0].Destination, ctx, queryString, args...)
+	}
 	return s.InsertOne(ctx, queryString, args...)
 }
 
+// InsertMany executes an INSERT query for multiple rows
+// and returns the number of rows affected.
 func (s *BasePostgreSqlService) InsertMany(ctx context.Context, queryString string, args ...any) (int64, error) {
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
@@ -222,24 +263,33 @@ func (s *BasePostgreSqlService) InsertMany(ctx context.Context, queryString stri
 	return commandTag.RowsAffected(), nil
 }
 
-func (s *BasePostgreSqlService) InsertManyWithData(ctx context.Context, body interface{}) (interface{}, error) {
-	queryString, args := common_builders.InsertBuilder(s.TableName, body)
+// InsertManyWithData builds and executes an INSERT query for multiple rows
+// from the given slice of structs. It can optionally return inserted data
+// if returnOption is provided.
+func (s *BasePostgreSqlService) InsertManyWithData(ctx context.Context, body interface{}, returnOption ...ReturningConfig) (interface{}, error) {
+	returnColumn := []string{}
+
+	if len(returnOption) > 0 {
+		returnColumn = append(returnColumn, returnOption[0].Column...)
+	}
+	queryString, args := common_builders.InsertBuilder(s.TableName, body, returnColumn...)
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
+	if len(returnOption) > 0 && returnOption[0].Destination != nil {
+		err := s.SelectMany(returnOption[0].Destination, ctx, queryString, args...)
+
+		val := reflect.ValueOf(returnOption[0].Destination)
+		if val.Kind() == reflect.Ptr && val.Elem().Kind() == reflect.Slice {
+			return int64(val.Elem().Len()), err
+		}
+
+		return 0, fmt.Errorf("destination must be pointer to slice")
+	}
 	return s.InsertMany(ctx, queryString, args...)
 }
 
-func (s *BasePostgreSqlService) InsertManyWithDataAndReturning(v any, ctx context.Context, body interface{}, returningColumn ...string) error {
-	queryString, args := common_builders.InsertBuilder(
-		s.TableName,
-		body,
-		returningColumn...,
-	)
-	shouldShowQuery(s.debugLevel, queryString, args...)
-
-	return s.SelectMany(v, ctx, queryString, args...)
-}
-
+// UpdateOne executes an UPDATE ... RETURNING id query
+// and returns the updated row ID.
 func (s *BasePostgreSqlService) UpdateOne(ctx context.Context, queryString string, args ...any) (interface{}, error) {
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
@@ -259,27 +309,29 @@ func (s *BasePostgreSqlService) UpdateOne(ctx context.Context, queryString strin
 	return resultId, nil
 }
 
-func (s *BasePostgreSqlService) UpdateOneWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}) (interface{}, error) {
+// UpdateOneWithData builds and executes an UPDATE query from a filter map
+// and a struct body. It supports returnOption to fetch specific returning columns.
+func (s *BasePostgreSqlService) UpdateOneWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}, returnOption ...ReturningConfig) (interface{}, error) {
+	returnColumn := []string{}
+
+	if len(returnOption) > 0 {
+		returnColumn = append(returnColumn, returnOption[0].Column...)
+	}
 	queryString, args := common_builders.UpdateBuilder(s.TableName,
 		query,
 		body,
+		returnColumn...,
 	)
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
+	if len(returnOption) > 0 && returnOption[0].Destination != nil {
+		return nil, s.SelectOne(returnOption[0].Destination, ctx, queryString, args...)
+	}
 	return s.UpdateOne(ctx, queryString, args...)
 }
 
-func (s *BasePostgreSqlService) UpdateOneWithDataAndReturning(v any, ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}, returningColumn ...string) error {
-	queryString, args := common_builders.UpdateBuilder(s.TableName,
-		query,
-		body,
-		returningColumn...,
-	)
-	shouldShowQuery(s.debugLevel, queryString, args...)
-
-	return s.SelectOne(v, ctx, queryString, args...)
-}
-
+// UpdateMany executes an UPDATE query that may affect multiple rows
+// and returns the number of rows updated.
 func (s *BasePostgreSqlService) UpdateMany(ctx context.Context, queryString string, args ...any) (int64, error) {
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
@@ -299,16 +351,37 @@ func (s *BasePostgreSqlService) UpdateMany(ctx context.Context, queryString stri
 	return commandTag.RowsAffected(), nil
 }
 
-func (s *BasePostgreSqlService) UpdateManyWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}) (int64, error) {
+// UpdateManyWithData builds and executes an UPDATE query for multiple rows
+// using the provided filter and struct body.
+// If returnOption is provided, it can return updated data.
+func (s *BasePostgreSqlService) UpdateManyWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}, returnOption ...ReturningConfig) (int64, error) {
+	returnColumn := []string{}
+
+	if len(returnOption) > 0 {
+		returnColumn = append(returnColumn, returnOption[0].Column...)
+	}
 	queryString, args := common_builders.UpdateBuilder(s.TableName,
 		query,
 		body,
+		returnColumn...,
 	)
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
+	if len(returnOption) > 0 && returnOption[0].Destination != nil {
+		err := s.SelectMany(returnOption[0].Destination, ctx, queryString, args...)
+
+		val := reflect.ValueOf(returnOption[0].Destination)
+		if val.Kind() == reflect.Ptr && val.Elem().Kind() == reflect.Slice {
+			return int64(val.Elem().Len()), err
+		}
+
+		return 0, fmt.Errorf("destination must be pointer to slice")
+	}
 	return s.UpdateMany(ctx, queryString, args...)
 }
 
+// UpdateEachWithData performs a bulk update per row (row-specific values)
+// using rowIdentifier (typically a primary key column or unique index).
 func (s *BasePostgreSqlService) UpdateEachWithData(ctx context.Context, rowIdentifier string, query map[string]sql_query.SQLCondition, body interface{}) (int64, error) {
 	queryString, args := common_builders.UpdateEachBuilder(s.TableName,
 		rowIdentifier,
@@ -320,6 +393,8 @@ func (s *BasePostgreSqlService) UpdateEachWithData(ctx context.Context, rowIdent
 	return s.UpdateMany(ctx, queryString, args...)
 }
 
+// DeleteOne executes a DELETE ... RETURNING id query
+// and returns the deleted row ID.
 func (s *BasePostgreSqlService) DeleteOne(ctx context.Context, queryString string, args ...any) (interface{}, error) {
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
@@ -339,6 +414,8 @@ func (s *BasePostgreSqlService) DeleteOne(ctx context.Context, queryString strin
 	return resultId, nil
 }
 
+// DeleteOneWithFilter builds and executes a DELETE query for a single row
+// using SQLCondition filters and returns the deleted row ID.
 func (s *BasePostgreSqlService) DeleteOneWithFilter(ctx context.Context, filter map[string]sql_query.SQLCondition) (interface{}, error) {
 	queryString, args := common_builders.DeleteBuilder(s.TableName, filter)
 	shouldShowQuery(s.debugLevel, queryString, args...)
@@ -346,6 +423,8 @@ func (s *BasePostgreSqlService) DeleteOneWithFilter(ctx context.Context, filter 
 	return s.DeleteOne(ctx, queryString, args...)
 }
 
+// DeleteMany executes a DELETE query that may affect multiple rows
+// and returns the number of rows deleted.
 func (s *BasePostgreSqlService) DeleteMany(ctx context.Context, queryString string, args ...any) (int64, error) {
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
@@ -365,6 +444,8 @@ func (s *BasePostgreSqlService) DeleteMany(ctx context.Context, queryString stri
 	return commandTag.RowsAffected(), nil
 }
 
+// DeleteManyWithFilter builds and executes a DELETE query for multiple rows
+// using SQLCondition filters and returns the number of rows deleted.
 func (s *BasePostgreSqlService) DeleteManyWithFilter(ctx context.Context, filter map[string]sql_query.SQLCondition) (int64, error) {
 	queryString, args := common_builders.DeleteBuilder(s.TableName, filter)
 	shouldShowQuery(s.debugLevel, queryString, args...)
@@ -372,6 +453,10 @@ func (s *BasePostgreSqlService) DeleteManyWithFilter(ctx context.Context, filter
 	return s.DeleteMany(ctx, queryString, args...)
 }
 
+// UseTransactions executes fn within a transaction.
+// If fn returns an error, the transaction is rolled back.
+// If fn succeeds, the transaction is committed.
+// The returned value is whatever fn returns, or an error if commit/rollback fails.
 func UseTransactions(ctx context.Context, pool PgxPoolInterface, fn func(tx pgx.Tx) (any, error)) (any, error) {
 	tx, err := pool.Begin(ctx)
 	if err != nil {
@@ -379,7 +464,12 @@ func UseTransactions(ctx context.Context, pool PgxPoolInterface, fn func(tx pgx.
 	}
 
 	defer func() {
-		tx.Rollback(ctx)
+		if r := recover(); r != nil {
+			tx.Rollback(ctx)
+			err = fmt.Errorf("transaction panicked: %v", r)
+		} else {
+			tx.Rollback(ctx)
+		}
 	}()
 
 	result, err := fn(tx)

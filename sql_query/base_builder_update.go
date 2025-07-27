@@ -54,7 +54,9 @@ func (s *updateBuilder) WhereOr(filters map[string]SQLCondition) SQLUpdateChainB
 	return s
 }
 
-// Return implements SQLUpdateChainBuilder. (Only able to be called once, overrides previous values if re-called)
+// Return implements SQLUpdateChainBuilder. (Only able to be called once, overrides previous values if re-called).
+// Return sets the columns to return after the update.
+// Defaults to RETURNING id if no column is provided.
 func (s *updateBuilder) Return(column ...string) SQLUpdateChainBuilder {
 	if len(column) > 0 {
 		s.Columns = column
@@ -64,13 +66,21 @@ func (s *updateBuilder) Return(column ...string) SQLUpdateChainBuilder {
 	return s
 }
 
-// Update implements SQLUpdateChainBuilder. (Only able to be called once, will override previous call)
+// Update implements SQLUpdateChainBuilder. (Only able to be called once, will override previous call).
+// Conflict adds an ON CONFLICT clause with the specified constraint and action.
+//
+// Example:
+//
+//	builder.Conflict("(id)", "NOTHING")
+//
+// → ON CONFLICT (id) DO NOTHING
 func (s *updateBuilder) Conflict(constraint, do string) SQLUpdateChainBuilder {
 	s.ConflictClause = fmt.Sprintf(" ON CONFLICT %s DO %s", constraint, do)
 	return s
 }
 
-// Update implements SQLUpdateChainBuilder using reflection like Insert(). (Only able to be called once)
+// Update builds an UPDATE query for a single struct using reflection.
+// Automatically sets updated_at = NOW() if not provided.
 func (s *updateBuilder) Update(values interface{}) SQLUpdateChainBuilder {
 	v := reflect.ValueOf(values)
 	if v.Kind() != reflect.Struct {
@@ -89,12 +99,17 @@ func (s *updateBuilder) Update(values interface{}) SQLUpdateChainBuilder {
 	return s
 }
 
-// UpdateEach implements SQLUpdateChainBuilder using reflection like Insert(). (Only able to be called once)
-// Example of expected result:
-// UPDATE alias_codes
-// SET is_checked = v.is_checked, value = v.value, updated_at = v.updated_at
-// FROM (VALUES ($1, $2, $3), ($4, $5, $6), ...more row) as v(name, is_checked, value, updated_at)
-// WHERE name = v.name
+// UpdateEach updates multiple rows at once using VALUES() with a slice of structs.
+// Matches rows using the given rowIdentifier (e.g., "id").
+//
+// Example:
+//
+//	builder.UpdateEach([]User{{ID: 1, Name: "A"}, {ID: 2, Name: "B"}}, "id")
+//
+// → UPDATE users SET name = v.name, updated_at = NOW()
+//
+//	FROM (VALUES ($1,$2),($3,$4)) AS v(id,name,updated_at)
+//	WHERE users.id = v.id
 func (s *updateBuilder) UpdateEach(values interface{}, rowIdentifier string) SQLUpdateChainBuilder {
 	v := reflect.ValueOf(values)
 
@@ -130,6 +145,14 @@ func (s *updateBuilder) UpdateEach(values interface{}, rowIdentifier string) SQL
 }
 
 // Increment is used to replace Update() for adding int value cause update cant handle that
+// Increment builds an UPDATE query that increases integer columns by a given value.
+// Automatically sets updated_at = NOW().
+//
+// Example:
+//
+//	builder.Increment(map[string]any{"count": 1})
+//
+// → UPDATE table SET "count" = "count" + $1, "updated_at" = NOW()
 func (s *updateBuilder) Increment(
 	values map[string]any,
 ) SQLUpdateChainBuilder {
@@ -152,6 +175,13 @@ func (s *updateBuilder) Increment(
 }
 
 // From implements SQLUpdateChainBuilder. (Overrides previous value if called again)
+// From adds a FROM clause to the UPDATE query, allowing joins with other tables.
+//
+// Example:
+//
+//	builder.From([]string{"users u", "roles r"})
+//
+// → FROM users u, roles r
 func (s *updateBuilder) From(tables []string) SQLUpdateChainBuilder {
 	if len(tables) < 1 {
 		return s
@@ -163,6 +193,12 @@ func (s *updateBuilder) From(tables []string) SQLUpdateChainBuilder {
 	return s
 }
 
+// NewSQLUpdateBuilder creates a new updateBuilder for the given table.
+//
+// Example:
+//
+//	builder := NewSQLUpdateBuilder("users")
+//	builder.Update(user).Return("id").Build()
 func NewSQLUpdateBuilder(tableName string) SQLUpdateInitBuilder {
 	return &updateBuilder{
 		&SQLEloquentQuery{
@@ -177,7 +213,8 @@ func NewSQLUpdateBuilder(tableName string) SQLUpdateInitBuilder {
 	}
 }
 
-// buildUpdateQuery implements SQLBuilder.
+// buildUpdateQuery constructs the final UPDATE query string and its arguments.
+// Ensures that CustomQuery is set and that a WHERE clause exists for safety.
 func (s *SQLEloquentQuery) buildUpdateQuery() (string, []interface{}, error) {
 	if s.CustomQuery == "" {
 		return "", nil, errors.New("invalid update query: CustomQuery not set")
@@ -205,6 +242,14 @@ func (s *SQLEloquentQuery) buildUpdateQuery() (string, []interface{}, error) {
 	return query, s.Args, nil
 }
 
+// updateEachClausesGenerator looks at every struct in the slice and builds:
+//  1. The SET part of the query (e.g., "name = v.name"),
+//  2. The column names to use in the VALUES table,
+//  3. The placeholders ($1, $2, …) for each row.
+//
+// It's the core logic behind UpdateEach, letting you bulk-update rows
+// by matching them with a unique rowIdentifier (e.g. "id" or "name").
+//
 // This function loop through slice, returning generated clauses for everything in it
 // Expected result:
 // setClauses contains: [value = v.value, ...etc].
@@ -258,6 +303,12 @@ func (s *updateBuilder) updateEachClausesGenerator(slice reflect.Value, rowIdent
 	return setClauses, valueClauses, valuePlaceholders
 }
 
+// extractUpdateFields goes through a struct's fields and turns them into
+// SET clauses for an UPDATE query. It uses the "column" or "json" tag (or
+// the field name if tags are missing) to pick the column name.
+//
+// It also checks if an "updated_at" field exists, so the builder knows
+// whether to add "updated_at = NOW()" automatically.
 func (s *updateBuilder) extractUpdateFields(v reflect.Value) ([]string, bool) {
 	var setClauses []string
 	var hasUpdatedAt bool

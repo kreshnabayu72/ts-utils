@@ -8,6 +8,18 @@ import (
 	"strings"
 )
 
+// sharedWhereAndQuery builds SQL WHERE/HAVING clauses from filters.
+// It supports operators like =, IN, BETWEEN, IS NULL, RAW, and column refs (IsRef).
+// Generated SQL fragments are added to Filters or HavingClauses, and Args is updated.
+//
+// Example:
+//
+//	filters := map[string]sql_query.SQLCondition{
+//	    "age": {Operator: ">", Value: 18},
+//	    "status": {Operator: "IN", Value: []string{"active", "pending"}},
+//	}
+//	builder.sharedWhereAndQuery(filters)
+//	// Produces: "age" > $1 AND "status" IN ($2, $3)
 func (s *SQLEloquentQuery) sharedWhereAndQuery(
 	filters map[string]SQLCondition,
 ) {
@@ -100,6 +112,16 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 	}
 }
 
+// sharedWhereOrQuery builds OR-combined conditions from multiple filter maps.
+// Each map is AND-combined internally, then OR-joined together. Args is updated.
+//
+// Example:
+//
+//	builder.sharedWhereOrQuery(
+//	    map[string]SQLCondition{"role": {Operator: "=", Value: "admin"}},
+//	    map[string]SQLCondition{"role": {Operator: "=", Value: "editor"}},
+//	)
+//	// Produces: (("role" = $1) OR ("role" = $2))
 func (s *SQLEloquentQuery) sharedWhereOrQuery(filters ...map[string]SQLCondition) {
 	orConditions := []string{}
 
