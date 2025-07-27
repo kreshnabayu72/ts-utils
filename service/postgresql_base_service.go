@@ -464,7 +464,12 @@ func UseTransactions(ctx context.Context, pool PgxPoolInterface, fn func(tx pgx.
 	}
 
 	defer func() {
-		tx.Rollback(ctx)
+		if r := recover(); r != nil {
+			tx.Rollback(ctx)
+			err = fmt.Errorf("transaction panicked: %v", r)
+		} else {
+			tx.Rollback(ctx)
+		}
 	}()
 
 	result, err := fn(tx)
