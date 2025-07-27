@@ -31,12 +31,26 @@ type insertBuilder struct {
 }
 
 // Insert implements SQLInsertChainBuilder. (Only able to be called once, will override previous call)
+// Conflict adds an ON CONFLICT clause to the insert statement.
+// Example:
+//
+//	.Conflict("(id)", "NOTHING")
+//	-> INSERT ... ON CONFLICT (id) DO NOTHING
 func (s *insertBuilder) Conflict(constraint, do string) SQLInsertChainBuilder {
 	s.ConflictClause = fmt.Sprintf(" ON CONFLICT %s DO %s", constraint, do)
 	return s
 }
 
 // Insert implements SQLInsertChainBuilder. (Only able to be called once)
+// Insert builds an INSERT query from either a single struct or a slice of structs.
+// - For a single struct → generates one row.
+// - For a slice → generates multiple rows.
+//
+// By default, it will RETURN the id::text column,
+// but you can pass custom returning columns:
+//
+//	Insert(user, "id", "name")
+//	Insert([]User{u1, u2})
 func (s *insertBuilder) Insert(values interface{}, returningColumns ...string) SQLInsertChainBuilder {
 	if len(returningColumns) > 0 {
 		s.Columns = returningColumns
@@ -71,6 +85,10 @@ func (s *insertBuilder) Insert(values interface{}, returningColumns ...string) S
 	return s.insertSingle(v)
 }
 
+// NewSQLInsertBuilder creates a new insert builder for a given table.
+// Example:
+//
+//	builder := NewSQLInsertBuilder("users")
 func NewSQLInsertBuilder(tableName string) SQLInsertInitBuilder {
 	return &insertBuilder{
 		&SQLEloquentQuery{
@@ -83,7 +101,9 @@ func NewSQLInsertBuilder(tableName string) SQLInsertInitBuilder {
 	}
 }
 
-// buildInsertQuery implements SQLBuilder.
+// buildInsertQuery finalizes the insert query into SQL string + args.
+// It prevents unsafe cases (like adding filters, joins, or pagination)
+// and appends RETURNING and ON CONFLICT if defined.
 func (s *SQLEloquentQuery) buildInsertQuery() (string, []interface{}, error) {
 	if s.LastError != nil {
 		return "", nil, errors.New(s.LastError.Error())
@@ -104,6 +124,9 @@ func (s *SQLEloquentQuery) buildInsertQuery() (string, []interface{}, error) {
 	return s.CustomQuery, s.Args, nil
 }
 
+// insertSingle handles the insert logic for a single struct.
+// It auto-generates a Snowflake ID and builds the VALUES list
+// based on struct field tags (using "column" or "json").
 func (s *insertBuilder) insertSingle(v reflect.Value) SQLInsertChainBuilder {
 	var args []interface{}
 	var columns []string
@@ -144,6 +167,14 @@ func (s *insertBuilder) insertSingle(v reflect.Value) SQLInsertChainBuilder {
 	return s
 }
 
+// insertMany handles inserting multiple structs at once.
+// It generates a Snowflake ID for each row, creates placeholders
+// for every value, and builds the full VALUES (...), (...), ... list.
+//
+// Example Result:
+//
+//	INSERT INTO users (id, name, email)
+//	VALUES ($1, $2, $3), ($4, $5, $6)
 func (s *insertBuilder) insertMany(slice reflect.Value) SQLInsertChainBuilder {
 	var args []interface{}
 	var columns []string
@@ -214,6 +245,9 @@ func (s *insertBuilder) insertMany(slice reflect.Value) SQLInsertChainBuilder {
 	return s
 }
 
+// preBuild is a helper that assembles the final
+// INSERT INTO ... (columns) VALUES ... statement
+// after the columns and value placeholders have been prepared.
 func (s *insertBuilder) preBuild(columns, valuePlaceholders []string) {
 	s.CustomQuery = fmt.Sprintf(
 		"INSERT INTO %s (%s) VALUES %s",

@@ -6,8 +6,6 @@ import (
 	"strings"
 )
 
-// To ensure method .Select() has its own chaining methods
-// e.g. .Select(...).Join(...).Where(...).Build()
 type SQLSelectChainBuilder interface {
 	GetCurrentArgIndex() int
 	AddArgs(arg ...interface{}) SQLSelectChainBuilder
@@ -15,6 +13,7 @@ type SQLSelectChainBuilder interface {
 	Select(columns ...string) SQLSelectChainBuilder
 	SelectCaseWhen(thenExpr, elseExpr, alias string, whenClause string, whenArgs ...interface{}) SQLSelectChainBuilder
 	SelectBoolOr(expr, alias string, args ...interface{}) SQLSelectChainBuilder
+
 	SelectJSONArrayElements(alias string, arrayElements []map[string]string) SQLSelectChainBuilder
 	SelectJSONAggregate(alias string, dto any, condition string, asArrayAggregation bool, orderByClauses ...string) SQLSelectChainBuilder
 	SelectJSONAggregateFunc(alias string, fn func(builder *SelectBuilder)) SQLSelectChainBuilder
@@ -52,16 +51,30 @@ func (s *SelectBuilder) WhereOr(filters map[string]SQLCondition) SQLSelectChainB
 	return s
 }
 
+// GetCurrentArgIndex returns the current number of arguments in the query.
+// Useful for calculating placeholder positions when building parameterized SQL.
 func (s *SelectBuilder) GetCurrentArgIndex() int {
 	return len(s.Args)
 }
 
+// AddArgs appends one or more arguments to the query's argument list.
+// Can be used to manually manage parameter placeholders.
 func (s *SelectBuilder) AddArgs(arg ...interface{}) SQLSelectChainBuilder {
 	s.Args = append(s.Args, arg...)
 	return s
 }
 
-// Search implements SQLSelectChainBuilder. (Accumulates previous value if called again)
+// Search implements SQLSelectChainBuilder. (Accumulates previous value if called again).
+// Search adds a case-insensitive ILIKE condition across multiple fields.
+// Each field is compared with the same keyword, combined using OR.
+//
+// Example:
+//
+//	builder.Search("john", []string{"first_name", "last_name"})
+//
+// Generates:
+//
+//	(first_name ILIKE $1 OR last_name ILIKE $1)
 func (s *SelectBuilder) Search(keyword string, fields []string) SQLSelectChainBuilder {
 	if keyword != "" && len(fields) > 0 {
 		var orClauses []string
@@ -81,7 +94,13 @@ func (s *SelectBuilder) Search(keyword string, fields []string) SQLSelectChainBu
 	return s
 }
 
-// Select implements SQLSelectChainBuilder. (Only able to be called once)
+// Select implements SQLSelectChainBuilder. (Only able to be called once).
+// Select defines one or more columns for the SELECT statement.
+// If a column alias already exists, it will be replaced.
+//
+// Example:
+//
+//	builder.Select("u.id AS user_id", "u.name")
 func (s *SelectBuilder) Select(columns ...string) SQLSelectChainBuilder {
 	for _, newCol := range columns {
 		newAlias := extractAlias(newCol)
@@ -103,19 +122,41 @@ func (s *SelectBuilder) Select(columns ...string) SQLSelectChainBuilder {
 	return s
 }
 
+// SelectBoolOr adds a bool_or aggregate column with an alias.
+//
+// Example:
+//
+//	builder.SelectBoolOr("is_active", "any_active")
+//
+// Generates:
+//
+//	bool_or(is_active) AS any_active
 func (s *SelectBuilder) SelectBoolOr(expr, alias string, args ...interface{}) SQLSelectChainBuilder {
 	s.Columns = append(s.Columns, fmt.Sprintf("bool_or(%s) AS %s", expr, alias))
 	s.Args = append(s.Args, args...)
 	return s
 }
 
+// SelectCaseWhen adds a CASE WHEN expression as a column.
+//
+// Example:
+//
+//	builder.SelectCaseWhen("'Yes'", "'No'", "is_admin", "role = 'admin'")
+//
+// Generates:
+//
+//	CASE WHEN role = 'admin' THEN 'Yes' ELSE 'No' END AS is_admin
 func (s *SelectBuilder) SelectCaseWhen(thenExpr, elseExpr, alias string, whenClause string, whenArgs ...interface{}) SQLSelectChainBuilder {
 	s.Columns = append(s.Columns, fmt.Sprintf("CASE WHEN %s THEN %s ELSE %s END AS %s", whenClause, thenExpr, elseExpr, alias))
 	s.Args = append(s.Args, whenArgs...)
 	return s
 }
 
-// JOIN is the equivalent of INNER JOIN
+// Join adds an INNER JOIN clause with the specified ON condition.
+//
+// Example:
+//
+//	builder.Join("roles r", "r.id = u.role_id")
 func (s *SelectBuilder) Join(table string, onCondition string) SQLSelectChainBuilder {
 	if table == "" {
 		return s
@@ -125,6 +166,11 @@ func (s *SelectBuilder) Join(table string, onCondition string) SQLSelectChainBui
 	return s
 }
 
+// LeftJoin adds a LEFT JOIN clause with the specified ON condition.
+//
+// Example:
+//
+//	builder.LeftJoin("roles r", "r.id = u.role_id")
 func (s *SelectBuilder) LeftJoin(table string, onCondition string) SQLSelectChainBuilder {
 	if table == "" {
 		return s
@@ -134,20 +180,37 @@ func (s *SelectBuilder) LeftJoin(table string, onCondition string) SQLSelectChai
 	return s
 }
 
-// GroupBy implements SQLSelectChainBuilder. (Overrides previous value if called again)
+// GroupBy adds one or more columns to the GROUP BY clause.
+// Multiple calls accumulate columns.
+//
+// Example:
+//
+//	builder.GroupBy("department", "role")
 func (s *SelectBuilder) GroupBy(groupBy ...string) SQLSelectChainBuilder {
 	s.Grouping = append(s.Grouping, groupBy...)
 	return s
 }
 
-// Having implements SQLSelectChainBuilder. (Overrides previous value if called again)
+// Having implements SQLSelectChainBuilder. (Overrides previous value if called again).
+// Having adds a HAVING clause for grouped queries.
+// Overwrites any previous HAVING condition.
+//
+// Example:
+//
+//	builder.GroupBy("role").Having(map[string]SQLCondition{
+//	    "count(*)": {Op: ">", Value: 5},
+//	})
 func (s *SelectBuilder) Having(havingClause map[string]SQLCondition) SQLSelectChainBuilder {
 	s.useHaving = true
 	s.SQLEloquentQuery.sharedWhereAndQuery(havingClause)
 	return s
 }
 
-// OrderBy implements SQLSelectChainBuilder. (Accumulates with previous value if called again)
+// OrderBy adds sorting rules to the query. Multiple calls accumulate sorting.
+//
+// Example:
+//
+//	builder.OrderBy([]string{"created_at"}, false) // DESC
 func (s *SelectBuilder) OrderBy(sortBy []string, asc bool) SQLSelectChainBuilder {
 	direction := "ASC"
 
@@ -174,7 +237,13 @@ type Pagination struct {
 	DefaultSort []Sort `json:"defaultSort"`
 }
 
-// Paginate implements SQLSelectChainBuilder. (Overrides previous value if called again)
+// Paginate implements SQLSelectChainBuilder. (Overrides previous value if called again).
+// Paginate applies LIMIT, OFFSET, and ORDER BY using a Pagination struct.
+// It supports single or multiple sorting rules.
+//
+// Example:
+//
+//	builder.Paginate(Pagination{Page: 2, Limit: 10, SortBy: "name", SortOrder: 1})
 func (s *SelectBuilder) Paginate(query Pagination) SQLSelectChainBuilder {
 	var normalizedPage int
 	if query.Page > 0 {
@@ -210,7 +279,11 @@ func (s *SelectBuilder) Paginate(query Pagination) SQLSelectChainBuilder {
 	return s
 }
 
-// SetLimit implements SQLSelectChainBuilder. (Overrides previous value if called again)
+// SetLimit sets a fixed LIMIT value for the query (overwrites any previous limit).
+//
+// Example:
+//
+//	builder.SetLimit(5)
 func (s *SelectBuilder) SetLimit(limit int) SQLSelectChainBuilder {
 	var normalizedPage int
 
@@ -220,6 +293,17 @@ func (s *SelectBuilder) SetLimit(limit int) SQLSelectChainBuilder {
 	return s
 }
 
+// WithCTEBuilder adds a Common Table Expression (CTE) to the query.
+// It adjusts argument placeholders to avoid conflicts.
+//
+// Example:
+//
+//	cte := NewSQLSelectBuilder[Order]("orders").Select("id", "user_id")
+//	builder.WithCTEBuilder("recent_orders", cte)
+//
+// Generates:
+//
+//	WITH recent_orders AS (SELECT id, user_id FROM orders) ...
 func (s *SelectBuilder) WithCTEBuilder(cteName string, cteBuilder SQLSelectChainBuilder) SQLSelectChainBuilder {
 	cteQuery, cteArgs, _ := cteBuilder.Build()
 
@@ -235,6 +319,12 @@ func (s *SelectBuilder) WithCTEBuilder(cteName string, cteBuilder SQLSelectChain
 	return s
 }
 
+// NewSQLSelectBuilder creates a new chainable SELECT builder for a given table.
+// It extracts JSON tags from the struct type T as default columns.
+//
+// Example:
+//
+//	builder := NewSQLSelectBuilder[User]("users").Select("id", "name")
 func NewSQLSelectBuilder[T any](tableName string) SQLSelectChainBuilder {
 	columns := ExtractJSONTags[T]()
 
@@ -279,7 +369,8 @@ func NewSQLCountBuilder(tableName string) SQLSelectChainBuilder {
 	}
 }
 
-// buildSelectQuery implements SQLBuilder.\
+// Build finalizes the SELECT query and returns the query string and arguments.
+// Returns an error if the query is invalid (e.g., HAVING without GROUP BY).
 func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 	if len(s.HavingClauses) > 0 && len(s.Grouping) < 1 {
 		return "", nil, errors.New("HAVING clauses only allowed if GROUP BY clause is exists")
