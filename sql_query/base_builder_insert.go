@@ -27,7 +27,7 @@ type SQLInsertChainBuilder interface {
 	Build() (string, []interface{}, error)
 }
 
-type insertBuilder struct {
+type InsertBuilder struct {
 	*SQLEloquentQuery
 }
 
@@ -36,7 +36,7 @@ type insertBuilder struct {
 //
 // Note: This option only affects single-row Insert operations.
 // It has no effect on bulk INSERT, because all rows in those operations must have the same set of columns.
-func (s *insertBuilder) ExcludeEmpty() SQLInsertChainBuilder {
+func (s *InsertBuilder) ExcludeEmpty() SQLInsertChainBuilder {
 	s.excludeEmptyValue = true
 	return s
 }
@@ -47,7 +47,7 @@ func (s *insertBuilder) ExcludeEmpty() SQLInsertChainBuilder {
 //
 //	.Conflict("(id)", "NOTHING")
 //	-> INSERT ... ON CONFLICT (id) DO NOTHING
-func (s *insertBuilder) Conflict(constraint, do string) SQLInsertChainBuilder {
+func (s *InsertBuilder) Conflict(constraint, do string) SQLInsertChainBuilder {
 	s.ConflictClause = fmt.Sprintf(" ON CONFLICT %s DO %s", constraint, do)
 	return s
 }
@@ -62,7 +62,7 @@ func (s *insertBuilder) Conflict(constraint, do string) SQLInsertChainBuilder {
 //
 //	Insert(user, "id", "name")
 //	Insert([]User{u1, u2})
-func (s *insertBuilder) Insert(values interface{}, returningColumns ...string) SQLInsertChainBuilder {
+func (s *InsertBuilder) Insert(values interface{}, returningColumns ...string) SQLInsertChainBuilder {
 	if len(returningColumns) > 0 {
 		s.Columns = returningColumns
 	} else {
@@ -101,7 +101,7 @@ func (s *insertBuilder) Insert(values interface{}, returningColumns ...string) S
 //
 //	builder := NewSQLInsertBuilder("users")
 func NewSQLInsertBuilder(tableName string) SQLInsertInitBuilder {
-	return &insertBuilder{
+	return &InsertBuilder{
 		&SQLEloquentQuery{
 			Table:       tableName,
 			Columns:     []string{},
@@ -138,7 +138,7 @@ func (s *SQLEloquentQuery) buildInsertQuery() (string, []interface{}, error) {
 // insertSingle handles the insert logic for a single struct.
 // It auto-generates a Snowflake ID and builds the VALUES list
 // based on struct field tags (using "column" or "json").
-func (s *insertBuilder) insertSingle(v reflect.Value) SQLInsertChainBuilder {
+func (s *InsertBuilder) insertSingle(v reflect.Value) SQLInsertChainBuilder {
 	var args []interface{}
 	var columns []string
 	var placeholders []string
@@ -192,7 +192,7 @@ func (s *insertBuilder) insertSingle(v reflect.Value) SQLInsertChainBuilder {
 //
 //	INSERT INTO users (id, name, email)
 //	VALUES ($1, $2, $3), ($4, $5, $6)
-func (s *insertBuilder) insertMany(slice reflect.Value) SQLInsertChainBuilder {
+func (s *InsertBuilder) insertMany(slice reflect.Value) SQLInsertChainBuilder {
 	var args []interface{}
 	var columns []string
 	var valuePlaceholders []string
@@ -265,7 +265,7 @@ func (s *insertBuilder) insertMany(slice reflect.Value) SQLInsertChainBuilder {
 // preBuild is a helper that assembles the final
 // INSERT INTO ... (columns) VALUES ... statement
 // after the columns and value placeholders have been prepared.
-func (s *insertBuilder) preBuild(columns, valuePlaceholders []string) {
+func (s *InsertBuilder) preBuild(columns, valuePlaceholders []string) {
 	s.CustomQuery = fmt.Sprintf(
 		"INSERT INTO %s (%s) VALUES %s",
 		s.Table,
