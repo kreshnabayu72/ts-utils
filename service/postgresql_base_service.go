@@ -200,6 +200,11 @@ func (s *BasePostgreSqlService) SelectMany(v any, ctx context.Context, queryStri
 		return err
 	}
 
+	if rows.Err() != nil {
+		log.Printf("rows error: %v", rows.Err())
+		return rows.Err()
+	}
+
 	return nil
 }
 
