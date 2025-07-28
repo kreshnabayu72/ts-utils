@@ -30,7 +30,7 @@ type SQLSelectChainBuilder interface {
 	GroupBy(groupBy ...string) SQLSelectChainBuilder
 	Having(havingClauses map[string]SQLCondition) SQLSelectChainBuilder
 
-	WithCTEBuilder(cteName string, cteBuilder SQLSelectChainBuilder) SQLSelectChainBuilder
+	WithCTEBuilder(cteName string, cteBuilder *SQLEloquentQuery) SQLSelectChainBuilder
 
 	Build() (string, []interface{}, error)
 }
@@ -304,8 +304,12 @@ func (s *SelectBuilder) SetLimit(limit int) SQLSelectChainBuilder {
 // Generates:
 //
 //	WITH recent_orders AS (SELECT id, user_id FROM orders) ...
-func (s *SelectBuilder) WithCTEBuilder(cteName string, cteBuilder SQLSelectChainBuilder) SQLSelectChainBuilder {
-	cteQuery, cteArgs, _ := cteBuilder.Build()
+func (s *SelectBuilder) WithCTEBuilder(cteName string, cteBuilder *SQLEloquentQuery) SQLSelectChainBuilder {
+	cteQuery, cteArgs, err := cteBuilder.Build()
+	if err != nil {
+		s.LastError = err
+		return s
+	}
 
 	// Calculate the current argument offset
 	offset := len(s.Args)
