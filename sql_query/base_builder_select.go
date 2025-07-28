@@ -299,7 +299,7 @@ func (s *SelectBuilder) SetLimit(limit int) SQLSelectChainBuilder {
 // Example:
 //
 //	cte := NewSQLSelectBuilder[Order]("orders").Select("id", "user_id")
-//	builder.WithCTEBuilder("recent_orders", cte)
+//	builder.WithCTEBuilder("recent_orders", cte.(*sql_query.SelectBuilder).SQLEloquentQuery)
 //
 // Generates:
 //
