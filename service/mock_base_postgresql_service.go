@@ -123,6 +123,16 @@ func (m *MockBasePostgreSqlService) UpdateEachWithData(ctx context.Context, rowI
 	return arg.Get(0).(int64), arg.Error(1)
 }
 
+func (m *MockBasePostgreSqlService) SoftDeleteOne(ctx context.Context, filter map[string]sql_query.SQLCondition, returnOption ...ReturningConfig) (interface{}, error) {
+	arg := m.Called(ctx, filter, returnOption)
+	return arg.Get(0), arg.Error(1)
+}
+
+func (m *MockBasePostgreSqlService) SoftDeleteMany(ctx context.Context, filter map[string]sql_query.SQLCondition, returnOption ...ReturningConfig) (int64, error) {
+	arg := m.Called(ctx, filter, returnOption)
+	return arg.Get(0).(int64), arg.Error(1)
+}
+
 func (m *MockBasePostgreSqlService) DeleteOne(
 	ctx context.Context,
 	queryString string,
