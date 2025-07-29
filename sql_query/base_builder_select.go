@@ -137,7 +137,7 @@ func (s *SelectBuilder) SelectBoolOr(expr, alias string, args ...interface{}) SQ
 	// Check if alias exists in current list
 	replaced := false
 	for i, existing := range s.Columns {
-		if extractAlias(existing) == alias {
+		if extractAlias(existing) == strings.ToLower(alias) {
 			s.Columns[i] = boolOrColumn // Overwrite
 			replaced = true
 			break
@@ -167,7 +167,7 @@ func (s *SelectBuilder) SelectCaseWhen(thenExpr, elseExpr, alias string, whenCla
 	// Check if alias exists in current list
 	replaced := false
 	for i, existing := range s.Columns {
-		if extractAlias(existing) == alias {
+		if extractAlias(existing) == strings.ToLower(alias) {
 			s.Columns[i] = caseWhenColumn // Overwrite
 			replaced = true
 			break
