@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"time"
 )
 
 func traverseNestedStruct[T any](typ reflect.Type) string {
@@ -67,7 +68,7 @@ func ExtractJSONTags[T any]() []string {
 		}
 
 		switch {
-		case ftype.Kind() == reflect.Struct || (ftype.Kind() == reflect.Slice && ftype.Elem().Kind() == reflect.Struct):
+		case (ftype.Kind() == reflect.Struct && ftype != reflect.TypeOf(time.Time{})) || (ftype.Kind() == reflect.Slice && ftype.Elem().Kind() == reflect.Struct):
 			jsonExpr := traverseNestedStruct[T](ftype)
 			if jsonExpr == "" {
 				continue
