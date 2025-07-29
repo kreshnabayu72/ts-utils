@@ -105,10 +105,15 @@ func SaveFileWithName(
 		return "", "", "", 0, "", err
 	}
 
+	formattedFilename := fileName
+	if formattedFilename == "" {
+		formattedFilename = fileHeader.Filename
+	}
+
 	// 2. Ensure fileName has an extension
 	origExt := filepath.Ext(fileHeader.Filename)
-	if filepath.Ext(fileName) == "" {
-		fileName += origExt
+	if filepath.Ext(formattedFilename) == "" {
+		formattedFilename += origExt
 	}
 
 	// 3. Build absolute path
@@ -139,12 +144,12 @@ func SaveFileWithName(
 	var b bytes.Buffer
 	writer := multipart.NewWriter(&b)
 
-	//other form part
+	// other form part
 	writer.WriteField("dirName", folderName)
 	writer.WriteField("filePrefix", folderName)
 
-	if fileName != "" {
-		writer.WriteField("fileName", fileName)
+	if formattedFilename != "" {
+		writer.WriteField("fileName", formattedFilename)
 	}
 
 	// Create form file part named "files"
@@ -198,13 +203,13 @@ func SaveFileWithName(
 	}
 
 	// 6. Return the public path
-	publicPath := fmt.Sprintf("/%s/%s/%s", companyCode, folderName, fileName)
+	publicPath := fmt.Sprintf("/%s/%s/%s", companyCode, folderName, formattedFilename)
 
 	if len(uploadResp.Data) > 0 {
 		publicPath = uploadResp.Data[0]
 	}
 
-	return publicPath, fileName, filetype, fileHeader.Size, middleware.GetFileSizeString(uint64(fileHeader.Size)), nil
+	return publicPath, formattedFilename, filetype, fileHeader.Size, middleware.GetFileSizeString(uint64(fileHeader.Size)), nil
 }
 
 func DeleteFile(filePath string) error {
