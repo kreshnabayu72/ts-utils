@@ -71,8 +71,8 @@ func (m *MockBasePostgreSqlService) InsertOne(
 	return arg.Get(0), arg.Error(1)
 }
 
-func (m *MockBasePostgreSqlService) InsertOneWithData(ctx context.Context, body interface{}) (interface{}, error) {
-	arg := m.Called(ctx, body)
+func (m *MockBasePostgreSqlService) InsertOneWithData(ctx context.Context, body interface{}, returnOption ...ReturningConfig) (interface{}, error) {
+	arg := m.Called(ctx, body, returnOption)
 	return arg.Get(0), arg.Error(1)
 }
 
@@ -85,14 +85,9 @@ func (m *MockBasePostgreSqlService) InsertMany(
 	return arg.Get(0).(int64), arg.Error(1)
 }
 
-func (m *MockBasePostgreSqlService) InsertManyWithData(ctx context.Context, body interface{}) (interface{}, error) {
-	arg := m.Called(ctx, body)
+func (m *MockBasePostgreSqlService) InsertManyWithData(ctx context.Context, body interface{}, returnOption ...ReturningConfig) (interface{}, error) {
+	arg := m.Called(ctx, body, returnOption)
 	return arg.Get(0), arg.Error(1)
-}
-
-func (m *MockBasePostgreSqlService) InsertManyWithDataAndReturning(v any, ctx context.Context, body interface{}, returningColumn ...string) error {
-	arg := m.Called(v, ctx, body, returningColumn)
-	return arg.Error(1)
 }
 
 func (m *MockBasePostgreSqlService) UpdateOne(
@@ -104,20 +99,9 @@ func (m *MockBasePostgreSqlService) UpdateOne(
 	return arg.Get(0), arg.Error(1)
 }
 
-func (m *MockBasePostgreSqlService) UpdateOneWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}) (interface{}, error) {
-	arg := m.Called(ctx, query, body)
+func (m *MockBasePostgreSqlService) UpdateOneWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}, returnOption ...ReturningConfig) (interface{}, error) {
+	arg := m.Called(ctx, query, body, returnOption)
 	return arg.Get(0), arg.Error(1)
-}
-
-func (m *MockBasePostgreSqlService) UpdateOneWithDataAndReturning(
-	v any,
-	ctx context.Context,
-	query map[string]sql_query.SQLCondition,
-	body interface{},
-	returning ...string,
-) error {
-	arg := m.Called(v, ctx, query, body, returning)
-	return arg.Error(0)
 }
 
 func (m *MockBasePostgreSqlService) UpdateMany(
@@ -129,8 +113,8 @@ func (m *MockBasePostgreSqlService) UpdateMany(
 	return arg.Get(0).(int64), arg.Error(1)
 }
 
-func (m *MockBasePostgreSqlService) UpdateManyWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}) (int64, error) {
-	arg := m.Called(ctx, query, body)
+func (m *MockBasePostgreSqlService) UpdateManyWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}, returnOption ...ReturningConfig) (int64, error) {
+	arg := m.Called(ctx, query, body, returnOption)
 	return arg.Get(0).(int64), arg.Error(1)
 }
 
@@ -159,6 +143,11 @@ func (m *MockBasePostgreSqlService) DeleteMany(
 	args ...any,
 ) (int64, error) {
 	arg := m.Called(ctx, queryString, args)
+	return arg.Get(0).(int64), arg.Error(1)
+}
+
+func (m *MockBasePostgreSqlService) DeleteManyWithFilter(ctx context.Context, filter map[string]sql_query.SQLCondition) (int64, error) {
+	arg := m.Called(ctx, filter)
 	return arg.Get(0).(int64), arg.Error(1)
 }
 

@@ -193,7 +193,7 @@ func SystemRolePermissionAggregation(
 		roleType,
 		globalRole,
 	)
-	builder.WithCTEBuilder("user_system_roles_cte", cteBuilder)
+	builder.WithCTEBuilder("user_system_roles_cte", cteBuilder.(*sql_query.SelectBuilder).SQLEloquentQuery)
 
 	GetHasSystemRoleSection(builder, roleType)
 
@@ -228,7 +228,7 @@ func TransactionRolePermissionAggregation(
 	filterOutEmptyRole ...bool,
 ) {
 	cteBuilder := generateUserTransactionRolesBuilder(loggedInUserId, transactionGroupAttribute)
-	builder.WithCTEBuilder("user_transaction_roles_cte", cteBuilder)
+	builder.WithCTEBuilder("user_transaction_roles_cte", cteBuilder.(*sql_query.SelectBuilder).SQLEloquentQuery)
 
 	GetHasTransactionRole(builder, transactionGroupAttribute)
 
@@ -829,14 +829,14 @@ func RolePermissionAggregation(
 	groupColumn string,
 ) {
 	transactionRoleBuilder := transactionRoleCTEBuilder(loggedInUserId)
-	builder.WithCTEBuilder("user_transaction_roles_cte", transactionRoleBuilder)
+	builder.WithCTEBuilder("user_transaction_roles_cte", transactionRoleBuilder.(*sql_query.SelectBuilder).SQLEloquentQuery)
 	builder.LeftJoin(
 		"user_transaction_roles_cte utr",
 		fmt.Sprintf("utr.group_id = %s", groupColumn),
 	)
 
 	systemRolesBuilder := systemRoleCTEBuilder(loggedInUserId)
-	builder.WithCTEBuilder("user_system_roles_cte", systemRolesBuilder)
+	builder.WithCTEBuilder("user_system_roles_cte", systemRolesBuilder.(*sql_query.SelectBuilder).SQLEloquentQuery)
 	builder.LeftJoin(
 		"user_system_roles_cte usr",
 		fmt.Sprintf("usr.group_id = %s", groupColumn),
@@ -1027,7 +1027,7 @@ func TransactionRoleMultiPermissionAggregation(
 	groupColumn string,
 ) {
 	cteBuilder := transactionRoleMultiPermissionAggregationCTE(loggedInUserId)
-	builder.WithCTEBuilder("user_transaction_roles_cte", cteBuilder)
+	builder.WithCTEBuilder("user_transaction_roles_cte", cteBuilder.(*sql_query.SelectBuilder).SQLEloquentQuery)
 	builder.LeftJoin(
 		"user_transaction_roles_cte utr",
 		fmt.Sprintf("utr.group_id = %s", groupColumn),

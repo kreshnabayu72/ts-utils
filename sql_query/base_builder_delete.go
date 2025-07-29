@@ -24,24 +24,35 @@ type SQLDeleteChainBuilder interface {
 }
 
 // <---To wrap builder to its respective interface, used as pointer type in method of each builder--->
-type deleteBuilder struct {
+type DeleteBuilder struct {
 	*SQLEloquentQuery
 }
 
 // Where implements SQLDeleteChainBuilder. (Accumulates previous value if called again)
-func (s *deleteBuilder) Where(filters map[string]SQLCondition) SQLDeleteChainBuilder {
+func (s *DeleteBuilder) Where(filters map[string]SQLCondition) SQLDeleteChainBuilder {
 	s.SQLEloquentQuery.sharedWhereAndQuery(filters)
 	return s
 }
 
 // WhereOr implements SQLDeleteChainBuilder. (Accumulates previous value if called again)
-func (s *deleteBuilder) WhereOr(filters map[string]SQLCondition) SQLDeleteChainBuilder {
+func (s *DeleteBuilder) WhereOr(filters map[string]SQLCondition) SQLDeleteChainBuilder {
 	s.SQLEloquentQuery.sharedWhereOrQuery(filters)
 	return s
 }
 
 // Delete implements SQLDeleteChainBuilder. (Only able to be called once)
-func (s *deleteBuilder) Delete(returningColumns ...string) SQLDeleteChainBuilder {
+// Delete initializes a DELETE statement for the current table.
+// By default, it returns the deleted "id", but you can pass custom RETURNING columns.
+//
+// Example:
+//
+//	builder.Delete()                     // RETURNING id
+//	builder.Delete("id", "deleted_at")   // RETURNING id, deleted_at
+//
+// Generates:
+//
+//	DELETE FROM table_name RETURNING id
+func (s *DeleteBuilder) Delete(returningColumns ...string) SQLDeleteChainBuilder {
 	if len(returningColumns) > 0 {
 		s.Columns = returningColumns
 	} else {
@@ -56,7 +67,17 @@ func (s *deleteBuilder) Delete(returningColumns ...string) SQLDeleteChainBuilder
 }
 
 // Using implements SQLDeleteChainBuilder. (Overrides previous value if called again)
-func (s *deleteBuilder) Using(tables []string) SQLDeleteChainBuilder {
+// Using adds a USING clause to the DELETE statement.
+// It is useful for multi-table DELETE with a join-like behavior.
+//
+// Example:
+//
+//	builder.Using([]string{"other_table"})
+//
+// Generates:
+//
+//	DELETE FROM table_name USING other_table
+func (s *DeleteBuilder) Using(tables []string) SQLDeleteChainBuilder {
 	if len(tables) < 1 {
 		return s
 	}
@@ -67,8 +88,13 @@ func (s *deleteBuilder) Using(tables []string) SQLDeleteChainBuilder {
 	return s
 }
 
+// NewSQLDeleteBuilder creates a new delete builder for a given table.
+//
+// Example:
+//
+//	builder := NewSQLDeleteBuilder("users")
 func NewSQLDeleteBuilder(tableName string) SQLDeleteInitBuilder {
-	return &deleteBuilder{
+	return &DeleteBuilder{
 		&SQLEloquentQuery{
 			Table:       tableName,
 			Filters:     []string{},
@@ -81,7 +107,13 @@ func NewSQLDeleteBuilder(tableName string) SQLDeleteInitBuilder {
 	}
 }
 
-// buildDeleteQuery implements SQLBuilder.
+// buildDeleteQuery finalizes the DELETE query into a full SQL string + args.
+// It adds USING, WHERE, and RETURNING clauses if provided.
+// Prevents execution if CustomQuery is empty.
+//
+// Example Output:
+//
+//	DELETE FROM users USING roles WHERE users.role_id = roles.id RETURNING id
 func (s *SQLEloquentQuery) buildDeleteQuery() (string, []interface{}, error) {
 	if s.LastError != nil {
 		return "", nil, errors.New(s.LastError.Error())
