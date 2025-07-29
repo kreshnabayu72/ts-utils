@@ -471,7 +471,7 @@ func extractAlias(column string) string {
 	if len(parts) < 2 {
 		return "" // No alias
 	}
-	return strings.TrimSpace(parts[len(parts)-1])
+	return strings.Trim(strings.TrimSpace(parts[len(parts)-1]), "\"")
 }
 
 // func validateGroupByColumns(availableColumns []string, groupByColumns []string) error {
