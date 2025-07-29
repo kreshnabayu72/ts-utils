@@ -24,18 +24,18 @@ type SQLDeleteChainBuilder interface {
 }
 
 // <---To wrap builder to its respective interface, used as pointer type in method of each builder--->
-type deleteBuilder struct {
+type DeleteBuilder struct {
 	*SQLEloquentQuery
 }
 
 // Where implements SQLDeleteChainBuilder. (Accumulates previous value if called again)
-func (s *deleteBuilder) Where(filters map[string]SQLCondition) SQLDeleteChainBuilder {
+func (s *DeleteBuilder) Where(filters map[string]SQLCondition) SQLDeleteChainBuilder {
 	s.SQLEloquentQuery.sharedWhereAndQuery(filters)
 	return s
 }
 
 // WhereOr implements SQLDeleteChainBuilder. (Accumulates previous value if called again)
-func (s *deleteBuilder) WhereOr(filters map[string]SQLCondition) SQLDeleteChainBuilder {
+func (s *DeleteBuilder) WhereOr(filters map[string]SQLCondition) SQLDeleteChainBuilder {
 	s.SQLEloquentQuery.sharedWhereOrQuery(filters)
 	return s
 }
@@ -52,7 +52,7 @@ func (s *deleteBuilder) WhereOr(filters map[string]SQLCondition) SQLDeleteChainB
 // Generates:
 //
 //	DELETE FROM table_name RETURNING id
-func (s *deleteBuilder) Delete(returningColumns ...string) SQLDeleteChainBuilder {
+func (s *DeleteBuilder) Delete(returningColumns ...string) SQLDeleteChainBuilder {
 	if len(returningColumns) > 0 {
 		s.Columns = returningColumns
 	} else {
@@ -77,7 +77,7 @@ func (s *deleteBuilder) Delete(returningColumns ...string) SQLDeleteChainBuilder
 // Generates:
 //
 //	DELETE FROM table_name USING other_table
-func (s *deleteBuilder) Using(tables []string) SQLDeleteChainBuilder {
+func (s *DeleteBuilder) Using(tables []string) SQLDeleteChainBuilder {
 	if len(tables) < 1 {
 		return s
 	}
@@ -94,7 +94,7 @@ func (s *deleteBuilder) Using(tables []string) SQLDeleteChainBuilder {
 //
 //	builder := NewSQLDeleteBuilder("users")
 func NewSQLDeleteBuilder(tableName string) SQLDeleteInitBuilder {
-	return &deleteBuilder{
+	return &DeleteBuilder{
 		&SQLEloquentQuery{
 			Table:       tableName,
 			Filters:     []string{},

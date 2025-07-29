@@ -39,18 +39,18 @@ type SQLUpdateChainBuilder interface {
 	Build() (string, []interface{}, error)
 }
 
-type updateBuilder struct {
+type UpdateBuilder struct {
 	*SQLEloquentQuery
 }
 
 // Where implements SQLUpdateChainBuilder. (Accumulates previous value if called again)
-func (s *updateBuilder) Where(filters map[string]SQLCondition) SQLUpdateChainBuilder {
+func (s *UpdateBuilder) Where(filters map[string]SQLCondition) SQLUpdateChainBuilder {
 	s.SQLEloquentQuery.sharedWhereAndQuery(filters)
 	return s
 }
 
 // WhereOr implements SQLUpdateChainBuilder. (Accumulates previous value if called again)
-func (s *updateBuilder) WhereOr(filters map[string]SQLCondition) SQLUpdateChainBuilder {
+func (s *UpdateBuilder) WhereOr(filters map[string]SQLCondition) SQLUpdateChainBuilder {
 	s.SQLEloquentQuery.sharedWhereOrQuery(filters)
 	return s
 }
@@ -60,7 +60,7 @@ func (s *updateBuilder) WhereOr(filters map[string]SQLCondition) SQLUpdateChainB
 //
 // Note: This option only affects single-row Update operations.
 // It has no effect on bulk UPDATE, because all rows in those operations must have the same set of columns.
-func (s *updateBuilder) ExcludeEmpty() SQLUpdateChainBuilder {
+func (s *UpdateBuilder) ExcludeEmpty() SQLUpdateChainBuilder {
 	s.excludeEmptyValue = true
 	return s
 }
@@ -68,7 +68,7 @@ func (s *updateBuilder) ExcludeEmpty() SQLUpdateChainBuilder {
 // Return implements SQLUpdateChainBuilder. (Only able to be called once, overrides previous values if re-called).
 // Return sets the columns to return after the update.
 // Defaults to RETURNING id if no column is provided.
-func (s *updateBuilder) Return(column ...string) SQLUpdateChainBuilder {
+func (s *UpdateBuilder) Return(column ...string) SQLUpdateChainBuilder {
 	if len(column) > 0 {
 		s.Columns = column
 	} else {
@@ -85,14 +85,14 @@ func (s *updateBuilder) Return(column ...string) SQLUpdateChainBuilder {
 //	builder.Conflict("(id)", "NOTHING")
 //
 // → ON CONFLICT (id) DO NOTHING
-func (s *updateBuilder) Conflict(constraint, do string) SQLUpdateChainBuilder {
+func (s *UpdateBuilder) Conflict(constraint, do string) SQLUpdateChainBuilder {
 	s.ConflictClause = fmt.Sprintf(" ON CONFLICT %s DO %s", constraint, do)
 	return s
 }
 
 // Update builds an UPDATE query for a single struct using reflection.
 // Automatically sets updated_at = NOW() if not provided.
-func (s *updateBuilder) Update(values interface{}) SQLUpdateChainBuilder {
+func (s *UpdateBuilder) Update(values interface{}) SQLUpdateChainBuilder {
 	v := reflect.ValueOf(values)
 	if v.Kind() != reflect.Struct {
 		s.LastError = fmt.Errorf("update one data must be a struct")
@@ -121,7 +121,7 @@ func (s *updateBuilder) Update(values interface{}) SQLUpdateChainBuilder {
 //
 //	FROM (VALUES ($1,$2),($3,$4)) AS v(id,name,updated_at)
 //	WHERE users.id = v.id
-func (s *updateBuilder) UpdateEach(values interface{}, rowIdentifier string) SQLUpdateChainBuilder {
+func (s *UpdateBuilder) UpdateEach(values interface{}, rowIdentifier string) SQLUpdateChainBuilder {
 	v := reflect.ValueOf(values)
 
 	// Slice data, plus length checking
@@ -164,7 +164,7 @@ func (s *updateBuilder) UpdateEach(values interface{}, rowIdentifier string) SQL
 //	builder.Increment(map[string]any{"count": 1})
 //
 // → UPDATE table SET "count" = "count" + $1, "updated_at" = NOW()
-func (s *updateBuilder) Increment(
+func (s *UpdateBuilder) Increment(
 	values map[string]any,
 ) SQLUpdateChainBuilder {
 	var setClauses []string
@@ -193,7 +193,7 @@ func (s *updateBuilder) Increment(
 //	builder.From([]string{"users u", "roles r"})
 //
 // → FROM users u, roles r
-func (s *updateBuilder) From(tables []string) SQLUpdateChainBuilder {
+func (s *UpdateBuilder) From(tables []string) SQLUpdateChainBuilder {
 	if len(tables) < 1 {
 		return s
 	}
@@ -204,14 +204,14 @@ func (s *updateBuilder) From(tables []string) SQLUpdateChainBuilder {
 	return s
 }
 
-// NewSQLUpdateBuilder creates a new updateBuilder for the given table.
+// NewSQLUpdateBuilder creates a new UpdateBuilder for the given table.
 //
 // Example:
 //
 //	builder := NewSQLUpdateBuilder("users")
 //	builder.Update(user).Return("id").Build()
 func NewSQLUpdateBuilder(tableName string) SQLUpdateInitBuilder {
-	return &updateBuilder{
+	return &UpdateBuilder{
 		&SQLEloquentQuery{
 			Table:       tableName,
 			Filters:     []string{},
@@ -266,7 +266,7 @@ func (s *SQLEloquentQuery) buildUpdateQuery() (string, []interface{}, error) {
 // setClauses contains: [value = v.value, ...etc].
 // valueClauses contains: [value, ...etc].
 // valuePlaceholders contains: [($1, $2, $3, ...etc), ($4, $5, ...etc), ...etc]
-func (s *updateBuilder) updateEachClausesGenerator(slice reflect.Value, rowIdentifier string) ([]string, []string, []string) {
+func (s *UpdateBuilder) updateEachClausesGenerator(slice reflect.Value, rowIdentifier string) ([]string, []string, []string) {
 	var args []interface{}
 	var setClauses, valueClauses, valuePlaceholders []string
 
@@ -320,7 +320,7 @@ func (s *updateBuilder) updateEachClausesGenerator(slice reflect.Value, rowIdent
 //
 // It also checks if an "updated_at" field exists, so the builder knows
 // whether to add "updated_at = NOW()" automatically.
-func (s *updateBuilder) extractUpdateFields(v reflect.Value) ([]string, bool) {
+func (s *UpdateBuilder) extractUpdateFields(v reflect.Value) ([]string, bool) {
 	var setClauses []string
 	var hasUpdatedAt bool
 
