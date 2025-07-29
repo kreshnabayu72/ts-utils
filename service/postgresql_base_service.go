@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/db"
+	"gitea.qwertysystem.net/BETS/ts-utils/dto"
 	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
 	"gitea.qwertysystem.net/BETS/ts-utils/sql_query/common_builders"
 
@@ -43,6 +44,9 @@ type PostgreSqlService interface {
 	UpdateMany(ctx context.Context, queryString string, args ...any) (int64, error)
 	UpdateManyWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}, returnOption ...ReturningConfig) (int64, error)
 	UpdateEachWithData(ctx context.Context, rowIdentifier string, query map[string]sql_query.SQLCondition, body interface{}) (int64, error)
+
+	SoftDeleteOne(ctx context.Context, filter map[string]sql_query.SQLCondition, returnOption ...ReturningConfig) (interface{}, error)
+	SoftDeleteMany(ctx context.Context, filter map[string]sql_query.SQLCondition, returnOption ...ReturningConfig) (int64, error)
 
 	DeleteOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
 	DeleteOneWithFilter(ctx context.Context, filter map[string]sql_query.SQLCondition) (interface{}, error)
@@ -464,6 +468,53 @@ func (s *BasePostgreSqlService) UpdateEachWithData(ctx context.Context, rowIdent
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	return s.UpdateMany(ctx, queryString, args...)
+}
+
+// SoftDeleteOne builds and executes a UPDATE soft delete query for a single row
+// using SQLCondition filters and returns the deleted row ID.
+func (s *BasePostgreSqlService) SoftDeleteOne(ctx context.Context, filter map[string]sql_query.SQLCondition, returnOption ...ReturningConfig) (interface{}, error) {
+	returnColumn := []string{}
+
+	if len(returnOption) > 0 {
+		returnColumn = append(returnColumn, returnOption[0].Column...)
+	}
+	queryString, args := common_builders.UpdateBuilder(s.TableName, filter, dto.SetSoftDelete{
+		IsDeleted: true,
+		DeletedAt: "NOW()",
+	}, returnColumn...)
+	shouldShowQuery(s.debugLevel, queryString, args...)
+
+	if len(returnOption) > 0 && returnOption[0].Destination != nil {
+		return nil, s.SelectOne(returnOption[0].Destination, ctx, queryString, args...)
+	}
+	return s.DeleteOne(ctx, queryString, args...)
+}
+
+// SoftDeleteMany builds and executes a UPDATE soft delete query for multiple rows
+// using SQLCondition filters and returns the number of rows deleted.
+func (s *BasePostgreSqlService) SoftDeleteMany(ctx context.Context, filter map[string]sql_query.SQLCondition, returnOption ...ReturningConfig) (int64, error) {
+	returnColumn := []string{}
+
+	if len(returnOption) > 0 {
+		returnColumn = append(returnColumn, returnOption[0].Column...)
+	}
+	queryString, args := common_builders.UpdateBuilder(s.TableName,
+		filter,
+		dto.SetSoftDelete{
+			IsDeleted: true,
+			DeletedAt: "NOW()",
+		},
+		returnColumn...,
+	)
+	shouldShowQuery(s.debugLevel, queryString, args...)
+
+	if len(returnOption) > 0 && returnOption[0].Destination != nil {
+		err := s.SelectMany(returnOption[0].Destination, ctx, queryString, args...)
+		val := reflect.ValueOf(returnOption[0].Destination)
+
+		return int64(val.Elem().Len()), err
+	}
+	return s.DeleteMany(ctx, queryString, args...)
 }
 
 // DeleteOne executes a DELETE ... RETURNING id query
