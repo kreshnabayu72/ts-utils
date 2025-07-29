@@ -109,7 +109,23 @@ func GenerateExistFilter(attribute string, filter []string) bson.M {
 
 	return bson.M{attribute: bson.M{"$ne": "vdjfPyv7ijO5vQeLIZmQHuzPO"}}
 }
+
+func EscapeRegex(str string) string {
+	// List of regex special characters
+	specialChars := `.+*?^$()[]{}\|`
+	var sb strings.Builder
+	for _, r := range str {
+		if strings.ContainsRune(specialChars, r) {
+			sb.WriteRune('\\')
+		}
+		sb.WriteRune(r)
+	}
+	return sb.String()
+}
+
 func GenerateSearchCondition(search string) primitive.M {
+	search = EscapeRegex(search)
+
 	if search != "" {
 		return bson.M{"$regex": search, "$options": "i"}
 	} else {
