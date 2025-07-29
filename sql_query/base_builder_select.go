@@ -132,7 +132,22 @@ func (s *SelectBuilder) Select(columns ...string) SQLSelectChainBuilder {
 //
 //	bool_or(is_active) AS any_active
 func (s *SelectBuilder) SelectBoolOr(expr, alias string, args ...interface{}) SQLSelectChainBuilder {
-	s.Columns = append(s.Columns, fmt.Sprintf("bool_or(%s) AS %s", expr, alias))
+	boolOrColumn := fmt.Sprintf("bool_or(%s) AS \"%s\"", expr, alias)
+
+	// Check if alias exists in current list
+	replaced := false
+	for i, existing := range s.Columns {
+		if extractAlias(existing) == alias {
+			s.Columns[i] = boolOrColumn // Overwrite
+			replaced = true
+			break
+		}
+	}
+
+	if !replaced {
+		s.Columns = append(s.Columns, boolOrColumn)
+	}
+
 	s.Args = append(s.Args, args...)
 	return s
 }
@@ -147,7 +162,22 @@ func (s *SelectBuilder) SelectBoolOr(expr, alias string, args ...interface{}) SQ
 //
 //	CASE WHEN role = 'admin' THEN 'Yes' ELSE 'No' END AS is_admin
 func (s *SelectBuilder) SelectCaseWhen(thenExpr, elseExpr, alias string, whenClause string, whenArgs ...interface{}) SQLSelectChainBuilder {
-	s.Columns = append(s.Columns, fmt.Sprintf("CASE WHEN %s THEN %s ELSE %s END AS %s", whenClause, thenExpr, elseExpr, alias))
+	caseWhenColumn := fmt.Sprintf("CASE WHEN %s THEN %s ELSE %s END AS \"%s\"", whenClause, thenExpr, elseExpr, alias)
+
+	// Check if alias exists in current list
+	replaced := false
+	for i, existing := range s.Columns {
+		if extractAlias(existing) == alias {
+			s.Columns[i] = caseWhenColumn // Overwrite
+			replaced = true
+			break
+		}
+	}
+
+	if !replaced {
+		s.Columns = append(s.Columns, caseWhenColumn)
+	}
+
 	s.Args = append(s.Args, whenArgs...)
 	return s
 }
