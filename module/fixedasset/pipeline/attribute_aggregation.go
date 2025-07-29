@@ -225,6 +225,7 @@ func GetAssetIdFromAliasCode(
 		},
 		).
 		Addfields(bson.M{
+			"previousAssetId": "$assetId",
 			"assetId": bson.M{
 				"$cond": bson.A{
 					bson.M{"$eq": bson.A{bson.M{"$size": "$assetIdMap"}, 0}},
