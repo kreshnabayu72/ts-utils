@@ -13,8 +13,8 @@ type CustomField struct {
 	IsActive      bool                `json:"isActive"  column:"is_active"`
 	IsShowOnTable bool                `json:"isShowOnTable"  column:"is_show_on_table"`
 
-	IsDeleted            bool       `json:"isDeleted"            column:"is_deleted"`
-	DeleteFromDatabaseAt *time.Time `json:"deleteFromDatabaseAt" column:"delete_from_database_at"`
-	CreatedAt            time.Time  `json:"createdAt"            column:"created_at"`
-	UpdatedAt            time.Time  `json:"updatedAt"            column:"updated_at"`
+	IsDeleted bool       `json:"isDeleted"            column:"is_deleted"`
+	DeletedAt *time.Time `json:"deletedAt" column:"deleted_at"`
+	CreatedAt time.Time  `json:"createdAt"            column:"created_at"`
+	UpdatedAt time.Time  `json:"updatedAt"            column:"updated_at"`
 }

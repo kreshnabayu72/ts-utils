@@ -15,7 +15,7 @@ type FileInStorage struct {
 	FileSize             string    `json:"fileSize" column:"file_size"`
 	FileSizeKB           float64   `json:"fileSizeKb" column:"file_size_kb"`
 	IsDeleted            bool      `json:"isDeleted" column:"is_deleted"`
-	DeleteFromDatabaseAt time.Time `json:"deleteFromDatabaseAt" column:"delete_from_database_at"`
+	DeleteFromDatabaseAt time.Time `json:"deleteFromDatabaseAt" column:"deleted_at"`
 	CreatedAt            time.Time `json:"createdAt" column:"created_at"`
 	UpdatedAt            time.Time `json:"updatedAt" column:"updated_at"`
 }

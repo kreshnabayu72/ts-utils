@@ -33,7 +33,7 @@ type User struct {
 	ModifiedByLastName     string     `json:"modifiedByLastName"     column:"modified_by_last_name"`
 	ModifiedByFullName     string     `json:"modifiedByFullName"     column:"modified_by_full_name"`
 	IsDeleted              bool       `json:"isDeleted"              column:"is_deleted"`
-	DeleteFromDatabaseAt   *time.Time `json:"deleteFromDatabaseAt"   column:"delete_from_database_at"`
+	DeleteFromDatabaseAt   *time.Time `json:"deleteFromDatabaseAt"   column:"deleted_at"`
 	CreatedAt              time.Time  `json:"createdAt"              column:"created_at"`
 	UpdatedAt              time.Time  `json:"updatedAt"              column:"updated_at"`
 }
