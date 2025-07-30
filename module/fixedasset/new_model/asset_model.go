@@ -20,8 +20,6 @@ type Asset struct {
 
 	// ─────── References ───────
 	GroupID        int  `json:"groupId"      column:"group_id"`
-	BrandID        int  `json:"brandId"      column:"brand_id"`
-	CategoryID     int  `json:"categoryId"      column:"category_id"`
 	ModelID        int  `json:"modelId"      column:"model_id"`
 	AssignedToID   *int `json:"assignedToId" column:"assigned_to_id"`
 	BorrowerID     *int `json:"borrowerId"   column:"borrower_id"`
