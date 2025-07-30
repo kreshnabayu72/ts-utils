@@ -52,6 +52,8 @@ const (
 	FileManagerAgendaTableName                = "file_manager_agenda"
 	FileRepairTicketingTableName              = "file_repair_ticketings"
 	GroupTableName                            = "groups"
+	GroupApprovalModelName                    = "group_approvals"
+	GroupQuotaModelName                       = "group_quotas"
 	ImportAccountCodeTableName                = "import_account_codes"
 	ImportAssetTableName                      = "import_assets"
 	ImportAssetNameTableName                  = "import_asset_names"
