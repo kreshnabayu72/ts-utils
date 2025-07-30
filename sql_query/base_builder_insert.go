@@ -83,7 +83,7 @@ func (s *InsertBuilder) Insert(values interface{}, returningColumns ...string) S
 	if len(returningColumns) > 0 {
 		s.Columns = returningColumns
 	} else {
-		s.Columns = []string{"id::text"}
+		s.Columns = []string{"id"}
 	}
 
 	v := reflect.ValueOf(values)

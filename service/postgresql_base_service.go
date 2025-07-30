@@ -326,7 +326,7 @@ func (s *BasePostgreSqlService) SelectMany(v any, ctx context.Context, queryStri
 func (s *BasePostgreSqlService) InsertOne(ctx context.Context, queryString string, args ...any) (interface{}, error) {
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
-	var resultId string
+	var resultId int
 	var err error
 
 	if s.Transaction != nil {
@@ -397,7 +397,7 @@ func (s *BasePostgreSqlService) InsertManyWithData(ctx context.Context, body int
 func (s *BasePostgreSqlService) UpdateOne(ctx context.Context, queryString string, args ...any) (interface{}, error) {
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
-	var resultId string
+	var resultId int
 	var err error
 
 	if s.Transaction != nil {
@@ -530,7 +530,7 @@ func (s *BasePostgreSqlService) SoftDeleteMany(ctx context.Context, filter map[s
 func (s *BasePostgreSqlService) DeleteOne(ctx context.Context, queryString string, args ...any) (interface{}, error) {
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
-	var resultId string
+	var resultId int
 	var err error
 
 	if s.Transaction != nil {
