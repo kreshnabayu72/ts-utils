@@ -591,6 +591,7 @@ func UseTransactions(ctx context.Context, pool PgxPoolInterface, fn func(tx pgx.
 
 	defer func() {
 		if r := recover(); r != nil {
+			log.Printf("transaction panicked: %v", r)
 			tx.Rollback(ctx)
 			err = fmt.Errorf("transaction panicked: %v", r)
 		} else {
@@ -604,6 +605,7 @@ func UseTransactions(ctx context.Context, pool PgxPoolInterface, fn func(tx pgx.
 	}
 
 	if err := tx.Commit(ctx); err != nil {
+		log.Printf("failed to commit: %v", err)
 		return nil, err
 	}
 
