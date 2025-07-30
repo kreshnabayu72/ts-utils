@@ -57,6 +57,54 @@ const (
 	CustomFieldDataTypeDocument      = CustomFieldDataType("Document")
 )
 
+type GroupQuotaType string
+
+const (
+	GroupQuotaTypeFixedAsset      = GroupQuotaType("Fixed Asset")
+	GroupQuotaTypeRepairTicketing = GroupQuotaType("Repair Ticketing")
+	GroupQuotaTypeTracking        = GroupQuotaType("Tracking")
+	GroupQuotaTypeAudit           = GroupQuotaType("Audit")
+	GroupQuotaTypeMaintenance     = GroupQuotaType("Maintenance")
+	GroupQuotaTypeAssetControl    = GroupQuotaType("Asset Control")
+)
+
+var GroupQuotaTypesArray = []string{
+	string(GroupQuotaTypeFixedAsset),
+	string(GroupQuotaTypeRepairTicketing),
+	string(GroupQuotaTypeTracking),
+	string(GroupQuotaTypeAudit),
+	string(GroupQuotaTypeMaintenance),
+	string(GroupQuotaTypeAssetControl),
+}
+
+type GroupTransactionType string
+
+const (
+	GroupTransactionTypeBorrowingAssignment = GroupTransactionType("Borrowing/Assignment")
+	GroupTransactionTypeTransfer            = GroupTransactionType("Transfer")
+	GroupTransactionTypeDisposal            = GroupTransactionType("Disposal")
+	GroupTransactionTypeDamage              = GroupTransactionType("Damage")
+	GroupTransactionTypeMissing             = GroupTransactionType("Missing")
+	GroupTransactionTypeRepairTicketing     = GroupTransactionType("Repair Ticketing")
+	GroupTransactionTypeTracking            = GroupTransactionType("Tracking")
+	GroupTransactionTypeAudit               = GroupTransactionType("Audit")
+	GroupTransactionTypeMaintenance         = GroupTransactionType("Maintenance")
+	GroupTransactionTypeAssetControl        = GroupTransactionType("Asset Control")
+)
+
+var GroupTransactionTypesArray = []string{
+	string(GroupTransactionTypeBorrowingAssignment),
+	string(GroupTransactionTypeTransfer),
+	string(GroupTransactionTypeDisposal),
+	string(GroupTransactionTypeDamage),
+	string(GroupTransactionTypeMissing),
+	string(GroupTransactionTypeRepairTicketing),
+	string(GroupTransactionTypeTracking),
+	string(GroupTransactionTypeAudit),
+	string(GroupTransactionTypeMaintenance),
+	string(GroupTransactionTypeAssetControl),
+}
+
 type TagType string
 
 const (
