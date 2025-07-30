@@ -381,7 +381,7 @@ type Pagination struct {
 	SortBy      string   `json:"sortBy"    transform:"string"`
 	SortOrder   int      `json:"sortOrder" transform:"int"`
 	MultiSort   []string `json:"multiSort"`
-	DefaultSort []string `json:"defaultSort"`
+	DefaultSort Sort     `json:"defaultSort"`
 }
 
 func (s *SelectBuilder) Paginate(query Pagination) SQLSelectChainBuilder {
@@ -396,8 +396,13 @@ func (s *SelectBuilder) Paginate(query Pagination) SQLSelectChainBuilder {
 	s.Limit = query.Limit
 	s.Offset = normalizedPage * query.Limit
 
+	order := query.DefaultSort.SortOrder
+	if query.SortOrder != 0 {
+		order = query.SortOrder
+	}
+
 	s.SortOrder = "asc"
-	if query.SortOrder < 0 {
+	if order < 0 {
 		s.SortOrder = "desc"
 	}
 
@@ -411,14 +416,12 @@ func (s *SelectBuilder) Paginate(query Pagination) SQLSelectChainBuilder {
 		for _, column := range query.MultiSort {
 			s.OrderBy([]string{column})
 		}
-	} else if len(query.DefaultSort) > 0 {
+	} else if query.DefaultSort.SortBy != "" {
 		// Overwrite sortBy sortOrder
 		// Functions: If all other sorts not defined, define defaultsort
 		s.SortBy = []string{}
 
-		for _, column := range query.DefaultSort {
-			s.OrderBy([]string{column})
-		}
+		s.OrderBy([]string{query.DefaultSort.SortBy})
 	}
 
 	return s
