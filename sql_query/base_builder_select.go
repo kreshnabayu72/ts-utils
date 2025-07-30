@@ -304,7 +304,21 @@ func (s *SelectBuilder) SelectArrayAggregation(alias string, source string, conf
 		}
 		orderByClause = fmt.Sprintf(" ORDER BY %s %s", config.SortBy, order)
 	}
-	s.Columns = append(s.Columns, fmt.Sprintf("(SELECT array_agg(%s%s) FROM %s) AS %s", config.Expr, orderByClause, source, alias))
+
+	arrayAggColumn := fmt.Sprintf("(SELECT array_agg(%s%s) FROM %s) AS %s", config.Expr, orderByClause, source, alias)
+
+	replaced := false
+	for i, existing := range s.Columns {
+		if extractAlias(existing) == strings.ToLower(alias) {
+			s.Columns[i] = arrayAggColumn // Overwrite
+			replaced = true
+			break
+		}
+	}
+
+	if !replaced {
+		s.Columns = append(s.Columns, arrayAggColumn)
+	}
 
 	return s
 }
