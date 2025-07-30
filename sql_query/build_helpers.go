@@ -49,7 +49,8 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 
 		/* ───────────── IS NULL / IS NOT NULL ──────────── */
 		case SQLOperatorIsNull, SQLOperatorIsNotNull:
-			clause = fmt.Sprintf(`"%s" %s`, column, each.Operator)
+			quotedColumn := escapeQuoteColumns(column)
+			clause = fmt.Sprintf(`%s %s`, quotedColumn, each.Operator)
 
 		/* ─────────────────── BETWEEN ──────────────────── */
 		case SQLOperatorBetween, SQLOperatorNotBetween:
@@ -57,23 +58,26 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 			if v.Kind() != reflect.Slice || v.Len() != 2 {
 				continue // Skip if length is not 2
 			}
+			quotedColumn := escapeQuoteColumns(column)
 			clause = fmt.Sprintf(
-				`"%s" %s $%d AND $%d`,
-				column, each.Operator,
+				`%s %s $%d AND $%d`,
+				quotedColumn, each.Operator,
 				len(s.Args)+1, len(s.Args)+2,
 			)
 			s.Args = append(s.Args, v.Index(0).Interface(), v.Index(1).Interface())
 
 		/* ────────────────── = ANY($n) ─────────────────── */
 		case SQLOperatorAny:
-			clause = fmt.Sprintf(`"%s" = ANY($%d)`, column, len(s.Args)+1)
+			quotedColumn := escapeQuoteColumns(column)
+			clause = fmt.Sprintf(`%s = ANY($%d)`, quotedColumn, len(s.Args)+1)
 			s.Args = append(s.Args, each.Value)
 
 		/* ──────────────────── DEFAULT ─────────────────── */
 		default:
 			// Reference to other columns like users.id = user_assets.user_id
 			if each.IsRef {
-				clause = fmt.Sprintf(`"%s" %s %v`, column, each.Operator, each.Value)
+				quotedColumn := escapeQuoteColumns(column)
+				clause = fmt.Sprintf(`%s %s %v`, quotedColumn, each.Operator, each.Value)
 				break
 			}
 
@@ -91,26 +95,12 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 					s.Args = append(s.Args, v.Index(i).Interface())
 				}
 
-				parts := strings.Split(column, ".")
-				for i, part := range parts {
-					parts[i] = fmt.Sprintf(`"%s"`, part)
-				}
-				quotedColumn := column
-				if !strings.Contains(column, "(") {
-					quotedColumn = strings.Join(parts, ".")
-				}
+				quotedColumn := escapeQuoteColumns(column)
 
 				clause = fmt.Sprintf(`%s %s (%s)`, quotedColumn, each.Operator, strings.Join(ph, ", "))
 			} else {
-				// Common operator, products.user.id = $1 (literal value with args)
-				parts := strings.Split(column, ".")
-				for i, part := range parts {
-					parts[i] = fmt.Sprintf(`"%s"`, part)
-				}
-				quotedColumn := column
-				if !strings.Contains(column, "(") {
-					quotedColumn = strings.Join(parts, ".")
-				}
+				// Common operator, products.user.id = $1 (literal value with args)=
+				quotedColumn := escapeQuoteColumns(column)
 
 				clause = fmt.Sprintf(`%s %s $%d`, quotedColumn, each.Operator, len(s.Args)+1)
 				s.Args = append(s.Args, each.Value)
@@ -148,6 +138,19 @@ func (s *SQLEloquentQuery) sharedWhereOrQuery(filters ...map[string]SQLCondition
 	}
 
 	s.Filters = append(s.Filters, fmt.Sprintf("(%s)", strings.Join(orConditions, " OR ")))
+}
+
+func escapeQuoteColumns(column string) string {
+	parts := strings.Split(column, ".")
+	for i, part := range parts {
+		parts[i] = fmt.Sprintf(`"%s"`, part)
+	}
+	quotedColumn := column
+	if !strings.Contains(column, "(") {
+		quotedColumn = strings.Join(parts, ".")
+	}
+
+	return quotedColumn
 }
 
 func shiftSQLPlaceholders(query string, offset int) string {
