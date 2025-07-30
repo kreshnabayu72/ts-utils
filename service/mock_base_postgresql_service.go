@@ -72,7 +72,14 @@ func (m *MockBasePostgreSqlService) InsertOne(
 }
 
 func (m *MockBasePostgreSqlService) InsertOneWithData(ctx context.Context, body interface{}, returnOption ...ReturningConfig) (interface{}, error) {
-	arg := m.Called(ctx, body, returnOption)
+	var arg mock.Arguments
+
+	if len(returnOption) > 0 {
+		arg = m.Called(ctx, body, returnOption)
+	} else {
+		arg = m.Called(ctx, body)
+	}
+
 	return arg.Get(0), arg.Error(1)
 }
 
@@ -86,7 +93,13 @@ func (m *MockBasePostgreSqlService) InsertMany(
 }
 
 func (m *MockBasePostgreSqlService) InsertManyWithData(ctx context.Context, body interface{}, returnOption ...ReturningConfig) (interface{}, error) {
-	arg := m.Called(ctx, body, returnOption)
+	var arg mock.Arguments
+
+	if len(returnOption) > 0 {
+		arg = m.Called(ctx, body, returnOption)
+	} else {
+		arg = m.Called(ctx, body)
+	}
 	return arg.Get(0), arg.Error(1)
 }
 
@@ -100,7 +113,12 @@ func (m *MockBasePostgreSqlService) UpdateOne(
 }
 
 func (m *MockBasePostgreSqlService) UpdateOneWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}, returnOption ...ReturningConfig) (interface{}, error) {
-	arg := m.Called(ctx, query, body, returnOption)
+	var arg mock.Arguments
+	if len(returnOption) > 0 {
+		arg = m.Called(ctx, query, body, returnOption)
+	} else {
+		arg = m.Called(ctx, query, body)
+	}
 	return arg.Get(0), arg.Error(1)
 }
 
@@ -114,7 +132,13 @@ func (m *MockBasePostgreSqlService) UpdateMany(
 }
 
 func (m *MockBasePostgreSqlService) UpdateManyWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}, returnOption ...ReturningConfig) (int64, error) {
-	arg := m.Called(ctx, query, body, returnOption)
+	var arg mock.Arguments
+
+	if len(returnOption) > 0 {
+		arg = m.Called(ctx, query, body, returnOption)
+	} else {
+		arg = m.Called(ctx, query, body)
+	}
 	return arg.Get(0).(int64), arg.Error(1)
 }
 
@@ -124,12 +148,25 @@ func (m *MockBasePostgreSqlService) UpdateEachWithData(ctx context.Context, rowI
 }
 
 func (m *MockBasePostgreSqlService) SoftDeleteOne(ctx context.Context, filter map[string]sql_query.SQLCondition, returnOption ...ReturningConfig) (interface{}, error) {
-	arg := m.Called(ctx, filter, returnOption)
+	var arg mock.Arguments
+
+	if len(returnOption) > 0 {
+		arg = m.Called(ctx, filter, returnOption)
+	} else {
+		arg = m.Called(ctx, filter)
+	}
+
 	return arg.Get(0), arg.Error(1)
 }
 
 func (m *MockBasePostgreSqlService) SoftDeleteMany(ctx context.Context, filter map[string]sql_query.SQLCondition, returnOption ...ReturningConfig) (int64, error) {
-	arg := m.Called(ctx, filter, returnOption)
+	var arg mock.Arguments
+
+	if len(returnOption) > 0 {
+		arg = m.Called(ctx, filter, returnOption)
+	} else {
+		arg = m.Called(ctx, filter)
+	}
 	return arg.Get(0).(int64), arg.Error(1)
 }
 
