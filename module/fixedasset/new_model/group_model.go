@@ -25,8 +25,8 @@ type Group struct {
 	MaintenanceRoleManagedByParent     bool `json:"maintenanceRoleManagedByParent" column:"maintenance_role_managed_by_parent"`
 	AssetControlRoleManagedByParent    bool `json:"assetControlRoleManagedByParent" column:"asset_control_role_managed_by_parent"`
 
-	IsDeleted            bool       `json:"isDeleted" column:"is_deleted"`
-	DeleteFromDatabaseAt *time.Time `json:"deleteFromDatabaseAt" column:"delete_from_database_at"`
+	IsDeleted bool       `json:"isDeleted" column:"is_deleted"`
+	DeletedAt *time.Time `json:"deletedAt" column:"deleted_at"`
 
 	CreatedAt time.Time `json:"createdAt" column:"created_at"`
 	UpdatedAt time.Time `json:"updatedAt" column:"updated_at"`
