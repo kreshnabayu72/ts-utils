@@ -31,3 +31,27 @@ type Group struct {
 	CreatedAt time.Time `json:"createdAt" column:"created_at"`
 	UpdatedAt time.Time `json:"updatedAt" column:"updated_at"`
 }
+
+type GroupQuota struct {
+	ID                  int            `json:"id" column:"id"`
+	GroupID             int            `json:"groupId" column:"group_id"`
+	Type                GroupQuotaType `json:"type" column:"type"`
+	Total               int            `json:"total" column:"total"`
+	UsedByThisGroup     int            `json:"usedByThisGroup" column:"used_by_this_group"`
+	AllocatedToSubgroup int            `json:"allocatedToSubgroup" column:"allocated_to_sub_group"`
+	Available           int            `json:"available" column:"available"`
+
+	CreatedAt time.Time `json:"createdAt" column:"created_at"`
+	UpdatedAt time.Time `json:"updatedAt" column:"updated_at"`
+}
+
+type GroupApprovalType struct {
+	ID              int                  `json:"id" column:"id"`
+	GroupID         int                  `json:"groupId" column:"group_id"`
+	Level           int                  `json:"level" column:"level"`
+	TransactionType GroupTransactionType `json:"transactionType" column:"transaction_type"`
+	ApprovalType    ApprovalType         `json:"approvalType" column:"approval_type"`
+
+	CreatedAt time.Time `json:"createdAt" column:"created_at"`
+	UpdatedAt time.Time `json:"updatedAt" column:"updated_at"`
+}
