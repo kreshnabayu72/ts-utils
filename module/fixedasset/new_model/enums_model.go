@@ -43,7 +43,7 @@ const (
 	CustomFieldDataTypeText          = CustomFieldDataType("Text")
 	CustomFieldDataTypeTextarea      = CustomFieldDataType("Textarea")
 	CustomFieldDataTypeDropdown      = CustomFieldDataType("Dropdown")
-	CustomFieldDataTypeMultidropdown = CustomFieldDataType("Multidropdown")
+	CustomFieldDataTypeMultiDropdown = CustomFieldDataType("MultiDropdown")
 	CustomFieldDataTypeRadioButton   = CustomFieldDataType("Radio button")
 	CustomFieldDataTypeCheckbox      = CustomFieldDataType("Checkbox")
 	CustomFieldDataTypeDate          = CustomFieldDataType("Date")
