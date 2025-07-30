@@ -360,10 +360,11 @@ func (s *SelectBuilder) Having(havingClause map[string]SQLCondition) SQLSelectCh
 }
 
 func (s *SelectBuilder) OrderBy(sortBy []string, asc ...bool) SQLSelectChainBuilder {
-	s.SortOrder = "ASC"
-
-	if len(asc) > 0 && !asc[0] {
-		s.SortOrder = "DESC"
+	if len(asc) > 0 {
+		s.SortOrder = "ASC"
+		if !asc[0] {
+			s.SortOrder = "DESC"
+		}
 	}
 
 	s.SortBy = append(s.SortBy, strings.Join(sortBy, ", "))
