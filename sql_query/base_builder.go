@@ -4,6 +4,12 @@ import (
 	"errors"
 )
 
+type ArrayAggConfig struct {
+	Expr      string
+	SortBy    string
+	SortOrder int
+}
+
 type SQLMode string
 
 const (
@@ -43,6 +49,7 @@ type SQLEloquentQuery struct {
 	Offset         int
 	Limit          int
 	SortBy         []string
+	SortOrder      string
 	Grouping       []string
 	HavingClauses  []string
 
