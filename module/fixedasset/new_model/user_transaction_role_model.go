@@ -5,10 +5,9 @@ import (
 )
 
 type UserTransactionRole struct {
-	ID                int  `json:"_id" column:"id"`
-	IsActive          bool `json:"isActive" column:"is_active"`
-	UserID            int  `json:"userId" column:"user_id"`
-	IsManagedByParent bool `json:"isManagedByParent" column:"is_managed_by_parent"`
+	ID       int  `json:"_id" column:"id"`
+	IsActive bool `json:"isActive" column:"is_active"`
+	UserID   int  `json:"userId" column:"user_id"`
 
 	RoleAttribute TransactionRoleAttribute `json:"roleAttribute" column:"role_attribute"`
 	RoleName      TransactionRoleName      `json:"roleName" column:"role_name"`
