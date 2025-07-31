@@ -853,7 +853,7 @@ func RolePermissionAggregation(
 }
 
 func FindUserSystemRoles[T any](
-	v T,
+	v *[]T,
 	service service.PostgreSqlService,
 	ctx context.Context,
 	loggedInUserId int,
@@ -900,7 +900,7 @@ func FindUserSystemRoles[T any](
 }
 
 func FindUserTransactionRoles[T any](
-	v T,
+	v *[]T,
 	service service.PostgreSqlService,
 	ctx context.Context,
 	loggedInUserId int,
