@@ -144,6 +144,45 @@ const (
 	SystemRoleNameOpenAPI                   SystemRoleName = "Open API"
 )
 
+func GetSystemRoleNameFromAttribute(attr SystemRoleAttribute) SystemRoleName {
+	switch attr {
+	case SystemRoleAttributeImportData:
+		return SystemRoleNameImportData
+	case SystemRoleAttributeAssetAttribute:
+		return SystemRoleNameManageAssetAttribute
+	case SystemRoleAttributeAssetPolicies:
+		return SystemRoleNameManageAssetPolicy
+	case SystemRoleAttributeDepreciationGroup:
+		return SystemRoleNameManageDepreciationGroup
+	case SystemRoleAttributeDepreciationMethod:
+		return SystemRoleNameManageDepreciationMethod
+	case SystemRoleAttributeDocumentDeletion:
+		return SystemRoleNameManageDocumentDeletion
+	case SystemRoleAttributeGroup:
+		return SystemRoleNameManageGroup
+	case SystemRoleAttributeUserAndRole:
+		return SystemRoleNameManageUserAndRole
+	case SystemRoleAttributeIoTReader:
+		return SystemRoleNameManageIoTAndReader
+	case SystemRoleAttributeLicense:
+		return SystemRoleNameManageLicense
+	case SystemRoleAttributePurchaseDocument:
+		return SystemRoleNameManagePurchaseDocument
+	case SystemRoleAttributePurchaseInfo:
+		return SystemRoleNameManagePurchaseInformation
+	case SystemRoleAttributeTag:
+		return SystemRoleNameManageTag
+	case SystemRoleAttributeRegisterAsset:
+		return SystemRoleNameRegisterAssets
+	case SystemRoleAttributeTagType:
+		return SystemRoleNameManageTagType
+	case SystemRoleAttributeOpenAPI:
+		return SystemRoleNameOpenAPI
+	default:
+		return SystemRoleName(attr) // fallback: cast raw string to SystemRoleName
+	}
+}
+
 type SystemRoleType string
 
 const (
@@ -249,6 +288,33 @@ const (
 	TransactionRoleNameDamaged             TransactionRoleName = "Damaged"
 	TransactionRoleNameMissing             TransactionRoleName = "Missing"
 )
+
+func GetTransactionRoleName(attr TransactionRoleAttribute) TransactionRoleName {
+	switch attr {
+	case TransactionRoleAttributeBorrowing:
+		return TransactionRoleNameBorrowingAssignment
+	case TransactionRoleAttributeDisposal:
+		return TransactionRoleNameDisposal
+	case TransactionRoleAttributeTransfer:
+		return TransactionRoleNameTransfer
+	case TransactionRoleAttributeAudit:
+		return TransactionRoleNameAudit
+	case TransactionRoleAttributeMaintenance:
+		return TransactionRoleNameMaintenanceRoutine
+	case TransactionRoleAttributeRepair:
+		return TransactionRoleNameRepairTicketing
+	case TransactionRoleAttributeAssetControl:
+		return TransactionRoleNameAssetControl
+	case TransactionRoleAttributeTracking:
+		return TransactionRoleNameTracking
+	case TransactionRoleAttributeDamaged:
+		return TransactionRoleNameDamaged
+	case TransactionRoleAttributeMissing:
+		return TransactionRoleNameMissing
+	default:
+		return TransactionRoleName(attr) // fallback: cast attribute as-is
+	}
+}
 
 type TransactionRoleType string
 
