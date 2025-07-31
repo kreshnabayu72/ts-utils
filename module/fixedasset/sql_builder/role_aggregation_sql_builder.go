@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"log"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/db"
 	fixedasset_model "gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/model"
 	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
+	"gitea.qwertysystem.net/BETS/ts-utils/service"
 	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
-	"github.com/jackc/pgx/v5"
 )
 
 type TransactionRoleRestriction struct {
@@ -855,15 +854,11 @@ func RolePermissionAggregation(
 
 func FindUserSystemRoles[T any](
 	v T,
+	service service.PostgreSqlService,
 	ctx context.Context,
-	companyCode string,
 	loggedInUserId int,
 	groupId ...int,
 ) error {
-	dbName := db.FixedAssetDBName.CompanyDBName(companyCode)
-	pool := db.ConnectPostgres(dbName)
-
-	var rows pgx.Rows
 	var err error
 
 	isGlobalRole := true
@@ -895,13 +890,7 @@ func FindUserSystemRoles[T any](
 		Where(filter).
 		Build()
 
-	rows, err = pool.Query(ctx, queryString, args...)
-	if err != nil {
-		return err
-	}
-	defer rows.Close()
-
-	err = sql_query.ScanRowsArray(v, rows)
+	err = service.SelectMany(v, ctx, queryString, args...)
 	if err != nil {
 		log.Println(err)
 		return err
@@ -912,15 +901,11 @@ func FindUserSystemRoles[T any](
 
 func FindUserTransactionRoles[T any](
 	v T,
+	service service.PostgreSqlService,
 	ctx context.Context,
-	companyCode string,
 	loggedInUserId int,
 	groupId int,
 ) error {
-	dbName := db.FixedAssetDBName.CompanyDBName(companyCode)
-	pool := db.ConnectPostgres(dbName)
-
-	var rows pgx.Rows
 	var err error
 
 	transactionRoleBuilder := sql_query.NewSQLSelectBuilder[T]("user_transaction_roles")
@@ -944,13 +929,7 @@ func FindUserTransactionRoles[T any](
 		Where(filter).
 		Build()
 
-	rows, err = pool.Query(ctx, queryString, args...)
-	if err != nil {
-		return err
-	}
-	defer rows.Close()
-
-	err = sql_query.ScanRowsArray(v, rows)
+	err = service.SelectMany(v, ctx, queryString, args...)
 	if err != nil {
 		log.Println(err)
 		return err
