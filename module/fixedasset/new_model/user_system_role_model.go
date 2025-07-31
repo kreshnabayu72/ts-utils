@@ -13,7 +13,7 @@ type UserSystemRole struct {
 	PermissionCreate bool `json:"permissionCreate" column:"permission_create"`
 	PermissionUpdate bool `json:"permissionUpdate" column:"permission_update"`
 	PermissionDelete bool `json:"permissionDelete" column:"permission_delete"`
-	GroupID          int  `json:"groupId" column:"group_id"`
+	GroupID          *int `json:"groupId" column:"group_id"`
 
 	RoleName      SystemRoleName      `json:"roleName" column:"role_name"`           // Enum: system_role_name_enum
 	RoleAttribute SystemRoleAttribute `json:"roleAttribute" column:"role_attribute"` // Enum: system_role_attribute_enum
