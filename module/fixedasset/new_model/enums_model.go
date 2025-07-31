@@ -144,6 +144,13 @@ const (
 	SystemRoleNameOpenAPI                   SystemRoleName = "Open API"
 )
 
+type SystemRoleType string
+
+const (
+	SystemRoleTypeGroup  SystemRoleType = "Group"
+	SystemRoleTypeGlobal SystemRoleType = "Global"
+)
+
 type SystemRoleAttribute string
 
 const (
