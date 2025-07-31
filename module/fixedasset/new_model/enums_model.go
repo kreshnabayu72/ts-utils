@@ -180,6 +180,19 @@ const (
 	TransactionRoleAttributeMissing      TransactionRoleAttribute = "missingRole"
 )
 
+var TransactionRoleAttributeArray = []string{
+	string(TransactionRoleAttributeBorrowing),
+	string(TransactionRoleAttributeDisposal),
+	string(TransactionRoleAttributeTransfer),
+	string(TransactionRoleAttributeAudit),
+	string(TransactionRoleAttributeMaintenance),
+	string(TransactionRoleAttributeRepair),
+	string(TransactionRoleAttributeAssetControl),
+	string(TransactionRoleAttributeTracking),
+	string(TransactionRoleAttributeDamaged),
+	string(TransactionRoleAttributeMissing),
+}
+
 type TransactionRoleName string
 
 const (
