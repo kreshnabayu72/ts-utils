@@ -189,6 +189,8 @@ func (s *InsertBuilder) insertSingle(v reflect.Value) SQLInsertChainBuilder {
 		placeholders = append(placeholders, fmt.Sprintf("$%d", len(args)))
 	}
 
+	columns = append(columns, []string{`"updated_at" = NOW()`, `"created_at" = NOW()`}...)
+
 	s.Args = args
 	s.preBuild(columns, []string{fmt.Sprintf("(%s)", strings.Join(placeholders, ", "))})
 
@@ -228,6 +230,8 @@ func (s *InsertBuilder) insertMany(slice reflect.Value) SQLInsertChainBuilder {
 				}
 				columns = append(columns, `"`+setTag+`"`)
 			}
+
+			columns = append(columns, []string{`"updated_at" = NOW()`, `"created_at" = NOW()`}...)
 		}
 
 		var rowPlaceholders []string
