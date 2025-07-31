@@ -46,11 +46,11 @@ type GroupQuota struct {
 }
 
 type GroupApprovalType struct {
-	ID              int                  `json:"id" column:"id"`
-	GroupID         int                  `json:"groupId" column:"group_id"`
-	Level           int                  `json:"level" column:"level"`
-	TransactionType GroupTransactionType `json:"transactionType" column:"transaction_type"`
-	ApprovalType    ApprovalType         `json:"approvalType" column:"approval_type"`
+	ID           int                  `json:"id" column:"id"`
+	GroupID      int                  `json:"groupId" column:"group_id"`
+	Level        int                  `json:"level" column:"level"`
+	Transaction  GroupTransactionType `json:"transaction" column:"transaction"`
+	ApprovalType ApprovalType         `json:"approvalType" column:"approval_type"`
 
 	CreatedAt time.Time `json:"createdAt" column:"created_at"`
 	UpdatedAt time.Time `json:"updatedAt" column:"updated_at"`
