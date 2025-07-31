@@ -1,4 +1,4 @@
-package common_builders
+package sql_builder
 
 import (
 	util_db "gitea.qwertysystem.net/BETS/ts-utils/db"
