@@ -125,7 +125,7 @@ type SQLSelectChainBuilder interface {
 	// Where implements SQLSelectChainBuilder. (Accumulates previous value if called again)
 	Where(filters map[string]SQLCondition) SQLSelectChainBuilder
 	// WhereOr implements SQLSelectChainBuilder. (Accumulates previous value if called again)
-	WhereOr(filters map[string]SQLCondition) SQLSelectChainBuilder
+	WhereOr(filters ...map[string]SQLCondition) SQLSelectChainBuilder
 
 	// Search implements SQLSelectChainBuilder. (Accumulates previous value if called again).
 	// Search adds a case-insensitive ILIKE condition across multiple fields.
@@ -216,8 +216,8 @@ func (s *SelectBuilder) Where(filters map[string]SQLCondition) SQLSelectChainBui
 	return s
 }
 
-func (s *SelectBuilder) WhereOr(filters map[string]SQLCondition) SQLSelectChainBuilder {
-	s.SQLEloquentQuery.sharedWhereOrQuery(filters)
+func (s *SelectBuilder) WhereOr(filters ...map[string]SQLCondition) SQLSelectChainBuilder {
+	s.SQLEloquentQuery.sharedWhereOrQuery(filters...)
 	return s
 }
 

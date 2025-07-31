@@ -30,7 +30,7 @@ type SQLDeleteChainBuilder interface {
 	// Where implements SQLDeleteChainBuilder. (Accumulates previous value if called again)
 	Where(filters map[string]SQLCondition) SQLDeleteChainBuilder
 	// WhereOr implements SQLDeleteChainBuilder. (Accumulates previous value if called again)
-	WhereOr(filters map[string]SQLCondition) SQLDeleteChainBuilder
+	WhereOr(filters ...map[string]SQLCondition) SQLDeleteChainBuilder
 
 	// Using implements SQLDeleteChainBuilder. (Overrides previous value if called again)
 	// Using adds a USING clause to the DELETE statement.
@@ -65,8 +65,8 @@ func (s *DeleteBuilder) Where(filters map[string]SQLCondition) SQLDeleteChainBui
 	return s
 }
 
-func (s *DeleteBuilder) WhereOr(filters map[string]SQLCondition) SQLDeleteChainBuilder {
-	s.SQLEloquentQuery.sharedWhereOrQuery(filters)
+func (s *DeleteBuilder) WhereOr(filters ...map[string]SQLCondition) SQLDeleteChainBuilder {
+	s.SQLEloquentQuery.sharedWhereOrQuery(filters...)
 	return s
 }
 

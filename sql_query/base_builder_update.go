@@ -90,7 +90,7 @@ type SQLUpdateChainBuilder interface {
 	// Where implements SQLUpdateChainBuilder. (Accumulates previous value if called again)
 	Where(filters map[string]SQLCondition) SQLUpdateChainBuilder
 	// WhereOr implements SQLUpdateChainBuilder. (Accumulates previous value if called again)
-	WhereOr(filters map[string]SQLCondition) SQLUpdateChainBuilder
+	WhereOr(filters ...map[string]SQLCondition) SQLUpdateChainBuilder
 	// Return implements SQLUpdateChainBuilder. (Only able to be called once, overrides previous values if re-called).
 	// Return sets the columns to return after the update.
 	// Defaults to RETURNING id if no column is provided.
@@ -120,8 +120,8 @@ func (s *UpdateBuilder) Where(filters map[string]SQLCondition) SQLUpdateChainBui
 	return s
 }
 
-func (s *UpdateBuilder) WhereOr(filters map[string]SQLCondition) SQLUpdateChainBuilder {
-	s.SQLEloquentQuery.sharedWhereOrQuery(filters)
+func (s *UpdateBuilder) WhereOr(filters ...map[string]SQLCondition) SQLUpdateChainBuilder {
+	s.SQLEloquentQuery.sharedWhereOrQuery(filters...)
 	return s
 }
 
