@@ -170,7 +170,7 @@ type SQLSelectChainBuilder interface {
 	// Example:
 	//
 	//	builder.OrderBy([]string{"created_at"}, false) // DESC
-	OrderBy(sortBy []string, asc ...bool) SQLSelectChainBuilder
+	OrderBy(sortBy []string, asc bool) SQLSelectChainBuilder
 	// GroupBy adds one or more columns to the GROUP BY clause.
 	// Multiple calls accumulate columns.
 	//
@@ -304,7 +304,21 @@ func (s *SelectBuilder) SelectArrayAggregation(alias string, source string, conf
 		}
 		orderByClause = fmt.Sprintf(" ORDER BY %s %s", config.SortBy, order)
 	}
-	s.Columns = append(s.Columns, fmt.Sprintf("(SELECT array_agg(%s%s) FROM %s) AS %s", config.Expr, orderByClause, source, alias))
+
+	arrayAggColumn := fmt.Sprintf("(SELECT array_agg(%s%s) FROM %s) AS %s", config.Expr, orderByClause, source, alias)
+
+	replaced := false
+	for i, existing := range s.Columns {
+		if extractAlias(existing) == strings.ToLower(alias) {
+			s.Columns[i] = arrayAggColumn // Overwrite
+			replaced = true
+			break
+		}
+	}
+
+	if !replaced {
+		s.Columns = append(s.Columns, arrayAggColumn)
+	}
 
 	return s
 }
@@ -359,14 +373,15 @@ func (s *SelectBuilder) Having(havingClause map[string]SQLCondition) SQLSelectCh
 	return s
 }
 
-func (s *SelectBuilder) OrderBy(sortBy []string, asc ...bool) SQLSelectChainBuilder {
-	s.SortOrder = "ASC"
+func (s *SelectBuilder) OrderBy(sortBy []string, asc bool) SQLSelectChainBuilder {
+	direction := "ASC"
 
-	if len(asc) > 0 && !asc[0] {
-		s.SortOrder = "DESC"
+	if !asc {
+		direction = "DESC"
 	}
 
-	s.SortBy = append(s.SortBy, strings.Join(sortBy, ", "))
+	sortingRule := fmt.Sprintf("%s %s", strings.Join(sortBy, ", "), direction)
+	s.SortBy = append(s.SortBy, sortingRule)
 	return s
 }
 
@@ -376,12 +391,12 @@ type Sort struct {
 }
 
 type Pagination struct {
-	Page        int      `json:"page"      transform:"int"`
-	Limit       int      `json:"limit"     transform:"int"`
-	SortBy      string   `json:"sortBy"    transform:"string"`
-	SortOrder   int      `json:"sortOrder" transform:"int"`
-	MultiSort   []string `json:"multiSort"`
-	DefaultSort Sort     `json:"defaultSort"`
+	Page        int    `json:"page"      transform:"int"`
+	Limit       int    `json:"limit"     transform:"int"`
+	SortBy      string `json:"sortBy"    transform:"string"`
+	SortOrder   int    `json:"sortOrder" transform:"int"`
+	MultiSort   []Sort `json:"multiSort"`
+	DefaultSort []Sort `json:"defaultSort"`
 }
 
 func (s *SelectBuilder) Paginate(query Pagination) SQLSelectChainBuilder {
@@ -396,32 +411,24 @@ func (s *SelectBuilder) Paginate(query Pagination) SQLSelectChainBuilder {
 	s.Limit = query.Limit
 	s.Offset = normalizedPage * query.Limit
 
-	order := query.DefaultSort.SortOrder
-	if query.SortOrder != 0 {
-		order = query.SortOrder
-	}
-
-	s.SortOrder = "asc"
-	if order < 0 {
-		s.SortOrder = "desc"
-	}
-
-	if query.SortBy != "" {
+	if query.SortBy != "" && query.SortOrder != 0 {
 		s.OrderBy([]string{query.SortBy}, query.SortOrder > 0)
 	} else if len(query.MultiSort) > 0 {
 		// Overwrite sortBy sortOrder
 		// Functions: For nameWithSequence sort (split the sort into 2 sorts)
 		s.SortBy = []string{}
 
-		for _, column := range query.MultiSort {
-			s.OrderBy([]string{column})
+		for _, sort := range query.MultiSort {
+			s.OrderBy([]string{sort.SortBy}, sort.SortOrder > 0)
 		}
-	} else if query.DefaultSort.SortBy != "" {
+	} else if len(query.DefaultSort) > 0 {
 		// Overwrite sortBy sortOrder
 		// Functions: If all other sorts not defined, define defaultsort
 		s.SortBy = []string{}
 
-		s.OrderBy([]string{query.DefaultSort.SortBy})
+		for _, sort := range query.DefaultSort {
+			s.OrderBy([]string{sort.SortBy}, sort.SortOrder > 0)
+		}
 	}
 
 	return s
@@ -548,7 +555,7 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 	}
 
 	if len(s.SortBy) > 0 {
-		sortingClause := fmt.Sprintf("ORDER BY %s %s", strings.Join(s.SortBy, ", "), s.SortOrder)
+		sortingClause := fmt.Sprintf("ORDER BY %s", strings.Join(s.SortBy, ", "))
 		dataQuery = append(dataQuery, sortingClause)
 	}
 

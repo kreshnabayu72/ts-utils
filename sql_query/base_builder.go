@@ -49,7 +49,6 @@ type SQLEloquentQuery struct {
 	Offset         int
 	Limit          int
 	SortBy         []string
-	SortOrder      string
 	Grouping       []string
 	HavingClauses  []string
 
