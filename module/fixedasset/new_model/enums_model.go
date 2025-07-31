@@ -151,6 +151,22 @@ const (
 	SystemRoleTypeGlobal SystemRoleType = "Global"
 )
 
+func GetSystemRoleTypeFromAttribute(attr SystemRoleAttribute) SystemRoleType {
+	switch attr {
+	case
+		SystemRoleAttributeImportData,
+		SystemRoleAttributeAssetAttribute,
+		SystemRoleAttributeAssetPolicies,
+		SystemRoleAttributeDepreciationGroup,
+		SystemRoleAttributeDepreciationMethod,
+		SystemRoleAttributeTagType,
+		SystemRoleAttributeOpenAPI:
+		return SystemRoleTypeGlobal
+	default:
+		return SystemRoleTypeGroup
+	}
+}
+
 type SystemRoleAttribute string
 
 const (
