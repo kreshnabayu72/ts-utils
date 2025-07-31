@@ -1,4 +1,4 @@
-package common_builders
+package sql_builder
 
 import (
 	util_db "gitea.qwertysystem.net/BETS/ts-utils/db"
@@ -6,8 +6,8 @@ import (
 	util_sql_query "gitea.qwertysystem.net/BETS/ts-utils/sql_query"
 )
 
-func GetLoggedInUserBuilder(userId string) (string, []interface{}, error) {
-	return util_sql_query.NewSQLSelectBuilder[util_fixedasset_new_model.UserAttribute](util_db.UserTableName).
+func GetLoggedInUserSystemRolesBuilder(userId string, groupId ...int) (string, []interface{}, error) {
+	return util_sql_query.NewSQLSelectBuilder[util_fixedasset_new_model.UserSystemRole](util_db.UserTableName).
 		Where(map[string]util_sql_query.SQLCondition{
 			"id": {
 				Operator: util_sql_query.SQLOperatorEqual,

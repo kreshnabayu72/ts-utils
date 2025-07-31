@@ -858,6 +858,7 @@ func FindUserSystemRoles[T any](
 	ctx context.Context,
 	companyCode string,
 	loggedInUserId int,
+	groupId ...int,
 ) error {
 	dbName := db.FixedAssetDBName.CompanyDBName(companyCode)
 	pool := db.ConnectPostgres(dbName)
@@ -865,17 +866,82 @@ func FindUserSystemRoles[T any](
 	var rows pgx.Rows
 	var err error
 
-	queryString, args, _ := sql_query.NewSQLSelectBuilder[T]("user_system_roles").
-		Where(map[string]sql_query.SQLCondition{
-			"user_id": {
-				Operator: sql_query.SQLOperatorEqual,
-				Value:    loggedInUserId,
-			},
-			"is_active": {
-				Operator: sql_query.SQLOperatorEqual,
-				Value:    true,
-			},
-		}).
+	isGlobalRole := true
+	if len(groupId) > 0 {
+		isGlobalRole = false
+	}
+
+	sytemRoleBuilder := sql_query.NewSQLSelectBuilder[T]("user_system_roles")
+
+	filter := map[string]sql_query.SQLCondition{
+		"user_id": {
+			Operator: sql_query.SQLOperatorEqual,
+			Value:    loggedInUserId,
+		},
+		"is_active": {
+			Operator: sql_query.SQLOperatorEqual,
+			Value:    true,
+		},
+	}
+
+	if !isGlobalRole {
+		filter["group_id"] = sql_query.SQLCondition{
+			Operator: sql_query.SQLOperatorEqual,
+			Value:    groupId[0],
+		}
+	}
+
+	queryString, args, _ := sytemRoleBuilder.
+		Where(filter).
+		Build()
+
+	rows, err = pool.Query(ctx, queryString, args...)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	err = sql_query.ScanRowsArray(v, rows)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	return nil
+}
+
+func FindUserTransactionRoles[T any](
+	v T,
+	ctx context.Context,
+	companyCode string,
+	loggedInUserId int,
+	groupId int,
+) error {
+	dbName := db.FixedAssetDBName.CompanyDBName(companyCode)
+	pool := db.ConnectPostgres(dbName)
+
+	var rows pgx.Rows
+	var err error
+
+	transactionRoleBuilder := sql_query.NewSQLSelectBuilder[T]("user_transaction_roles")
+
+	filter := map[string]sql_query.SQLCondition{
+		"user_id": {
+			Operator: sql_query.SQLOperatorEqual,
+			Value:    loggedInUserId,
+		},
+		"is_active": {
+			Operator: sql_query.SQLOperatorEqual,
+			Value:    true,
+		},
+		"group_id": {
+			Operator: sql_query.SQLOperatorEqual,
+			Value:    groupId,
+		},
+	}
+
+	queryString, args, _ := transactionRoleBuilder.
+		Where(filter).
 		Build()
 
 	rows, err = pool.Query(ctx, queryString, args...)
