@@ -184,7 +184,14 @@ func (s *InsertBuilder) insertSingle(v reflect.Value) SQLInsertChainBuilder {
 		if columnTag != "" {
 			setTag = columnTag
 		}
+
 		columns = append(columns, `"`+setTag+`"`)
+
+		if ArrayIncludes([]string{"updated_at", "created_at"}, setTag) {
+			placeholders = append(placeholders, "NOW()")
+			continue
+		}
+
 		args = append(args, val.Interface())
 		placeholders = append(placeholders, fmt.Sprintf("$%d", len(args)))
 	}
@@ -243,12 +250,21 @@ func (s *InsertBuilder) insertMany(slice reflect.Value) SQLInsertChainBuilder {
 			field := t.Field(j)
 			jsonTag := field.Tag.Get("json")
 			columnTag := field.Tag.Get("column")
+			setTag := CamelToSnake(jsonTag)
+			if columnTag != "" {
+				setTag = columnTag
+			}
 
 			if ArrayIncludes([]string{"_id", "id"}, jsonTag) || columnTag == "id" {
 				continue
 			}
 
 			if ArrayIncludes([]string{"", "-"}, jsonTag) && ArrayIncludes([]string{"", "-"}, columnTag) {
+				continue
+			}
+
+			if ArrayIncludes([]string{"updated_at", "created_at"}, setTag) {
+				rowPlaceholders = append(rowPlaceholders, "NOW()")
 				continue
 			}
 
