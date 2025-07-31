@@ -852,21 +852,25 @@ func RolePermissionAggregation(
 	)
 }
 
+type SystemRoleFilter struct {
+	RoleAttribute    new_model.SystemRoleAttribute `json:"roleAttribute" column:"role_attribute"` // Enum: system_role_attribute_enum
+	PermissionView   bool                          `json:"permissionView" column:"permission_view"`
+	PermissionCreate bool                          `json:"permissionCreate" column:"permission_create"`
+	PermissionUpdate bool                          `json:"permissionUpdate" column:"permission_update"`
+	PermissionDelete bool                          `json:"permissionDelete" column:"permission_delete"`
+	GroupID          *int                          `json:"groupId" column:"group_id"`
+}
+
 func FindUserSystemRoles[T any](
 	v *[]T,
 	service service.PostgreSqlService,
 	ctx context.Context,
 	loggedInUserId int,
-	groupId ...int,
+	roleFilter ...SystemRoleFilter,
 ) error {
 	var err error
 
-	isGlobalRole := true
-	if len(groupId) > 0 {
-		isGlobalRole = false
-	}
-
-	sytemRoleBuilder := sql_query.NewSQLSelectBuilder[T]("user_system_roles")
+	systemRolesBuilder := sql_query.NewSQLSelectBuilder[T]("user_system_roles")
 
 	filter := map[string]sql_query.SQLCondition{
 		"user_id": {
@@ -879,14 +883,34 @@ func FindUserSystemRoles[T any](
 		},
 	}
 
-	if !isGlobalRole {
-		filter["group_id"] = sql_query.SQLCondition{
-			Operator: sql_query.SQLOperatorEqual,
-			Value:    groupId[0],
+	orFilter := []map[string]sql_query.SQLCondition{}
+	for _, each := range roleFilter {
+		filterPart := map[string]sql_query.SQLCondition{}
+		if each.RoleAttribute != "" {
+			filterPart["role_attribute"] = sql_query.SQLCondition{Operator: sql_query.SQLOperatorEqual, Value: each.RoleAttribute}
 		}
+		if each.GroupID != nil {
+			filterPart["group_id"] = sql_query.SQLCondition{Operator: sql_query.SQLOperatorEqual, Value: each.GroupID}
+		}
+		if !each.PermissionCreate {
+			filterPart["permission_create"] = sql_query.SQLCondition{Operator: sql_query.SQLOperatorEqual, Value: each.PermissionCreate}
+		}
+		if !each.PermissionView {
+			filterPart["permission_view"] = sql_query.SQLCondition{Operator: sql_query.SQLOperatorEqual, Value: each.PermissionView}
+		}
+		if !each.PermissionUpdate {
+			filterPart["permission_update"] = sql_query.SQLCondition{Operator: sql_query.SQLOperatorEqual, Value: each.PermissionUpdate}
+		}
+		if !each.PermissionDelete {
+			filterPart["permission_delete"] = sql_query.SQLCondition{Operator: sql_query.SQLOperatorEqual, Value: each.PermissionDelete}
+		}
+		orFilter = append(orFilter, filterPart)
+	}
+	if len(orFilter) > 0 {
+		systemRolesBuilder.WhereOr(orFilter...)
 	}
 
-	queryString, args, _ := sytemRoleBuilder.
+	queryString, args, _ := systemRolesBuilder.
 		Where(filter).
 		Build()
 
@@ -899,12 +923,18 @@ func FindUserSystemRoles[T any](
 	return nil
 }
 
+type TransactionRoleFilter struct {
+	RoleAttribute new_model.TransactionRoleAttribute `json:"roleAttribute" column:"role_attribute"`
+	RoleType      new_model.TransactionRoleType      `json:"roleType" column:"role_type"`
+	GroupID       *int                               `json:"groupId" column:"group_id"`
+}
+
 func FindUserTransactionRoles[T any](
 	v *[]T,
 	service service.PostgreSqlService,
 	ctx context.Context,
 	loggedInUserId int,
-	groupId int,
+	roleFilter ...TransactionRoleFilter,
 ) error {
 	var err error
 
@@ -919,10 +949,24 @@ func FindUserTransactionRoles[T any](
 			Operator: sql_query.SQLOperatorEqual,
 			Value:    true,
 		},
-		"group_id": {
-			Operator: sql_query.SQLOperatorEqual,
-			Value:    groupId,
-		},
+	}
+
+	orFilter := []map[string]sql_query.SQLCondition{}
+	for _, each := range roleFilter {
+		filterPart := map[string]sql_query.SQLCondition{}
+		if each.RoleAttribute != "" {
+			filterPart["role_attribute"] = sql_query.SQLCondition{Operator: sql_query.SQLOperatorEqual, Value: each.RoleAttribute}
+		}
+		if each.RoleType != "" {
+			filterPart["role_type"] = sql_query.SQLCondition{Operator: sql_query.SQLOperatorEqual, Value: each.RoleType}
+		}
+		if each.GroupID != nil {
+			filterPart["group_id"] = sql_query.SQLCondition{Operator: sql_query.SQLOperatorEqual, Value: each.GroupID}
+		}
+		orFilter = append(orFilter, filterPart)
+	}
+	if len(orFilter) > 0 {
+		transactionRoleBuilder.WhereOr(orFilter...)
 	}
 
 	queryString, args, _ := transactionRoleBuilder.
