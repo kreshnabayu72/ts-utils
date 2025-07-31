@@ -289,7 +289,7 @@ const (
 	TransactionRoleNameMissing             TransactionRoleName = "Missing"
 )
 
-func GetTransactionRoleName(attr TransactionRoleAttribute) TransactionRoleName {
+func GetTransactionRoleNameFromAttribute(attr TransactionRoleAttribute) TransactionRoleName {
 	switch attr {
 	case TransactionRoleAttributeBorrowing:
 		return TransactionRoleNameBorrowingAssignment
