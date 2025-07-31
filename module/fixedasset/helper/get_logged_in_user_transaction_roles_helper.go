@@ -11,7 +11,7 @@ import (
 
 func GetLoggedInUserTransactionRolesHelper(service service.PostgreSqlService, ctx context.Context, companyCode string, loggedInUserId int, groupId int) (*[]new_model.UserTransactionRole, error) {
 	userTransactionRoles := new([]new_model.UserTransactionRole)
-	if err := sql_builder.FindUserTransactionRoles(userTransactionRoles, ctx, companyCode, loggedInUserId, groupId); err != nil {
+	if err := sql_builder.FindUserTransactionRoles(userTransactionRoles, service, ctx, loggedInUserId, groupId); err != nil {
 		return nil, errors.New("failed to get user transaction roles")
 	}
 

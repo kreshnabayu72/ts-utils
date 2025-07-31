@@ -11,7 +11,7 @@ import (
 
 func GetLoggedInUserSystemRolesHelper(service service.PostgreSqlService, ctx context.Context, companyCode string, loggedInUserId int, groupId ...int) (*[]new_model.UserSystemRole, error) {
 	userSystemRoles := new([]new_model.UserSystemRole)
-	if err := sql_builder.FindUserSystemRoles(userSystemRoles, ctx, companyCode, loggedInUserId, groupId...); err != nil {
+	if err := sql_builder.FindUserSystemRoles(userSystemRoles, service, ctx, loggedInUserId, groupId...); err != nil {
 		return nil, errors.New("failed to get user system roles")
 	}
 
