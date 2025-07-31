@@ -185,12 +185,13 @@ func (s *InsertBuilder) insertSingle(v reflect.Value) SQLInsertChainBuilder {
 			setTag = columnTag
 		}
 
+		columns = append(columns, `"`+setTag+`"`)
+
 		if ArrayIncludes([]string{"updated_at", "created_at"}, setTag) {
 			placeholders = append(placeholders, "NOW()")
 			continue
 		}
 
-		columns = append(columns, `"`+setTag+`"`)
 		args = append(args, val.Interface())
 		placeholders = append(placeholders, fmt.Sprintf("$%d", len(args)))
 	}
