@@ -892,16 +892,16 @@ func FindUserSystemRoles[T any](
 		if each.GroupID != nil {
 			filterPart["group_id"] = sql_query.SQLCondition{Operator: sql_query.SQLOperatorEqual, Value: each.GroupID}
 		}
-		if !each.PermissionCreate {
+		if each.PermissionCreate {
 			filterPart["permission_create"] = sql_query.SQLCondition{Operator: sql_query.SQLOperatorEqual, Value: each.PermissionCreate}
 		}
-		if !each.PermissionView {
+		if each.PermissionView {
 			filterPart["permission_view"] = sql_query.SQLCondition{Operator: sql_query.SQLOperatorEqual, Value: each.PermissionView}
 		}
-		if !each.PermissionUpdate {
+		if each.PermissionUpdate {
 			filterPart["permission_update"] = sql_query.SQLCondition{Operator: sql_query.SQLOperatorEqual, Value: each.PermissionUpdate}
 		}
-		if !each.PermissionDelete {
+		if each.PermissionDelete {
 			filterPart["permission_delete"] = sql_query.SQLCondition{Operator: sql_query.SQLOperatorEqual, Value: each.PermissionDelete}
 		}
 		orFilter = append(orFilter, filterPart)
