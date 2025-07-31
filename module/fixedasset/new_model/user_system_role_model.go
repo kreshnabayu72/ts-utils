@@ -17,6 +17,7 @@ type UserSystemRole struct {
 
 	RoleName      SystemRoleName      `json:"roleName" column:"role_name"`           // Enum: system_role_name_enum
 	RoleAttribute SystemRoleAttribute `json:"roleAttribute" column:"role_attribute"` // Enum: system_role_attribute_enum
+	RoleType      SystemRoleType      `json:"roleType" column:"role_typee"`
 
 	CreatedAt *time.Time `json:"createdAt" column:"created_at"`
 	UpdatedAt *time.Time `json:"updatedAt" column:"updated_at"`

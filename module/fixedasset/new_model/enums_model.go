@@ -144,6 +144,29 @@ const (
 	SystemRoleNameOpenAPI                   SystemRoleName = "Open API"
 )
 
+type SystemRoleType string
+
+const (
+	SystemRoleTypeGroup  SystemRoleType = "Group"
+	SystemRoleTypeGlobal SystemRoleType = "Global"
+)
+
+func GetSystemRoleTypeFromAttribute(attr SystemRoleAttribute) SystemRoleType {
+	switch attr {
+	case
+		SystemRoleAttributeImportData,
+		SystemRoleAttributeAssetAttribute,
+		SystemRoleAttributeAssetPolicies,
+		SystemRoleAttributeDepreciationGroup,
+		SystemRoleAttributeDepreciationMethod,
+		SystemRoleAttributeTagType,
+		SystemRoleAttributeOpenAPI:
+		return SystemRoleTypeGlobal
+	default:
+		return SystemRoleTypeGroup
+	}
+}
+
 type SystemRoleAttribute string
 
 const (
