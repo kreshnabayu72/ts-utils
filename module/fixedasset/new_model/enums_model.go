@@ -165,6 +165,25 @@ const (
 	SystemRoleAttributeOpenAPI            SystemRoleAttribute = "openAPI"
 )
 
+var SystemRoleAttributeArray = []string{
+	string(SystemRoleAttributeImportData),
+	string(SystemRoleAttributeAssetAttribute),
+	string(SystemRoleAttributeAssetPolicies),
+	string(SystemRoleAttributeDepreciationGroup),
+	string(SystemRoleAttributeDepreciationMethod),
+	string(SystemRoleAttributeDocumentDeletion),
+	string(SystemRoleAttributeGroup),
+	string(SystemRoleAttributeUserAndRole),
+	string(SystemRoleAttributeIoTReader),
+	string(SystemRoleAttributeLicense),
+	string(SystemRoleAttributePurchaseDocument),
+	string(SystemRoleAttributePurchaseInfo),
+	string(SystemRoleAttributeTag),
+	string(SystemRoleAttributeRegisterAsset),
+	string(SystemRoleAttributeTagType),
+	string(SystemRoleAttributeOpenAPI),
+}
+
 type TransactionRoleAttribute string
 
 const (
