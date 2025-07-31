@@ -17,6 +17,13 @@ func ValidateJWT() fiber.Handler {
 		var jwtKey = []byte(os.Getenv("JWT_KEY"))
 		tokenStr := ctx.Get("Authorization", "NOT_FOUND")
 		if tokenStr == "NOT_FOUND" {
+			fmt.Println("1. Method:", ctx.Method())
+			fmt.Println("Path:", ctx.Path())
+
+			if route := ctx.Route(); route != nil {
+				fmt.Printf("Matched route: [%s] %s\n", route.Method, route.Path)
+			}
+
 			return response.SendResponse(ctx, fiber.StatusBadRequest, nil, "Unauthorized")
 		}
 
@@ -33,6 +40,12 @@ func ValidateJWT() fiber.Handler {
 		})
 
 		if err != nil {
+			fmt.Println("2. Method:", ctx.Method())
+			fmt.Println("Path:", ctx.Path())
+
+			if route := ctx.Route(); route != nil {
+				fmt.Printf("Matched route: [%s] %s\n", route.Method, route.Path)
+			}
 			return response.SendResponse(ctx, fiber.StatusBadRequest, nil, "Unauthorized")
 		}
 
@@ -52,6 +65,12 @@ func ValidateJWT() fiber.Handler {
 			ctx.Locals(Company, company)
 
 		} else {
+			fmt.Println("3. Method:", ctx.Method())
+			fmt.Println("Path:", ctx.Path())
+
+			if route := ctx.Route(); route != nil {
+				fmt.Printf("Matched route: [%s] %s\n", route.Method, route.Path)
+			}
 			return response.SendResponse(ctx, fiber.StatusBadRequest, nil, "Unauthorized")
 		}
 
@@ -67,6 +86,7 @@ func ValidateReaderJWT() fiber.Handler {
 		var jwtKey = []byte(os.Getenv("JWT_KEY"))
 		tokenStr := ctx.Get("Authorization", "NOT_FOUND")
 		if tokenStr == "NOT_FOUND" {
+
 			return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
 		}
 
