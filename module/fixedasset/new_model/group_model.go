@@ -8,7 +8,7 @@ type Group struct {
 	Code *string `json:"code" column:"code"`
 	Key  int     `json:"key"  column:"key"`
 
-	Level *int `json:"level" column:"level"`
+	Level int `json:"level" column:"level"`
 
 	IsDisposable        bool `json:"isDisposable" column:"is_disposable"`
 	ParentID            int  `json:"parentId" column:"parent_id"`
