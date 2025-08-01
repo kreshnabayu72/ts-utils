@@ -18,7 +18,10 @@ func ScanRowObject(v any, row pgx.Rows) error {
 
 	// Advance to first row
 	if !row.Next() {
-		return fmt.Errorf("no rows found")
+		if row.Err() != nil {
+			return row.Err()
+		}
+		return pgx.ErrNoRows
 	}
 
 	fieldDescs := row.FieldDescriptions()
