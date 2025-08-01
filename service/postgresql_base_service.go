@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log"
 	"reflect"
 
@@ -583,30 +582,32 @@ func (s *BasePostgreSqlService) DeleteManyWithFilter(ctx context.Context, filter
 // If fn returns an error, the transaction is rolled back.
 // If fn succeeds, the transaction is committed.
 // The returned value is whatever fn returns, or an error if commit/rollback fails.
-func UseTransactions(ctx context.Context, pool PgxPoolInterface, fn func(tx pgx.Tx) (any, error)) (any, error) {
+func UseTransactions(ctx context.Context, pool PgxPoolInterface, fn func(tx pgx.Tx) (any, error)) (result any, err error) {
 	tx, err := pool.Begin(ctx)
 	if err != nil {
-		return nil, errors.New("Can't start transactions: " + err.Error())
+		log.Printf("can't start transactions: %v", err)
+		return nil, errors.New("something went wrong")
 	}
 
 	defer func() {
 		if r := recover(); r != nil {
 			log.Printf("transaction panicked: %v", r)
 			tx.Rollback(ctx)
-			err = fmt.Errorf("transaction panicked: %v", r)
+			err = errors.New("something went wrong")
+			result = nil
 		} else {
 			tx.Rollback(ctx)
 		}
 	}()
 
-	result, err := fn(tx)
+	result, err = fn(tx)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := tx.Commit(ctx); err != nil {
-		log.Printf("failed to commit: %v", err)
-		return nil, err
+	if commitErr := tx.Commit(ctx); commitErr != nil {
+		log.Printf("failed to commit: %v", commitErr)
+		return nil, errors.New("something went wrong")
 	}
 
 	return result, nil
