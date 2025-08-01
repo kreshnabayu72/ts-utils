@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"sync"
 
 	"github.com/bwmarrin/snowflake"
@@ -47,7 +48,14 @@ func ConnectPostgres(dbName DBName) *pgxpool.Pool {
 		postgresHost = "localhost:5432"
 	}
 
-	postgresUri := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=%s", postgresUsername, postgresPassword, postgresHost, dbName, postgresSslMode)
+	postgresUri := fmt.Sprintf(
+		"postgres://%s:%s@%s/%s?sslmode=%s",
+		postgresUsername,
+		postgresPassword,
+		postgresHost,
+		dbName,
+		postgresSslMode,
+	)
 
 	config, err := pgxpool.ParseConfig(postgresUri)
 	if err != nil {
@@ -61,7 +69,19 @@ func ConnectPostgres(dbName DBName) *pgxpool.Pool {
 
 	err = pool.Ping(context.Background())
 	if err != nil {
-		log.Fatalf("Unable to ping PostgreSQL: %v", err)
+		notExisingDB := fmt.Sprintf("database \"%s\" does not exist", dbName)
+		if strings.Contains(err.Error(), notExisingDB) {
+			MigrateDB(
+				dbName,
+				postgresHost,
+				postgresUsername,
+				postgresPassword,
+				postgresSslMode,
+			)
+		} else {
+			log.Fatalf("Unable to ping PostgreSQL: %v", err)
+		}
+
 	}
 
 	fmt.Println("PostgreSQL pool initialized!")

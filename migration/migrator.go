@@ -29,6 +29,35 @@ func MakeMigrator(host, username, password, sslMode string) *Migrator {
 	}
 }
 
+func (m *Migrator) IsDBExist(dbName string) bool {
+	postgresUri := fmt.Sprintf(
+		"postgres://%s:%s@%s/%s?sslmode=%s",
+		m.Username,
+		m.Password,
+		m.Host,
+		dbName,
+		m.SSLMode,
+	)
+
+	config, err := pgxpool.ParseConfig(postgresUri)
+	if err != nil {
+		return false
+	}
+
+	pool, err := pgxpool.NewWithConfig(context.Background(), config)
+	if err != nil {
+		return false
+	}
+	defer pool.Close()
+
+	err = pool.Ping(context.Background())
+	if err != nil {
+		return false
+	}
+
+	return true
+}
+
 func (m *Migrator) MigrateDB(dbName string) error {
 	defaultDB := "postgres"
 	postgresUri := fmt.Sprintf(
