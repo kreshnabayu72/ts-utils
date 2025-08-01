@@ -32,7 +32,11 @@ func InitSnowflake() {
 // ConnectPostgres initializes the PostgreSQL connection pool once
 func ConnectPostgres(dbName DBName) *pgxpool.Pool {
 	if pools[string(dbName)] != nil {
-		return pools[string(dbName)]
+		pool := pools[string(dbName)]
+		err := pool.Ping(context.Background())
+		if err == nil {
+			return pool
+		}
 	}
 
 	postgresHost := os.Getenv("POSTGRES_HOST")
