@@ -12,6 +12,7 @@ type TransactionLog struct {
 	Transaction               primitive.ObjectID     `json:"transaction" bson:"transaction"`
 	AssetName                 string                 `json:"assetName" bson:"assetName"`
 	AssetId                   primitive.ObjectID     `json:"assetId" bson:"assetId"`
+	AssetAliasCode            *string                `json:"assetAliasCode" bson:"assetAliasCode"`
 	AssetNameWithSequence     string                 `json:"assetNameWithSequence" bson:"assetNameWithSequence"`
 	Action                    string                 `json:"action" bson:"action"`
 	UserId                    *primitive.ObjectID    `json:"userId" bson:"userId"`
