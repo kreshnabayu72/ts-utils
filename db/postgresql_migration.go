@@ -1,6 +1,7 @@
 package db
 
 import (
+	"log"
 	"strings"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/migration"
@@ -14,22 +15,27 @@ func MigrateDB(dbName DBName, host, username, password, sslModel string) error {
 
 	migrator := migration.MakeMigrator(host, username, password, sslModel)
 	if strDBName == string(RootDBName) {
+		log.Println("Migrating Root DB")
 		return migrateRootDB(strDBName, migrator)
 	}
 
 	if strDBName == string(AdminDBName) {
+		log.Println("Migrating Admin DB")
 		return migrateAdminDB(strDBName, migrator)
 	}
 
 	if strings.Contains(strDBName, string(GlobalDBName)) {
+		log.Println("Migrating Global DB")
 		return migrateGlobalDB(strDBName, migrator)
 	}
 
 	if strings.Contains(strDBName, string(FixedAssetDBName)) {
+		log.Println("Migrating Fixed Asset DB")
 		return migrateFixedAssetDB(strDBName)
 	}
 
 	if strings.Contains(strDBName, string(SupplyAssetDBName)) {
+		log.Println("Migrating Supply Asset DB")
 		return migrateSupplyAssetDB(strDBName)
 	}
 
