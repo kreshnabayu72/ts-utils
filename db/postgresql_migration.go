@@ -156,6 +156,21 @@ func migrateFixedAssetDB(dbName string, migrator *migration.Migrator) error {
 		&fixedasset_model.MissingReport{},
 		&fixedasset_model.ReplaceTagPrelist{},
 		&fixedasset_model.UserSystemRole{},
+		&fixedasset_model.AssignmentApproval{},
+		&fixedasset_model.AssignmentPrelist{},
+		&fixedasset_model.AssignmentPrelistRequest{},
+		&fixedasset_model.AssignmentRequest{},
+		&fixedasset_model.AssignmentTransaction{},
+		&fixedasset_model.DisposalApproval{},
+		&fixedasset_model.DisposalPrelist{},
+		&fixedasset_model.DisposalPrelistRequest{},
+		&fixedasset_model.DisposalRequest{},
+		&fixedasset_model.DisposalTransaction{},
+		&fixedasset_model.TransferApproval{},
+		&fixedasset_model.TransferPrelist{},
+		&fixedasset_model.TransferPrelistRequest{},
+		&fixedasset_model.TransferRequest{},
+		&fixedasset_model.TransferTransaction{},
 	}
 
 	isDBExist := migrator.IsDBExist(dbName)
@@ -181,6 +196,12 @@ func migrateFixedAssetDB(dbName string, migrator *migration.Migrator) error {
 	}
 
 	err = migrator.MigrateModels(dbName, models...)
+
+	viewQueryPath := filepath.Join(baseDir, "migration/fixed_asset_view.sql")
+	err = migrator.ExecFile(dbName, viewQueryPath)
+	if err != nil {
+		return err
+	}
 
 	return err
 }
