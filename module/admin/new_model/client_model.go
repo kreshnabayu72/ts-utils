@@ -9,6 +9,7 @@ import (
 )
 
 type Client struct {
+	ID int `json:"id" column:"id" sql:"BIGINT PRIMARY KEY"`
 	// ─────── Company Information ───────
 	Name               string        `json:"name" column:"name" sql:"BIGINT PRIMARY KEY"`
 	ClientID           string        `json:"clientId"  column:"client_id" sql:"VARCHAR NOT NULL"`
