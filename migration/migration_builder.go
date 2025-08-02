@@ -41,7 +41,7 @@ func (b *MigrationBuilder) AddColumn(dest any) {
 		tag := field.Tag.Get("sql")
 		columnName := field.Tag.Get("column")
 		if tag != "" {
-			query := columnName + " " + tag
+			query := fmt.Sprintf("\"%s\"", columnName) + " " + tag
 			b.columns = append(b.columns, query)
 		}
 	}
