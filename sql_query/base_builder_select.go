@@ -3,6 +3,7 @@ package sql_query
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -513,63 +514,116 @@ func NewSQLCountBuilder(tableName string) SQLSelectChainBuilder {
 }
 
 func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
-	if len(s.HavingClauses) > 0 && len(s.Grouping) < 1 {
+	if len(s.HavingClauses) > 0 && len(s.Grouping) == 0 {
 		return "", nil, errors.New("HAVING clauses only allowed if GROUP BY clause is exists")
 	}
 
 	if len(s.Columns) == 0 {
-		s.Columns = append(s.Columns, "*")
+		s.Columns = []string{"*"}
 	}
 
-	var dataQuery []string
-	var countQuery []string
+	var sb strings.Builder
+	var countQuery string
+	sb.Grow(256) // preallocate ~256 bytes
 
+	// WITH
 	if len(s.WithClauses) > 0 {
-		dataQuery = append(dataQuery, fmt.Sprintf("WITH %s", strings.Join(s.WithClauses, ", "))+"\n")
-		countQuery = append(countQuery, fmt.Sprintf("WITH %s", strings.Join(s.WithClauses, ", "))+"\n")
+		sb.WriteByte('\n')
+		sb.WriteString("WITH ")
+		for i, c := range s.WithClauses {
+			if i > 0 {
+				sb.WriteString(", ")
+			}
+			sb.WriteString(c)
+		}
 	}
 
-	dataQuery = append(dataQuery, fmt.Sprintf("SELECT %s FROM %s", strings.Join(s.Columns, ","), s.Table))
-	countQuery = dataQuery
+	// SELECT
+	sb.WriteByte('\n')
+	sb.WriteString("SELECT ")
+	for i, col := range s.Columns {
+		if i > 0 {
+			sb.WriteByte(',')
+		}
+		sb.WriteString(col)
+	}
+	sb.WriteByte('\n')
+	sb.WriteString("FROM ")
+	sb.WriteString(s.Table)
+	sb.WriteByte('\n')
 
+	// JOIN
 	if len(s.OtherTables) > 0 {
-		joinClause := strings.Join(s.OtherTables, " ")
-		dataQuery = append(dataQuery, joinClause)
-		countQuery = append(countQuery, joinClause)
+		for _, j := range s.OtherTables {
+			sb.WriteString(j)
+			sb.WriteByte('\n')
+		}
 	}
 
+	// WHERE
 	if len(s.Filters) > 0 {
-		whereClause := fmt.Sprintf("WHERE %s", strings.Join(s.Filters, " AND "))
-		dataQuery = append(dataQuery, whereClause)
-		countQuery = append(countQuery, whereClause)
+		sb.WriteString("WHERE ")
+		for i, f := range s.Filters {
+			if i > 0 {
+				sb.WriteString(" AND ")
+			}
+			sb.WriteString(f)
+		}
+		sb.WriteByte('\n')
 	}
 
+	// GROUP BY
 	if len(s.Grouping) > 0 {
-		dataQuery = append(dataQuery, fmt.Sprintf("GROUP BY %s", strings.Join(s.Grouping, ", ")))
-		countQuery = append(countQuery, fmt.Sprintf("GROUP BY %s", strings.Join(s.Grouping, ", ")))
+		sb.WriteString("GROUP BY ")
+		for i, g := range s.Grouping {
+			if i > 0 {
+				sb.WriteString(", ")
+			}
+			sb.WriteString(g)
+		}
+		sb.WriteByte('\n')
 	}
 
+	// HAVING
 	if len(s.HavingClauses) > 0 {
-		dataQuery = append(dataQuery, fmt.Sprintf("HAVING %s", strings.Join(s.HavingClauses, " AND ")))
-		countQuery = append(countQuery, fmt.Sprintf("HAVING %s", strings.Join(s.HavingClauses, " AND ")))
+		sb.WriteString("HAVING ")
+		for i, h := range s.HavingClauses {
+			if i > 0 {
+				sb.WriteString(" AND ")
+			}
+			sb.WriteString(h)
+		}
+		sb.WriteByte('\n')
 	}
 
+	countQuery = sb.String()
+
+	// ORDER BY
 	if len(s.SortBy) > 0 {
-		sortingClause := fmt.Sprintf("ORDER BY %s", strings.Join(s.SortBy, ", "))
-		dataQuery = append(dataQuery, sortingClause)
+		sb.WriteString("ORDER BY ")
+		for i, srt := range s.SortBy {
+			if i > 0 {
+				sb.WriteString(", ")
+			}
+			sb.WriteString(srt)
+		}
+		sb.WriteByte('\n')
 	}
 
+	// LIMIT/OFFSET
 	if s.UsePagination {
 		if s.Limit > 0 {
-			dataQuery = append(dataQuery, fmt.Sprintf("LIMIT %d", s.Limit))
+			sb.WriteString("LIMIT ")
+			sb.WriteString(strconv.Itoa(s.Limit))
 		}
-		dataQuery = append(dataQuery, fmt.Sprintf("OFFSET %d", s.Offset))
+		sb.WriteString("OFFSET ")
+		sb.WriteString(strconv.Itoa(s.Offset))
+		sb.WriteByte('\n')
 
-		return PaginationQuery(strings.Join(dataQuery, " "), strings.Join(countQuery, " ")), s.Args, nil
+		return PaginationQuery(sb.String(), countQuery), s.Args, nil
 	}
 
-	result := strings.Join(dataQuery, " ")
-	return result, s.Args, nil
+	return sb.String(), s.Args, nil
 }
 
 // Internal Utils for builder select
