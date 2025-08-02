@@ -53,11 +53,11 @@ type Client struct {
 	PendingDepreciationMethod *CompanyDepreciationMethod `json:"pendingDepreciationMethod" column:"pending_depreciation_method" sql:"depreciation_method_enum NULL"`
 
 	// ─────── Add On Status ───────
-	AddOnRepairTicketing bool `json:"addOnRepairTicketing" column:"add_on_repair_ticketing" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
-	AddOnMaintenance     bool `json:"addOnMaintenance" column:"add_on_maintenance" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
-	AddOnTracking        bool `json:"addOnTracking" column:"add_on_tracking" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
-	AddOnAssetControl    bool `json:"addOnAssetControl" column:"add_on_asset_control" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
-	AddOnAudit           bool `json:"addOnAudit" column:"add_on_audit" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
+	AddOnRepairTicketing bool `json:"addOnRepairTicketing" column:"addon_repair_ticketing" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
+	AddOnMaintenance     bool `json:"addOnMaintenance" column:"addon_maintenance" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
+	AddOnTracking        bool `json:"addOnTracking" column:"addon_tracking" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
+	AddOnAssetControl    bool `json:"addOnAssetControl" column:"addon_asset_control" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
+	AddOnAudit           bool `json:"addOnAudit" column:"addon_audit" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
 
 	// ─────── Transaction Settings ───────
 	AuditAttrsMaxGracePeriod           int `json:"auditAttrsMaxGracePeriod" column:"audit_attrs_max_grace_period" sql:"INTEGER"`
