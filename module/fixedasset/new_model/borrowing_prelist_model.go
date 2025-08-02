@@ -1,11 +1,39 @@
 package new_model
 
-import "time"
+import (
+	"time"
+
+	"gitea.qwertysystem.net/BETS/ts-utils/migration"
+)
 
 type BorrowingPrelist struct {
-	ID         int       `json:"id" column:"id"`
-	GroupId    int       `json:"groupId" column:"group_id"`
-	BorrowerId int       `json:"borrowerId" column:"borrower_id"`
-	CreatedAt  time.Time `json:"createdAt" column:"created_at"`
-	UpdatedAt  time.Time `json:"updatedAt" column:"updated_at"`
+	ID         int       `json:"id" column:"id" sql:"BIGINT PRIMARY KEY"`
+	GroupId    int       `json:"groupId" column:"group_id" sql:"BIGINT"`
+	BorrowerId int       `json:"borrowerId" column:"borrower_id" sql:"BIGINT"`
+	CreatedAt  time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	UpdatedAt  time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+}
+
+func (BorrowingPrelist) TableName() string {
+	return "borrowing_prelists"
+}
+
+func (BorrowingPrelist) Up(builder *migration.MigrationBuilder) {
+	builder.AddColumn(BorrowingPrelist{})
+
+	builder.AddForeignKey(
+		"fk_borrowing_prelists_group",
+		"group_id",
+		"groups",
+		"id",
+		"",
+	)
+
+	builder.AddForeignKey(
+		"fk_borrowing_prelists_borrower",
+		"borrower_id",
+		"users",
+		"id",
+		"",
+	)
 }
