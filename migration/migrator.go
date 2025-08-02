@@ -97,6 +97,13 @@ func (m *Migrator) migrateModel(
 ) error {
 	// Ensure reference table exists
 	for _, fk := range builderToMigrate.ForeignKeys {
+		// Skip if the foreign key references the same table
+		// This avoids circular dependencies in migrations
+		// and ensures we only migrate tables that are not already migrated.
+		if fk.RefTable == builderToMigrate.TableName {
+			continue
+		}
+
 		foundBuilder := MigrationBuilder{}
 		for _, b := range allBuilders {
 			if b.TableName == fk.RefTable {
