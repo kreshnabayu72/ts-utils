@@ -152,7 +152,7 @@ func (m *Client) Up(builder *migration.MigrationBuilder) {
 	builder.AddIndex("clients_client_id_uindex", "client_id", true, "")
 
 	// ─────── Additional Queries ───────
-	postQuery, err := os.ReadFile("module/admin/new_model/client_post_query.sql")
+	postQuery, err := os.ReadFile("module/admin/migration/client_post_query.sql")
 	log.Fatal(err)
 	builder.SetPostQuery(string(postQuery))
 }
