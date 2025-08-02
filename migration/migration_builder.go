@@ -23,9 +23,10 @@ type MigrationBuilder struct {
 	PreQuery  string
 	PostQuery string
 
-	columns     []string
-	index       []string
-	enums       []enum
+	columns []string
+	index   []string
+	enums   []enum
+
 	ForeignKeys []foreignKey
 }
 

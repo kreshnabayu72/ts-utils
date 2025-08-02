@@ -1,17 +1,59 @@
 package new_model
 
-import "time"
+import (
+	"log"
+	"os"
+	"path/filepath"
+	"runtime"
+	"time"
+
+	"gitea.qwertysystem.net/BETS/ts-utils/migration"
+)
 
 type BorrowingApproval struct {
-	ID         int            `json:"id" column:"id"`
-	RequestID  int            `json:"requestId" column:"request_id"`
-	ApproverID int            `json:"approverId" column:"approver_id"`
-	Level      int            `json:"level" column:"level"`
-	Status     ApprovalStatus `json:"status" column:"status"`
-	IsApproved *bool          `json:"isApproved" column:"is_approved"`
-	Notes      *string        `json:"notes" column:"notes"`
-	Type       ApprovalType   `json:"type" column:"type"`
-	ApprovedAt *time.Time     `json:"approvedAt" column:"approved_at"`
-	CreatedAt  time.Time      `json:"createdAt" column:"created_at"`
-	UpdatedAt  time.Time      `json:"updatedAt" column:"updated_at"`
+	ID         int            `json:"id" column:"id" sql:"BIGINT PRIMARY KEY"`
+	RequestID  int            `json:"requestId" column:"request_id" sql:"BIGINT"`
+	ApproverID int            `json:"approverId" column:"approver_id" sql:"BIGINT"`
+	Level      int            `json:"level" column:"level" sql:"INTEGER"`
+	Status     ApprovalStatus `json:"status" column:"status" sql:"approval_status_enum"`
+	IsApproved *bool          `json:"isApproved" column:"is_approved" sql:"BOOLEAN NULL DEFAULT NULL"`
+	Notes      *string        `json:"notes" column:"notes" sql:"VARCHAR"`
+	Type       ApprovalType   `json:"type" column:"type" sql:"approval_type_enum NOT NULL"`
+	ApprovedAt *time.Time     `json:"approvedAt" column:"approved_at" sql:"TIMESTAMP NULL DEFAULT NULL"`
+	CreatedAt  time.Time      `json:"createdAt" column:"created_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	UpdatedAt  time.Time      `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+}
+
+func (BorrowingApproval) TableName() string {
+	return "borrowing_approvals"
+}
+
+func (BorrowingApproval) Up(builder *migration.MigrationBuilder) {
+	builder.AddColumn(BorrowingApproval{})
+
+	builder.AddForeignKey(
+		"fk_borrowing_approvals_request",
+		"request_id",
+		"borrowing_requests",
+		"id",
+		"",
+	)
+
+	builder.AddForeignKey(
+		"fk_borrowing_approvals_approver",
+		"approver_id",
+		"users",
+		"id",
+		"",
+	)
+
+	_, filename, _, _ := runtime.Caller(0)
+	baseDir := filepath.Dir(filename)
+	postQuery, err := os.ReadFile(
+		filepath.Join(baseDir, "..", "migration/borrowing_approval_post_query.sql"),
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	builder.SetPostQuery(string(postQuery))
 }
