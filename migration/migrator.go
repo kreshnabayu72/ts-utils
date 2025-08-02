@@ -124,11 +124,10 @@ func (m *Migrator) migrateModel(
 		if foundBuilder.TableName != "" {
 			isTableExist := m.isTableExist(pool, foundBuilder.TableName)
 			if !isTableExist {
-				if builderToMigrate.TableName == "iot_antenna" ||
-					builderToMigrate.TableName == "iot_reader_ports" {
-					log.Printf("Migrating %s", foundBuilder.TableName)
+				err := m.migrateModel(pool, allBuilders, foundBuilder)
+				if err != nil {
+					return err
 				}
-				m.migrateModel(pool, allBuilders, foundBuilder)
 			}
 		}
 	}
