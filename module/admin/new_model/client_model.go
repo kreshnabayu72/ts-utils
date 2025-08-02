@@ -159,6 +159,8 @@ func (m *Client) Up(builder *migration.MigrationBuilder) {
 	postQuery, err := os.ReadFile(
 		filepath.Join(baseDir, "..", "migration/client_post_query.sql"),
 	)
-	log.Fatal(err)
+	if err != nil {
+		log.Fatal(err)
+	}
 	builder.SetPostQuery(string(postQuery))
 }
