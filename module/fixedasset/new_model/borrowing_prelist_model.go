@@ -14,12 +14,12 @@ type BorrowingPrelist struct {
 	UpdatedAt  time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
 }
 
-func (BorrowingPrelist) TableName() string {
+func (m *BorrowingPrelist) TableName() string {
 	return "borrowing_prelists"
 }
 
-func (BorrowingPrelist) Up(builder *migration.MigrationBuilder) {
-	builder.AddColumn(BorrowingPrelist{})
+func (m *BorrowingPrelist) Up(builder *migration.MigrationBuilder) {
+	builder.AddColumn(m)
 
 	builder.AddForeignKey(
 		"fk_borrowing_prelists_group",
