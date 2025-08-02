@@ -95,6 +95,14 @@ func (m *Migrator) migrateModel(
 	allBuilders []MigrationBuilder,
 	builderToMigrate MigrationBuilder,
 ) error {
+	// Exectute pre query
+	if builderToMigrate.PreQuery != "" {
+		_, err := pool.Exec(context.Background(), builderToMigrate.PreQuery)
+		if err != nil {
+			return fmt.Errorf("failed to execute pre query: %w", err)
+		}
+	}
+
 	// Ensure reference table exists
 	for _, fk := range builderToMigrate.ForeignKeys {
 		// Skip if the foreign key references the same table
@@ -125,6 +133,14 @@ func (m *Migrator) migrateModel(
 			builderToMigrate.TableName,
 			err,
 		)
+	}
+
+	// Execute post query
+	if builderToMigrate.PostQuery != "" {
+		_, err := pool.Exec(context.Background(), builderToMigrate.PostQuery)
+		if err != nil {
+			return fmt.Errorf("failed to execute post query: %w", err)
+		}
 	}
 
 	return nil

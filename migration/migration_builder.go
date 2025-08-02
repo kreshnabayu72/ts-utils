@@ -20,6 +20,8 @@ type foreignKey struct {
 
 type MigrationBuilder struct {
 	TableName string
+	PreQuery  string
+	PostQuery string
 
 	columns     []string
 	index       []string
@@ -130,6 +132,14 @@ func (b *MigrationBuilder) buildForeignKeyQuery() string {
 	}
 
 	return query
+}
+
+func (b *MigrationBuilder) SetPreQuery(query string) {
+	b.PreQuery = query
+}
+
+func (b *MigrationBuilder) SetPostQuery(query string) {
+	b.PostQuery = query
 }
 
 func (b *MigrationBuilder) Build() string {

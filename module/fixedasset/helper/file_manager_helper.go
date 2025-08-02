@@ -6,6 +6,7 @@ import (
 	"gitea.qwertysystem.net/BETS/ts-utils/db"
 	utildb "gitea.qwertysystem.net/BETS/ts-utils/db"
 	"gitea.qwertysystem.net/BETS/ts-utils/entity"
+	admin_model "gitea.qwertysystem.net/BETS/ts-utils/module/admin/new_model"
 	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
 	utilprovider "gitea.qwertysystem.net/BETS/ts-utils/provider"
 	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
@@ -52,7 +53,7 @@ func (f *FileManagerHelperImpl) CreateFileManagerSQL(
 		SetLimit(1).
 		Build()
 
-	var client new_model.Company
+	var client admin_model.Client
 	err := clientService.SelectOne(&client, context.Background(), queryStr, args...)
 	if err != nil {
 		return &entity.HttpError{Message: "Company not found"}
@@ -170,7 +171,7 @@ func (f *FileManagerHelperImpl) DeleteFileManagerSQL(
 		SetLimit(1).
 		Build()
 
-	var client new_model.Company
+	var client admin_model.Client
 	err = clientService.SelectOne(&client, context.Background(), queryStr, args...)
 	if err != nil {
 		return &entity.HttpError{}
