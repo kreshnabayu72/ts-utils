@@ -82,7 +82,9 @@ func ConnectPostgres(dbName DBName) *pgxpool.Pool {
 				postgresPassword,
 				postgresSslMode,
 			)
-			log.Fatal(err)
+			if err != nil {
+				log.Fatal(err)
+			}
 		} else {
 			log.Fatalf("Unable to ping PostgreSQL: %v", err)
 		}
