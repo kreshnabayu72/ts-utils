@@ -121,13 +121,13 @@ func (m *Migrator) migrateModel(
 			}
 		}
 
-		if builderToMigrate.TableName == "iot_antenna" ||
-			builderToMigrate.TableName == "iot_reader_ports" {
-			log.Printf("Migrating %s", foundBuilder.TableName)
-		}
 		if foundBuilder.TableName != "" {
 			isTableExist := m.isTableExist(pool, foundBuilder.TableName)
 			if !isTableExist {
+				if builderToMigrate.TableName == "iot_antenna" ||
+					builderToMigrate.TableName == "iot_reader_ports" {
+					log.Printf("Migrating %s", foundBuilder.TableName)
+				}
 				m.migrateModel(pool, allBuilders, foundBuilder)
 			}
 		}
