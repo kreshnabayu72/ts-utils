@@ -153,7 +153,13 @@ func MakeAMQPService(
 
 	err := amqpServiceImpl.Connect()
 	if err != nil {
-		logOnError(err, fmt.Sprintf("Could not connect to RabbitMQ after %d attempts", amqpServiceImpl.ReconnectAttempts))
+		logOnError(
+			err,
+			fmt.Sprintf(
+				"Could not connect to RabbitMQ after %d attempts",
+				amqpServiceImpl.ReconnectAttempts,
+			),
+		)
 	}
 
 	if keepAlive {
@@ -173,10 +179,10 @@ func (s *AMQPServiceImpl) Publish(
 	pub PublishArgs,
 ) error {
 	ch, err := s.Connection.Channel()
-	defer ch.Close()
 	if err != nil {
 		return err
 	}
+	defer ch.Close()
 
 	if err = ch.ExchangeDeclare(
 		exchange.name,
@@ -397,7 +403,15 @@ func (s *AMQPServiceImpl) Connect() error {
 			},
 		})
 		if err != nil {
-			logOnError(err, fmt.Sprintf("Failed to connect to RabbitMQ. Retrying in %v... (%d/%d)", s.ReconnectDelay, i+1, s.ReconnectAttempts))
+			logOnError(
+				err,
+				fmt.Sprintf(
+					"Failed to connect to RabbitMQ. Retrying in %v... (%d/%d)",
+					s.ReconnectDelay,
+					i+1,
+					s.ReconnectAttempts,
+				),
+			)
 			time.Sleep(s.ReconnectDelay)
 			continue
 		}
@@ -406,7 +420,10 @@ func (s *AMQPServiceImpl) Connect() error {
 		return nil
 	}
 
-	logOnError(err, fmt.Sprintf("Could not connect to RabbitMQ after %d attempts", s.ReconnectAttempts))
+	logOnError(
+		err,
+		fmt.Sprintf("Could not connect to RabbitMQ after %d attempts", s.ReconnectAttempts),
+	)
 
 	return err
 }
@@ -435,7 +452,11 @@ func (s *AMQPServiceImpl) keepAlive() {
 					s.Resubscribe()
 					break
 				}
-				log.Printf("Reconnection failed: %v. Retrying in %v...", reconnectErr, s.ReconnectDelay)
+				log.Printf(
+					"Reconnection failed: %v. Retrying in %v...",
+					reconnectErr,
+					s.ReconnectDelay,
+				)
 				time.Sleep(s.ReconnectDelay)
 			}
 		}

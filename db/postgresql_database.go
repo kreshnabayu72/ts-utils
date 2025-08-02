@@ -75,13 +75,16 @@ func ConnectPostgres(dbName DBName) *pgxpool.Pool {
 	if err != nil {
 		notExisingDB := fmt.Sprintf("database \"%s\" does not exist", dbName)
 		if strings.Contains(err.Error(), notExisingDB) {
-			MigrateDB(
+			err := MigrateDB(
 				dbName,
 				postgresHost,
 				postgresUsername,
 				postgresPassword,
 				postgresSslMode,
 			)
+			if err != nil {
+				log.Fatal(err)
+			}
 		} else {
 			log.Fatalf("Unable to ping PostgreSQL: %v", err)
 		}

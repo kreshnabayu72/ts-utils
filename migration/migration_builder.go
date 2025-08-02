@@ -20,10 +20,13 @@ type foreignKey struct {
 
 type MigrationBuilder struct {
 	TableName string
+	PreQuery  string
+	PostQuery string
 
-	columns     []string
-	index       []string
-	enums       []enum
+	columns []string
+	index   []string
+	enums   []enum
+
 	ForeignKeys []foreignKey
 }
 
@@ -39,7 +42,7 @@ func (b *MigrationBuilder) AddColumn(dest any) {
 		tag := field.Tag.Get("sql")
 		columnName := field.Tag.Get("column")
 		if tag != "" {
-			query := columnName + " " + tag
+			query := fmt.Sprintf("\"%s\"", columnName) + " " + tag
 			b.columns = append(b.columns, query)
 		}
 	}
@@ -50,10 +53,12 @@ func (b *MigrationBuilder) AddIndex(indexName, column string, unique bool, where
 	if unique {
 		indexQuery += "UNIQUE "
 	}
-	indexQuery += "INDEX IF NOT EXISTS " + indexName + " ON " + b.TableName + " (" + column + ");"
+	indexQuery += "INDEX IF NOT EXISTS " + indexName + " ON " + b.TableName + " (" + column + ")"
 	if where != "" {
 		indexQuery += " WHERE " + where
 	}
+	indexQuery += ";"
+
 	b.index = append(b.index, indexQuery)
 }
 
@@ -130,6 +135,14 @@ func (b *MigrationBuilder) buildForeignKeyQuery() string {
 	}
 
 	return query
+}
+
+func (b *MigrationBuilder) SetPreQuery(query string) {
+	b.PreQuery = query
+}
+
+func (b *MigrationBuilder) SetPostQuery(query string) {
+	b.PostQuery = query
 }
 
 func (b *MigrationBuilder) Build() string {

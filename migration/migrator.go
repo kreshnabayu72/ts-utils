@@ -3,6 +3,7 @@ package migration
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -81,7 +82,7 @@ func (m *Migrator) MigrateDB(dbName string) error {
 	defer pool.Close()
 
 	// Create the database if it does not exist
-	createDBQuery := fmt.Sprintf("CREATE DATABASE %s", dbName)
+	createDBQuery := fmt.Sprintf("CREATE DATABASE \"%s\"", dbName)
 	_, err = pool.Exec(context.Background(), createDBQuery)
 	if err != nil {
 		return fmt.Errorf("failed to create database %s: %w", dbName, err)
@@ -95,8 +96,23 @@ func (m *Migrator) migrateModel(
 	allBuilders []MigrationBuilder,
 	builderToMigrate MigrationBuilder,
 ) error {
+	// Exectute pre query
+	if builderToMigrate.PreQuery != "" {
+		_, err := pool.Exec(context.Background(), builderToMigrate.PreQuery)
+		if err != nil {
+			return fmt.Errorf("failed to execute pre query: %w", err)
+		}
+	}
+
 	// Ensure reference table exists
 	for _, fk := range builderToMigrate.ForeignKeys {
+		// Skip if the foreign key references the same table
+		// This avoids circular dependencies in migrations
+		// and ensures we only migrate tables that are not already migrated.
+		if fk.RefTable == builderToMigrate.TableName {
+			continue
+		}
+
 		foundBuilder := MigrationBuilder{}
 		for _, b := range allBuilders {
 			if b.TableName == fk.RefTable {
@@ -106,7 +122,13 @@ func (m *Migrator) migrateModel(
 		}
 
 		if foundBuilder.TableName != "" {
-			m.migrateModel(pool, allBuilders, foundBuilder)
+			isTableExist := m.isTableExist(pool, foundBuilder.TableName)
+			if !isTableExist {
+				err := m.migrateModel(pool, allBuilders, foundBuilder)
+				if err != nil {
+					return err
+				}
+			}
 		}
 	}
 
@@ -120,7 +142,31 @@ func (m *Migrator) migrateModel(
 		)
 	}
 
+	// Execute post query
+	if builderToMigrate.PostQuery != "" {
+		_, err := pool.Exec(context.Background(), builderToMigrate.PostQuery)
+		if err != nil {
+			return fmt.Errorf("failed to execute post query: %w", err)
+		}
+	}
+
 	return nil
+}
+
+func (m *Migrator) isTableExist(pool *pgxpool.Pool, tableName string) bool {
+	query := fmt.Sprintf(
+		"SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = '%s')",
+		tableName,
+	)
+
+	var exists bool
+	err := pool.QueryRow(context.Background(), query).Scan(&exists)
+	if err != nil {
+		log.Printf("Error checking if table %s exists: %v", tableName, err)
+		return false
+	}
+
+	return exists
 }
 
 func (m *Migrator) MigrateModels(dbName string, models ...Model) error {
