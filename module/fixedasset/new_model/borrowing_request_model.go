@@ -17,12 +17,12 @@ type BorrowingRequest struct {
 	UpdatedAt     time.Time              `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
 }
 
-func (BorrowingRequest) TableName() string {
+func (m *BorrowingRequest) TableName() string {
 	return "borrowing_requests"
 }
 
-func (BorrowingRequest) Up(builder *migration.MigrationBuilder) {
-	builder.AddColumn(BorrowingRequest{})
+func (m *BorrowingRequest) Up(builder *migration.MigrationBuilder) {
+	builder.AddColumn(m)
 
 	builder.AddForeignKey(
 		"fk_borrowing_request_asset",

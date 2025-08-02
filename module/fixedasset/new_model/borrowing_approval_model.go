@@ -24,12 +24,12 @@ type BorrowingApproval struct {
 	UpdatedAt  time.Time      `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
 }
 
-func (BorrowingApproval) TableName() string {
+func (m *BorrowingApproval) TableName() string {
 	return "borrowing_approvals"
 }
 
-func (BorrowingApproval) Up(builder *migration.MigrationBuilder) {
-	builder.AddColumn(BorrowingApproval{})
+func (m *BorrowingApproval) Up(builder *migration.MigrationBuilder) {
+	builder.AddColumn(m)
 
 	builder.AddForeignKey(
 		"fk_borrowing_approvals_request",
