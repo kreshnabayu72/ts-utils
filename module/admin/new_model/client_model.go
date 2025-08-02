@@ -3,6 +3,7 @@ package new_model
 import (
 	"log"
 	"os"
+	"path/filepath"
 	"time"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/migration"
@@ -152,7 +153,10 @@ func (m *Client) Up(builder *migration.MigrationBuilder) {
 	builder.AddIndex("clients_client_id_uindex", "client_id", true, "")
 
 	// ─────── Additional Queries ───────
-	postQuery, err := os.ReadFile("module/admin/migration/client_post_query.sql")
+	cwd, _ := os.Getwd()
+	postQuery, err := os.ReadFile(
+		filepath.Join(cwd, "module/admin/migration/client_post_query.sql"),
+	)
 	log.Fatal(err)
 	builder.SetPostQuery(string(postQuery))
 }
