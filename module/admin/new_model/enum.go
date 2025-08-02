@@ -18,6 +18,6 @@ const (
 type CompanyDepreciationMethod string
 
 const (
-	CompanyDepreciationMethodStraightLine           CompanyDepreciationMethod = "Straight Line"
+	CompanyDepreciationMethodStraightLine           CompanyDepreciationMethod = "Straight-Line"
 	CompanyDepreciationMethodDoubleDecliningBalance CompanyDepreciationMethod = "Double-Declining Balance"
 )
