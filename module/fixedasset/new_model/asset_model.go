@@ -31,10 +31,11 @@ type Asset struct {
 	ParentID       *int `json:"parentId"       column:"parent_id" sql:"BIGINT"`
 
 	// ─────── Purchase Info ───────
-	PurchaseDate          *time.Time `json:"purchaseDate"            column:"purchase_date" sql:"TIMESTAMP"`
-	PurchaseCost          *float64   `json:"purchaseCost"            column:"purchase_cost" sql:"FLOAT"`
-	PurchaseCurrency      *string    `json:"purchaseCurrency"        column:"purchase_currency" sql:"VARCHAR"`
-	PurchaseWarrantyYears *int       `json:"purchaseWarrantyDuration" column:"purchase_warranty_duration" sql:"INTEGER"`
+	PurchaseDate           *time.Time `json:"purchaseDate"            column:"purchase_date" sql:"TIMESTAMP"`
+	PurchaseCost           *float64   `json:"purchaseCost"            column:"purchase_cost" sql:"FLOAT"`
+	PurchaseCurrency       *string    `json:"purchaseCurrency"        column:"purchase_currency" sql:"VARCHAR"`
+	PurchaseWarrantyYears  *int       `json:"purchaseWarrantyDuration" column:"purchase_warranty_duration" sql:"INTEGER"`
+	PurchaseCurrencySymbol *string    `json:"purchaseCurrencySymbol"  column:"purchase_currency_symbol" sql:"VARCHAR"`
 
 	// ─────── Metadata ───────
 	IsDeleted     bool       `json:"isDeleted"      column:"is_deleted" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
