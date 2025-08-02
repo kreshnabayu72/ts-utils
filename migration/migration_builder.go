@@ -52,10 +52,12 @@ func (b *MigrationBuilder) AddIndex(indexName, column string, unique bool, where
 	if unique {
 		indexQuery += "UNIQUE "
 	}
-	indexQuery += "INDEX IF NOT EXISTS " + indexName + " ON " + b.TableName + " (" + column + ");"
+	indexQuery += "INDEX IF NOT EXISTS " + indexName + " ON " + b.TableName + " (" + column + ")"
 	if where != "" {
 		indexQuery += " WHERE " + where
 	}
+	indexQuery += ";"
+
 	b.index = append(b.index, indexQuery)
 }
 
