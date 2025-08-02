@@ -81,7 +81,7 @@ func (m *Migrator) MigrateDB(dbName string) error {
 	defer pool.Close()
 
 	// Create the database if it does not exist
-	createDBQuery := fmt.Sprintf("CREATE DATABASE %s", dbName)
+	createDBQuery := fmt.Sprintf("CREATE DATABASE \"%s\"", dbName)
 	_, err = pool.Exec(context.Background(), createDBQuery)
 	if err != nil {
 		return fmt.Errorf("failed to create database %s: %w", dbName, err)
