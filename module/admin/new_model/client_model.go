@@ -14,7 +14,7 @@ import (
 type Client struct {
 	ID int `json:"id" column:"id" sql:"BIGINT PRIMARY KEY"`
 	// ─────── Company Information ───────
-	Name               string        `json:"name" column:"name" sql:"BIGINT PRIMARY KEY"`
+	Name               string        `json:"name" column:"name" sql:"VARCHAR NOT NULL"`
 	ClientID           string        `json:"clientId"  column:"client_id" sql:"VARCHAR NOT NULL"`
 	Status             CompanyStatus `json:"status" column:"status" sql:"client_status_enum NOT NULL"`
 	Email              *string       `json:"email" column:"email" sql:"VARCHAR NULL"`
