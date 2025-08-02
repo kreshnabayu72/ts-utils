@@ -9,9 +9,9 @@ import (
 type IotReader struct {
 	ID int `json:"_id" column:"id" sql:"BIGINT PRIMARY KEY"`
 
-	GroupID   *int `json:"groupId" column:"group_id" sql:"BIGINT"`
-	ManagerID int  `json:"managerId" column:"manager_id" sql:"BIGINT"`
-	QrCode    *int `json:"qrCode" column:"qr_code"` // NOTE: Go struct uses INT, SQL uses VARCHAR
+	GroupID   *int    `json:"groupId" column:"group_id" sql:"BIGINT"`
+	ManagerID int     `json:"managerId" column:"manager_id" sql:"BIGINT"`
+	QrCode    *string `json:"qrCode" column:"qr_code" sql:"VARCHAR NULL"`
 
 	Image            string `json:"image" column:"image" sql:"VARCHAR"`
 	SerialNumber     string `json:"serialNumber" column:"serial_number" sql:"VARCHAR"`
