@@ -45,7 +45,7 @@ type Client struct {
 	// ─────── License Plan ───────
 	PlanFixedAsset       fixedasset_model.PlanTypes `json:"planFixedAsset" column:"plan_fixed_asset" sql:"license_plan_enum NULL"`
 	PlanSupplyAsset      fixedasset_model.PlanTypes `json:"planSupplyAsset" column:"plan_supply_asset" sql:"license_plan_enum NULL"`
-	PlanInventory        fixedasset_model.PlanTypes `json:"planInventory" column:"plan_inventory" sql:"license_plan_enum NULL"`
+	PlanInventory        fixedasset_model.PlanTypes `json:"planInventory" column:"plan_inventory_asset" sql:"license_plan_enum NULL"`
 	PlanProcurementAsset fixedasset_model.PlanTypes `json:"planProcurementAsset" column:"plan_procurement_asset" sql:"license_plan_enum NULL"`
 
 	// ─────── Deprec Method ───────
