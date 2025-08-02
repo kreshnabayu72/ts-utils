@@ -2,10 +2,13 @@ package db
 
 import (
 	"log"
+	"path/filepath"
+	"runtime"
 	"strings"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/migration"
 	admin_model "gitea.qwertysystem.net/BETS/ts-utils/module/admin/new_model"
+	fixedasset_model "gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
 	global_model "gitea.qwertysystem.net/BETS/ts-utils/module/global/new_model"
 	root_model "gitea.qwertysystem.net/BETS/ts-utils/module/root/new_model"
 )
@@ -31,7 +34,7 @@ func MigrateDB(dbName DBName, host, username, password, sslModel string) error {
 
 	if strings.Contains(strDBName, string(FixedAssetDBName)) {
 		log.Println("Migrating Fixed Asset DB")
-		return migrateFixedAssetDB(strDBName)
+		return migrateFixedAssetDB(strDBName, migrator)
 	}
 
 	if strings.Contains(strDBName, string(SupplyAssetDBName)) {
@@ -102,9 +105,39 @@ func migrateGlobalDB(dbName string, migrator *migration.Migrator) error {
 	return err
 }
 
-func migrateFixedAssetDB(dbName string) error {
-	// TODO: Implement the migration logic for the Fixed Asset DB
-	return nil
+func migrateFixedAssetDB(dbName string, migrator *migration.Migrator) error {
+	models := []migration.Model{
+		&fixedasset_model.Measurement{},
+		&fixedasset_model.User{},
+		&fixedasset_model.AliasCode{},
+		&fixedasset_model.AliasCodeData{},
+	}
+
+	isDBExist := migrator.IsDBExist(dbName)
+	if !isDBExist {
+		err := migrator.MigrateDB(dbName)
+		if err != nil {
+			return err
+		}
+	}
+
+	_, filename, _, _ := runtime.Caller(0)
+	baseDir := filepath.Dir(filename)
+	functionQueryPath := filepath.Join(baseDir, "migration/fixed_asset_function.sql")
+	err := migrator.ExecFile(dbName, functionQueryPath)
+	if err != nil {
+		return err
+	}
+
+	enumQueryPath := filepath.Join(baseDir, "migration/fixed_asset_enum.sql")
+	err = migrator.ExecFile(dbName, enumQueryPath)
+	if err != nil {
+		return err
+	}
+
+	err = migrator.MigrateModels(dbName, models...)
+
+	return err
 }
 
 func migrateSupplyAssetDB(dbName string) error {
