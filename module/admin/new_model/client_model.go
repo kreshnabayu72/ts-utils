@@ -62,7 +62,7 @@ type Client struct {
 	// ─────── Transaction Settings ───────
 	AuditAttrsMaxGracePeriod           int `json:"auditAttrsMaxGracePeriod" column:"audit_attrs_max_grace_period" sql:"INTEGER"`
 	TransferAttrsTransactionTimeout    int `json:"transferAttrsTransactionTimeout" column:"transfer_attrs_transaction_timeout" sql:"INTEGER"`
-	TransferAttrsAssetControlToMissing int `json:"transferAttrsAssetControlToMissing" column:"transfer_attrs_asset_control_to_missing" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
+	TransferAttrsAssetControlToMissing int `json:"transferAttrsAssetControlToMissing" column:"transfer_attrs_asset_control_to_missing" sql:"INTEGER"`
 	BorrowingAttrsMaxBorrowingTime     int `json:"borrowingAttrsMaxBorrowingTime" column:"borrowing_attrs_max_borrowing_time" sql:"INTEGER"`
 	BorrowingAttrsDefaultBorrowingTime int `json:"borrowingAttrsDefaultBorrowingTime" column:"borrowing_attrs_default_borrowing_time" sql:"INTEGER"`
 	BorrowingAttrsConfirmationTimeout  int `json:"borrowingAttrsConfirmationTimeout" column:"borrowing_attrs_confirmation_timeout" sql:"INTEGER"`
