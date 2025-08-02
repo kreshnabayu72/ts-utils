@@ -148,6 +148,11 @@ func (m *Migrator) migrateModel(
 		}
 	}
 
+	if builderToMigrate.TableName == "iot_antenna" ||
+		builderToMigrate.TableName == "iot_reader_ports" {
+		log.Printf("Success Migrating %s", builderToMigrate.TableName)
+	}
+
 	return nil
 }
 
