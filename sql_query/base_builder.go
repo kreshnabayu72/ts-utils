@@ -59,7 +59,6 @@ type SQLEloquentQuery struct {
 	Mode          SQLMode
 	LastError     error
 
-	useAggregation    bool
 	useHaving         bool
 	excludeEmptyValue bool
 }
