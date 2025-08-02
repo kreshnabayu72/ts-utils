@@ -3,6 +3,7 @@ package migration
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -120,6 +121,10 @@ func (m *Migrator) migrateModel(
 			}
 		}
 
+		if builderToMigrate.TableName == "iot_antenna" ||
+			builderToMigrate.TableName == "iot_reader_ports" {
+			log.Printf("Migrating %s", foundBuilder.TableName)
+		}
 		if foundBuilder.TableName != "" {
 			m.migrateModel(pool, allBuilders, foundBuilder)
 		}
