@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/migration"
+	admin_model "gitea.qwertysystem.net/BETS/ts-utils/module/admin/new_model"
 	global_model "gitea.qwertysystem.net/BETS/ts-utils/module/global/new_model"
 	root_model "gitea.qwertysystem.net/BETS/ts-utils/module/root/new_model"
 )
@@ -17,7 +18,7 @@ func MigrateDB(dbName DBName, host, username, password, sslModel string) error {
 	}
 
 	if strDBName == string(AdminDBName) {
-		return migrateAdminDB(strDBName)
+		return migrateAdminDB(strDBName, migrator)
 	}
 
 	if strings.Contains(strDBName, string(GlobalDBName)) {
@@ -56,9 +57,23 @@ func migrateRootDB(dbName string, migrator *migration.Migrator) error {
 	return err
 }
 
-func migrateAdminDB(dbName string) error {
-	// TODO: Implement the migration logic for the Admin DB
-	return nil
+func migrateAdminDB(dbName string, migrator *migration.Migrator) error {
+	models := []migration.Model{
+		&admin_model.Client{},
+		&admin_model.User{},
+	}
+
+	isDBExist := migrator.IsDBExist(dbName)
+	if !isDBExist {
+		err := migrator.MigrateDB(dbName)
+		if err != nil {
+			return err
+		}
+	}
+
+	err := migrator.MigrateModels(dbName, models...)
+
+	return err
 }
 
 func migrateGlobalDB(dbName string, migrator *migration.Migrator) error {
