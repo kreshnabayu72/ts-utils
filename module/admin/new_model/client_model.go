@@ -86,7 +86,7 @@ type Client struct {
 	FileStorageAvailableKB       float64 `json:"fileStorageAvailableKB" column:"file_storage_available_kb" sql:"FLOAT"`
 	FileStorageUsedKB            float64 `json:"fileStorageUsedKB" column:"file_storage_used_kb" sql:"FLOAT"`
 	FileStorageAttachmentKB      float64 `json:"fileStorageAttachmentKB" column:"file_storage_attachment_kb" sql:"FLOAT"`
-	FileStorageDamagedKB         float64 `json:"fileStorageDamagedKB" column:"file_storage_damaged_kb" sql:"FLOAT"`
+	FileStorageDamagedKB         float64 `json:"fileStorageDamagedKB" column:"file_storage_damage_kb" sql:"FLOAT"`
 	FileStorageDisposalKB        float64 `json:"fileStorageDisposalKB" column:"file_storage_disposal_kb" sql:"FLOAT"`
 	FileStorageRepairTicketingKB float64 `json:"fileStorageRepairTicketingKB" column:"file_storage_repair_ticketing_kb" sql:"FLOAT"`
 	FileStorageRoutineKB         float64 `json:"fileStorageRoutineKB" column:"file_storage_routine_kb" sql:"FLOAT"`
