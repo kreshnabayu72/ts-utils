@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"runtime"
 	"time"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/migration"
@@ -153,9 +154,10 @@ func (m *Client) Up(builder *migration.MigrationBuilder) {
 	builder.AddIndex("clients_client_id_uindex", "client_id", true, "")
 
 	// ─────── Additional Queries ───────
-	cwd, _ := os.Getwd()
+	_, filename, _, _ := runtime.Caller(0)
+	baseDir := filepath.Dir(filename)
 	postQuery, err := os.ReadFile(
-		filepath.Join(cwd, "module/admin/migration/client_post_query.sql"),
+		filepath.Join(baseDir, "module/admin/migration/client_post_query.sql"),
 	)
 	log.Fatal(err)
 	builder.SetPostQuery(string(postQuery))
