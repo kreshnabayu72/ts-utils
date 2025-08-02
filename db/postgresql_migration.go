@@ -111,6 +111,12 @@ func migrateFixedAssetDB(dbName string, migrator *migration.Migrator) error {
 		&fixedasset_model.User{},
 		&fixedasset_model.AliasCode{},
 		&fixedasset_model.AliasCodeData{},
+		&fixedasset_model.AccountCode{},
+		&fixedasset_model.DepreciationGroup{},
+		&fixedasset_model.Group{},
+		&fixedasset_model.GroupApprovalType{},
+		&fixedasset_model.GroupQuota{},
+		&fixedasset_model.Category{},
 	}
 
 	isDBExist := migrator.IsDBExist(dbName)
