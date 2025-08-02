@@ -126,7 +126,10 @@ func (m *Migrator) migrateModel(
 			log.Printf("Migrating %s", foundBuilder.TableName)
 		}
 		if foundBuilder.TableName != "" {
-			m.migrateModel(pool, allBuilders, foundBuilder)
+			isTableExist := m.isTableExist(pool, foundBuilder.TableName)
+			if !isTableExist {
+				m.migrateModel(pool, allBuilders, foundBuilder)
+			}
 		}
 	}
 
@@ -148,12 +151,23 @@ func (m *Migrator) migrateModel(
 		}
 	}
 
-	if builderToMigrate.TableName == "iot_antenna" ||
-		builderToMigrate.TableName == "iot_reader_ports" {
-		log.Printf("Success Migrating %s", builderToMigrate.TableName)
+	return nil
+}
+
+func (m *Migrator) isTableExist(pool *pgxpool.Pool, tableName string) bool {
+	query := fmt.Sprintf(
+		"SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = '%s')",
+		tableName,
+	)
+
+	var exists bool
+	err := pool.QueryRow(context.Background(), query).Scan(&exists)
+	if err != nil {
+		log.Printf("Error checking if table %s exists: %v", tableName, err)
+		return false
 	}
 
-	return nil
+	return exists
 }
 
 func (m *Migrator) MigrateModels(dbName string, models ...Model) error {
