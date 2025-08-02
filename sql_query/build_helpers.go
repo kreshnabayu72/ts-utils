@@ -2,7 +2,6 @@ package sql_query
 
 import (
 	"fmt"
-	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
@@ -54,17 +53,19 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 
 		/* ─────────────────── BETWEEN ──────────────────── */
 		case SQLOperatorBetween, SQLOperatorNotBetween:
-			v := reflect.ValueOf(each.Value)
-			if v.Kind() != reflect.Slice || v.Len() != 2 {
-				continue // Skip if length is not 2
+			switch v := each.Value.(type) {
+			case []any: // slice of any
+				if len(v) == 2 {
+					clause = fmt.Sprintf(
+						`%s %s $%d AND $%d`,
+						escapeQuoteColumns(column), each.Operator,
+						len(s.Args)+1, len(s.Args)+2,
+					)
+					s.Args = append(s.Args, v[0], v[1])
+				}
+			default:
+				continue
 			}
-			quotedColumn := escapeQuoteColumns(column)
-			clause = fmt.Sprintf(
-				`%s %s $%d AND $%d`,
-				quotedColumn, each.Operator,
-				len(s.Args)+1, len(s.Args)+2,
-			)
-			s.Args = append(s.Args, v.Index(0).Interface(), v.Index(1).Interface())
 
 		/* ────────────────── = ANY($n) ─────────────────── */
 		case SQLOperatorAny:
@@ -81,28 +82,27 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 				break
 			}
 
-			typ := reflect.TypeOf(each.Value)
-			if typ.Kind() == reflect.Slice {
-				// products.user.id IN ($1,$2) (each element in array became args)
-				// To expand placeholder usage for operator IN / NOT IN
-				v := reflect.ValueOf(each.Value)
-				if v.Len() == 0 {
+			switch v := each.Value.(type) {
+			case []any:
+				if len(v) == 0 {
 					continue
 				}
-				ph := make([]string, v.Len())
-				for i := 0; i < v.Len(); i++ {
-					ph[i] = fmt.Sprintf("$%d", len(s.Args)+1)
-					s.Args = append(s.Args, v.Index(i).Interface())
+				placeholders := make([]string, len(v))
+				for i, val := range v {
+					placeholders[i] = fmt.Sprintf("$%d", len(s.Args)+1)
+					s.Args = append(s.Args, val)
 				}
-
-				quotedColumn := escapeQuoteColumns(column)
-
-				clause = fmt.Sprintf(`%s %s (%s)`, quotedColumn, each.Operator, strings.Join(ph, ", "))
-			} else {
-				// Common operator, products.user.id = $1 (literal value with args)=
-				quotedColumn := escapeQuoteColumns(column)
-
-				clause = fmt.Sprintf(`%s %s $%d`, quotedColumn, each.Operator, len(s.Args)+1)
+				clause = fmt.Sprintf(`%s %s (%s)`,
+					escapeQuoteColumns(column),
+					each.Operator,
+					strings.Join(placeholders, ", "),
+				)
+			default:
+				clause = fmt.Sprintf(`%s %s $%d`,
+					escapeQuoteColumns(column),
+					each.Operator,
+					len(s.Args)+1,
+				)
 				s.Args = append(s.Args, each.Value)
 			}
 		}
