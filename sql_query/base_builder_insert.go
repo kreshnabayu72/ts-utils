@@ -154,17 +154,19 @@ func (s *InsertBuilder) cachedInsertSingle(v reflect.Value) SQLInsertChainBuilde
 	t := v.Type()
 	typeName := t.PkgPath() + "." + t.Name()
 
-	// Ambil fieldMeta dari cache
+	// Get field meta from cache
 	fieldMeta, ok := fieldMetaCache[typeName]
 	if !ok {
+		// Build metadata if not cached (only once per type)
 		meta := ExtractFromType(t)
 		fieldMetaCache[typeName] = &meta
 		fieldMeta = &meta
 	}
 
-	// Ambil InsertTemplate dari cache
+	// Get template for insert from cache
 	cachedTemplate, ok := InsertCache[typeName]
 	if !ok {
+		// Build template if not cached (only once per type)
 		var normalizedPlaceholders strings.Builder
 		columns := []string{"id"}
 		placeholders := []string{"($1"}
@@ -214,7 +216,7 @@ func (s *InsertBuilder) cachedInsertSingle(v reflect.Value) SQLInsertChainBuilde
 
 	args := make([]interface{}, 0, len(cachedTemplate.FieldIndexes)+1)
 	db.InitSnowflake()
-	args = append(args, db.Node.Generate().Int64()) // untuk "id" di posisi pertama
+	args = append(args, db.Node.Generate().Int64()) // id in first position
 
 	for _, idx := range cachedTemplate.FieldIndexes {
 		val := v.FieldByIndex(idx)
@@ -289,22 +291,24 @@ func (s *InsertBuilder) cachedInsertMany(slice reflect.Value) SQLInsertChainBuil
 	t := firstElem.Type()
 	typeName := t.PkgPath() + "." + t.Name()
 
-	// Ambil fieldMeta dari cache
+	// Get field meta from cache
 	fieldMeta, ok := fieldMetaCache[typeName]
 	if !ok {
+		// Build metadata if not cached (only once per type)
 		meta := ExtractFromType(t)
 		fieldMetaCache[typeName] = &meta
 		fieldMeta = &meta
 	}
 
-	// Ambil InsertTemplate dari cache (cache columns + FieldIndexes saja)
+	// Get template for insert from cache
 	cachedTemplate, ok := InsertCache[typeName]
 	if !ok {
+		// Build template if not cached (only once per type)
 		columns := []string{"id"}
 		FieldIndexes := make([][]int, 0, len(*fieldMeta))
 		basePlaceholders := make([]string, 0, len(*fieldMeta)+1)
 
-		// ID selalu ada di awal
+		// ID in first position
 		basePlaceholders = append(basePlaceholders, "$1")
 
 		for _, meta := range *fieldMeta {
