@@ -12,6 +12,7 @@ type FieldMeta struct {
 	JSONTag      string
 	ColumnTag    string
 	SQLExpr      string
+	FieldIndex   []int
 	NestedFields []FieldMeta
 
 	IsStruct bool
@@ -19,9 +20,21 @@ type FieldMeta struct {
 	IsTime   bool
 }
 
+type InsertTemplate struct {
+	InsertColumn         []string
+	FieldIndexes         [][]int
+	fieldMeta            *[]FieldMeta
+	basePlaceholders     []string
+	singleRowPlaceholder string
+	UseID                []bool
+	UseNow               []bool
+}
+
 var (
 	fieldMetaCache = make(map[string]*[]FieldMeta)
 	columnsCache   = make(map[string]*[]string)
+
+	InsertCache = make(map[string]*InsertTemplate)
 )
 
 func normalizeType(t reflect.Type) reflect.Type {
@@ -31,7 +44,7 @@ func normalizeType(t reflect.Type) reflect.Type {
 	return t
 }
 
-func extractFromType(typ reflect.Type) []FieldMeta {
+func ExtractFromType(typ reflect.Type) []FieldMeta {
 	typ = normalizeType(typ)
 	var fields []FieldMeta
 
@@ -45,17 +58,18 @@ func extractFromType(typ reflect.Type) []FieldMeta {
 		timeType := reflect.TypeOf(time.Time{})
 
 		meta := FieldMeta{
-			Name:      f.Name,
-			Type:      f.Type,
-			JSONTag:   strings.TrimSuffix(f.Tag.Get("json"), ",omitempty"),
-			ColumnTag: f.Tag.Get("column"),
-			IsStruct:  f.Type.Kind() == reflect.Struct && f.Type != timeType,
-			IsSlice:   f.Type.Kind() == reflect.Slice,
-			IsTime:    f.Type == timeType,
+			Name:       f.Name,
+			Type:       f.Type,
+			JSONTag:    strings.TrimSuffix(f.Tag.Get("json"), ",omitempty"),
+			ColumnTag:  f.Tag.Get("column"),
+			FieldIndex: f.Index,
+			IsStruct:   f.Type.Kind() == reflect.Struct && f.Type != timeType,
+			IsSlice:    f.Type.Kind() == reflect.Slice,
+			IsTime:     f.Type == timeType,
 		}
 
 		if meta.IsStruct || (meta.IsSlice && meta.Type.Elem().Kind() == reflect.Struct) {
-			meta.NestedFields = extractFromType(
+			meta.NestedFields = ExtractFromType(
 				func() reflect.Type {
 					if meta.IsSlice {
 						return meta.Type.Elem()
@@ -74,4 +88,5 @@ func extractFromType(typ reflect.Type) []FieldMeta {
 func ClearCache() {
 	fieldMetaCache = make(map[string]*[]FieldMeta)
 	columnsCache = make(map[string]*[]string)
+	InsertCache = make(map[string]*InsertTemplate)
 }
