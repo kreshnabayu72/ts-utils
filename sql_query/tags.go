@@ -34,7 +34,7 @@ func ExtractJSONTags[T any](optType ...reflect.Type) []string {
 	fieldMeta, ok := fieldMetaCache[typeName]
 	if !ok {
 		// Build metadata if not cached (only once per type)
-		meta := extractFromType(typ)
+		meta := ExtractFromType(typ)
 		fieldMetaCache[typeName] = &meta
 		fieldMeta = &meta
 	}
@@ -129,7 +129,7 @@ func MakeMapJSONTags[T any]() map[string]string {
 	fieldMeta, ok := fieldMetaCache[typeName]
 	if !ok {
 		// Build metadata if not cached (only once per type)
-		meta := extractFromType(typ)
+		meta := ExtractFromType(typ)
 		fieldMetaCache[typeName] = &meta
 		fieldMeta = &meta
 	}
@@ -150,7 +150,7 @@ func MakeMapJSONTagsFromValue(dto any) map[string]string {
 	fieldMeta, ok := fieldMetaCache[typeName]
 	if !ok {
 		// Build metadata if not cached (only once per type)
-		meta := extractFromType(typ)
+		meta := ExtractFromType(typ)
 		fieldMetaCache[typeName] = &meta
 		fieldMeta = &meta
 	}

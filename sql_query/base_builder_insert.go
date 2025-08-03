@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/db"
@@ -27,7 +28,7 @@ type SQLInsertInitBuilder interface {
 	// insertSingle handles the insert logic for a single struct.
 	// It auto-generates a Snowflake ID and builds the VALUES list
 	// based on struct field tags (using "column" or "json").
-	insertSingle(v reflect.Value) SQLInsertChainBuilder
+	cachedInsertSingle(v reflect.Value) SQLInsertChainBuilder
 	// insertMany handles inserting multiple structs at once.
 	// It generates a Snowflake ID for each row, creates placeholders
 	// for every value, and builds the full VALUES (...), (...), ... list.
@@ -36,7 +37,7 @@ type SQLInsertInitBuilder interface {
 	//
 	//	INSERT INTO users (id, name, email)
 	//	VALUES ($1, $2, $3), ($4, $5, $6)
-	insertMany(slice reflect.Value) SQLInsertChainBuilder
+	cachedInsertMany(slice reflect.Value) SQLInsertChainBuilder
 	// preBuild is a helper that assembles the final
 	// INSERT INTO ... (columns) VALUES ... statement
 	// after the columns and value placeholders have been prepared.
@@ -106,11 +107,11 @@ func (s *InsertBuilder) Insert(values interface{}, returningColumns ...string) S
 			return s
 		}
 
-		return s.insertMany(v)
+		return s.cachedInsertMany(v)
 	}
 
 	// Single struct case
-	return s.insertSingle(v)
+	return s.cachedInsertSingle(v)
 }
 
 // NewSQLInsertBuilder creates a new insert builder for a given table.
@@ -147,6 +148,88 @@ func (s *SQLEloquentQuery) buildInsertQuery() (string, []interface{}, error) {
 	}
 
 	return s.CustomQuery, s.Args, nil
+}
+
+func (s *InsertBuilder) cachedInsertSingle(v reflect.Value) SQLInsertChainBuilder {
+	t := v.Type()
+	typeName := t.PkgPath() + "." + t.Name()
+
+	// Get field meta from cache
+	fieldMeta, ok := fieldMetaCache[typeName]
+	if !ok {
+		// Build metadata if not cached (only once per type)
+		meta := ExtractFromType(t)
+		fieldMetaCache[typeName] = &meta
+		fieldMeta = &meta
+	}
+
+	// Get template for insert from cache
+	cachedTemplate, ok := InsertCache[typeName]
+	if !ok {
+		// Build template if not cached (only once per type)
+		var normalizedPlaceholders strings.Builder
+		columns := []string{"id"}
+		placeholders := []string{"($1"}
+		FieldIndexes := [][]int{}
+
+		for _, meta := range *fieldMeta {
+			if ArrayIncludes([]string{"_id", "id"}, meta.JSONTag) || meta.ColumnTag == "id" {
+				continue
+			}
+			if ArrayIncludes([]string{"", "-"}, meta.JSONTag) && ArrayIncludes([]string{"", "-"}, meta.ColumnTag) {
+				continue
+			}
+
+			setTag := CamelToSnake(meta.JSONTag)
+			if meta.ColumnTag != "" {
+				setTag = meta.ColumnTag
+			}
+
+			columns = append(columns, `"`+setTag+`"`)
+
+			if ArrayIncludes([]string{"updated_at", "created_at"}, setTag) {
+				placeholders = append(placeholders, "NOW()")
+			} else {
+				placeholders = append(placeholders, fmt.Sprintf("$%d", len(placeholders)+1))
+			}
+
+			FieldIndexes = append(FieldIndexes, meta.FieldIndex)
+		}
+
+		for idx, each := range placeholders {
+			if idx > 0 {
+				normalizedPlaceholders.WriteByte(',')
+			}
+			normalizedPlaceholders.WriteString(each)
+			if idx == len(placeholders)-1 {
+				normalizedPlaceholders.WriteByte(')')
+			}
+		}
+		cachedTemplate = &InsertTemplate{
+			InsertColumn:         columns,
+			fieldMeta:            fieldMeta,
+			singleRowPlaceholder: normalizedPlaceholders.String(),
+			FieldIndexes:         FieldIndexes,
+		}
+		InsertCache[typeName] = cachedTemplate
+	}
+
+	args := make([]interface{}, 0, len(cachedTemplate.FieldIndexes)+1)
+	db.InitSnowflake()
+	args = append(args, db.Node.Generate().Int64()) // id in first position
+
+	for _, idx := range cachedTemplate.FieldIndexes {
+		val := v.FieldByIndex(idx)
+		if val.IsZero() && s.excludeEmptyValue {
+			continue
+		}
+		args = append(args, val.Interface())
+	}
+
+	s.Args = args
+	s.preBuild(cachedTemplate.InsertColumn, []string{cachedTemplate.singleRowPlaceholder})
+
+	return s
 }
 
 func (s *InsertBuilder) insertSingle(v reflect.Value) SQLInsertChainBuilder {
@@ -198,6 +281,110 @@ func (s *InsertBuilder) insertSingle(v reflect.Value) SQLInsertChainBuilder {
 
 	s.Args = args
 	s.preBuild(columns, []string{fmt.Sprintf("(%s)", strings.Join(placeholders, ", "))})
+
+	return s
+}
+
+func (s *InsertBuilder) cachedInsertMany(slice reflect.Value) SQLInsertChainBuilder {
+	db.InitSnowflake()
+	firstElem := slice.Index(0)
+	t := firstElem.Type()
+	typeName := t.PkgPath() + "." + t.Name()
+
+	// Get field meta from cache
+	fieldMeta, ok := fieldMetaCache[typeName]
+	if !ok {
+		// Build metadata if not cached (only once per type)
+		meta := ExtractFromType(t)
+		fieldMetaCache[typeName] = &meta
+		fieldMeta = &meta
+	}
+
+	// Get template for insert from cache
+	cachedTemplate, ok := InsertCache[typeName]
+	if !ok {
+		// Build template if not cached (only once per type)
+		columns := []string{"id"}
+		FieldIndexes := make([][]int, 0, len(*fieldMeta))
+		basePlaceholders := make([]string, 0, len(*fieldMeta)+1)
+
+		// ID in first position
+		basePlaceholders = append(basePlaceholders, "$1")
+
+		for _, meta := range *fieldMeta {
+			if ArrayIncludes([]string{"_id", "id"}, meta.JSONTag) || meta.ColumnTag == "id" {
+				continue
+			}
+			if ArrayIncludes([]string{"", "-"}, meta.JSONTag) && ArrayIncludes([]string{"", "-"}, meta.ColumnTag) {
+				continue
+			}
+
+			setTag := CamelToSnake(meta.JSONTag)
+			if meta.ColumnTag != "" {
+				setTag = meta.ColumnTag
+			}
+
+			columns = append(columns, `"`+setTag+`"`)
+			FieldIndexes = append(FieldIndexes, meta.FieldIndex)
+
+			if ArrayIncludes([]string{"updated_at", "created_at"}, setTag) {
+				basePlaceholders = append(basePlaceholders, "NOW()")
+			} else {
+				basePlaceholders = append(basePlaceholders, "$X")
+			}
+		}
+
+		cachedTemplate = &InsertTemplate{
+			InsertColumn:     columns,
+			basePlaceholders: basePlaceholders,
+			FieldIndexes:     FieldIndexes,
+		}
+		InsertCache[typeName] = cachedTemplate
+	}
+
+	numRows := slice.Len()
+	numCols := len(cachedTemplate.basePlaceholders)
+
+	args := make([]interface{}, numRows*numCols)
+	var allPlaceholders strings.Builder
+	allPlaceholders.Grow(numRows * (numCols * 4)) // pre-allocate
+
+	argsPos := 0
+	for i := 0; i < numRows; i++ {
+		values := slice.Index(i)
+		if i > 0 {
+			allPlaceholders.WriteByte(',')
+		}
+		allPlaceholders.WriteByte('(')
+
+		args[argsPos] = db.Node.Generate().Int64()
+		argsPos++
+
+		for j, base := range cachedTemplate.basePlaceholders {
+			if j > 0 {
+				allPlaceholders.WriteByte(',')
+			}
+
+			if base == "NOW()" {
+				allPlaceholders.WriteString("NOW()")
+				continue
+			}
+
+			if j > 0 {
+				val := values.FieldByIndex(cachedTemplate.FieldIndexes[j-1])
+				args[argsPos] = val.Interface()
+				argsPos++
+			}
+
+			allPlaceholders.WriteByte('$')
+			allPlaceholders.WriteString(strconv.Itoa(argsPos))
+		}
+
+		allPlaceholders.WriteByte(')')
+	}
+
+	s.Args = args
+	s.preBuild(cachedTemplate.InsertColumn, []string{allPlaceholders.String()})
 
 	return s
 }
@@ -282,10 +469,39 @@ func (s *InsertBuilder) insertMany(slice reflect.Value) SQLInsertChainBuilder {
 }
 
 func (s *InsertBuilder) preBuild(columns, valuePlaceholders []string) {
-	s.CustomQuery = fmt.Sprintf(
-		"INSERT INTO %s (%s) VALUES %s",
-		s.Table,
-		strings.Join(columns, ", "),
-		strings.Join(valuePlaceholders, ", "),
-	)
+	var sb strings.Builder
+	sb.Grow(256) // preallocate ~256 bytes
+
+	sb.WriteByte('\n')
+	sb.WriteString("INSERT INTO ")
+	sb.WriteString(s.Table)
+	sb.WriteByte('\n')
+	for i, column := range columns {
+		if i == 0 {
+			sb.WriteByte('(')
+		}
+
+		if i > 0 {
+			sb.WriteByte(',')
+		}
+		sb.WriteString(column)
+
+		if i == len(columns)-1 {
+			sb.WriteByte(')')
+		}
+	}
+
+	sb.WriteByte('\n')
+	sb.WriteString("VALUES ")
+	for i, placeholder := range valuePlaceholders {
+		if i > 0 {
+			sb.WriteByte(',')
+		}
+		sb.WriteString(placeholder)
+	}
+	sb.WriteByte('\n')
+
+	s.CustomQuery = sb.String()
+	// fmt.Println("s.Args", s.Args)
+	// fmt.Println("s.CustomQuery", s.CustomQuery)
 }
