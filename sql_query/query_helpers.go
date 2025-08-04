@@ -49,6 +49,50 @@ func ScanRowObject(v any, row pgx.Rows) error {
 	return nil
 }
 
+func CachedScanRowObject(v any, row pgx.Rows) error {
+	vVal := reflect.ValueOf(v)
+	if vVal.Kind() != reflect.Ptr || vVal.Elem().Kind() != reflect.Struct {
+		return fmt.Errorf("ScanRow: v must be a pointer to a struct")
+	}
+
+	if !row.Next() {
+		if row.Err() != nil {
+			return row.Err()
+		}
+		return pgx.ErrNoRows
+	}
+
+	fds := row.FieldDescriptions()
+	values, err := row.Values()
+	if err != nil {
+		return err
+	}
+
+	fm := GetFieldMap(vVal.Type(), fds)
+	structVal := vVal.Elem()
+
+	for i, val := range values {
+		idx := fm[i]
+		if idx == -1 {
+			continue
+		}
+
+		field := structVal.Field(idx)
+		if !field.CanSet() {
+			continue
+		}
+
+		rv := reflect.ValueOf(val)
+		if rv.Type().AssignableTo(field.Type()) {
+			field.Set(rv)
+		} else if rv.Type().ConvertibleTo(field.Type()) {
+			field.Set(rv.Convert(field.Type()))
+		}
+	}
+
+	return nil
+}
+
 func ScanRowsArray(v any, rows pgx.Rows) error {
 	vVal := reflect.ValueOf(v)
 	if vVal.Kind() != reflect.Ptr || vVal.Elem().Kind() != reflect.Slice {
@@ -82,6 +126,51 @@ func ScanRowsArray(v any, rows pgx.Rows) error {
 		}
 
 		sliceVal.Set(reflect.Append(sliceVal, newElemPtr.Elem()))
+	}
+
+	return nil
+}
+
+func CachedScanRowsArray(v any, rows pgx.Rows) error {
+	vVal := reflect.ValueOf(v)
+	if vVal.Kind() != reflect.Ptr || vVal.Elem().Kind() != reflect.Slice {
+		return fmt.Errorf("ScanRows: v must be a pointer to a slice")
+	}
+
+	sliceVal := vVal.Elem()
+	elemType := sliceVal.Type().Elem()
+	fieldDescs := rows.FieldDescriptions()
+	fm := GetFieldMap(elemType, fieldDescs)
+
+	for rows.Next() {
+		values, err := rows.Values()
+		if err != nil {
+			return err
+		}
+
+		newElemPtr := reflect.New(elemType)
+		elem := newElemPtr.Elem()
+
+		for i, val := range values {
+			idx := fm[i]
+			if idx == -1 {
+				continue
+			}
+
+			field := elem.Field(idx)
+			if !field.CanSet() {
+				continue
+			}
+
+			rv := reflect.ValueOf(val)
+			if rv.Type().AssignableTo(field.Type()) {
+				field.Set(rv)
+			} else if rv.Type().ConvertibleTo(field.Type()) {
+				field.Set(rv.Convert(field.Type()))
+			}
+		}
+
+		sliceVal.Set(reflect.Append(sliceVal, elem))
 	}
 
 	return nil
