@@ -45,9 +45,7 @@ func normalizeType(t reflect.Type) reflect.Type {
 }
 
 func ExtractFromType(typ reflect.Type) []FieldMeta {
-	typ = normalizeType(typ)
 	var fields []FieldMeta
-
 	for i := 0; i < typ.NumField(); i++ {
 		f := typ.Field(i)
 
@@ -55,17 +53,19 @@ func ExtractFromType(typ reflect.Type) []FieldMeta {
 			continue
 		}
 
+		fType := f.Type
+		fType = normalizeType(fType)
 		timeType := reflect.TypeOf(time.Time{})
 
 		meta := FieldMeta{
 			Name:       f.Name,
-			Type:       f.Type,
+			Type:       fType,
 			JSONTag:    strings.TrimSuffix(f.Tag.Get("json"), ",omitempty"),
 			ColumnTag:  f.Tag.Get("column"),
 			FieldIndex: f.Index,
-			IsStruct:   f.Type.Kind() == reflect.Struct && f.Type != timeType,
-			IsSlice:    f.Type.Kind() == reflect.Slice,
-			IsTime:     f.Type == timeType,
+			IsStruct:   fType.Kind() == reflect.Struct && fType != timeType,
+			IsSlice:    fType.Kind() == reflect.Slice,
+			IsTime:     fType == timeType,
 		}
 
 		if meta.IsStruct || (meta.IsSlice && meta.Type.Elem().Kind() == reflect.Struct) {
