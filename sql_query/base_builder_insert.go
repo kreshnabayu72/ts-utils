@@ -468,6 +468,53 @@ func (s *InsertBuilder) insertMany(slice reflect.Value) SQLInsertChainBuilder {
 	return s
 }
 
+func BuildInsertTemplate(t reflect.Type) *InsertTemplate {
+	meta := ExtractFromType(t)
+
+	columns := []string{}
+	fieldIndexes := [][]int{}
+	useID := []bool{}
+	useNow := []bool{}
+
+	useID = append(useID, true)
+	useNow = append(useNow, false)
+	fieldIndexes = append(fieldIndexes, nil)
+
+	for _, m := range meta {
+		if ArrayIncludes([]string{"_id", "id"}, m.JSONTag) || m.ColumnTag == "id" {
+			continue
+		}
+		if ArrayIncludes([]string{"", "-"}, m.JSONTag) && ArrayIncludes([]string{"", "-"}, m.ColumnTag) {
+			continue
+		}
+
+		setTag := CamelToSnake(m.JSONTag)
+		if m.ColumnTag != "" {
+			setTag = m.ColumnTag
+		}
+
+		columns = append(columns, setTag)
+
+		if setTag == "created_at" || setTag == "updated_at" {
+			useID = append(useID, false)
+			useNow = append(useNow, true)
+			fieldIndexes = append(fieldIndexes, nil)
+			continue
+		}
+
+		useID = append(useID, false)
+		useNow = append(useNow, false)
+		fieldIndexes = append(fieldIndexes, m.FieldIndex)
+	}
+
+	return &InsertTemplate{
+		InsertColumn: columns,
+		FieldIndexes: fieldIndexes,
+		UseID:        useID,
+		UseNow:       useNow,
+	}
+}
+
 func (s *InsertBuilder) preBuild(columns, valuePlaceholders []string) {
 	var sb strings.Builder
 	sb.Grow(256) // preallocate ~256 bytes
