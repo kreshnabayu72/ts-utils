@@ -3,7 +3,10 @@ package sql_query
 import (
 	"reflect"
 	"strings"
+	"sync"
 	"time"
+
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 type FieldMeta struct {
@@ -30,11 +33,18 @@ type InsertTemplate struct {
 	UseNow               []bool
 }
 
+type CacheKey struct {
+	Typ    reflect.Type
+	Colsig string
+}
+
 var (
 	fieldMetaCache = make(map[string]*[]FieldMeta)
 	columnsCache   = make(map[string]*[]string)
 
 	InsertCache = make(map[string]*InsertTemplate)
+
+	FieldMapCache sync.Map
 )
 
 func normalizeType(t reflect.Type) reflect.Type {
@@ -83,6 +93,52 @@ func ExtractFromType(typ reflect.Type) []FieldMeta {
 	}
 
 	return fields
+}
+
+func GetFieldMap(elemType reflect.Type, fds []pgconn.FieldDescription) []int {
+	if elemType.Kind() == reflect.Ptr {
+		elemType = elemType.Elem()
+	}
+
+	key := CacheKey{Typ: elemType, Colsig: columnsSignature(fds)}
+	if cached, ok := FieldMapCache.Load(key); ok {
+		return cached.([]int)
+	}
+
+	// Build lookup table for struct fields
+	lookup := map[string]int{}
+	for i := 0; i < elemType.NumField(); i++ {
+		f := elemType.Field(i)
+		if f.PkgPath != "" {
+			continue // skip unexported fields
+		}
+
+		name := f.Tag.Get("column")
+		if name == "" {
+			name = f.Name
+		}
+		lookup[strings.ToLower(name)] = i
+	}
+
+	indices := make([]int, len(fds))
+	for i, fd := range fds {
+		if idx, ok := lookup[strings.ToLower(string(fd.Name))]; ok {
+			indices[i] = idx
+		} else {
+			indices[i] = -1
+		}
+	}
+
+	FieldMapCache.Store(key, indices)
+	return indices
+}
+
+func columnsSignature(fds []pgconn.FieldDescription) string {
+	parts := make([]string, len(fds))
+	for i, fd := range fds {
+		parts[i] = string(fd.Name)
+	}
+	return strings.Join(parts, ",")
 }
 
 func ClearCache() {

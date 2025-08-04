@@ -87,6 +87,11 @@ func (m *Migrator) MigrateDB(dbName string) error {
 	if err != nil {
 		return fmt.Errorf("failed to create database %s: %w", dbName, err)
 	}
+	setTimezoneQuery := fmt.Sprintf(`ALTER DATABASE "%s" SET timezone TO 'UTC'`, dbName)
+	_, err = pool.Exec(context.Background(), setTimezoneQuery)
+	if err != nil {
+		return fmt.Errorf("failed to set timezone for database %s: %w", dbName, err)
+	}
 
 	return nil
 }

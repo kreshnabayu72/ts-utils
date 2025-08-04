@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 	"reflect"
+	"time"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/db"
 	"gitea.qwertysystem.net/BETS/ts-utils/dto"
@@ -236,6 +237,8 @@ type PgxPoolInterface interface {
 	// and returns a pgconn.CommandTag containing rows affected.
 	Exec(ctx context.Context, sql string, args ...any) (pgconn.CommandTag, error)
 
+	CopyFrom(ctx context.Context, identifier pgx.Identifier, columns []string, source pgx.CopyFromSource) (int64, error)
+
 	// Close closes the database pool connection.
 	Close()
 }
@@ -461,6 +464,61 @@ func (s *BasePostgreSqlService) InsertManyWithData(
 		return int64(val.Elem().Len()), err
 	}
 	return s.InsertMany(ctx, queryString, args...)
+}
+
+// Still in experimental stage, recommended to use InsertManyWithData until this function stable
+func (s *BasePostgreSqlService) InsertBatch(ctx context.Context, body interface{}) (int64, error) {
+	v := reflect.ValueOf(body)
+	if v.Kind() != reflect.Slice {
+		return 0, errors.New("body must be a slice")
+	}
+	if v.Len() == 0 {
+		return 0, nil
+	}
+
+	firstElem := v.Index(0).Interface()
+	t := reflect.TypeOf(firstElem)
+	typeName := t.PkgPath() + "." + t.Name()
+
+	// Ambil atau buat template
+	insertTemplate, ok := sql_query.InsertCache[typeName]
+	if !ok {
+		insertTemplate = sql_query.BuildInsertTemplate(t) // disini tentukan useNow & useID
+		sql_query.InsertCache[typeName] = insertTemplate
+	}
+
+	rows := make([][]interface{}, v.Len())
+	for i := 0; i < v.Len(); i++ {
+		elem := v.Index(i)
+		row := make([]interface{}, len(insertTemplate.InsertColumn))
+
+		for j := range insertTemplate.InsertColumn {
+			if insertTemplate.UseID[j] {
+				row[j] = db.Node.Generate().Int64()
+			} else if insertTemplate.UseNow[j] {
+				row[j] = time.Now() // CopyFrom tidak bisa pakai literal NOW(), harus diisi value
+			} else {
+				row[j] = elem.FieldByIndex(insertTemplate.FieldIndexes[j]).Interface()
+			}
+		}
+		rows[i] = row
+	}
+
+	if s.Transaction != nil {
+		return s.Transaction.CopyFrom(
+			ctx,
+			pgx.Identifier{s.TableName},
+			insertTemplate.InsertColumn,
+			pgx.CopyFromRows(rows),
+		)
+	}
+
+	return s.Pool.CopyFrom(
+		ctx,
+		pgx.Identifier{s.TableName},
+		insertTemplate.InsertColumn,
+		pgx.CopyFromRows(rows),
+	)
 }
 
 func (s *BasePostgreSqlService) UpdateOne(
