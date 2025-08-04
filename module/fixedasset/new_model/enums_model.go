@@ -227,6 +227,25 @@ const (
 	SystemRoleAttributeOpenAPI            SystemRoleAttribute = "openAPI"
 )
 
+var SystemRoleAttributeEnum = map[string]SystemRoleAttribute{
+	"importData":          SystemRoleAttributeImportData,
+	"assetAttribute":      SystemRoleAttributeAssetAttribute,
+	"assetPolicies":       SystemRoleAttributeAssetPolicies,
+	"depreciationGroup":   SystemRoleAttributeDepreciationGroup,
+	"depreciationMethod":  SystemRoleAttributeDepreciationMethod,
+	"documentDeletion":    SystemRoleAttributeDocumentDeletion,
+	"group":               SystemRoleAttributeGroup,
+	"userAndRole":         SystemRoleAttributeUserAndRole,
+	"iotReader":           SystemRoleAttributeIoTReader,
+	"license":             SystemRoleAttributeLicense,
+	"purchaseDocument":    SystemRoleAttributePurchaseDocument,
+	"purchaseInformation": SystemRoleAttributePurchaseInfo,
+	"tag":                 SystemRoleAttributeTag,
+	"registerAsset":       SystemRoleAttributeRegisterAsset,
+	"tagType":             SystemRoleAttributeTagType,
+	"openAPI":             SystemRoleAttributeOpenAPI,
+}
+
 var SystemRoleAttributeArray = []string{
 	string(SystemRoleAttributeImportData),
 	string(SystemRoleAttributeAssetAttribute),
