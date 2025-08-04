@@ -79,7 +79,11 @@ type PostgreSqlService interface {
 	// Returns:
 	//   - interface{} → Inserted ID (string) or nil (if Destination is provided).
 	//   - error       → Any error encountered during query building, execution, or scanning.
-	InsertOneWithData(ctx context.Context, body interface{}, returnOption ...ReturningConfig) (interface{}, error)
+	InsertOneWithData(
+		ctx context.Context,
+		body interface{},
+		returnOption ...ReturningConfig,
+	) (interface{}, error)
 	// InsertMany executes an INSERT query for multiple rows
 	// and returns the number of rows affected.
 	InsertMany(ctx context.Context, queryString string, args ...any) (int64, error)
@@ -105,7 +109,11 @@ type PostgreSqlService interface {
 	//
 	// Notes:
 	//   - Destination must be a pointer to a slice (e.g., *[]YourDTO), otherwise it returns an error.
-	InsertManyWithData(ctx context.Context, body interface{}, returnOption ...ReturningConfig) (interface{}, error)
+	InsertManyWithData(
+		ctx context.Context,
+		body interface{},
+		returnOption ...ReturningConfig,
+	) (interface{}, error)
 
 	// UpdateOne executes an UPDATE ... RETURNING id query
 	// and returns the updated row ID.
@@ -133,7 +141,12 @@ type PostgreSqlService interface {
 	//   - interface{}: The updated row's ID (string) if no Destination is provided.
 	//     nil if Destination is provided (caller reads from Destination).
 	//   - error:       Any error encountered during query building, execution, or scanning.
-	UpdateOneWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}, returnOption ...ReturningConfig) (interface{}, error)
+	UpdateOneWithData(
+		ctx context.Context,
+		query map[string]sql_query.SQLCondition,
+		body interface{},
+		returnOption ...ReturningConfig,
+	) (interface{}, error)
 	// UpdateMany executes an UPDATE query that may affect multiple rows
 	// and returns the number of rows updated.
 	UpdateMany(ctx context.Context, queryString string, args ...any) (int64, error)
@@ -159,32 +172,56 @@ type PostgreSqlService interface {
 	// Returns:
 	//   - int64: Number of rows affected. If Destination is provided, this equals len(Destination).
 	//   - error: Any error encountered during query building, execution, or scanning.
-	UpdateManyWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}, returnOption ...ReturningConfig) (int64, error)
+	UpdateManyWithData(
+		ctx context.Context,
+		query map[string]sql_query.SQLCondition,
+		body interface{},
+		returnOption ...ReturningConfig,
+	) (int64, error)
 	// UpdateEachWithData performs a bulk update per row (row-specific values)
 	// using rowIdentifier (typically a primary key column or unique index).
-	UpdateEachWithData(ctx context.Context, rowIdentifier string, query map[string]sql_query.SQLCondition, body interface{}) (int64, error)
+	UpdateEachWithData(
+		ctx context.Context,
+		rowIdentifier string,
+		query map[string]sql_query.SQLCondition,
+		body interface{},
+	) (int64, error)
 
 	// SoftDeleteOne builds and executes a UPDATE soft delete query for a single row
 	// using SQLCondition filters and returns the deleted row ID.
 	// Table must has column is_deleted and deleted_at.
-	SoftDeleteOne(ctx context.Context, filter map[string]sql_query.SQLCondition, returnOption ...ReturningConfig) (interface{}, error)
+	SoftDeleteOne(
+		ctx context.Context,
+		filter map[string]sql_query.SQLCondition,
+		returnOption ...ReturningConfig,
+	) (interface{}, error)
 	// SoftDeleteMany builds and executes a UPDATE soft delete query for multiple rows
 	// using SQLCondition filters and returns the number of rows deleted.
 	// Table must has column is_deleted and deleted_at.
-	SoftDeleteMany(ctx context.Context, filter map[string]sql_query.SQLCondition, returnOption ...ReturningConfig) (int64, error)
+	SoftDeleteMany(
+		ctx context.Context,
+		filter map[string]sql_query.SQLCondition,
+		returnOption ...ReturningConfig,
+	) (int64, error)
 
 	// DeleteOne executes a DELETE ... RETURNING id query
 	// and returns the deleted row ID.
 	DeleteOne(ctx context.Context, queryString string, args ...any) (interface{}, error)
 	// DeleteOneWithFilter builds and executes a DELETE query for a single row
 	// using SQLCondition filters and returns the deleted row ID.
-	DeleteOneWithFilter(ctx context.Context, filter map[string]sql_query.SQLCondition) (interface{}, error)
+	DeleteOneWithFilter(
+		ctx context.Context,
+		filter map[string]sql_query.SQLCondition,
+	) (interface{}, error)
 	// DeleteMany executes a DELETE query that may affect multiple rows
 	// and returns the number of rows deleted.
 	DeleteMany(ctx context.Context, queryString string, args ...any) (int64, error)
 	// DeleteManyWithFilter builds and executes a DELETE query for multiple rows
 	// using SQLCondition filters and returns the number of rows deleted.
-	DeleteManyWithFilter(ctx context.Context, filter map[string]sql_query.SQLCondition) (int64, error)
+	DeleteManyWithFilter(
+		ctx context.Context,
+		filter map[string]sql_query.SQLCondition,
+	) (int64, error)
 }
 
 type PgxPoolInterface interface {
@@ -238,7 +275,11 @@ func (s *BasePostgreSqlService) SetTransaction(tx pgx.Tx) {
 	s.Transaction = tx
 }
 
-func (s *BasePostgreSqlService) Count(ctx context.Context, queryString string, args ...any) (int, error) {
+func (s *BasePostgreSqlService) Count(
+	ctx context.Context,
+	queryString string,
+	args ...any,
+) (int, error) {
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	var count int
@@ -258,14 +299,22 @@ func (s *BasePostgreSqlService) Count(ctx context.Context, queryString string, a
 	return count, nil
 }
 
-func (s *BasePostgreSqlService) CountWithFilter(ctx context.Context, filter map[string]sql_query.SQLCondition) (int, error) {
+func (s *BasePostgreSqlService) CountWithFilter(
+	ctx context.Context,
+	filter map[string]sql_query.SQLCondition,
+) (int, error) {
 	queryString, args := common_builders.CountBuilder(s.TableName, filter)
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	return s.Count(ctx, queryString, args...)
 }
 
-func (s *BasePostgreSqlService) SelectOne(v any, ctx context.Context, queryString string, args ...any) error {
+func (s *BasePostgreSqlService) SelectOne(
+	v any,
+	ctx context.Context,
+	queryString string,
+	args ...any,
+) error {
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	var rows pgx.Rows
@@ -291,7 +340,12 @@ func (s *BasePostgreSqlService) SelectOne(v any, ctx context.Context, queryStrin
 	return nil
 }
 
-func (s *BasePostgreSqlService) SelectMany(v any, ctx context.Context, queryString string, args ...any) error {
+func (s *BasePostgreSqlService) SelectMany(
+	v any,
+	ctx context.Context,
+	queryString string,
+	args ...any,
+) error {
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	var rows pgx.Rows
@@ -322,7 +376,11 @@ func (s *BasePostgreSqlService) SelectMany(v any, ctx context.Context, queryStri
 	return nil
 }
 
-func (s *BasePostgreSqlService) InsertOne(ctx context.Context, queryString string, args ...any) (interface{}, error) {
+func (s *BasePostgreSqlService) InsertOne(
+	ctx context.Context,
+	queryString string,
+	args ...any,
+) (interface{}, error) {
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	var resultId int
@@ -341,7 +399,11 @@ func (s *BasePostgreSqlService) InsertOne(ctx context.Context, queryString strin
 	return resultId, nil
 }
 
-func (s *BasePostgreSqlService) InsertOneWithData(ctx context.Context, body interface{}, returnOption ...ReturningConfig) (interface{}, error) {
+func (s *BasePostgreSqlService) InsertOneWithData(
+	ctx context.Context,
+	body interface{},
+	returnOption ...ReturningConfig,
+) (interface{}, error) {
 	returnColumn := []string{}
 
 	if len(returnOption) > 0 {
@@ -356,7 +418,11 @@ func (s *BasePostgreSqlService) InsertOneWithData(ctx context.Context, body inte
 	return s.InsertOne(ctx, queryString, args...)
 }
 
-func (s *BasePostgreSqlService) InsertMany(ctx context.Context, queryString string, args ...any) (int64, error) {
+func (s *BasePostgreSqlService) InsertMany(
+	ctx context.Context,
+	queryString string,
+	args ...any,
+) (int64, error) {
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	var commandTag pgconn.CommandTag
@@ -375,7 +441,11 @@ func (s *BasePostgreSqlService) InsertMany(ctx context.Context, queryString stri
 	return commandTag.RowsAffected(), nil
 }
 
-func (s *BasePostgreSqlService) InsertManyWithData(ctx context.Context, body interface{}, returnOption ...ReturningConfig) (interface{}, error) {
+func (s *BasePostgreSqlService) InsertManyWithData(
+	ctx context.Context,
+	body interface{},
+	returnOption ...ReturningConfig,
+) (interface{}, error) {
 	returnColumn := []string{}
 
 	if len(returnOption) > 0 {
@@ -393,7 +463,11 @@ func (s *BasePostgreSqlService) InsertManyWithData(ctx context.Context, body int
 	return s.InsertMany(ctx, queryString, args...)
 }
 
-func (s *BasePostgreSqlService) UpdateOne(ctx context.Context, queryString string, args ...any) (interface{}, error) {
+func (s *BasePostgreSqlService) UpdateOne(
+	ctx context.Context,
+	queryString string,
+	args ...any,
+) (interface{}, error) {
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	var resultId int
@@ -412,7 +486,12 @@ func (s *BasePostgreSqlService) UpdateOne(ctx context.Context, queryString strin
 	return resultId, nil
 }
 
-func (s *BasePostgreSqlService) UpdateOneWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}, returnOption ...ReturningConfig) (interface{}, error) {
+func (s *BasePostgreSqlService) UpdateOneWithData(
+	ctx context.Context,
+	query map[string]sql_query.SQLCondition,
+	body interface{},
+	returnOption ...ReturningConfig,
+) (interface{}, error) {
 	returnColumn := []string{}
 
 	if len(returnOption) > 0 {
@@ -431,7 +510,11 @@ func (s *BasePostgreSqlService) UpdateOneWithData(ctx context.Context, query map
 	return s.UpdateOne(ctx, queryString, args...)
 }
 
-func (s *BasePostgreSqlService) UpdateMany(ctx context.Context, queryString string, args ...any) (int64, error) {
+func (s *BasePostgreSqlService) UpdateMany(
+	ctx context.Context,
+	queryString string,
+	args ...any,
+) (int64, error) {
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	var commandTag pgconn.CommandTag
@@ -450,7 +533,12 @@ func (s *BasePostgreSqlService) UpdateMany(ctx context.Context, queryString stri
 	return commandTag.RowsAffected(), nil
 }
 
-func (s *BasePostgreSqlService) UpdateManyWithData(ctx context.Context, query map[string]sql_query.SQLCondition, body interface{}, returnOption ...ReturningConfig) (int64, error) {
+func (s *BasePostgreSqlService) UpdateManyWithData(
+	ctx context.Context,
+	query map[string]sql_query.SQLCondition,
+	body interface{},
+	returnOption ...ReturningConfig,
+) (int64, error) {
 	returnColumn := []string{}
 
 	if len(returnOption) > 0 {
@@ -472,7 +560,12 @@ func (s *BasePostgreSqlService) UpdateManyWithData(ctx context.Context, query ma
 	return s.UpdateMany(ctx, queryString, args...)
 }
 
-func (s *BasePostgreSqlService) UpdateEachWithData(ctx context.Context, rowIdentifier string, query map[string]sql_query.SQLCondition, body interface{}) (int64, error) {
+func (s *BasePostgreSqlService) UpdateEachWithData(
+	ctx context.Context,
+	rowIdentifier string,
+	query map[string]sql_query.SQLCondition,
+	body interface{},
+) (int64, error) {
 	queryString, args := common_builders.UpdateEachBuilder(s.TableName,
 		rowIdentifier,
 		query,
@@ -483,7 +576,11 @@ func (s *BasePostgreSqlService) UpdateEachWithData(ctx context.Context, rowIdent
 	return s.UpdateMany(ctx, queryString, args...)
 }
 
-func (s *BasePostgreSqlService) SoftDeleteOne(ctx context.Context, filter map[string]sql_query.SQLCondition, returnOption ...ReturningConfig) (interface{}, error) {
+func (s *BasePostgreSqlService) SoftDeleteOne(
+	ctx context.Context,
+	filter map[string]sql_query.SQLCondition,
+	returnOption ...ReturningConfig,
+) (interface{}, error) {
 	returnColumn := []string{}
 
 	if len(returnOption) > 0 {
@@ -501,7 +598,11 @@ func (s *BasePostgreSqlService) SoftDeleteOne(ctx context.Context, filter map[st
 	return s.DeleteOne(ctx, queryString, args...)
 }
 
-func (s *BasePostgreSqlService) SoftDeleteMany(ctx context.Context, filter map[string]sql_query.SQLCondition, returnOption ...ReturningConfig) (int64, error) {
+func (s *BasePostgreSqlService) SoftDeleteMany(
+	ctx context.Context,
+	filter map[string]sql_query.SQLCondition,
+	returnOption ...ReturningConfig,
+) (int64, error) {
 	returnColumn := []string{}
 
 	if len(returnOption) > 0 {
@@ -526,7 +627,11 @@ func (s *BasePostgreSqlService) SoftDeleteMany(ctx context.Context, filter map[s
 	return s.DeleteMany(ctx, queryString, args...)
 }
 
-func (s *BasePostgreSqlService) DeleteOne(ctx context.Context, queryString string, args ...any) (interface{}, error) {
+func (s *BasePostgreSqlService) DeleteOne(
+	ctx context.Context,
+	queryString string,
+	args ...any,
+) (interface{}, error) {
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	var resultId int
@@ -545,14 +650,21 @@ func (s *BasePostgreSqlService) DeleteOne(ctx context.Context, queryString strin
 	return resultId, nil
 }
 
-func (s *BasePostgreSqlService) DeleteOneWithFilter(ctx context.Context, filter map[string]sql_query.SQLCondition) (interface{}, error) {
+func (s *BasePostgreSqlService) DeleteOneWithFilter(
+	ctx context.Context,
+	filter map[string]sql_query.SQLCondition,
+) (interface{}, error) {
 	queryString, args := common_builders.DeleteBuilder(s.TableName, filter)
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	return s.DeleteOne(ctx, queryString, args...)
 }
 
-func (s *BasePostgreSqlService) DeleteMany(ctx context.Context, queryString string, args ...any) (int64, error) {
+func (s *BasePostgreSqlService) DeleteMany(
+	ctx context.Context,
+	queryString string,
+	args ...any,
+) (int64, error) {
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	var commandTag pgconn.CommandTag
@@ -571,7 +683,10 @@ func (s *BasePostgreSqlService) DeleteMany(ctx context.Context, queryString stri
 	return commandTag.RowsAffected(), nil
 }
 
-func (s *BasePostgreSqlService) DeleteManyWithFilter(ctx context.Context, filter map[string]sql_query.SQLCondition) (int64, error) {
+func (s *BasePostgreSqlService) DeleteManyWithFilter(
+	ctx context.Context,
+	filter map[string]sql_query.SQLCondition,
+) (int64, error) {
 	queryString, args := common_builders.DeleteBuilder(s.TableName, filter)
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
@@ -582,11 +697,16 @@ func (s *BasePostgreSqlService) DeleteManyWithFilter(ctx context.Context, filter
 // If fn returns an error, the transaction is rolled back.
 // If fn succeeds, the transaction is committed.
 // The returned value is whatever fn returns, or an error if commit/rollback fails.
-func UseTransactions(ctx context.Context, pool PgxPoolInterface, fn func(tx pgx.Tx) (any, error)) (result any, err error) {
+func UseTransactions[T any](
+	ctx context.Context,
+	pool PgxPoolInterface,
+	fn func(tx pgx.Tx) (T, error),
+) (result T, err error) {
 	tx, err := pool.Begin(ctx)
 	if err != nil {
 		log.Printf("can't start transactions: %v", err)
-		return nil, errors.New("something went wrong")
+		err = errors.New("something went wrong")
+		return
 	}
 
 	defer func() {
@@ -594,7 +714,6 @@ func UseTransactions(ctx context.Context, pool PgxPoolInterface, fn func(tx pgx.
 			log.Printf("transaction panicked: %v", r)
 			tx.Rollback(ctx)
 			err = errors.New("something went wrong")
-			result = nil
 		} else {
 			tx.Rollback(ctx)
 		}
@@ -602,12 +721,13 @@ func UseTransactions(ctx context.Context, pool PgxPoolInterface, fn func(tx pgx.
 
 	result, err = fn(tx)
 	if err != nil {
-		return nil, err
+		return
 	}
 
 	if commitErr := tx.Commit(ctx); commitErr != nil {
 		log.Printf("failed to commit: %v", commitErr)
-		return nil, errors.New("something went wrong")
+		err = errors.New("something went wrong")
+		return
 	}
 
 	return result, nil
