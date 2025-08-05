@@ -66,9 +66,31 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 			s.Args = append(s.Args, v.Index(0).Interface(), v.Index(1).Interface())
 
 		/* ────────────────── = ANY($n) ─────────────────── */
-		case SQLOperatorAny:
+		// products.user.id = ANY ($1) (array became args)
+		case SQLOperatorAny, SQLOperatorIn, SQLOperatorNotIn:
 			quotedColumn := escapeQuoteColumns(column)
-			clause = fmt.Sprintf(`%s = ANY($%d)`, quotedColumn, len(s.Args)+1)
+
+			v := reflect.ValueOf(each.Value)
+			if v.Kind() == reflect.Ptr {
+				v = v.Elem()
+			}
+
+			if !v.IsValid() || (v.Kind() == reflect.Slice && v.IsNil()) {
+				continue
+			}
+
+			if v.Len() == 0 {
+				if each.Operator != SQLOperatorNotIn {
+					// Empty slice/array means show nothing
+					clause = "FALSE"
+				} else {
+					// Empty slice/array means show all
+					clause = "TRUE"
+				}
+				break
+			}
+
+			clause = fmt.Sprintf(`%s = ANY(%d)`, quotedColumn, len(s.Args)+1)
 			s.Args = append(s.Args, each.Value)
 
 		/* ──────────────────── DEFAULT ─────────────────── */
@@ -80,25 +102,9 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 				break
 			}
 
-			v := reflect.ValueOf(each.Value)
-			if v.Kind() == reflect.Slice {
-				// products.user.id IN ($1,$2) (each element in array became args)
-				// To expand placeholder usage for operator IN / NOT IN
-				if v.Len() == 0 {
-					continue
-				}
-				ph := make([]string, v.Len())
-				for i := 0; i < v.Len(); i++ {
-					ph[i] = fmt.Sprintf("$%d", len(s.Args)+1)
-					s.Args = append(s.Args, v.Index(i).Interface())
-				}
-
-				clause = fmt.Sprintf(`%s %s (%s)`, escapeQuoteColumns(column), each.Operator, strings.Join(ph, ", "))
-			} else {
-				// Common operator, products.user.id = $1 (literal value with args)=
-				clause = fmt.Sprintf(`%s %s $%d`, escapeQuoteColumns(column), each.Operator, len(s.Args)+1)
-				s.Args = append(s.Args, each.Value)
-			}
+			// Common operator, products.user.id = $1 (literal value with args)=
+			clause = fmt.Sprintf(`%s %s $%d`, escapeQuoteColumns(column), each.Operator, len(s.Args)+1)
+			s.Args = append(s.Args, each.Value)
 		}
 
 		// Insert to Where clause or Having clause based on given params
