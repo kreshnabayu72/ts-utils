@@ -59,6 +59,13 @@ func GetAllAssetsBuilder(filters map[string]sql_query.SQLCondition) (string, []i
 
 func GetAllAssetsWithRoleBuilder(filters map[string]sql_query.SQLCondition) (string, []interface{}, error) {
 	commonBuilder := commonGetAssetListBuilder()
-	TransactionRolePermissionAggregation(commonBuilder, 1000000000000000001, "a.group_id", "damagedRole", RoleRestrictionOptions{}, true)
+	TransactionRolePermissionAggregation(
+		commonBuilder,
+		1000000000000000001,
+		"a.group_id",
+		"damagedRole",
+		RoleRestrictionOptions{},
+		true,
+	)
 	return commonBuilder.Where(filters).Build()
 }
