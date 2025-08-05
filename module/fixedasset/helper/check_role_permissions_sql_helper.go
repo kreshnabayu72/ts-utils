@@ -170,7 +170,7 @@ func CheckTransactionRoleMultiGroupPermissionsSQL(
 
 	fmt.Println("query", query, args)
 	var permissionCheck []map[string]any
-	err := service.SelectMany(permissionCheck, context.Background(), query, args...)
+	err := service.SelectMany(&permissionCheck, context.Background(), query, args...)
 	if err != nil {
 		fmt.Printf("ERR: %v\n", err.Error())
 		return errors.New("Data not found")
