@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strings"
+	"unicode"
 
 	fixedasset_model "gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/model"
 	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
@@ -26,66 +28,81 @@ type RoleRestrictionOptions struct {
 }
 
 type UserSystemRole struct {
-	ID       string                    `json:"_id" column:"usr.id::text"`
-	GroupID  string                    `json:"group_id" column:"usr.group_id"`
-	RoleType fixedasset_model.RoleType `json:"role_attribute" column:"usr.role_attribute"`
-	Create   bool                      `json:"create" column:"usr.permission_create"`
-	View     bool                      `json:"view" column:"usr.permission_view"`
-	Update   bool                      `json:"update" column:"usr.permission_update"`
-	Delete   bool                      `json:"delete" column:"usr.permission_delete"`
+	ID       string                        `json:"_id"            column:"usr.id::text"`
+	GroupID  string                        `json:"group_id"       column:"usr.group_id"`
+	RoleType new_model.SystemRoleAttribute `json:"role_attribute" column:"usr.role_attribute"`
+	Create   bool                          `json:"create"         column:"usr.permission_create"`
+	View     bool                          `json:"view"           column:"usr.permission_view"`
+	Update   bool                          `json:"update"         column:"usr.permission_update"`
+	Delete   bool                          `json:"delete"         column:"usr.permission_delete"`
 }
 
 type UserTransactionRole struct {
-	ID                        string                                     `json:"_id" column:"utr.id::text"`
-	GroupID                   string                                     `json:"group_id" column:"utr.group_id"`
-	RoleType                  fixedasset_model.TransactionRoleType       `json:"role_type" column:"utr.role_type"`
+	ID                        string                                     `json:"_id"            column:"utr.id::text"`
+	GroupID                   string                                     `json:"group_id"       column:"utr.group_id"`
+	RoleType                  fixedasset_model.TransactionRoleType       `json:"role_type"      column:"utr.role_type"`
 	TransactionGroupAttribute fixedasset_model.TransactionGroupAttribute `json:"role_attribute" column:"utr.role_attribute"`
+}
+
+func ToSnakeCase(s string) string {
+	var result strings.Builder
+	for i, r := range s {
+		if unicode.IsUpper(r) {
+			if i > 0 { // Don't add underscore before the first character if it's uppercase
+				result.WriteByte('_')
+			}
+			result.WriteRune(unicode.ToLower(r))
+		} else {
+			result.WriteRune(r)
+		}
+	}
+	return result.String()
 }
 
 func generateUserSystemRolesBuilder(
 	loggedInUserId int,
 	groupColumn string,
-	isFieldArray bool,
-	roleType fixedasset_model.RoleType,
-	isGlobalRole ...bool,
+	roleAttribute new_model.SystemRoleAttribute,
 ) sql_query.SQLSelectChainBuilder {
 	builder := sql_query.NewSQLSelectBuilder[UserSystemRole]("user_system_roles usr").
-		Where(map[string]sql_query.SQLCondition{
-			"usr\".\"user_id": {
-				Operator: sql_query.SQLOperatorEqual,
-				Value:    loggedInUserId,
-			},
-			"usr\".\"is_active": {
-				Operator: sql_query.SQLOperatorEqual,
-				Value:    true,
-			},
-			"usr\".\"role_attribute": {
-				Operator: sql_query.SQLOperatorEqual,
-				Value:    roleType,
-			},
-		})
-
-	if len(isGlobalRole) < 1 && isGlobalRole[0] && groupColumn != "" {
-		if !isFieldArray {
-			builder.Where(map[string]sql_query.SQLCondition{
-				"usr.group_id": {
+		Where(
+			map[string]sql_query.SQLCondition{
+				"usr.user_id": {
 					Operator: sql_query.SQLOperatorEqual,
-					Value:    groupColumn,
-					IsRef:    true,
+					Value:    loggedInUserId,
 				},
-			})
+				"usr.is_active": {
+					Operator: sql_query.SQLOperatorEqual,
+					Value:    true,
+				},
+				"usr.role_attribute": {
+					Operator: sql_query.SQLOperatorEqual,
+					Value:    roleAttribute,
+				},
+			},
+		)
 
-			return builder
-		}
-
-		builder.Where(map[string]sql_query.SQLCondition{
+	builder.WhereOr(
+		map[string]sql_query.SQLCondition{
+			// If the system role type is 'Global', skip checking for the group_id.
+			"usr.role_type": {
+				Operator: sql_query.SQLOperatorEqual,
+				Value:    new_model.SystemRoleTypeGlobal,
+			},
 			"usr.group_id": {
-				Operator: sql_query.SQLOperatorAny,
+				Operator: sql_query.SQLOperatorEqual,
 				Value:    groupColumn,
 				IsRef:    true,
 			},
-		})
-	}
+		},
+	)
+
+	builder.Select(
+		"usr.permission_create AS create",
+		"usr.permission_view AS view",
+		"usr.permission_update AS update",
+		"usr.permission_delete AS delete",
+	)
 
 	return builder
 }
@@ -115,88 +132,28 @@ func generateUserTransactionRolesBuilder(
 		})
 }
 
-func getSystemRolePermission(permission string) string {
-	return fmt.Sprintf("usr.%s", permission)
-}
-
-func GetHasSystemRoleSection(builder *sql_query.SelectBuilder, roleType fixedasset_model.RoleType) {
-	rt, ok := fixedasset_model.RoleTypeMap[string(roleType)]
-	if !ok {
-		return
-	}
-
-	builder.SelectJSONAggregateFunc("hasSystemRole", func(b *sql_query.SelectBuilder) {
-		b.SelectJSONAggregate(string(rt),
-			map[string]string{
-				"create": getSystemRolePermission("create"),
-				"view":   getSystemRolePermission("view"),
-				"update": getSystemRolePermission("update"),
-				"delete": getSystemRolePermission("delete"),
-			}, fmt.Sprintf("usr.role_attribute = $%d", len(builder.Args)+1), false,
-		)
-	})
-	// builder.SelectJSONAggregateFunc("hasSystemRole", func(b *sql_query.SelectBuilder) {
-	// 	// To make json below to be children of this alias
-	// 	b.AggregationChild = true
-
-	// 	b.SelectJSONAggregateFunc("userAndRole", func(sb *sql_query.SelectBuilder) {
-	// 		sb.SelectJSONAggregate(map[string]string{
-	// 			"create": getSystemRolePermission("create"),
-	// 			"view":   getSystemRolePermission("view"),
-	// 			"update": getSystemRolePermission("update"),
-	// 			"delete": getSystemRolePermission("delete"),
-	// 		}, false).
-	// 			Where(map[string]sql_query.SQLCondition{
-	// 				"usr\".\"role_attribute": {
-	// 					Operator: sql_query.SQLOperatorEqual,
-	// 					Value:    "userAndRole",
-	// 				},
-	// 			})
-	// 	})
-	// 	b.SelectJSONAggregateFunc("openAPI", func(sb *sql_query.SelectBuilder) {
-	// 		sb.SelectJSONAggregate(map[string]string{
-	// 			"create": getSystemRolePermission("create"),
-	// 			"view":   getSystemRolePermission("view"),
-	// 			"update": getSystemRolePermission("update"),
-	// 			"delete": getSystemRolePermission("delete"),
-	// 		}, false).
-	// 			Where(map[string]sql_query.SQLCondition{
-	// 				"usr\".\"role_attribute": {
-	// 					Operator: sql_query.SQLOperatorEqual,
-	// 					Value:    "openAPI",
-	// 				},
-	// 			})
-	// 	})
-	// })
-}
-
 func SystemRolePermissionAggregation(
 	builder *sql_query.SelectBuilder,
 	loggedInUserId int,
 	groupColumn string,
-	isFieldArray bool,
-	roleType fixedasset_model.RoleType,
-	isGlobalRole ...bool,
+	roleAttributes []new_model.SystemRoleAttribute,
 ) {
-	var globalRole bool
-	if len(isGlobalRole) > 0 {
-		globalRole = isGlobalRole[0]
-	} else {
-		globalRole = false // default
+	for _, roleAttribute := range roleAttributes {
+		cteName := fmt.Sprintf("has_system_role_%s", ToSnakeCase(string(roleAttribute)))
+
+		cteBuilder := generateUserSystemRolesBuilder(
+			loggedInUserId,
+			groupColumn,
+			roleAttribute,
+		)
+
+		builder.WithCTEBuilder(
+			cteName,
+			cteBuilder.(*sql_query.SelectBuilder).SQLEloquentQuery,
+		)
+
+		builder.LeftJoin(cteName, "true")
 	}
-
-	cteBuilder := generateUserSystemRolesBuilder(
-		loggedInUserId,
-		groupColumn,
-		isFieldArray,
-		roleType,
-		globalRole,
-	)
-	builder.WithCTEBuilder("user_system_roles_cte", cteBuilder.(*sql_query.SelectBuilder).SQLEloquentQuery)
-
-	GetHasSystemRoleSection(builder, roleType)
-
-	builder.LeftJoin("user_system_roles_cte usr", "true")
 }
 
 func GetHasTransactionRole(
