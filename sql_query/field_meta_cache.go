@@ -47,11 +47,15 @@ var (
 	FieldMapCache sync.Map
 )
 
-func normalizeType(t reflect.Type) reflect.Type {
+func normalizeType(t reflect.Type) (normalizedType reflect.Type, isSlice bool) {
 	for t.Kind() == reflect.Ptr || t.Kind() == reflect.Slice {
+		if t.Kind() == reflect.Slice {
+			isSlice = true
+		}
 		t = t.Elem()
 	}
-	return t
+	normalizedType = t
+	return normalizedType, isSlice
 }
 
 func ExtractFromType(typ reflect.Type) []FieldMeta {
@@ -63,8 +67,9 @@ func ExtractFromType(typ reflect.Type) []FieldMeta {
 			continue
 		}
 
+		var isSlice bool
 		fType := f.Type
-		fType = normalizeType(fType)
+		fType, isSlice = normalizeType(fType)
 		timeType := reflect.TypeOf(time.Time{})
 
 		meta := FieldMeta{
@@ -74,19 +79,13 @@ func ExtractFromType(typ reflect.Type) []FieldMeta {
 			ColumnTag:  f.Tag.Get("column"),
 			FieldIndex: f.Index,
 			IsStruct:   fType.Kind() == reflect.Struct && fType != timeType,
-			IsSlice:    fType.Kind() == reflect.Slice,
+			IsSlice:    isSlice,
 			IsTime:     fType == timeType,
 		}
 
-		if meta.IsStruct || (meta.IsSlice && meta.Type.Elem().Kind() == reflect.Struct) {
-			meta.NestedFields = ExtractFromType(
-				func() reflect.Type {
-					if meta.IsSlice {
-						return meta.Type.Elem()
-					}
-					return meta.Type
-				}(),
-			)
+		// No longer need to check for .Elem() since variable `meta` already normalized to single struct
+		if meta.IsStruct || (meta.IsSlice && meta.Type.Kind() == reflect.Struct) {
+			meta.NestedFields = ExtractFromType(meta.Type)
 		}
 
 		fields = append(fields, meta)
