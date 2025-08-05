@@ -245,6 +245,16 @@ type MockPgxPool struct {
 	mock.Mock
 }
 
+func (m *MockPgxPool) CopyFrom(
+	ctx context.Context,
+	identifier pgx.Identifier,
+	columns []string,
+	source pgx.CopyFromSource,
+) (int64, error) {
+	args := m.Called(ctx, identifier, columns, source)
+	return args.Get(0).(int64), args.Error(1)
+}
+
 func (m *MockPgxPool) Exec(
 	ctx context.Context,
 	sql string,
