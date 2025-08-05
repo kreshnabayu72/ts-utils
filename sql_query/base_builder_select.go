@@ -615,6 +615,7 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 		if s.Limit > 0 {
 			sb.WriteString("LIMIT ")
 			sb.WriteString(strconv.Itoa(s.Limit))
+			sb.WriteByte(' ')
 		}
 		sb.WriteString("OFFSET ")
 		sb.WriteString(strconv.Itoa(s.Offset))
