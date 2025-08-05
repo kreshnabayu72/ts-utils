@@ -158,7 +158,7 @@ func SystemRolePermissionAggregation(
 			cteBuilder.(*sql_query.SelectBuilder).SQLEloquentQuery,
 		)
 
-		builder.LeftJoin(cteName, fmt.Sprintf("%s.id = %s.id", builder.Table, proxyTable))
+		builder.LeftJoin(cteName, fmt.Sprintf("%s.id = %s.id", builder.Table, cteName))
 	}
 }
 
