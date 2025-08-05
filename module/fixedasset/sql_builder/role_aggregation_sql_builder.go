@@ -141,6 +141,7 @@ func SystemRolePermissionAggregation(
 	loggedInUserId int,
 	groupColumn string,
 	mainTable string,
+	aliasTable string,
 	roleAttributes []new_model.SystemRoleAttribute,
 ) {
 	for _, roleAttribute := range roleAttributes {
@@ -158,7 +159,7 @@ func SystemRolePermissionAggregation(
 			cteBuilder.(*sql_query.SelectBuilder).SQLEloquentQuery,
 		)
 
-		builder.LeftJoin(cteName, fmt.Sprintf("%s.id = %s.id", mainTable, cteName))
+		builder.LeftJoin(cteName, fmt.Sprintf("%s.id = %s.id", aliasTable, cteName))
 	}
 }
 
