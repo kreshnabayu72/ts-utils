@@ -7,23 +7,21 @@ import (
 )
 
 type Asset struct {
-	ID          int    `json:"_id"                column:"id"                 sql:"BIGINT PRIMARY KEY"`
-	AssetIDFull string `json:"assetIdFull"        column:"asset_id_full"      sql:"VARCHAR UNIQUE"`
-	AssetID     string `json:"assetId"            column:"asset_id"           sql:"VARCHAR UNIQUE"`
-	NameID      int    `json:"nameId"             column:"name_id"            sql:"BIGINT"`
-	// TODO: think about column name_with_sequence or completely delete this
-	// NameWithSequence string            `json:"nameWithSequence"   column:"name_with_sequence" sql:"VARCHAR"`
-	SequenceNumber int     `json:"sequenceNumber"     column:"sequence_number"    sql:"BIGINT"`
-	AliasName      *string `json:"aliasName"          column:"alias_name"         sql:"VARCHAR"`
-	// TODO: think about column alias_code or completely delete this
-	// AliasCode        *string           `json:"aliasCode"          column:"alias_code"         sql:"VARCHAR"`
-	QrID           *int              `json:"qrId"               column:"qr_id"              sql:"BIGINT"`
-	RfidID         *int              `json:"rfidId"             column:"rfid_id"            sql:"BIGINT"`
-	Status         AssetStatus       `json:"status"             column:"status"             sql:"asset_status_enum NOT NULL"`
-	FirstImage     *string           `json:"firstImage"         column:"first_image"        sql:"VARCHAR"`
-	SecondImage    *string           `json:"secondImage"        column:"second_image"       sql:"VARCHAR"`
-	SetDefault     AssetDefaultImage `json:"setDefault"         column:"set_default"        sql:"asset_default_image_enum"`
-	PreviousStatus *string           `json:"previousStatus"     column:"previous_status"    sql:"asset_status_enum NOT NULL"`
+	ID               int               `json:"_id"                column:"id"                 sql:"BIGINT PRIMARY KEY"`
+	AssetIDFull      string            `json:"assetIdFull"        column:"asset_id_full"      sql:"VARCHAR UNIQUE"`
+	AssetID          string            `json:"assetId"            column:"asset_id"           sql:"VARCHAR UNIQUE"`
+	NameID           int               `json:"nameId"             column:"name_id"            sql:"BIGINT"`
+	NameWithSequence string            `json:"nameWithSequence"   column:"name_with_sequence" sql:"VARCHAR"`
+	SequenceNumber   int               `json:"sequenceNumber"     column:"sequence_number"    sql:"BIGINT"`
+	AliasName        *string           `json:"aliasName"          column:"alias_name"         sql:"VARCHAR"`
+	AliasCode        *string           `json:"aliasCode"          column:"alias_code"         sql:"VARCHAR"`
+	QrID             *int              `json:"qrId"               column:"qr_id"              sql:"BIGINT"`
+	RfidID           *int              `json:"rfidId"             column:"rfid_id"            sql:"BIGINT"`
+	Status           AssetStatus       `json:"status"             column:"status"             sql:"asset_status_enum NOT NULL"`
+	FirstImage       *string           `json:"firstImage"         column:"first_image"        sql:"VARCHAR"`
+	SecondImage      *string           `json:"secondImage"        column:"second_image"       sql:"VARCHAR"`
+	SetDefault       AssetDefaultImage `json:"setDefault"         column:"set_default"        sql:"asset_default_image_enum"`
+	PreviousStatus   *string           `json:"previousStatus"     column:"previous_status"    sql:"asset_status_enum NOT NULL"`
 
 	// ─────── References ───────
 	GroupID        int  `json:"groupId"        column:"group_id" sql:"BIGINT"`
