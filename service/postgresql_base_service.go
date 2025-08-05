@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 	"reflect"
+	"runtime/debug"
 	"time"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/db"
@@ -769,7 +770,7 @@ func UseTransactions[T any](
 
 	defer func() {
 		if r := recover(); r != nil {
-			log.Printf("transaction panicked: %v", r)
+			log.Printf("transaction panicked: %v\n%s", r, debug.Stack())
 			tx.Rollback(ctx)
 			err = errors.New("something went wrong")
 		} else {
