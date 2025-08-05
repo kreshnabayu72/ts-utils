@@ -62,7 +62,7 @@ func ToSnakeCase(s string) string {
 func generateUserSystemRolesBuilder(
 	loggedInUserId int,
 	groupColumn string,
-	proxyTable string,
+	mainTable string,
 	roleAttribute new_model.SystemRoleAttribute,
 ) sql_query.SQLSelectChainBuilder {
 	builder := sql_query.NewSQLSelectBuilder[UserSystemRole]("user_system_roles usr").
@@ -99,14 +99,14 @@ func generateUserSystemRolesBuilder(
 	)
 
 	builder.Select(
-		fmt.Sprintf("%s.id AS id", proxyTable),
+		fmt.Sprintf("%s.id AS id", mainTable),
 		"usr.permission_create AS \"create\"",
 		"usr.permission_view AS \"view\"",
 		"usr.permission_update AS \"update\"",
 		"usr.permission_delete AS \"delete\"",
 	)
 
-	builder.Join(proxyTable, "true")
+	builder.Join(mainTable, "true")
 
 	return builder
 }
@@ -140,7 +140,7 @@ func SystemRolePermissionAggregation(
 	builder *sql_query.SelectBuilder,
 	loggedInUserId int,
 	groupColumn string,
-	proxyTable string,
+	mainTable string,
 	roleAttributes []new_model.SystemRoleAttribute,
 ) {
 	for _, roleAttribute := range roleAttributes {
@@ -149,7 +149,7 @@ func SystemRolePermissionAggregation(
 		cteBuilder := generateUserSystemRolesBuilder(
 			loggedInUserId,
 			groupColumn,
-			proxyTable,
+			mainTable,
 			roleAttribute,
 		)
 
@@ -158,7 +158,7 @@ func SystemRolePermissionAggregation(
 			cteBuilder.(*sql_query.SelectBuilder).SQLEloquentQuery,
 		)
 
-		builder.LeftJoin(cteName, fmt.Sprintf("%s.id = %s.id", builder.Table, cteName))
+		builder.LeftJoin(cteName, fmt.Sprintf("%s.id = %s.id", mainTable, cteName))
 	}
 }
 
