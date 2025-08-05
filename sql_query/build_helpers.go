@@ -90,7 +90,7 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 				break
 			}
 
-			clause = fmt.Sprintf(`%s = ANY(%d)`, quotedColumn, len(s.Args)+1)
+			clause = fmt.Sprintf(`%s = ANY($%d)`, quotedColumn, len(s.Args)+1)
 			s.Args = append(s.Args, each.Value)
 
 		/* ──────────────────── DEFAULT ─────────────────── */
