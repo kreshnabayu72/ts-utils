@@ -47,7 +47,7 @@ type NotificationHelperSQL interface {
 	SendNotificationToUsersSQL(
 		serviceProvider provider.ServiceProvider,
 		companyCode string,
-		userIds []int,
+		userIds []string,
 		notificationDataWithoutUser util_fixedasset_new_model.Notification,
 	) *entity.HttpError
 
@@ -57,7 +57,7 @@ type NotificationHelperSQL interface {
 		notifications []util_fixedasset_new_model.Notification,
 	) *entity.HttpError
 
-	RefreshNotificationSseSQL(userIds []int) *entity.HttpError
+	RefreshNotificationSseSQL(userIds []string) *entity.HttpError
 }
 
 type SendNotificationSQLHelperImpl struct {
@@ -134,17 +134,17 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationToTransactionRolesSQL(
 		return entity.InternalServerError(err.Error())
 	}
 
-	var uniqueUserIds []int
-	var uniqueUserIdsCheck map[int]bool = make(map[int]bool)
+	var uniqueUserIds []string
+	var uniqueUserIdsCheck map[string]bool = make(map[string]bool)
 
 	for _, role := range roles {
 		// if user id already used, continue/skip
-		if _, ok := uniqueUserIdsCheck[role.UserID]; ok {
+		if _, ok := uniqueUserIdsCheck[strconv.Itoa(role.UserID)]; ok {
 			continue
 		}
 
-		uniqueUserIds = append(uniqueUserIds, role.UserID)
-		uniqueUserIdsCheck[role.UserID] = true
+		uniqueUserIds = append(uniqueUserIds, strconv.Itoa(role.UserID))
+		uniqueUserIdsCheck[strconv.Itoa(role.UserID)] = true
 	}
 
 	return r.SendNotificationToUsersSQL(
@@ -186,17 +186,17 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationToSystemRolesSQL(
 		return entity.InternalServerError(err.Error())
 	}
 
-	var uniqueUserIds []int
-	var uniqueUserIdsCheck map[int]bool = make(map[int]bool)
+	var uniqueUserIds []string
+	var uniqueUserIdsCheck map[string]bool = make(map[string]bool)
 
 	for _, role := range roles {
 		// if user id already used, continue/skip
-		if _, ok := uniqueUserIdsCheck[role.UserID]; ok {
+		if _, ok := uniqueUserIdsCheck[strconv.Itoa(role.UserID)]; ok {
 			continue
 		}
 
-		uniqueUserIds = append(uniqueUserIds, role.UserID)
-		uniqueUserIdsCheck[role.UserID] = true
+		uniqueUserIds = append(uniqueUserIds, strconv.Itoa(role.UserID))
+		uniqueUserIdsCheck[strconv.Itoa(role.UserID)] = true
 	}
 
 	return r.SendNotificationToUsersSQL(
@@ -210,7 +210,7 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationToSystemRolesSQL(
 func (r *SendNotificationSQLHelperImpl) SendNotificationToUsersSQL(
 	serviceProvider provider.ServiceProvider,
 	companyCode string,
-	userIds []int,
+	userIds []string,
 	notificationDataWithoutUser util_fixedasset_new_model.Notification,
 ) *entity.HttpError {
 	if len(userIds) == 0 {
@@ -416,7 +416,7 @@ func (r *SendNotificationSQLHelperImpl) SendMobileNotificationSQL(data util_fixe
 }
 
 func (r *SendNotificationSQLHelperImpl) RefreshNotificationSseSQL(
-	userIds []int,
+	userIds []string,
 ) *entity.HttpError {
 	notificationApi := os.Getenv("NOTIFICATION_API")
 	if notificationApi == "" {
@@ -429,7 +429,7 @@ func (r *SendNotificationSQLHelperImpl) RefreshNotificationSseSQL(
 			fmt.Sprintf(
 				"%s/v2/sse/send?id=%s&message=user:unread-notification",
 				notificationApi,
-				url.QueryEscape(strconv.Itoa(userId)),
+				url.QueryEscape(userId),
 			),
 		)
 		// Dont throw error, if notif is down, let transaction continue
