@@ -134,6 +134,7 @@ func CheckGroupPermissionSQL(
 // Can handle multiple data with different groups
 func CheckTransactionRoleMultiGroupPermissionsSQL(
 	service service.PostgreSqlService, // service for data (assets, transactions, etc)
+	tableName string,
 	loggedInUser *string,
 	dataFilter map[string]sql_query.SQLCondition,
 	groupIdField string,
@@ -159,10 +160,10 @@ func CheckTransactionRoleMultiGroupPermissionsSQL(
 		},
 	}
 
-	builder := sql_query.NewSQLSelectBuilder[any](fmt.Sprintf("%s as ctrmgp", service.GetTableName()))
+	builder := sql_query.NewSQLSelectBuilder[any](tableName)
 
 	query, args, _ := builder.
-		Select("ctrmgp.id", "utr.id as \"userTransactionRoleId\"").
+		Select(tableName+".id", "utr.id as \"userTransactionRoleId\"").
 		LeftJoin(fmt.Sprintf("%s as utr", db.UserTransactionRoleTableName), fmt.Sprintf("%s = utr.group_id", groupIdField), filter).
 		Where(dataFilter).
 		Build()
