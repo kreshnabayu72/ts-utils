@@ -191,16 +191,17 @@ func (s *InsertBuilder) cachedInsertSingle(v reflect.Value) SQLInsertChainBuilde
 				setTag = meta.ColumnTag
 			}
 
-			columns = append(columns, `"`+setTag+`"`)
-
 			if ArrayIncludes([]string{"updated_at", "created_at"}, setTag) {
-				placeholders = append(placeholders, "NOW()")
-			} else {
-				placeholders = append(placeholders, fmt.Sprintf("$%d", len(placeholders)+1))
+				continue
 			}
 
+			columns = append(columns, `"`+setTag+`"`)
+			placeholders = append(placeholders, fmt.Sprintf("$%d", len(placeholders)+1))
 			FieldIndexes = append(FieldIndexes, meta.FieldIndex)
 		}
+
+		columns = append(columns, "updated_at", "created_at")
+		placeholders = append(placeholders, "NOW()", "NOW()")
 
 		for idx, each := range placeholders {
 			if idx > 0 {
@@ -331,16 +332,17 @@ func (s *InsertBuilder) cachedInsertMany(slice reflect.Value) SQLInsertChainBuil
 			if meta.ColumnTag != "" {
 				setTag = meta.ColumnTag
 			}
+			if ArrayIncludes([]string{"updated_at", "created_at"}, setTag) {
+				continue
+			}
 
 			columns = append(columns, `"`+setTag+`"`)
 			FieldIndexes = append(FieldIndexes, meta.FieldIndex)
-
-			if ArrayIncludes([]string{"updated_at", "created_at"}, setTag) {
-				basePlaceholders = append(basePlaceholders, "NOW()")
-			} else {
-				basePlaceholders = append(basePlaceholders, "$X")
-			}
+			basePlaceholders = append(basePlaceholders, "$X")
 		}
+
+		columns = append(columns, "updated_at", "created_at")
+		basePlaceholders = append(basePlaceholders, "NOW()", "NOW()")
 
 		cachedTemplate = &InsertTemplate{
 			InsertColumn:     columns,
