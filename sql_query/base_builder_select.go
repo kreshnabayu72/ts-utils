@@ -20,8 +20,8 @@ type SQLSelectChainBuilder interface {
 	//
 	// Example:
 	//
-	//	builder.Distinct("u.id", "u.name")
-	Distinct(columns ...string) SQLSelectChainBuilder
+	//	builder.Distinct("distinct", "u.id", "u.name")
+	Distinct(alias string, columns ...string) SQLSelectChainBuilder
 
 	// Select implements SQLSelectChainBuilder.
 	// Select defines one or more columns for the SELECT statement.
@@ -258,9 +258,24 @@ func (s *SelectBuilder) Search(keyword string, fields []string) SQLSelectChainBu
 	return s
 }
 
-func (s *SelectBuilder) Distinct(columns ...string) SQLSelectChainBuilder {
+func (s *SelectBuilder) Distinct(alias string, columns ...string) SQLSelectChainBuilder {
+	s.DistinctAlias = alias
 	for _, newCol := range columns {
-		s.DistinctClauses = append(s.DistinctClauses, newCol)
+		newAlias := extractAlias(newCol)
+
+		// Check if alias exists in current list
+		replaced := false
+		for i, existing := range s.DistinctBy {
+			if extractAlias(existing) == newAlias {
+				s.DistinctBy[i] = newCol // Overwrite
+				replaced = true
+				break
+			}
+		}
+
+		if !replaced {
+			s.DistinctBy = append(s.DistinctBy, newCol)
+		}
 	}
 
 	return s
@@ -578,16 +593,18 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 
 	// DISTINCT
 	var db strings.Builder
-	if len(s.DistinctClauses) > 0 {
-		db.WriteString("DISTINCT ")
+	if len(s.DistinctBy) > 0 {
+		db.WriteString("DISTINCT ON ")
 		db.WriteString("(")
-		for i, d := range s.DistinctClauses {
+		for i, d := range s.DistinctBy {
 			if i > 0 {
 				db.WriteString(",")
 			}
 			db.WriteString(d)
 		}
 		db.WriteString(")")
+		db.WriteString(" " + s.DistinctAlias)
+
 		tmp := make([]string, len(s.Columns))
 
 		// Prepend distinct to the column clause.
