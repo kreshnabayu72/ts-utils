@@ -566,7 +566,7 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 			db.WriteString(d)
 		}
 		db.WriteString(")")
-		var tmp []string
+		tmp := make([]string, len(s.Columns))
 
 		// Prepend distinct to the column clause.
 		copy(tmp, s.Columns)
