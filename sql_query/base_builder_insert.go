@@ -353,7 +353,8 @@ func (s *InsertBuilder) cachedInsertMany(slice reflect.Value) SQLInsertChainBuil
 	}
 
 	numRows := slice.Len()
-	numCols := len(cachedTemplate.basePlaceholders)
+	// Exclude created_at and updated_at columns so it is not add unnecessary nil value at the end of args
+	numCols := len(cachedTemplate.basePlaceholders) - 2
 
 	args := make([]interface{}, numRows*numCols)
 	var allPlaceholders strings.Builder
