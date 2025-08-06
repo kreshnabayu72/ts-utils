@@ -315,7 +315,6 @@ func (s *InsertBuilder) cachedInsertMany(slice reflect.Value) SQLInsertChainBuil
 		columns := []string{"id"}
 		FieldIndexes := make([][]int, 0, len(*fieldMeta))
 		basePlaceholders := make([]string, 0, len(*fieldMeta)+1)
-		excludedColumns := 0
 
 		// ID in first position
 		basePlaceholders = append(basePlaceholders, "$1")
@@ -326,7 +325,6 @@ func (s *InsertBuilder) cachedInsertMany(slice reflect.Value) SQLInsertChainBuil
 			}
 			if ArrayIncludes([]string{"", "-"}, meta.JSONTag) &&
 				ArrayIncludes([]string{"", "-"}, meta.ColumnTag) {
-				excludedColumns++
 				continue
 			}
 
@@ -335,7 +333,6 @@ func (s *InsertBuilder) cachedInsertMany(slice reflect.Value) SQLInsertChainBuil
 				setTag = meta.ColumnTag
 			}
 			if ArrayIncludes([]string{"updated_at", "created_at"}, setTag) {
-				excludedColumns++
 				continue
 			}
 
@@ -351,15 +348,12 @@ func (s *InsertBuilder) cachedInsertMany(slice reflect.Value) SQLInsertChainBuil
 			InsertColumn:     columns,
 			basePlaceholders: basePlaceholders,
 			FieldIndexes:     FieldIndexes,
-			excludedColumns:  excludedColumns,
 		}
 		InsertCache[typeName] = cachedTemplate
 	}
 
 	numRows := slice.Len()
-	// Adjust number of columns based on excluded columns
-	// So it will not add unnecessary nil value at the end of args
-	numCols := len(cachedTemplate.basePlaceholders) - cachedTemplate.excludedColumns
+	numCols := len(cachedTemplate.basePlaceholders)
 
 	args := make([]interface{}, numRows*numCols)
 	var allPlaceholders strings.Builder
@@ -399,7 +393,7 @@ func (s *InsertBuilder) cachedInsertMany(slice reflect.Value) SQLInsertChainBuil
 		allPlaceholders.WriteByte(')')
 	}
 
-	s.Args = args
+	s.Args = args[:argsPos] // Trim args to the actual used size because there might excluded columns
 	s.preBuild(cachedTemplate.InsertColumn, []string{allPlaceholders.String()})
 
 	return s
