@@ -344,6 +344,13 @@ const (
 	TransactionRoleTypeStaff      TransactionRoleType = "Staff"
 )
 
+var TransactionRoleTypeEnum = map[string]TransactionRoleType{
+	"Manager":    TransactionRoleTypeManager,
+	"Monitoring": TransactionRoleTypeMonitoring,
+	"Approval":   TransactionRoleTypeApproval,
+	"Staff":      TransactionRoleTypeStaff,
+}
+
 type PlanTypes string
 
 const (
