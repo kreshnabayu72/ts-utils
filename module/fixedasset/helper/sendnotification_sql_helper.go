@@ -3,8 +3,10 @@ package helper
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"strconv"
 	"strings"
@@ -54,6 +56,8 @@ type NotificationHelperSQL interface {
 		companyCode string,
 		notifications []util_fixedasset_new_model.Notification,
 	) *entity.HttpError
+
+	RefreshNotificationSseSQL(userIds []int) *entity.HttpError
 }
 
 type SendNotificationSQLHelperImpl struct {
@@ -296,7 +300,7 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationSQL(
 	notificationsInterface := []any{}
 	for _, pendingNotification := range notifications {
 		notificationsInterface = append(notificationsInterface, pendingNotification)
-		_, err := http.Get(
+		resp, err := http.Get(
 			fmt.Sprintf(
 				"%s/v2/sse/send?id=%s&message=user:unread-notification",
 				notificationApi,
@@ -306,8 +310,12 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationSQL(
 		// Dont throw error, if notif is down, let transaction continue
 		if err != nil {
 			fmt.Println("NOTIFICATION ERROR: " + err.Error())
+			continue
 		}
 
+		// Drain & close body so the connection can be reused
+		_, _ = io.Copy(io.Discard, resp.Body)
+		resp.Body.Close()
 	}
 
 	_, err := notificationService.InsertMany(context.Background(), notificationsInterface)
@@ -404,5 +412,36 @@ func (r *SendNotificationSQLHelperImpl) SendMobileNotificationSQL(data util_fixe
 		}
 		log.Printf("Daftar token yang gagal: %v", failedTokens)
 	}
+	return nil
+}
+
+func (r *SendNotificationSQLHelperImpl) RefreshNotificationSseSQL(
+	userIds []int,
+) *entity.HttpError {
+	notificationApi := os.Getenv("NOTIFICATION_API")
+	if notificationApi == "" {
+		log.Println("REFRESH SSE: NOTIFICATION_API not set")
+		return nil
+	}
+
+	for _, userId := range userIds {
+		resp, err := http.Get(
+			fmt.Sprintf(
+				"%s/v2/sse/send?id=%s&message=user:unread-notification",
+				notificationApi,
+				url.QueryEscape(strconv.Itoa(userId)),
+			),
+		)
+		// Dont throw error, if notif is down, let transaction continue
+		if err != nil {
+			fmt.Println("RefreshNotificationSseSQL: " + err.Error())
+			continue
+		}
+
+		// Drain & close body so the connection can be reused
+		_, _ = io.Copy(io.Discard, resp.Body)
+		resp.Body.Close()
+	}
+
 	return nil
 }
