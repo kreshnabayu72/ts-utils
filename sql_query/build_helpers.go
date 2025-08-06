@@ -96,8 +96,19 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 				break
 			}
 
-			clause = fmt.Sprintf(`%s = ANY($%d)`, quotedColumn, len(s.Args)+1)
-			s.Args = append(s.Args, each.Value)
+			switch each.Operator {
+			case SQLOperatorIn, SQLOperatorNotIn:
+				ph := make([]string, v.Len())
+				for i := 0; i < v.Len(); i++ {
+					ph[i] = fmt.Sprintf("$%d", len(s.Args)+1)
+					s.Args = append(s.Args, v.Index(i).Interface())
+				}
+
+				clause = fmt.Sprintf(`%s %s (%s)`, escapeQuoteColumns(column), each.Operator, strings.Join(ph, ", "))
+			case SQLOperatorAny:
+				clause = fmt.Sprintf(`%s = ANY($%d)`, quotedColumn, len(s.Args)+1)
+				s.Args = append(s.Args, each.Value)
+			}
 
 		/* ──────────────────── DEFAULT ─────────────────── */
 		default:
@@ -128,7 +139,10 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 	}
 
 	if useDestination {
-		v[0] = &dest
+		if v[0] == nil {
+			v[0] = &[]string{}
+		}
+		*v[0] = dest
 	}
 }
 
