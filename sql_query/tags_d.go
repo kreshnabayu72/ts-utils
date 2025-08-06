@@ -40,9 +40,9 @@ package sql_query
 // 	}
 
 // 	if isSliceOfStruct {
-// 		return fmt.Sprintf("json_agg(json_build_object(%s))", strings.Join(exprs, ", "))
+// 		return fmt.Sprintf("jsonb_agg(jsonb_build_object(%s))", strings.Join(exprs, ", "))
 // 	}
-// 	return fmt.Sprintf("json_build_object(%s)", strings.Join(exprs, ", "))
+// 	return fmt.Sprintf("jsonb_build_object(%s)", strings.Join(exprs, ", "))
 // }
 
 // func ExtractJSONTags[T any](optType ...reflect.Type) []string {
@@ -89,7 +89,7 @@ package sql_query
 // 			}
 
 // 		case columnTag == "-":
-// 			// Some columns are generated from json_build_object,etc so it should be skipped here and use Select() instead
+// 			// Some columns are generated from jsonb_build_object,etc so it should be skipped here and use Select() instead
 // 			continue
 
 // 		// Just normal column name that use json as alias
