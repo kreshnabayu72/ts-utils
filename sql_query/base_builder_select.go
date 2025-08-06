@@ -250,6 +250,14 @@ func (s *SelectBuilder) Search(keyword string, fields []string) SQLSelectChainBu
 	return s
 }
 
+func (s *SelectBuilder) Distinct(columns ...string) SQLSelectChainBuilder {
+	for _, newCol := range columns {
+		s.DistinctClauses = append(s.DistinctClauses, newCol)
+	}
+
+	return s
+}
+
 func (s *SelectBuilder) Select(columns ...string) SQLSelectChainBuilder {
 	for _, newCol := range columns {
 		newAlias := extractAlias(newCol)
@@ -536,6 +544,26 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 			}
 			sb.WriteString(c)
 		}
+	}
+
+	// DISTINCT
+	var db strings.Builder
+	if len(s.DistinctClauses) > 0 {
+		db.WriteString("DISTINCT ")
+		db.WriteString("(")
+		for i, d := range s.DistinctClauses {
+			if i > 0 {
+				db.WriteString(",")
+			}
+			db.WriteString(d)
+		}
+		db.WriteString(")")
+		var tmp []string
+
+		// Prepend distinct to the column clause.
+		copy(tmp, s.Columns)
+		s.Columns = []string{db.String()}
+		s.Columns = append(s.Columns, tmp...)
 	}
 
 	// SELECT
