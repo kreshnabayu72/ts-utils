@@ -143,10 +143,11 @@ func (s *SQLEloquentQuery) sharedWhereOrQuery(filters ...map[string]SQLCondition
 func escapeQuoteColumns(column string) string {
 	var hasSuffix bool
 	var suffix string
-	if strings.HasSuffix(column, "::text") {
+	if strings.Contains(column, "::") {
 		hasSuffix = true
-		suffix = column[len(column)-len("::text"):]
-		column = strings.TrimSuffix(column, "::text")
+		splittedByCast := strings.Split(column, "::")
+		suffix = "::" + splittedByCast[len(splittedByCast)-1]
+		column = splittedByCast[0]
 	}
 
 	parts := strings.Split(column, ".")
