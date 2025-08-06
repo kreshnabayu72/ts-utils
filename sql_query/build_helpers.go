@@ -12,6 +12,8 @@ import (
 // It supports operators like =, IN, BETWEEN, IS NULL, RAW, and column refs (IsRef).
 // Generated SQL fragments are added to Filters or HavingClauses, and Args is updated.
 //
+// WHERE filters for table & HAVING clauses won't be generated if you provide destination in params (pointer of slice string), but this function will assign value to the destination instead.
+//
 // Example:
 //
 //	filters := map[string]sql_query.SQLCondition{
@@ -22,7 +24,11 @@ import (
 //	// Produces: "age" > $1 AND "status" IN ($2, $3)
 func (s *SQLEloquentQuery) sharedWhereAndQuery(
 	filters map[string]SQLCondition,
+	v ...*[]string,
 ) {
+	var dest []string
+	useDestination := len(v) > 0
+
 	for column, each := range filters {
 		// Skip value nil except for IS NULL / IS NOT NULL
 		if each.Value == nil &&
@@ -90,8 +96,19 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 				break
 			}
 
-			clause = fmt.Sprintf(`%s = ANY($%d)`, quotedColumn, len(s.Args)+1)
-			s.Args = append(s.Args, each.Value)
+			switch each.Operator {
+			case SQLOperatorIn, SQLOperatorNotIn:
+				ph := make([]string, v.Len())
+				for i := 0; i < v.Len(); i++ {
+					ph[i] = fmt.Sprintf("$%d", len(s.Args)+1)
+					s.Args = append(s.Args, v.Index(i).Interface())
+				}
+
+				clause = fmt.Sprintf(`%s %s (%s)`, escapeQuoteColumns(column), each.Operator, strings.Join(ph, ", "))
+			case SQLOperatorAny:
+				clause = fmt.Sprintf(`%s = ANY($%d)`, quotedColumn, len(s.Args)+1)
+				s.Args = append(s.Args, each.Value)
+			}
 
 		/* ──────────────────── DEFAULT ─────────────────── */
 		default:
@@ -107,12 +124,25 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 			s.Args = append(s.Args, each.Value)
 		}
 
+		// If there's destination in param, then HavingClauses and Filters wont be used, instead assign value to destination
+		if useDestination {
+			dest = append(dest, clause)
+			continue
+		}
+
 		// Insert to Where clause or Having clause based on given params
 		if s.useHaving {
 			s.HavingClauses = append(s.HavingClauses, clause)
 		} else {
 			s.Filters = append(s.Filters, clause)
 		}
+	}
+
+	if useDestination {
+		if v[0] == nil {
+			v[0] = &[]string{}
+		}
+		*v[0] = dest
 	}
 }
 
@@ -141,6 +171,15 @@ func (s *SQLEloquentQuery) sharedWhereOrQuery(filters ...map[string]SQLCondition
 }
 
 func escapeQuoteColumns(column string) string {
+	var hasSuffix bool
+	var suffix string
+	if strings.Contains(column, "::") {
+		hasSuffix = true
+		splittedByCast := strings.Split(column, "::")
+		suffix = "::" + splittedByCast[len(splittedByCast)-1]
+		column = splittedByCast[0]
+	}
+
 	parts := strings.Split(column, ".")
 	for i, part := range parts {
 		parts[i] = fmt.Sprintf(`"%s"`, part)
@@ -150,6 +189,9 @@ func escapeQuoteColumns(column string) string {
 		quotedColumn = strings.Join(parts, ".")
 	}
 
+	if hasSuffix {
+		quotedColumn += suffix
+	}
 	return quotedColumn
 }
 

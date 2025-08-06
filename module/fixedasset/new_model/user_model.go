@@ -8,6 +8,7 @@ import (
 
 type User struct {
 	ID                     int        `json:"_id" column:"id" sql:"BIGINT PRIMARY KEY"`
+	FCMToken               string     `json:"fcmToken"    column:"fcm_token" sql:"VARCHAR NULL"`
 	FirstName              string     `json:"firstName" column:"first_name" sql:"VARCHAR NOT NULL"`
 	LastName               string     `json:"lastName" column:"last_name" sql:"VARCHAR NOT NULL"`
 	FullName               string     `json:"fullName" column:"full_name" sql:"VARCHAR NOT NULL GENERATED ALWAYS AS (first_name || ' ' || last_name) STORED"`

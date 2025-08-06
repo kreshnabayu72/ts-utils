@@ -78,7 +78,7 @@ func buildColumnsFromMeta(fieldMeta []FieldMeta) *[]string {
 			}
 
 		case meta.ColumnTag == "-":
-			// Some columns are generated from json_build_object,etc so it should be skipped here and use Select() instead
+			// Some columns are generated from jsonb_build_object,etc so it should be skipped here and use Select() instead
 			continue
 
 		// Just normal column name that use json as alias
@@ -90,7 +90,7 @@ func buildColumnsFromMeta(fieldMeta []FieldMeta) *[]string {
 	return cols
 }
 
-// To generate nested field type with their respective sql aggregation (either json_build_object or json_agg).
+// To generate nested field type with their respective sql aggregation (either jsonb_build_object or jsonb_agg).
 // This function called in `buildColumnsFromMeta` when: field type is either struct (not time.Time) or slice of struct
 // (these 2 conditions are marked by meta.NestedFields that has length above 0)
 func traverseNestedStruct(parentField FieldMeta, nestedFieldMeta []FieldMeta) string {
@@ -114,9 +114,9 @@ func traverseNestedStruct(parentField FieldMeta, nestedFieldMeta []FieldMeta) st
 	}
 
 	if parentField.IsSlice {
-		return fmt.Sprintf("json_agg(json_build_object(%s))", strings.Join(exprs, ", "))
+		return fmt.Sprintf("jsonb_agg(jsonb_build_object(%s))", strings.Join(exprs, ", "))
 	}
-	return fmt.Sprintf("json_build_object(%s)", strings.Join(exprs, ", "))
+	return fmt.Sprintf("jsonb_build_object(%s)", strings.Join(exprs, ", "))
 }
 
 func MakeMapJSONTags[T any]() map[string]string {

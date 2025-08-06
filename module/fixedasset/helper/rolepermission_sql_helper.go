@@ -6,7 +6,6 @@ import (
 	"gitea.qwertysystem.net/BETS/ts-utils/service"
 	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
 	"github.com/gofiber/fiber/v2"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type RolePermissionHelperSQL interface {
@@ -14,22 +13,23 @@ type RolePermissionHelperSQL interface {
 		ctx *fiber.Ctx,
 		permissionKey new_model.PermissionType,
 		resourceTypes []new_model.SystemRoleAttribute,
-		groupFilter primitive.M,
+		groupFilter sql_query.SQLCondition,
 	) *entity.HttpError
 
 	CheckGroupPermissionSQL(
-		service service.Service,
-		loggedInUser *primitive.ObjectID,
-		dataFilter primitive.M,
+		service service.PostgreSqlService,
+		loggedInUser *string,
+		dataFilter map[string]sql_query.SQLCondition,
 		groupIdField string,
 		permissions []new_model.PermissionType,
 		systemRoleTypes []new_model.SystemRoleAttribute,
 	) error
 
 	CheckTransactionRoleMultiGroupPermissionsSQL(
-		service service.Service, // service for data (assets, transactions, etc)
-		loggedInUser *primitive.ObjectID,
-		dataFilter primitive.M,
+		service service.PostgreSqlService, // service for data (assets, transactions, etc)
+		tableName string,
+		loggedInUser *string,
+		dataFilter map[string]sql_query.SQLCondition,
 		groupIdField string,
 		transactionType []new_model.TransactionRoleAttribute,
 		roleType []new_model.TransactionRoleType,
@@ -37,7 +37,7 @@ type RolePermissionHelperSQL interface {
 
 	CheckTransactionRolePermissionSQL(
 		ctx *fiber.Ctx,
-		groupIdFilter primitive.M,
+		groupIdFilter sql_query.SQLCondition,
 		transactionType []new_model.TransactionRoleAttribute,
 		roleType []new_model.TransactionRoleType,
 	) error
@@ -47,7 +47,7 @@ type RolePermissionHelperSQL interface {
 
 type RolePermissionSQLHelperImpl struct{}
 
-func MakeRolePermisisonSQLHelperImpl() *RolePermissionSQLHelperImpl {
+func MakeRolePermisisonSQLHelperImpl() RolePermissionHelperSQL {
 	return &RolePermissionSQLHelperImpl{}
 }
 
@@ -80,6 +80,7 @@ func (r *RolePermissionSQLHelperImpl) CheckGroupPermissionSQL(
 
 func (r *RolePermissionSQLHelperImpl) CheckTransactionRoleMultiGroupPermissionsSQL(
 	service service.PostgreSqlService,
+	tableName string,
 	loggedInUser *string,
 	dataFilter map[string]sql_query.SQLCondition,
 	groupIdField string,
@@ -88,6 +89,7 @@ func (r *RolePermissionSQLHelperImpl) CheckTransactionRoleMultiGroupPermissionsS
 ) error {
 	return CheckTransactionRoleMultiGroupPermissionsSQL(
 		service,
+		tableName,
 		loggedInUser,
 		dataFilter,
 		groupIdField,

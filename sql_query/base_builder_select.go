@@ -15,7 +15,15 @@ type SQLSelectChainBuilder interface {
 	// Can be used to manually manage parameter placeholders.
 	AddArgs(arg ...interface{}) SQLSelectChainBuilder
 
-	// Select implements SQLSelectChainBuilder. (Only able to be called once).
+	// Distinct implements SQLSelectChainBuilder.
+	// Distinct defines one or more columns for the DISTINCT ON(...) statement.
+	//
+	// Example:
+	//
+	//	builder.Distinct("distinct", "u.id", "u.name")
+	Distinct(alias string, columns ...string) SQLSelectChainBuilder
+
+	// Select implements SQLSelectChainBuilder.
 	// Select defines one or more columns for the SELECT statement.
 	// If a column alias already exists, it will be replaced.
 	//
@@ -60,14 +68,14 @@ type SQLSelectChainBuilder interface {
 	//
 	//	jsonb_array_elements($1::jsonb) AS items
 	SelectJSONArrayElements(alias string, arrayElements []map[string]string) SQLSelectChainBuilder
-	// SelectJSONAggregate builds a JSON object or JSON array aggregation using json_build_object
-	// or json_agg(json_build_object(...)). It supports optional filtering and ordering.
+	// SelectJSONAggregate builds a JSON object or JSON array aggregation using jsonb_build_object
+	// or jsonb_agg(jsonb_build_object(...)). It supports optional filtering and ordering.
 	//
 	// The `dto` parameter can be either:
 	//   - a struct (fields are mapped from JSON tags), or
 	//   - a map[string]string (keys = JSON keys, values = SQL expressions).
 	//
-	// If asArrayAggregation is true, the result is wrapped with json_agg().
+	// If asArrayAggregation is true, the result is wrapped with jsonb_agg().
 	//
 	// Example (array aggregation):
 	//
@@ -91,12 +99,12 @@ type SQLSelectChainBuilder interface {
 	//
 	// Generates:
 	//
-	//	json_agg(json_build_object('id', items.id, 'name', items.name) ORDER BY items.created_at)
+	//	jsonb_agg(jsonb_build_object('id', items.id, 'name', items.name) ORDER BY items.created_at)
 	//	  FILTER (WHERE items.is_active = TRUE) AS order_items
 	SelectJSONAggregate(alias string, dto any, condition string, asArrayAggregation bool, orderByClauses ...string) SQLSelectChainBuilder
 	// SelectJSONAggregateFunc builds a nested JSON object by executing a callback
 	// that itself adds JSON aggregate fields. The resulting fields are combined
-	// into a single json_build_object aliased as `alias`.
+	// into a single jsonb_build_object aliased as `alias`.
 	//
 	// Example:
 	//
@@ -116,8 +124,8 @@ type SQLSelectChainBuilder interface {
 	//
 	// Generates:
 	//
-	//	json_build_object(
-	//	    'SomeRole', CASE WHEN usr.role_attribute = $1 THEN json_build_object(
+	//	jsonb_build_object(
+	//	    'SomeRole', CASE WHEN usr.role_attribute = $1 THEN jsonb_build_object(
 	//	        'create', <expr>, 'view', <expr>, 'update', <expr>, 'delete', <expr>
 	//	    ) ELSE NULL END
 	//	) AS hasSystemRole
@@ -151,13 +159,13 @@ type SQLSelectChainBuilder interface {
 	// Example:
 	//
 	//	builder.Join("roles r", "r.id = u.role_id")
-	Join(table string, onCondition string) SQLSelectChainBuilder
+	Join(table string, onCondition string, additionalConditions ...map[string]SQLCondition) SQLSelectChainBuilder
 	// LeftJoin adds a LEFT JOIN clause with the specified ON condition.
 	//
 	// Example:
 	//
 	//	builder.LeftJoin("roles r", "r.id = u.role_id")
-	LeftJoin(table string, onCondition string) SQLSelectChainBuilder
+	LeftJoin(table string, onCondition string, additionalConditions ...map[string]SQLCondition) SQLSelectChainBuilder
 	// Paginate implements SQLSelectChainBuilder. (Overrides previous value if called again).
 	// Paginate applies LIMIT, OFFSET, and ORDER BY using a Pagination struct.
 	// It supports single or multiple sorting rules.
@@ -245,6 +253,29 @@ func (s *SelectBuilder) Search(keyword string, fields []string) SQLSelectChainBu
 		orClauseGroup := fmt.Sprintf("(%s)", strings.Join(orClauses, " OR "))
 		s.Filters = append(s.Filters, orClauseGroup)
 		s.Args = append(s.Args, orArgs...)
+	}
+
+	return s
+}
+
+func (s *SelectBuilder) Distinct(alias string, columns ...string) SQLSelectChainBuilder {
+	s.DistinctAlias = alias
+	for _, newCol := range columns {
+		newAlias := extractAlias(newCol)
+
+		// Check if alias exists in current list
+		replaced := false
+		for i, existing := range s.DistinctBy {
+			if extractAlias(existing) == newAlias {
+				s.DistinctBy[i] = newCol // Overwrite
+				replaced = true
+				break
+			}
+		}
+
+		if !replaced {
+			s.DistinctBy = append(s.DistinctBy, newCol)
+		}
 	}
 
 	return s
@@ -345,21 +376,43 @@ func (s *SelectBuilder) SelectCaseWhen(thenExpr, elseExpr, alias string, whenCla
 	return s
 }
 
-func (s *SelectBuilder) Join(table string, onCondition string) SQLSelectChainBuilder {
+func (s *SelectBuilder) Join(table string, onCondition string, additionalConditions ...map[string]SQLCondition) SQLSelectChainBuilder {
 	if table == "" {
 		return s
 	}
 
-	s.OtherTables = append(s.OtherTables, fmt.Sprintf("JOIN %s ON %s", table, onCondition))
+	var filterSb strings.Builder
+	if len(additionalConditions) > 0 {
+		var filters []string
+		s.sharedWhereAndQuery(additionalConditions[0], &filters)
+
+		for i := range filters {
+			filterSb.WriteString(" AND ")
+			filterSb.WriteString(filters[i])
+		}
+	}
+
+	s.OtherTables = append(s.OtherTables, fmt.Sprintf("JOIN %s ON %s%s", table, onCondition, filterSb.String()))
 	return s
 }
 
-func (s *SelectBuilder) LeftJoin(table string, onCondition string) SQLSelectChainBuilder {
+func (s *SelectBuilder) LeftJoin(table string, mainCondition string, additionalConditions ...map[string]SQLCondition) SQLSelectChainBuilder {
 	if table == "" {
 		return s
 	}
 
-	s.OtherTables = append(s.OtherTables, fmt.Sprintf("LEFT JOIN %s ON %s", table, onCondition))
+	var filterSb strings.Builder
+	if len(additionalConditions) > 0 {
+		var filters []string
+		s.sharedWhereAndQuery(additionalConditions[0], &filters)
+
+		for i := range filters {
+			filterSb.WriteString(" AND ")
+			filterSb.WriteString(filters[i])
+		}
+	}
+
+	s.OtherTables = append(s.OtherTables, fmt.Sprintf("LEFT JOIN %s ON %s%s", table, mainCondition, filterSb.String()))
 	return s
 }
 
@@ -536,6 +589,28 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 			}
 			sb.WriteString(c)
 		}
+	}
+
+	// DISTINCT
+	var db strings.Builder
+	if len(s.DistinctBy) > 0 {
+		db.WriteString("DISTINCT ON ")
+		db.WriteString("(")
+		for i, d := range s.DistinctBy {
+			if i > 0 {
+				db.WriteString(",")
+			}
+			db.WriteString(d)
+		}
+		db.WriteString(")")
+		db.WriteString(" " + s.DistinctAlias)
+
+		tmp := make([]string, len(s.Columns))
+
+		// Prepend distinct to the column clause.
+		copy(tmp, s.Columns)
+		s.Columns = []string{db.String()}
+		s.Columns = append(s.Columns, tmp...)
 	}
 
 	// SELECT

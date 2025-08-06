@@ -1,0 +1,447 @@
+package helper
+
+import (
+	"context"
+	"fmt"
+	"io"
+	"log"
+	"net/http"
+	"net/url"
+	"os"
+	"strconv"
+	"strings"
+	"time"
+
+	firebase "firebase.google.com/go/v4"
+	"firebase.google.com/go/v4/messaging"
+
+	"gitea.qwertysystem.net/BETS/ts-utils/db"
+	"gitea.qwertysystem.net/BETS/ts-utils/entity"
+	util_fixedasset_new_model "gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
+	"gitea.qwertysystem.net/BETS/ts-utils/provider"
+	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"golang.org/x/oauth2/jwt"
+	"google.golang.org/api/option"
+)
+
+type NotificationHelperSQL interface {
+	SendNotificationToTransactionRolesSQL(
+		serviceProvider provider.ServiceProvider,
+		companyCode string,
+		groupIdFilter sql_query.SQLCondition,
+		transactionType []util_fixedasset_new_model.TransactionRoleAttribute,
+		roleType []util_fixedasset_new_model.TransactionRoleType,
+		notificationDataWithoutUser util_fixedasset_new_model.Notification,
+	) *entity.HttpError
+
+	SendNotificationToSystemRolesSQL(
+		serviceProvider provider.ServiceProvider,
+		companyCode string,
+		groupIdFilter sql_query.SQLCondition,
+		roleAttribute []util_fixedasset_new_model.SystemRoleAttribute,
+		notificationDataWithoutUser util_fixedasset_new_model.Notification,
+	) *entity.HttpError
+
+	SendNotificationToUsersSQL(
+		serviceProvider provider.ServiceProvider,
+		companyCode string,
+		userIds []int,
+		notificationDataWithoutUser util_fixedasset_new_model.Notification,
+	) *entity.HttpError
+
+	SendNotificationSQL(
+		serviceProvider provider.ServiceProvider,
+		companyCode string,
+		notifications []util_fixedasset_new_model.Notification,
+	) *entity.HttpError
+
+	RefreshNotificationSseSQL(userIds []int) *entity.HttpError
+}
+
+type SendNotificationSQLHelperImpl struct {
+	AccessToken           string
+	MobileNotificationURI string
+}
+
+func MakeNotificationSQLHelperImpl() NotificationHelperSQL {
+	result := &SendNotificationSQLHelperImpl{
+		MobileNotificationURI: "https://fcm.googleapis.com/v1/projects/tag-samurai/messages:send",
+	}
+	result.GetAccessTokenSQL()
+	return result
+}
+
+func (r *SendNotificationSQLHelperImpl) GetAccessTokenSQL() error {
+	// 1. Read the raw private key from env and replace literal "\n" with actual newlines
+	rawKey := os.Getenv("MOBILE_PRIVATE_KEY")
+	if rawKey == "" {
+		return fmt.Errorf("MOBILE_PRIVATE_KEY is not set")
+	}
+	privateKey := strings.ReplaceAll(rawKey, `\n`, "\n")
+
+	// 2. Configure the JWT with your service-account details
+	cfg := &jwt.Config{
+		Email:        "firebase-adminsdk-53b72@tag-samurai.iam.gserviceaccount.com",
+		PrivateKey:   []byte(privateKey),
+		PrivateKeyID: "efd5f98c2704770fd75b4e65d977c412d093ec19",
+		Scopes:       []string{"https://www.googleapis.com/auth/firebase.messaging"},
+		TokenURL:     "https://oauth2.googleapis.com/token",
+	}
+
+	// 3. Request a token
+	tok, err := cfg.TokenSource(context.Background()).Token()
+	if err != nil {
+		return fmt.Errorf("failed to retrieve access token: %w", err)
+	}
+
+	r.AccessToken = tok.AccessToken
+	return nil
+}
+
+func (r *SendNotificationSQLHelperImpl) SendNotificationToTransactionRolesSQL(
+	serviceProvider provider.ServiceProvider,
+	companyCode string,
+	groupIdFilter sql_query.SQLCondition,
+	transactionType []util_fixedasset_new_model.TransactionRoleAttribute,
+	roleType []util_fixedasset_new_model.TransactionRoleType,
+	notificationDataWithoutUser util_fixedasset_new_model.Notification,
+) *entity.HttpError {
+	userTransactionRoleService := serviceProvider.MakePostgreSqlService(
+		db.FixedAssetDBName.CompanyDBName(companyCode),
+		db.UserTransactionRoleTableName,
+	)
+
+	builder := sql_query.NewSQLSelectBuilder[util_fixedasset_new_model.UserTransactionRole](db.UserTransactionRoleTableName)
+	builder.Where(map[string]sql_query.SQLCondition{
+		"is_active":      {Operator: sql_query.SQLOperatorEqual, Value: true},
+		"role_type":      {Operator: sql_query.SQLOperatorIn, Value: roleType},
+		"role_attribute": {Operator: sql_query.SQLOperatorIn, Value: transactionType},
+		"group_id":       groupIdFilter,
+	})
+
+	query, args, _ := builder.Build()
+
+	var roles []util_fixedasset_new_model.UserTransactionRole
+	err := userTransactionRoleService.SelectMany(
+		&roles,
+		context.Background(),
+		query,
+		args...,
+	)
+	if err != nil {
+		return entity.InternalServerError(err.Error())
+	}
+
+	var uniqueUserIds []int
+	var uniqueUserIdsCheck map[int]bool = make(map[int]bool)
+
+	for _, role := range roles {
+		// if user id already used, continue/skip
+		if _, ok := uniqueUserIdsCheck[role.UserID]; ok {
+			continue
+		}
+
+		uniqueUserIds = append(uniqueUserIds, role.UserID)
+		uniqueUserIdsCheck[role.UserID] = true
+	}
+
+	return r.SendNotificationToUsersSQL(
+		serviceProvider,
+		companyCode,
+		uniqueUserIds,
+		notificationDataWithoutUser,
+	)
+}
+
+func (r *SendNotificationSQLHelperImpl) SendNotificationToSystemRolesSQL(
+	serviceProvider provider.ServiceProvider,
+	companyCode string,
+	groupIdFilter sql_query.SQLCondition,
+	roleAttribute []util_fixedasset_new_model.SystemRoleAttribute,
+	notificationDataWithoutUser util_fixedasset_new_model.Notification,
+) *entity.HttpError {
+	userSystemRoleService := serviceProvider.MakePostgreSqlService(
+		db.FixedAssetDBName.CompanyDBName(companyCode),
+		db.UserSystemRoleTableName,
+	)
+
+	query, args, _ := sql_query.NewSQLSelectBuilder[util_fixedasset_new_model.UserSystemRole](db.UserSystemRoleTableName).
+		Where(map[string]sql_query.SQLCondition{
+			"is_active":      {Operator: sql_query.SQLOperatorEqual, Value: true},
+			"role_attribute": {Operator: sql_query.SQLOperatorIn, Value: roleAttribute},
+			"group_id":       groupIdFilter,
+		}).
+		Build()
+
+	var roles []util_fixedasset_new_model.UserSystemRole
+	err := userSystemRoleService.SelectMany(
+		&roles,
+		context.Background(),
+		query,
+		args...,
+	)
+	if err != nil {
+		return entity.InternalServerError(err.Error())
+	}
+
+	var uniqueUserIds []int
+	var uniqueUserIdsCheck map[int]bool = make(map[int]bool)
+
+	for _, role := range roles {
+		// if user id already used, continue/skip
+		if _, ok := uniqueUserIdsCheck[role.UserID]; ok {
+			continue
+		}
+
+		uniqueUserIds = append(uniqueUserIds, role.UserID)
+		uniqueUserIdsCheck[role.UserID] = true
+	}
+
+	return r.SendNotificationToUsersSQL(
+		serviceProvider,
+		companyCode,
+		uniqueUserIds,
+		notificationDataWithoutUser,
+	)
+}
+
+func (r *SendNotificationSQLHelperImpl) SendNotificationToUsersSQL(
+	serviceProvider provider.ServiceProvider,
+	companyCode string,
+	userIds []int,
+	notificationDataWithoutUser util_fixedasset_new_model.Notification,
+) *entity.HttpError {
+	if len(userIds) == 0 {
+		return nil
+	}
+	userService := serviceProvider.MakePostgreSqlService(
+		db.FixedAssetDBName.CompanyDBName(companyCode),
+		db.UserTableName,
+	)
+
+	query, args, _ := sql_query.NewSQLSelectBuilder[util_fixedasset_new_model.User](db.UserTableName).
+		Where(map[string]sql_query.SQLCondition{
+			"id": {Operator: sql_query.SQLOperatorIn, Value: userIds},
+		}).
+		Build()
+
+	var users []util_fixedasset_new_model.User
+	err := userService.SelectMany(
+		&users,
+		context.Background(),
+		query,
+		args...,
+	)
+	if err != nil {
+		return entity.InternalServerError(err.Error())
+	}
+
+	var pendingNotifications []util_fixedasset_new_model.Notification
+	var fcmTokens []string
+
+	for _, user := range users {
+		pendingNotifications = append(pendingNotifications, util_fixedasset_new_model.Notification{
+			ID:         primitive.NewObjectID(),
+			Title:      notificationDataWithoutUser.Title,
+			Detail:     notificationDataWithoutUser.Detail,
+			App:        notificationDataWithoutUser.App,
+			UserKey:    user.ID,
+			FCMToken:   user.FCMToken,
+			IsRead:     false,
+			IsReadOnly: notificationDataWithoutUser.IsReadOnly,
+			Module:     notificationDataWithoutUser.Module,
+			Status:     notificationDataWithoutUser.Status,
+			Severity:   notificationDataWithoutUser.Severity,
+			Category:   notificationDataWithoutUser.Category,
+			Type:       notificationDataWithoutUser.Type,
+			Data:       notificationDataWithoutUser.Data,
+			CreatedAt:  time.Now(),
+			UpdatedAt:  time.Now(),
+		})
+
+		if user.FCMToken != "" {
+			fcmTokens = append(fcmTokens, user.FCMToken)
+		}
+	}
+
+	sendNotifErr := r.SendNotificationSQL(serviceProvider, companyCode, pendingNotifications)
+
+	if sendNotifErr != nil {
+		return entity.ToHttpError(sendNotifErr)
+	}
+
+	mobileNotifErr := r.SendMobileNotificationSQL(notificationDataWithoutUser, fcmTokens)
+
+	if mobileNotifErr != nil {
+		fmt.Println("MOBILE NOTIFICATION ERROR: " + mobileNotifErr.Error())
+	}
+
+	return nil
+}
+
+func (r *SendNotificationSQLHelperImpl) SendNotificationSQL(
+	serviceProvider provider.ServiceProvider,
+	companyCode string,
+	notifications []util_fixedasset_new_model.Notification,
+) *entity.HttpError {
+	if len(notifications) == 0 {
+		return nil
+	}
+
+	notificationApi := os.Getenv("NOTIFICATION_API")
+
+	notificationService := serviceProvider.MakeService(
+		db.FixedAssetDBName.CompanyDBName(companyCode),
+		db.NotificationModelName,
+	)
+
+	notificationsInterface := []any{}
+	for _, pendingNotification := range notifications {
+		notificationsInterface = append(notificationsInterface, pendingNotification)
+		resp, err := http.Get(
+			fmt.Sprintf(
+				"%s/v2/sse/send?id=%s&message=user:unread-notification",
+				notificationApi,
+				strconv.Itoa(pendingNotification.UserKey),
+			),
+		)
+		// Dont throw error, if notif is down, let transaction continue
+		if err != nil {
+			fmt.Println("NOTIFICATION ERROR: " + err.Error())
+			continue
+		}
+
+		// Drain & close body so the connection can be reused
+		_, _ = io.Copy(io.Discard, resp.Body)
+		resp.Body.Close()
+	}
+
+	_, err := notificationService.InsertMany(context.Background(), notificationsInterface)
+	if err != nil {
+		return entity.InternalServerError(err.Error())
+	}
+
+	return nil
+}
+
+func (r *SendNotificationSQLHelperImpl) SendMobileNotificationSQL(data util_fixedasset_new_model.Notification, tokens []string) *entity.HttpError {
+	// ─────── credentials ───────
+	cred := os.Getenv("MOBILE_CREDENTIAL_JSON")
+	opt := option.WithCredentialsJSON([]byte(cred))
+
+	// ─────── init firebase app ───────
+	ctx := context.Background()
+
+	config := &firebase.Config{
+		ProjectID: "tag-samurai", // <-- explicitly set your Firebase project ID
+	}
+
+	app, err := firebase.NewApp(ctx, config, opt)
+	if err != nil {
+		fmt.Printf("error initializing app: %v\n", err)
+	}
+	client, err := app.Messaging(ctx)
+	if err != nil {
+		fmt.Printf("error getting Messaging client: %v\n", err)
+	}
+
+	if client == nil {
+		log.Println("Koneksi client gagal")
+		return nil
+	}
+
+	dataPayload := make(map[string]string)
+
+	for k, v := range data.Data {
+		dataPayload[k] = v.(string)
+	}
+
+	// Tambahkan field lain sebagai string
+	dataPayload["_id"] = data.ID.Hex()
+	dataPayload["title"] = data.Title
+	dataPayload["detail"] = data.Detail
+	dataPayload["user"] = strconv.Itoa(data.UserKey)
+	dataPayload["isReadOnly"] = fmt.Sprintf("%v", data.IsReadOnly)
+	dataPayload["plan"] = data.Plan
+	dataPayload["module"] = string(data.Module)
+	dataPayload["status"] = string(data.Status)
+	dataPayload["severity"] = string(data.Severity)
+	dataPayload["category"] = string(data.Category)
+	dataPayload["type"] = data.Type
+
+	// --- 2. Bangun Pesan Multicast Menggunakan Struct SDK ---
+	// Ini cara yang lebih aman dan direkomendasikan daripada map[string]interface{}
+	message := &messaging.MulticastMessage{
+		Tokens: tokens, // Targetnya adalah daftar token, bukan satu topik
+		Data:   dataPayload,
+		Notification: &messaging.Notification{
+			Title: data.Title,
+			Body:  data.Detail,
+		},
+		Android: &messaging.AndroidConfig{
+			Priority: "high",
+			Notification: &messaging.AndroidNotification{
+				ClickAction: "MOBILE_NOTIFICATION",
+			},
+		},
+	}
+
+	// --- 3. Kirim Pesan dengan SendMulticast ---
+	br, err := client.SendEachForMulticast(context.Background(), message)
+	if err != nil {
+		log.Printf("Gagal mengirim notifikasi multicast: %v %v\n", err, message)
+		return nil
+	}
+
+	// --- 4. (SANGAT PENTING) Tangani Respons & Bersihkan Token Gagal ---
+	// Cek respons untuk setiap token yang dikirim.
+	log.Printf("Berhasil mengirim notifikasi ke: %d perangkat\n", br.SuccessCount)
+	log.Printf("Gagal mengirim notifikasi ke: %d perangkat\n", br.FailureCount)
+
+	if br.FailureCount > 0 {
+		var failedTokens []string
+		for idx, resp := range br.Responses {
+			if !resp.Success {
+				// Token gagal, catat atau langsung hapus dari database bos.
+				// Kode error 'messaging.IsRegistrationTokenNotRegistered' menandakan token sudah tidak valid.
+				log.Printf("Gagal kirim ke token %s: %v\n", tokens[idx], resp.Error)
+				failedTokens = append(failedTokens, tokens[idx])
+			}
+		}
+		log.Printf("Daftar token yang gagal: %v", failedTokens)
+	}
+	return nil
+}
+
+func (r *SendNotificationSQLHelperImpl) RefreshNotificationSseSQL(
+	userIds []int,
+) *entity.HttpError {
+	notificationApi := os.Getenv("NOTIFICATION_API")
+	if notificationApi == "" {
+		log.Println("REFRESH SSE: NOTIFICATION_API not set")
+		return nil
+	}
+
+	for _, userId := range userIds {
+		resp, err := http.Get(
+			fmt.Sprintf(
+				"%s/v2/sse/send?id=%s&message=user:unread-notification",
+				notificationApi,
+				url.QueryEscape(strconv.Itoa(userId)),
+			),
+		)
+		// Dont throw error, if notif is down, let transaction continue
+		if err != nil {
+			fmt.Println("RefreshNotificationSseSQL: " + err.Error())
+			continue
+		}
+
+		// Drain & close body so the connection can be reused
+		_, _ = io.Copy(io.Discard, resp.Body)
+		resp.Body.Close()
+	}
+
+	return nil
+}

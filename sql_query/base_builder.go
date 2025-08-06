@@ -46,6 +46,8 @@ type SQLEloquentQuery struct {
 	Filters        []string
 	OtherTables    []string
 	Columns        []string
+	DistinctBy     []string
+	DistinctAlias  string
 	Offset         int
 	Limit          int
 	SortBy         []string

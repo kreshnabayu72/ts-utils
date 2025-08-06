@@ -64,12 +64,12 @@ func (s *SelectBuilder) SelectJSONAggregate(alias string, dto any, condition str
 		if len(orderByClauses) > 0 {
 			orderBy = fmt.Sprintf(" ORDER BY %s", orderByClauses[0])
 		}
-		formattedColumn = fmt.Sprintf("json_agg(json_build_object(%s)%s)", strings.Join(keyValuePairs, ", "), orderBy)
+		formattedColumn = fmt.Sprintf("jsonb_agg(jsonb_build_object(%s)%s)", strings.Join(keyValuePairs, ", "), orderBy)
 		if condition != "" {
 			formattedColumn = fmt.Sprintf("%s FILTER (WHERE %s)", formattedColumn, condition)
 		}
 	} else {
-		formattedColumn = fmt.Sprintf("json_build_object(%s)", strings.Join(keyValuePairs, ", "))
+		formattedColumn = fmt.Sprintf("jsonb_build_object(%s)", strings.Join(keyValuePairs, ", "))
 		if condition != "" {
 			formattedColumn = fmt.Sprintf("CASE WHEN %s THEN %s ELSE NULL END", condition, formattedColumn)
 		}
@@ -95,7 +95,7 @@ func (s *SelectBuilder) SelectJSONAggregateFunc(alias string, fn func(builder *S
 
 	s.Columns = append(
 		s.Columns,
-		fmt.Sprintf("json_build_object(%s) AS %s", strings.Join(s.NestedAggregation, ", "), alias),
+		fmt.Sprintf("jsonb_build_object(%s) AS %s", strings.Join(s.NestedAggregation, ", "), alias),
 	)
 
 	s.WrapAggregation = false
