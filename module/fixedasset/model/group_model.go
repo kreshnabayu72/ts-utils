@@ -20,20 +20,20 @@ type GroupRole struct {
 
 // AddOnData represents the add-on data schema.
 type AddOnData struct {
-	Total                *int `bson:"total"                json:"total,omitempty"`
-	Used                 int  `bson:"used"                 json:"used"`
-	UsedByThisGroup      *int `bson:"usedByThisGroup"      json:"usedByThisGroup,omitempty"`
-	AllocatedToSubGroups int  `bson:"allocatedToSubGroups" json:"allocatedToSubGroups"`
-	Available            *int `bson:"available"            json:"available,omitempty"`
+	Total                int `bson:"total"                json:"total,omitempty"`
+	Used                 int `bson:"used"                 json:"used"`
+	UsedByThisGroup      int `bson:"usedByThisGroup"      json:"usedByThisGroup,omitempty"`
+	AllocatedToSubGroups int `bson:"allocatedToSubGroups" json:"allocatedToSubGroups"`
+	Available            int `bson:"available"            json:"available,omitempty"`
 }
 
 // GroupLicense represents the license schema for a group.
 type GroupLicense struct {
-	AvailableNew     *int `bson:"availableNew"     json:"availableNew,omitempty"`
-	AvailableExpired *int `bson:"availableExpired" json:"availableExpired,omitempty"`
-	UsedActive       *int `bson:"usedActive"       json:"usedActive,omitempty"`
-	UsedExpired      *int `bson:"usedExpired"      json:"usedExpired,omitempty"`
-	Total            *int `bson:"total"            json:"total,omitempty"`
+	AvailableNew     int `bson:"availableNew"     json:"availableNew,omitempty"`
+	AvailableExpired int `bson:"availableExpired" json:"availableExpired,omitempty"`
+	UsedActive       int `bson:"usedActive"       json:"usedActive,omitempty"`
+	UsedExpired      int `bson:"usedExpired"      json:"usedExpired,omitempty"`
+	Total            int `bson:"total"            json:"total,omitempty"`
 }
 
 // Quota represents the quota information for various categories.
