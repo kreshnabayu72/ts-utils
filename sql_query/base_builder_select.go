@@ -68,14 +68,14 @@ type SQLSelectChainBuilder interface {
 	//
 	//	jsonb_array_elements($1::jsonb) AS items
 	SelectJSONArrayElements(alias string, arrayElements []map[string]string) SQLSelectChainBuilder
-	// SelectJSONAggregate builds a JSON object or JSON array aggregation using json_build_object
-	// or json_agg(json_build_object(...)). It supports optional filtering and ordering.
+	// SelectJSONAggregate builds a JSON object or JSON array aggregation using jsonb_build_object
+	// or jsonb_agg(jsonb_build_object(...)). It supports optional filtering and ordering.
 	//
 	// The `dto` parameter can be either:
 	//   - a struct (fields are mapped from JSON tags), or
 	//   - a map[string]string (keys = JSON keys, values = SQL expressions).
 	//
-	// If asArrayAggregation is true, the result is wrapped with json_agg().
+	// If asArrayAggregation is true, the result is wrapped with jsonb_agg().
 	//
 	// Example (array aggregation):
 	//
@@ -99,12 +99,12 @@ type SQLSelectChainBuilder interface {
 	//
 	// Generates:
 	//
-	//	json_agg(json_build_object('id', items.id, 'name', items.name) ORDER BY items.created_at)
+	//	jsonb_agg(jsonb_build_object('id', items.id, 'name', items.name) ORDER BY items.created_at)
 	//	  FILTER (WHERE items.is_active = TRUE) AS order_items
 	SelectJSONAggregate(alias string, dto any, condition string, asArrayAggregation bool, orderByClauses ...string) SQLSelectChainBuilder
 	// SelectJSONAggregateFunc builds a nested JSON object by executing a callback
 	// that itself adds JSON aggregate fields. The resulting fields are combined
-	// into a single json_build_object aliased as `alias`.
+	// into a single jsonb_build_object aliased as `alias`.
 	//
 	// Example:
 	//
@@ -124,8 +124,8 @@ type SQLSelectChainBuilder interface {
 	//
 	// Generates:
 	//
-	//	json_build_object(
-	//	    'SomeRole', CASE WHEN usr.role_attribute = $1 THEN json_build_object(
+	//	jsonb_build_object(
+	//	    'SomeRole', CASE WHEN usr.role_attribute = $1 THEN jsonb_build_object(
 	//	        'create', <expr>, 'view', <expr>, 'update', <expr>, 'delete', <expr>
 	//	    ) ELSE NULL END
 	//	) AS hasSystemRole
@@ -159,13 +159,13 @@ type SQLSelectChainBuilder interface {
 	// Example:
 	//
 	//	builder.Join("roles r", "r.id = u.role_id")
-	Join(table string, onCondition string) SQLSelectChainBuilder
+	Join(table string, onCondition string, additionalConditions ...map[string]SQLCondition) SQLSelectChainBuilder
 	// LeftJoin adds a LEFT JOIN clause with the specified ON condition.
 	//
 	// Example:
 	//
 	//	builder.LeftJoin("roles r", "r.id = u.role_id")
-	LeftJoin(table string, onCondition string) SQLSelectChainBuilder
+	LeftJoin(table string, onCondition string, additionalConditions ...map[string]SQLCondition) SQLSelectChainBuilder
 	// Paginate implements SQLSelectChainBuilder. (Overrides previous value if called again).
 	// Paginate applies LIMIT, OFFSET, and ORDER BY using a Pagination struct.
 	// It supports single or multiple sorting rules.
@@ -361,21 +361,43 @@ func (s *SelectBuilder) SelectCaseWhen(thenExpr, elseExpr, alias string, whenCla
 	return s
 }
 
-func (s *SelectBuilder) Join(table string, onCondition string) SQLSelectChainBuilder {
+func (s *SelectBuilder) Join(table string, onCondition string, additionalConditions ...map[string]SQLCondition) SQLSelectChainBuilder {
 	if table == "" {
 		return s
 	}
 
-	s.OtherTables = append(s.OtherTables, fmt.Sprintf("JOIN %s ON %s", table, onCondition))
+	var filterSb strings.Builder
+	if len(additionalConditions) > 0 {
+		var filters []string
+		s.sharedWhereAndQuery(additionalConditions[0], &filters)
+
+		for i := range filters {
+			filterSb.WriteString(" AND ")
+			filterSb.WriteString(filters[i])
+		}
+	}
+
+	s.OtherTables = append(s.OtherTables, fmt.Sprintf("JOIN %s ON %s%s", table, onCondition, filterSb.String()))
 	return s
 }
 
-func (s *SelectBuilder) LeftJoin(table string, onCondition string) SQLSelectChainBuilder {
+func (s *SelectBuilder) LeftJoin(table string, mainCondition string, additionalConditions ...map[string]SQLCondition) SQLSelectChainBuilder {
 	if table == "" {
 		return s
 	}
 
-	s.OtherTables = append(s.OtherTables, fmt.Sprintf("LEFT JOIN %s ON %s", table, onCondition))
+	var filterSb strings.Builder
+	if len(additionalConditions) > 0 {
+		var filters []string
+		s.sharedWhereAndQuery(additionalConditions[0], &filters)
+
+		for i := range filters {
+			filterSb.WriteString(" AND ")
+			filterSb.WriteString(filters[i])
+		}
+	}
+
+	s.OtherTables = append(s.OtherTables, fmt.Sprintf("LEFT JOIN %s ON %s%s", table, mainCondition, filterSb.String()))
 	return s
 }
 
