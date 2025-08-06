@@ -29,6 +29,7 @@ type InsertTemplate struct {
 	fieldMeta            *[]FieldMeta
 	basePlaceholders     []string
 	singleRowPlaceholder string
+	excludedColumns      int
 	UseID                []bool
 	UseNow               []bool
 }
