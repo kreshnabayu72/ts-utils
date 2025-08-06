@@ -626,3 +626,29 @@ const (
 	DisposalGroupTypeOrigin   DisposalGroupType = "Origin"
 	DisposalGroupTypeDisposal DisposalGroupType = "Disposal"
 )
+
+type RoutineScheduleFrequency string
+
+const (
+	RoutineScheduleFrequencyOnce     RoutineScheduleFrequency = "Once"
+	RoutineScheduleFrequencyDaily    RoutineScheduleFrequency = "Daily"
+	RoutineScheduleFrequencyWeekly   RoutineScheduleFrequency = "Weekly"
+	RoutineScheduleFrequencyMonthly  RoutineScheduleFrequency = "Monthly"
+	RoutineScheduleFrequencyAnnually RoutineScheduleFrequency = "Annually"
+	RoutineScheduleFrequencyCustom   RoutineScheduleFrequency = "Custom"
+)
+
+type IndicatorType string
+
+const (
+	IndicatorTypeSelection   IndicatorType = "Selection"
+	IndicatorTypeSingleValue IndicatorType = "Single Value"
+	IndicatorTypeRangeValue  IndicatorType = "Range Value"
+)
+
+type IndicatorDataType string
+
+const (
+	IndicatorDataTypeText   IndicatorDataType = "Text"
+	IndicatorDataTypeNumber IndicatorDataType = "Number"
+)
