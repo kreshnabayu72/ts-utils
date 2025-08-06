@@ -247,7 +247,7 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationToUsersSQL(
 			Title:      notificationDataWithoutUser.Title,
 			Detail:     notificationDataWithoutUser.Detail,
 			App:        notificationDataWithoutUser.App,
-			UserKey:    user.ID,
+			UserKey:    strconv.Itoa(user.ID),
 			FCMToken:   user.FCMToken,
 			IsRead:     false,
 			IsReadOnly: notificationDataWithoutUser.IsReadOnly,
@@ -304,7 +304,7 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationSQL(
 			fmt.Sprintf(
 				"%s/v2/sse/send?id=%s&message=user:unread-notification",
 				notificationApi,
-				strconv.Itoa(pendingNotification.UserKey),
+				pendingNotification.UserKey,
 			),
 		)
 		// Dont throw error, if notif is down, let transaction continue
@@ -362,7 +362,7 @@ func (r *SendNotificationSQLHelperImpl) SendMobileNotificationSQL(data util_fixe
 	dataPayload["_id"] = data.ID.Hex()
 	dataPayload["title"] = data.Title
 	dataPayload["detail"] = data.Detail
-	dataPayload["user"] = strconv.Itoa(data.UserKey)
+	dataPayload["user"] = data.UserKey
 	dataPayload["isReadOnly"] = fmt.Sprintf("%v", data.IsReadOnly)
 	dataPayload["plan"] = data.Plan
 	dataPayload["module"] = string(data.Module)
