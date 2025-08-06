@@ -191,17 +191,16 @@ func (s *InsertBuilder) cachedInsertSingle(v reflect.Value) SQLInsertChainBuilde
 				setTag = meta.ColumnTag
 			}
 
+			columns = append(columns, `"`+setTag+`"`)
+
 			if ArrayIncludes([]string{"updated_at", "created_at"}, setTag) {
-				continue
+				placeholders = append(placeholders, "NOW()")
+			} else {
+				placeholders = append(placeholders, fmt.Sprintf("$%d", len(placeholders)+1))
 			}
 
-			columns = append(columns, `"`+setTag+`"`)
-			placeholders = append(placeholders, fmt.Sprintf("$%d", len(placeholders)+1))
 			FieldIndexes = append(FieldIndexes, meta.FieldIndex)
 		}
-
-		columns = append(columns, "updated_at", "created_at")
-		placeholders = append(placeholders, "NOW()", "NOW()")
 
 		for idx, each := range placeholders {
 			if idx > 0 {
@@ -332,17 +331,16 @@ func (s *InsertBuilder) cachedInsertMany(slice reflect.Value) SQLInsertChainBuil
 			if meta.ColumnTag != "" {
 				setTag = meta.ColumnTag
 			}
-			if ArrayIncludes([]string{"updated_at", "created_at"}, setTag) {
-				continue
-			}
 
 			columns = append(columns, `"`+setTag+`"`)
 			FieldIndexes = append(FieldIndexes, meta.FieldIndex)
-			basePlaceholders = append(basePlaceholders, "$X")
-		}
 
-		columns = append(columns, "updated_at", "created_at")
-		basePlaceholders = append(basePlaceholders, "NOW()", "NOW()")
+			if ArrayIncludes([]string{"updated_at", "created_at"}, setTag) {
+				basePlaceholders = append(basePlaceholders, "NOW()")
+			} else {
+				basePlaceholders = append(basePlaceholders, "$X")
+			}
+		}
 
 		cachedTemplate = &InsertTemplate{
 			InsertColumn:     columns,
@@ -370,28 +368,18 @@ func (s *InsertBuilder) cachedInsertMany(slice reflect.Value) SQLInsertChainBuil
 		args[argsPos] = db.Node.Generate().Int64()
 		argsPos++
 
-		for j := range cachedTemplate.basePlaceholders {
+		for j, base := range cachedTemplate.basePlaceholders {
 			if j > 0 {
 				allPlaceholders.WriteByte(',')
 			}
 
-			// if base == "NOW()" {
-			// 	allPlaceholders.WriteString("NOW()")
-			// 	continue
-			// }
+			if base == "NOW()" {
+				allPlaceholders.WriteString("NOW()")
+				continue
+			}
 
 			if j > 0 {
 				val := values.FieldByIndex(cachedTemplate.FieldIndexes[j-1])
-
-				column := cachedTemplate.InsertColumn[j-1]
-				// Condition for created_at or updated_at
-				if column == "\"created_at\"" || column == "\"updated_at\"" {
-					// If it is zero value, use NOW()
-					if val.IsZero() {
-						allPlaceholders.WriteString("NOW()")
-						continue
-					}
-				}
 				args[argsPos] = val.Interface()
 				argsPos++
 			}
