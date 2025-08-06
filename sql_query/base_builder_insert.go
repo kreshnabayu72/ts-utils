@@ -80,7 +80,10 @@ func (s *InsertBuilder) Conflict(constraint, do string) SQLInsertChainBuilder {
 	return s
 }
 
-func (s *InsertBuilder) Insert(values interface{}, returningColumns ...string) SQLInsertChainBuilder {
+func (s *InsertBuilder) Insert(
+	values interface{},
+	returningColumns ...string,
+) SQLInsertChainBuilder {
 	if len(returningColumns) > 0 {
 		s.Columns = returningColumns
 	} else {
@@ -136,7 +139,9 @@ func (s *SQLEloquentQuery) buildInsertQuery() (string, []interface{}, error) {
 	}
 
 	if len(s.Filters) > 0 || s.UsePagination || len(s.OtherTables) > 0 {
-		return "", nil, errors.New("invalid insert query: cannot include filters, joins, or pagination")
+		return "", nil, errors.New(
+			"invalid insert query: cannot include filters, joins, or pagination",
+		)
 	}
 
 	if len(s.Columns) > 0 {
@@ -176,7 +181,8 @@ func (s *InsertBuilder) cachedInsertSingle(v reflect.Value) SQLInsertChainBuilde
 			if ArrayIncludes([]string{"_id", "id"}, meta.JSONTag) || meta.ColumnTag == "id" {
 				continue
 			}
-			if ArrayIncludes([]string{"", "-"}, meta.JSONTag) && ArrayIncludes([]string{"", "-"}, meta.ColumnTag) {
+			if ArrayIncludes([]string{"", "-"}, meta.JSONTag) &&
+				ArrayIncludes([]string{"", "-"}, meta.ColumnTag) {
 				continue
 			}
 
@@ -185,17 +191,16 @@ func (s *InsertBuilder) cachedInsertSingle(v reflect.Value) SQLInsertChainBuilde
 				setTag = meta.ColumnTag
 			}
 
+			columns = append(columns, `"`+setTag+`"`)
+
 			if ArrayIncludes([]string{"updated_at", "created_at"}, setTag) {
-				continue
+				placeholders = append(placeholders, "NOW()")
+			} else {
+				placeholders = append(placeholders, fmt.Sprintf("$%d", len(placeholders)+1))
 			}
 
-			columns = append(columns, `"`+setTag+`"`)
-			placeholders = append(placeholders, fmt.Sprintf("$%d", len(placeholders)+1))
 			FieldIndexes = append(FieldIndexes, meta.FieldIndex)
 		}
-
-		columns = append(columns, "updated_at", "created_at")
-		placeholders = append(placeholders, "NOW()", "NOW()")
 
 		for idx, each := range placeholders {
 			if idx > 0 {
@@ -260,7 +265,8 @@ func (s *InsertBuilder) insertSingle(v reflect.Value) SQLInsertChainBuilder {
 			continue
 		}
 
-		if ArrayIncludes([]string{"", "-"}, jsonTag) && ArrayIncludes([]string{"", "-"}, columnTag) {
+		if ArrayIncludes([]string{"", "-"}, jsonTag) &&
+			ArrayIncludes([]string{"", "-"}, columnTag) {
 			continue
 		}
 
@@ -316,7 +322,8 @@ func (s *InsertBuilder) cachedInsertMany(slice reflect.Value) SQLInsertChainBuil
 			if ArrayIncludes([]string{"_id", "id"}, meta.JSONTag) || meta.ColumnTag == "id" {
 				continue
 			}
-			if ArrayIncludes([]string{"", "-"}, meta.JSONTag) && ArrayIncludes([]string{"", "-"}, meta.ColumnTag) {
+			if ArrayIncludes([]string{"", "-"}, meta.JSONTag) &&
+				ArrayIncludes([]string{"", "-"}, meta.ColumnTag) {
 				continue
 			}
 
@@ -324,17 +331,16 @@ func (s *InsertBuilder) cachedInsertMany(slice reflect.Value) SQLInsertChainBuil
 			if meta.ColumnTag != "" {
 				setTag = meta.ColumnTag
 			}
-			if ArrayIncludes([]string{"updated_at", "created_at"}, setTag) {
-				continue
-			}
 
 			columns = append(columns, `"`+setTag+`"`)
 			FieldIndexes = append(FieldIndexes, meta.FieldIndex)
-			basePlaceholders = append(basePlaceholders, "$X")
-		}
 
-		columns = append(columns, "updated_at", "created_at")
-		basePlaceholders = append(basePlaceholders, "NOW()", "NOW()")
+			if ArrayIncludes([]string{"updated_at", "created_at"}, setTag) {
+				basePlaceholders = append(basePlaceholders, "NOW()")
+			} else {
+				basePlaceholders = append(basePlaceholders, "$X")
+			}
+		}
 
 		cachedTemplate = &InsertTemplate{
 			InsertColumn:     columns,
@@ -414,7 +420,8 @@ func (s *InsertBuilder) insertMany(slice reflect.Value) SQLInsertChainBuilder {
 					continue
 				}
 
-				if ArrayIncludes([]string{"", "-"}, jsonTag) && ArrayIncludes([]string{"", "-"}, columnTag) {
+				if ArrayIncludes([]string{"", "-"}, jsonTag) &&
+					ArrayIncludes([]string{"", "-"}, columnTag) {
 					continue
 				}
 
@@ -448,7 +455,8 @@ func (s *InsertBuilder) insertMany(slice reflect.Value) SQLInsertChainBuilder {
 				continue
 			}
 
-			if ArrayIncludes([]string{"", "-"}, jsonTag) && ArrayIncludes([]string{"", "-"}, columnTag) {
+			if ArrayIncludes([]string{"", "-"}, jsonTag) &&
+				ArrayIncludes([]string{"", "-"}, columnTag) {
 				continue
 			}
 
@@ -461,7 +469,10 @@ func (s *InsertBuilder) insertMany(slice reflect.Value) SQLInsertChainBuilder {
 			rowPlaceholders = append(rowPlaceholders, fmt.Sprintf("$%d", len(args)))
 		}
 
-		valuePlaceholders = append(valuePlaceholders, fmt.Sprintf("(%s)", strings.Join(rowPlaceholders, ", ")))
+		valuePlaceholders = append(
+			valuePlaceholders,
+			fmt.Sprintf("(%s)", strings.Join(rowPlaceholders, ", ")),
+		)
 	}
 
 	s.Args = args
@@ -486,7 +497,8 @@ func BuildInsertTemplate(t reflect.Type) *InsertTemplate {
 		if ArrayIncludes([]string{"_id", "id"}, m.JSONTag) || m.ColumnTag == "id" {
 			continue
 		}
-		if ArrayIncludes([]string{"", "-"}, m.JSONTag) && ArrayIncludes([]string{"", "-"}, m.ColumnTag) {
+		if ArrayIncludes([]string{"", "-"}, m.JSONTag) &&
+			ArrayIncludes([]string{"", "-"}, m.ColumnTag) {
 			continue
 		}
 
