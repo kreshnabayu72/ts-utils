@@ -141,19 +141,19 @@ func CheckTransactionRoleMultiGroupPermissionsSQL(
 	roleType []new_model.TransactionRoleType,
 ) error {
 	filter := map[string]sql_query.SQLCondition{
-		"usr.user_id": {
+		"utr.user_id": {
 			Operator: sql_query.SQLOperatorEqual,
-			Value:    loggedInUser,
+			Value:    *loggedInUser,
 		},
-		"usr.role_type": {
+		"utr.role_type": {
 			Operator: sql_query.SQLOperatorIn,
 			Value:    roleType,
 		},
-		"usr.role_attribute": {
+		"utr.role_attribute": {
 			Operator: sql_query.SQLOperatorIn,
 			Value:    transactionType,
 		},
-		"usr.is_active": {
+		"utr.is_active": {
 			Operator: sql_query.SQLOperatorEqual,
 			Value:    true,
 		},
@@ -162,13 +162,11 @@ func CheckTransactionRoleMultiGroupPermissionsSQL(
 	builder := sql_query.NewSQLSelectBuilder[any](fmt.Sprintf("%s as ctrmgp", service.GetTableName()))
 
 	query, args, _ := builder.
-		Select("ctrmgp.id::text").
-		LeftJoin(fmt.Sprintf("%s as utr", db.UserTransactionRoleTableName), fmt.Sprintf("%s = utr.group_id", groupIdField)).
+		Select("ctrmgp.id", "utr.id as \"userTransactionRoleId\"").
+		LeftJoin(fmt.Sprintf("%s as utr", db.UserTransactionRoleTableName), fmt.Sprintf("%s = utr.group_id", groupIdField), filter).
 		Where(dataFilter).
-		Where(filter).
 		Build()
 
-	fmt.Println("query", query, args)
 	var permissionCheck []map[string]any
 	err := service.SelectMany(&permissionCheck, context.Background(), query, args...)
 	if err != nil {
@@ -181,7 +179,7 @@ func CheckTransactionRoleMultiGroupPermissionsSQL(
 	}
 
 	for _, data := range permissionCheck {
-		transactionRoles, _ := data["transactionRoles"]
+		transactionRoles, _ := data["userTransactionRoleId"]
 		if transactionRoles == nil {
 			// If ONE OF data have no permission, throw error
 			return errors.New("You have no permission")
