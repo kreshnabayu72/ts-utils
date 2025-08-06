@@ -49,7 +49,7 @@ const (
 
 type Notification struct {
 	ID         primitive.ObjectID     `json:"_id,omitempty" bson:"_id,omitempty"`
-	UserKey    int                    `json:"user" bson:"user"`
+	UserKey    string                 `json:"user" bson:"user"`
 	Title      string                 `json:"title"         bson:"title"`
 	Detail     string                 `json:"detail"        bson:"detail"`
 	Plan       string                 `json:"plan"        bson:"plan"`
