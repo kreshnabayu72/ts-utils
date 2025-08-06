@@ -6,7 +6,7 @@ import (
 	"gitea.qwertysystem.net/BETS/ts-utils/migration"
 )
 
-type RoutineScheduleAsset struct {
+type RoutineScheduledAsset struct {
 	ID         int       `json:"_id" column:"id" sql:"BIGINT PRIMARY KEY"`
 	ScheduleID int       `json:"scheduleId" column:"schedule_id" sql:"BIGINT NOT NULL"`
 	AssetID    int       `json:"assetId" column:"asset_id" sql:"BIGINT NOT NULL"`
@@ -15,11 +15,11 @@ type RoutineScheduleAsset struct {
 	UpdatedAt  time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
 }
 
-func (m *RoutineScheduleAsset) TableName() string {
-	return "routine_schedule_assets"
+func (m *RoutineScheduledAsset) TableName() string {
+	return "routine_scheduled_assets"
 }
 
-func (m *RoutineScheduleAsset) Up(builder *migration.MigrationBuilder) {
+func (m *RoutineScheduledAsset) Up(builder *migration.MigrationBuilder) {
 	builder.AddColumn(m)
 
 	builder.AddForeignKey(

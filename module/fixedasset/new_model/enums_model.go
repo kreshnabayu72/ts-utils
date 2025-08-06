@@ -652,3 +652,18 @@ const (
 	IndicatorDataTypeText   IndicatorDataType = "Text"
 	IndicatorDataTypeNumber IndicatorDataType = "Number"
 )
+
+type RoutineTaskStatus string
+
+const (
+	RoutineTaskStatusOnSchedule           RoutineTaskStatus = "On Schedule"
+	RoutineTaskStatusWaitingForAssignment RoutineTaskStatus = "Waiting for Assignment"
+	RoutineTaskStatusUnderMaintenance     RoutineTaskStatus = "Under Maintenance"
+	RoutineTaskStatusWaitingForReview     RoutineTaskStatus = "Waiting for Review"
+	RoutineTaskStatusWaitingForApproval   RoutineTaskStatus = "Waiting for Approval"
+	RoutineTaskStatusOverdue              RoutineTaskStatus = "Overdue"
+	RoutineTaskStatusCompleted            RoutineTaskStatus = "Completed"
+	RoutineTaskStatusCanceled             RoutineTaskStatus = "Canceled"
+	RoutineTaskStatusReportedDamaged      RoutineTaskStatus = "Reported Damaged"
+	RoutineTaskStatusStopped              RoutineTaskStatus = "Stopped"
+)

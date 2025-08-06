@@ -173,8 +173,12 @@ func migrateFixedAssetDB(dbName string, migrator *migration.Migrator) error {
 		&fixedasset_model.TransferTransaction{},
 		&fixedasset_model.RoutineSchedule{},
 		&fixedasset_model.RoutineScheduleStaff{},
-		&fixedasset_model.RoutineScheduleAsset{},
+		&fixedasset_model.RoutineScheduledAsset{},
 		&fixedasset_model.RoutineScheduleIndicator{},
+		&fixedasset_model.RoutineTask{},
+		&fixedasset_model.RoutineTaskStaff{},
+		&fixedasset_model.RoutineTaskIndicator{},
+		&fixedasset_model.RoutineApproval{},
 	}
 
 	isDBExist := migrator.IsDBExist(dbName)
