@@ -370,7 +370,7 @@ func PaginationQuery(dataQuery, totalQuery string) string {
 				SELECT COUNT(*) FROM totalRow
 			)
 		SELECT
-			COALESCE((SELECT json_agg(paginated) FROM paginated), '[]') AS data,
+			COALESCE((SELECT jsonb_agg(paginated) FROM paginated), '[]') AS data,
 			(SELECT COUNT FROM total) AS totalRecords;
 	`, dataQuery, totalQuery)
 
