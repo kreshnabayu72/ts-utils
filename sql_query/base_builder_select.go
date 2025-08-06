@@ -15,7 +15,15 @@ type SQLSelectChainBuilder interface {
 	// Can be used to manually manage parameter placeholders.
 	AddArgs(arg ...interface{}) SQLSelectChainBuilder
 
-	// Select implements SQLSelectChainBuilder. (Only able to be called once).
+	// Distinct implements SQLSelectChainBuilder.
+	// Distinct defines one or more columns for the DISTINCT ON(...) statement.
+	//
+	// Example:
+	//
+	//	builder.Distinct("u.id", "u.name")
+	Distinct(columns ...string) SQLSelectChainBuilder
+
+	// Select implements SQLSelectChainBuilder.
 	// Select defines one or more columns for the SELECT statement.
 	// If a column alias already exists, it will be replaced.
 	//
