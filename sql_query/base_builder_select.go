@@ -159,13 +159,13 @@ type SQLSelectChainBuilder interface {
 	// Example:
 	//
 	//	builder.Join("roles r", "r.id = u.role_id")
-	Join(table string, onCondition string) SQLSelectChainBuilder
+	Join(table string, onCondition string, additionalConditions ...map[string]SQLCondition) SQLSelectChainBuilder
 	// LeftJoin adds a LEFT JOIN clause with the specified ON condition.
 	//
 	// Example:
 	//
 	//	builder.LeftJoin("roles r", "r.id = u.role_id")
-	LeftJoin(table string, onCondition string) SQLSelectChainBuilder
+	LeftJoin(table string, onCondition string, additionalConditions ...map[string]SQLCondition) SQLSelectChainBuilder
 	// Paginate implements SQLSelectChainBuilder. (Overrides previous value if called again).
 	// Paginate applies LIMIT, OFFSET, and ORDER BY using a Pagination struct.
 	// It supports single or multiple sorting rules.
@@ -361,21 +361,43 @@ func (s *SelectBuilder) SelectCaseWhen(thenExpr, elseExpr, alias string, whenCla
 	return s
 }
 
-func (s *SelectBuilder) Join(table string, onCondition string) SQLSelectChainBuilder {
+func (s *SelectBuilder) Join(table string, onCondition string, additionalConditions ...map[string]SQLCondition) SQLSelectChainBuilder {
 	if table == "" {
 		return s
 	}
 
-	s.OtherTables = append(s.OtherTables, fmt.Sprintf("JOIN %s ON %s", table, onCondition))
+	var filterSb strings.Builder
+	if len(additionalConditions) > 0 {
+		var filters []string
+		s.sharedWhereAndQuery(additionalConditions[0], &filters)
+
+		for i := range filters {
+			filterSb.WriteString(" AND ")
+			filterSb.WriteString(filters[i])
+		}
+	}
+
+	s.OtherTables = append(s.OtherTables, fmt.Sprintf("JOIN %s ON %s%s", table, onCondition, filterSb.String()))
 	return s
 }
 
-func (s *SelectBuilder) LeftJoin(table string, onCondition string) SQLSelectChainBuilder {
+func (s *SelectBuilder) LeftJoin(table string, mainCondition string, additionalConditions ...map[string]SQLCondition) SQLSelectChainBuilder {
 	if table == "" {
 		return s
 	}
 
-	s.OtherTables = append(s.OtherTables, fmt.Sprintf("LEFT JOIN %s ON %s", table, onCondition))
+	var filterSb strings.Builder
+	if len(additionalConditions) > 0 {
+		var filters []string
+		s.sharedWhereAndQuery(additionalConditions[0], &filters)
+
+		for i := range filters {
+			filterSb.WriteString(" AND ")
+			filterSb.WriteString(filters[i])
+		}
+	}
+
+	s.OtherTables = append(s.OtherTables, fmt.Sprintf("LEFT JOIN %s ON %s%s", table, mainCondition, filterSb.String()))
 	return s
 }
 

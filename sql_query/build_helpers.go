@@ -12,6 +12,8 @@ import (
 // It supports operators like =, IN, BETWEEN, IS NULL, RAW, and column refs (IsRef).
 // Generated SQL fragments are added to Filters or HavingClauses, and Args is updated.
 //
+// WHERE filters for table & HAVING clauses won't be generated if you provide destination in params (pointer of slice string), but this function will assign value to the destination instead.
+//
 // Example:
 //
 //	filters := map[string]sql_query.SQLCondition{
@@ -22,7 +24,11 @@ import (
 //	// Produces: "age" > $1 AND "status" IN ($2, $3)
 func (s *SQLEloquentQuery) sharedWhereAndQuery(
 	filters map[string]SQLCondition,
+	v ...*[]string,
 ) {
+	var dest []string
+	useDestination := len(v) > 0
+
 	for column, each := range filters {
 		// Skip value nil except for IS NULL / IS NOT NULL
 		if each.Value == nil &&
@@ -107,12 +113,22 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 			s.Args = append(s.Args, each.Value)
 		}
 
+		// If there's destination in param, then HavingClauses and Filters wont be used, instead assign value to destination
+		if useDestination {
+			dest = append(dest, clause)
+			continue
+		}
+
 		// Insert to Where clause or Having clause based on given params
 		if s.useHaving {
 			s.HavingClauses = append(s.HavingClauses, clause)
 		} else {
 			s.Filters = append(s.Filters, clause)
 		}
+	}
+
+	if useDestination {
+		v[0] = &dest
 	}
 }
 
