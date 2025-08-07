@@ -211,6 +211,19 @@ type SQLSelectChainBuilder interface {
 	//	WITH recent_orders AS (SELECT id, user_id FROM orders) ...
 	WithCTEBuilder(cteName string, cteBuilder *SQLEloquentQuery) SQLSelectChainBuilder
 
+	// WithRecursiveCTEBuilder adds a Common Table Expression (CTE) to the query.
+	// It adjusts argument placeholders to avoid conflicts.
+	//
+	// Example:
+	//
+	//	cte := NewSQLSelectBuilder[Order]("orders").Select("id", "user_id")
+	//	builder.WithRecursiveCTEBuilder("recent_orders", cte.(*sql_query.SelectBuilder).SQLEloquentQuery)
+	//
+	// Generates:
+	//
+	//	WITH RECURSIVE recent_orders AS (SELECT id, user_id FROM orders) ...
+	WithRecursiveCTEBuilder(cteName string, cteBuilder *SQLEloquentQuery) SQLSelectChainBuilder
+
 	// Add "UNION ALL" in between the queries
 	// example:
 	//  SELECT id
