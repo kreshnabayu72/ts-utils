@@ -25,8 +25,8 @@ type User struct {
 	Access         []fixed_asset_model.ModuleAccess `json:"access" column:"access"`
 	ModifiedBy     int                              `json:"modifiedById" column:"modified_by_id" sql:"BIGINT REFERENCES users(id)"`
 
-	CreatedAt *time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	UpdatedAt *time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	CreatedAt *time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt *time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (m *User) TableName() string {

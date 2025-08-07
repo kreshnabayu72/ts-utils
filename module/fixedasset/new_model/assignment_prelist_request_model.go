@@ -11,8 +11,8 @@ type AssignmentPrelistRequest struct {
 	ID        int       `json:"id" column:"id" sql:"BIGINT PRIMARY KEY"`
 	AssetID   int       `json:"assetId" column:"asset_id" sql:"BIGINT"`
 	PrelistID int       `json:"prelistId" column:"prelist_id" sql:"BIGINT"`
-	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 // TableName returns the name of the database table for this model.

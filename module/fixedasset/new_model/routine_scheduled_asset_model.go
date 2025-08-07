@@ -11,8 +11,8 @@ type RoutineScheduledAsset struct {
 	ScheduleID int       `json:"scheduleId" column:"schedule_id" sql:"BIGINT NOT NULL"`
 	AssetID    int       `json:"assetId" column:"asset_id" sql:"BIGINT NOT NULL"`
 	IsActive   bool      `json:"isActive" column:"is_active" sql:"BOOLEAN NOT NULL DEFAULT TRUE"`
-	CreatedAt  time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	UpdatedAt  time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	CreatedAt  time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt  time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (m *RoutineScheduledAsset) TableName() string {

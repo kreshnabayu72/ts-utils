@@ -16,10 +16,10 @@ type LicenseTransaction struct {
 	DurationText  int                 `json:"durationText" column:"duration_text" sql:"VARCHAR"`
 	PurchaseType  LicensePurchaseType `json:"purchaseType" column:"purchase_type" sql:"license_transaction_purchase_type_enum"`
 
-	ActivatedAt time.Time `json:"activatedAt" column:"activated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	ExpiredAt   time.Time `json:"expiredAt" column:"expired_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	CreatedAt   time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	UpdatedAt   time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	ActivatedAt time.Time `json:"activatedAt" column:"activated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ExpiredAt   time.Time `json:"expiredAt" column:"expired_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	CreatedAt   time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt   time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (l *LicenseTransaction) TableName() string {

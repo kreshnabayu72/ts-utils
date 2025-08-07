@@ -21,8 +21,8 @@ type User struct {
 	ProfilePicture *string   `json:"profilePicture" column:"profile_picture" sql:"VARCHAR NULL"`
 	EmployeeID     *string   `json:"employeeId" column:"employee_id" sql:"VARCHAR NULL"`
 	ModifiedByID   int       `json:"modifiedById" column:"modified_by_id" sql:"BIGINT REFERENCES users(id)"`
-	CreatedAt      time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	UpdatedAt      time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	CreatedAt      time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt      time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (m *User) TableName() string {

@@ -22,8 +22,8 @@ type UserSystemRole struct {
 	RoleName      SystemRoleName      `json:"roleName" column:"role_name" sql:"system_role_name_enum NOT NULL"`
 	RoleAttribute SystemRoleAttribute `json:"roleAttribute" column:"role_attribute" sql:"system_role_attribute_enum NOT NULL"`
 
-	CreatedAt *time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMP NULL"`
-	UpdatedAt *time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NULL"`
+	CreatedAt *time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NULL"`
+	UpdatedAt *time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NULL"`
 }
 
 func (u *UserSystemRole) TableName() string {

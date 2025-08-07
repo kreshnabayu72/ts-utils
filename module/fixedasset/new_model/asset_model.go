@@ -32,7 +32,7 @@ type Asset struct {
 	ParentID       *int `json:"parentId"       column:"parent_id" sql:"BIGINT"`
 
 	// ─────── Purchase Info ───────
-	PurchaseDate           *time.Time `json:"purchaseDate"            column:"purchase_date" sql:"TIMESTAMP"`
+	PurchaseDate           *time.Time `json:"purchaseDate"            column:"purchase_date" sql:"TIMESTAMPTZ"`
 	PurchaseCost           *float64   `json:"purchaseCost"            column:"purchase_cost" sql:"FLOAT"`
 	PurchaseCurrency       *string    `json:"purchaseCurrency"        column:"purchase_currency" sql:"VARCHAR"`
 	PurchaseWarrantyYears  *int       `json:"purchaseWarrantyDuration" column:"purchase_warranty_duration" sql:"INTEGER"`
@@ -40,9 +40,9 @@ type Asset struct {
 
 	// ─────── Metadata ───────
 	IsDeleted     bool       `json:"isDeleted"      column:"is_deleted" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
-	LastScannedAt *time.Time `json:"lastScannedAt"  column:"last_scanned_at" sql:"TIMESTAMP DEFAULT NOW()"`
-	CreatedAt     time.Time  `json:"createdAt"      column:"created_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	UpdatedAt     time.Time  `json:"updatedAt"      column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	LastScannedAt *time.Time `json:"lastScannedAt"  column:"last_scanned_at" sql:"TIMESTAMPTZ DEFAULT NOW()"`
+	CreatedAt     time.Time  `json:"createdAt"      column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt     time.Time  `json:"updatedAt"      column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (m *Asset) TableName() string {

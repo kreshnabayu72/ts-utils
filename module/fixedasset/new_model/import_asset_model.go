@@ -28,8 +28,8 @@ type ImportFixedAsset struct {
 	Model       *string `json:"model" column:"model" sql:"VARCHAR"`
 	Measurement *string `json:"measurement" column:"measurement" sql:"VARCHAR"`
 
-	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (a *ImportFixedAsset) TableName() string {

@@ -17,13 +17,13 @@ type AssignmentTransaction struct {
 	IsVerified                   bool                        `json:"isVerified" column:"is_verified" sql:"BOOLEAN"`
 	ConfirmationEmail            string                      `json:"confirmationEmail" column:"confirmation_email" sql:"VARCHAR"`
 	ConfirmationEmailConfirmed   bool                        `json:"confirmationEmailConfirmed" column:"confirmation_email_confirmed" sql:"BOOLEAN"`
-	ConfirmationEmailSentAt      time.Time                   `json:"confirmationEmailSentAt" column:"confirmation_email_sent_at" sql:"TIMESTAMP"`
-	ConfirmationEmailExpiredAt   time.Time                   `json:"confirmationEmailExpiredAt" column:"confirmation_email_expired_at" sql:"TIMESTAMP"`
+	ConfirmationEmailSentAt      time.Time                   `json:"confirmationEmailSentAt" column:"confirmation_email_sent_at" sql:"TIMESTAMPTZ"`
+	ConfirmationEmailExpiredAt   time.Time                   `json:"confirmationEmailExpiredAt" column:"confirmation_email_expired_at" sql:"TIMESTAMPTZ"`
 	ConfirmationEmailToken       string                      `json:"confirmationEmailToken" column:"confirmation_email_token" sql:"VARCHAR"`
-	ConfirmationEmailConfirmedAt time.Time                   `json:"confirmationEmailConfirmedAt" column:"confirmation_email_confirmed_at" sql:"TIMESTAMP"`
+	ConfirmationEmailConfirmedAt time.Time                   `json:"confirmationEmailConfirmedAt" column:"confirmation_email_confirmed_at" sql:"TIMESTAMPTZ"`
 	CurrentApprovalLevel         int                         `json:"currentApprovalLevel" column:"current_approval_level" sql:"INTEGER DEFAULT 1"`
-	CreatedAt                    time.Time                   `json:"createdAt" column:"created_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	UpdatedAt                    time.Time                   `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	CreatedAt                    time.Time                   `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt                    time.Time                   `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 // TableName returns the name of the database table for this model.

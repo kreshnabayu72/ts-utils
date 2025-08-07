@@ -13,8 +13,8 @@ type ImportAccountCode struct {
 	Name string `json:"name" column:"name" sql:"VARCHAR NOT NULL"`
 	Code string `json:"code" column:"code" sql:"VARCHAR NOT NULL"`
 
-	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (i *ImportAccountCode) TableName() string {

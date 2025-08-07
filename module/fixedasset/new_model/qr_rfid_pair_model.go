@@ -12,8 +12,8 @@ type QrRfidPair struct {
 	QrId   int `json:"qrId"   column:"qr_id" sql:"BIGINT"`
 	RfidId int `json:"rfidId" column:"rfid_id" sql:"BIGINT"`
 
-	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (m *QrRfidPair) TableName() string {
