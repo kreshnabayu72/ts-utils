@@ -25,6 +25,14 @@ type UpdateCases interface {
 	//   - conditions: a MultiFilterCondition containing AND and OR filters used for this WHEN clause.
 	//   - value: the resulting value when the conditions match.
 	//   - isRef: whether the value is a SQL column reference (true) or a literal that should be parameterized (false).
+	//
+	// Example:
+	//   c.Case(MultiFilterCondition{
+	//     And: map[string]SQLCondition{
+	//       "status":       {Operator: SQLOperatorEqual, Value: "Not Paired Yet"},
+	//       body.TagType:   {SourceIsValue: true, Operator: SQLOperatorEqual, Value: "Non TAG"},
+	//     },
+	//   }, "Available", false)
 	Case(conditions MultiFilterCondition, value interface{}, isRef bool)
 	// Else sets the default ELSE value for the current CASE expression.
 	// It is used when none of the WHEN conditions match.
@@ -32,6 +40,9 @@ type UpdateCases interface {
 	// Parameters:
 	//   - value: the fallback value if no WHEN clause matches.
 	//   - isRef: whether the value is a SQL column reference (true) or a literal that should be parameterized (false).
+	//
+	// Example:
+	//   c.Else("status", true) // fallback to the original "status" column value
 	Else(value interface{}, isRef bool)
 }
 
