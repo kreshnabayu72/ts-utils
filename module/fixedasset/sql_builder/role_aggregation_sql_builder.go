@@ -1034,12 +1034,12 @@ func transactionRoleMultiPermissionAggregationCTE(
 				new_model.TransactionRoleAttributeBorrowing,
 			),
 			fmt.Sprintf(
-				`BOOL_OR(utr.role_type = '%s' AND utr.role_attribute = '%s') AS AS "manager_transfer""`,
+				`BOOL_OR(utr.role_type = '%s' AND utr.role_attribute = '%s') AS AS "manager_transfer"`,
 				new_model.TransactionRoleTypeManager,
 				new_model.TransactionRoleAttributeTransfer,
 			),
 			fmt.Sprintf(
-				`BOOL_OR(utr.role_type = '%s' AND utr.role_attribute = '%s') AS AS "manager_disposal""`,
+				`BOOL_OR(utr.role_type = '%s' AND utr.role_attribute = '%s') AS AS "manager_disposal"`,
 				new_model.TransactionRoleTypeManager,
 				new_model.TransactionRoleAttributeDisposal,
 			),
@@ -1049,12 +1049,12 @@ func transactionRoleMultiPermissionAggregationCTE(
 				new_model.TransactionRoleAttributeBorrowing,
 			),
 			fmt.Sprintf(
-				`BOOL_OR(utr.role_type = '%s' AND utr.role_attribute = '%s') AS AS "monitoring_transfer""`,
+				`BOOL_OR(utr.role_type = '%s' AND utr.role_attribute = '%s') AS AS "monitoring_transfer"`,
 				new_model.TransactionRoleTypeMonitoring,
 				new_model.TransactionRoleAttributeTransfer,
 			),
 			fmt.Sprintf(
-				`BOOL_OR(utr.role_type = '%s' AND utr.role_attribute = '%s') AS AS "monitoring_disposal""`,
+				`BOOL_OR(utr.role_type = '%s' AND utr.role_attribute = '%s') AS AS "monitoring_disposal"`,
 				new_model.TransactionRoleTypeMonitoring,
 				new_model.TransactionRoleAttributeDisposal,
 			),
