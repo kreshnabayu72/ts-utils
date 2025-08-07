@@ -82,6 +82,7 @@ type SQLEloquentQuery struct {
 	LastError     error
 
 	currentUpdateCaseKey string
+	useUnionAll          bool
 	useHaving            bool
 	excludeEmptyValue    bool
 }
