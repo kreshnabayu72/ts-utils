@@ -35,6 +35,22 @@ type SQLCondition struct {
 	ExtraArgs []interface{}
 }
 
+type UpdateCaseParam struct {
+	conditions []string
+	value      string
+	isElse     bool
+}
+
+// type UpdateCaseParam struct {
+// 	column         string
+// 	UpdateCaseExpr []UpdateCaseExpr
+// }
+
+type MultiFilterCondition struct {
+	And map[string]SQLCondition
+	Or  []map[string]SQLCondition
+}
+
 // Base struct that contains params used by methods
 type SQLEloquentQuery struct {
 	NestedAggregation []string
@@ -54,15 +70,17 @@ type SQLEloquentQuery struct {
 	Grouping       []string
 	HavingClauses  []string
 
-	CustomQuery string
+	CustomQuery       string
+	UpdateCaseClauses map[string][]UpdateCaseParam
 
 	Args          []interface{}
 	UsePagination bool
 	Mode          SQLMode
 	LastError     error
 
-	useHaving         bool
-	excludeEmptyValue bool
+	currentUpdateCaseKey string
+	useHaving            bool
+	excludeEmptyValue    bool
 }
 
 // Run respective build method based on given mode

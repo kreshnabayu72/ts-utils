@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -15,6 +16,11 @@ import (
 // 	IsRef     bool         // to determine whether WHERE is targeting literal value or reference
 // 	ExtraArgs []interface{}
 // }
+
+type UpdateCases interface {
+	Case(conditions MultiFilterCondition, value string, isRef bool)
+	Else(value string, isRef bool)
+}
 
 // To ensure SQLUpdateBuilder has its own initial methods
 // e.g. UpdateBuilder(...).Update()...Rest
@@ -34,6 +40,8 @@ type SQLUpdateInitBuilder interface {
 	//	FROM (VALUES ($1,$2),($3,$4)) AS v(id,name,updated_at)
 	//	WHERE users.id = v.id
 	UpdateEach(values interface{}, rowIdentifier string) SQLUpdateChainBuilder
+
+	AddCase(setColumn string, fn func(b UpdateCases)) SQLUpdateChainBuilder
 
 	// Increment is used to replace Update() for adding int value cause update cant handle that
 	// Increment builds an UPDATE query that increases integer columns by a given value.
@@ -72,6 +80,8 @@ type SQLUpdateInitBuilder interface {
 // To ensure method .Update() has its own chaining methods
 // e.g. .Update(...).From(...).Build()
 type SQLUpdateChainBuilder interface {
+	AddCase(setColumn string, fn func(b UpdateCases)) SQLUpdateChainBuilder
+
 	// By default, the Update builder includes all fields, even if their values are zero or nil.
 	// Calling this method tells the builder to skip fields with zero values when generating the SET clause.
 	//
@@ -142,6 +152,58 @@ func (s *UpdateBuilder) Return(column ...string) SQLUpdateChainBuilder {
 func (s *UpdateBuilder) Conflict(constraint, do string) SQLUpdateChainBuilder {
 	s.ConflictClause = fmt.Sprintf(" ON CONFLICT %s DO %s", constraint, do)
 	return s
+}
+
+func (s *UpdateBuilder) AddCase(setColumn string, fn func(b UpdateCases)) SQLUpdateChainBuilder {
+	s.UpdateCaseClauses[setColumn] = []UpdateCaseParam{}
+	s.currentUpdateCaseKey = setColumn
+	return s
+}
+
+func (s *UpdateBuilder) Case(conditions MultiFilterCondition, value interface{}, isRef bool) {
+	filters := []string{}
+
+	if len(conditions.And) > 0 {
+		andFilters := []string{}
+		s.sharedWhereAndQuery(conditions.And, &andFilters)
+		filters = append(filters, andFilters...)
+	}
+
+	if len(conditions.Or) > 0 {
+		orFilters := []string{}
+		s.whereOrDestination(conditions.Or, &orFilters)
+		filters = append(filters, orFilters...)
+	}
+
+	var valueSb strings.Builder
+	if isRef {
+		valueSb.WriteString(value.(string))
+	} else {
+		valueSb.WriteByte('$')
+		s.Args = append(s.Args, value)
+		valueSb.WriteString(strconv.Itoa(len(s.Args)))
+	}
+
+	s.UpdateCaseClauses[s.currentUpdateCaseKey] = append(
+		s.UpdateCaseClauses[s.currentUpdateCaseKey],
+		UpdateCaseParam{conditions: filters, value: valueSb.String()},
+	)
+}
+
+func (s *UpdateBuilder) Else(value interface{}, isRef bool) {
+	var valueSb strings.Builder
+	if isRef {
+		valueSb.WriteString(value.(string))
+	} else {
+		valueSb.WriteByte('$')
+		s.Args = append(s.Args, value)
+		valueSb.WriteString(strconv.Itoa(len(s.Args)))
+	}
+
+	s.UpdateCaseClauses[s.currentUpdateCaseKey] = append(
+		s.UpdateCaseClauses[s.currentUpdateCaseKey],
+		UpdateCaseParam{conditions: []string{}, value: valueSb.String(), isElse: true},
+	)
 }
 
 func (s *UpdateBuilder) Update(values interface{}) SQLUpdateChainBuilder {
@@ -253,7 +315,12 @@ func (s *SQLEloquentQuery) buildUpdateQuery() (string, []interface{}, error) {
 		return "", nil, errors.New("invalid update query: CustomQuery not set")
 	}
 
-	query := s.CustomQuery
+	var query string
+	if len(s.UpdateCaseClauses) > 0 {
+		query = buildUpdateCase(s.UpdateCaseClauses, s.Table)
+	} else {
+		query = s.CustomQuery
+	}
 
 	if len(s.OtherTables) > 0 {
 		fromClause := strings.Join(s.OtherTables, " ")
@@ -377,4 +444,21 @@ func (s *UpdateBuilder) extractUpdateFields(v reflect.Value) ([]string, bool) {
 	}
 
 	return setClauses, hasUpdatedAt
+}
+
+func buildUpdateCase(updateCaseClauses map[string][]UpdateCaseParam, tableName string) string {
+	var updateExpr string
+	updateExpr = "UPDATE " + tableName + "\n"
+	updateExpr += "SET\n"
+
+	for key, each := range updateCaseClauses {
+		updateExpr += key + " CASE\n"
+
+		for _, param := range each {
+			updateExpr += "WHEN " + strings.Join(param.conditions, " AND ") + " THEN" + param.value
+			updateExpr += "\n"
+		}
+	}
+
+	return updateExpr
 }
