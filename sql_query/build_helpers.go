@@ -39,6 +39,13 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 
 		var clause string
 
+		// Needed for filtering with subquery, e.g: WHERE category_id IN (SELECT id FROM category_recursive)
+		if each.IsSubQuery {
+			clause = fmt.Sprintf(`%s %s %v`, column, each.Operator, each.Value)
+			s.Filters = append(s.Filters, clause)
+			break
+		}
+
 		switch each.Operator {
 		/* ───────────────────── RAW ───────────────────── */
 		case SQLOperatorRaw:
