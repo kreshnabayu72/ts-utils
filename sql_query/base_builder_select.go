@@ -211,6 +211,19 @@ type SQLSelectChainBuilder interface {
 	//	WITH recent_orders AS (SELECT id, user_id FROM orders) ...
 	WithCTEBuilder(cteName string, cteBuilder *SQLEloquentQuery) SQLSelectChainBuilder
 
+	// Add "UNION ALL" in between the queries
+	// example:
+	//  SELECT id
+	// FROM categories
+	// WHERE id = 0
+	//
+	// UNION ALL
+	//
+	// SELECT c.id
+	// FROM categories c
+	// INNER JOIN category_tree ct ON c.parent_id = ct.id
+	UnionAll(cteBuilders ...*SQLEloquentQuery) SQLSelectChainBuilder
+
 	// Build finalizes the SELECT query and returns the query string and arguments.
 	// Returns an error if the query is invalid (e.g., HAVING without GROUP BY).
 	Build() (string, []interface{}, error)
@@ -516,6 +529,40 @@ func (s *SelectBuilder) WithCTEBuilder(cteName string, cteBuilder *SQLEloquentQu
 	return s
 }
 
+func (s *SelectBuilder) WithRecursiveCTEBuilder(cteName string, cteBuilder *SQLEloquentQuery) SQLSelectChainBuilder {
+	cteQuery, cteArgs, err := cteBuilder.Build()
+	if err != nil {
+		s.LastError = err
+		return s
+	}
+
+	// Calculate the current argument offset
+	offset := len(s.Args)
+
+	// Shift the placeholders in the CTE query
+	shiftedCTEQuery := shiftSQLPlaceholders(cteQuery, offset)
+
+	s.WithRecursiveClauses = append(s.WithRecursiveClauses, fmt.Sprintf("%s AS (%s)", cteName, shiftedCTEQuery))
+	s.Args = append(s.Args, cteArgs...)
+
+	return s
+}
+
+func (s *SelectBuilder) UnionAll(cteBuilders ...*SQLEloquentQuery) SQLSelectChainBuilder {
+	for _, cteBuilder := range cteBuilders {
+		cteQuery, cteArgs, err := cteBuilder.Build()
+		if err != nil {
+			s.LastError = err
+			return s
+		}
+
+		s.UnionAllQueries = append(s.UnionAllQueries, cteQuery)
+		s.Args = append(s.Args, cteArgs...)
+	}
+
+	return s
+}
+
 // NewSQLSelectBuilder creates a new chainable SELECT builder for a given table.
 // It extracts JSON tags from the struct type T as default columns.
 //
@@ -551,17 +598,18 @@ func NewSQLCountBuilder(tableName string) SQLSelectChainBuilder {
 
 	return &SelectBuilder{
 		&SQLEloquentQuery{
-			Table:         tableName,
-			Filters:       []string{},
-			OtherTables:   []string{},
-			Columns:       defaultColumns,
-			Limit:         0,
-			Offset:        0,
-			SortBy:        []string{},
-			CustomQuery:   "",
-			Args:          nil,
-			UsePagination: false,
-			Mode:          "select",
+			Table:           tableName,
+			Filters:         []string{},
+			OtherTables:     []string{},
+			UnionAllQueries: []string{},
+			Columns:         defaultColumns,
+			Limit:           0,
+			Offset:          0,
+			SortBy:          []string{},
+			CustomQuery:     "",
+			Args:            nil,
+			UsePagination:   false,
+			Mode:            "select",
 		},
 	}
 }
@@ -584,6 +632,18 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 		sb.WriteByte('\n')
 		sb.WriteString("WITH ")
 		for i, c := range s.WithClauses {
+			if i > 0 {
+				sb.WriteString(", ")
+			}
+			sb.WriteString(c)
+		}
+	}
+
+	// WITH RECURSIVE
+	if len(s.WithRecursiveClauses) > 0 {
+		sb.WriteByte('\n')
+		sb.WriteString("WITH RECURSIVE ")
+		for i, c := range s.WithRecursiveClauses {
 			if i > 0 {
 				sb.WriteString(", ")
 			}
@@ -655,6 +715,18 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 				sb.WriteString(", ")
 			}
 			sb.WriteString(g)
+		}
+		sb.WriteByte('\n')
+	}
+
+	// UNION ALL
+	if len(s.UnionAllQueries) > 0 {
+		for i, u := range s.UnionAllQueries {
+			if i > 0 {
+				sb.WriteString("UNION ALL")
+				sb.WriteByte('\n')
+			}
+			sb.WriteString(u)
 		}
 		sb.WriteByte('\n')
 	}

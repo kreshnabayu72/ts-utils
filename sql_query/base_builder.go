@@ -57,19 +57,21 @@ type SQLEloquentQuery struct {
 	NestedAggregation []string
 	WrapAggregation   bool
 
-	ConflictClause string
-	WithClauses    []string
-	Table          string
-	Filters        []string
-	OtherTables    []string
-	Columns        []string
-	DistinctBy     []string
-	DistinctAlias  string
-	Offset         int
-	Limit          int
-	SortBy         []string
-	Grouping       []string
-	HavingClauses  []string
+	ConflictClause       string
+	WithClauses          []string
+	WithRecursiveClauses []string
+	Table                string
+	Filters              []string
+	OtherTables          []string
+	UnionAllQueries      []string
+	Columns              []string
+	DistinctBy           []string
+	DistinctAlias        string
+	Offset               int
+	Limit                int
+	SortBy               []string
+	Grouping             []string
+	HavingClauses        []string
 
 	CustomQuery       string
 	UpdateCaseClauses map[string][]UpdateCaseParam
