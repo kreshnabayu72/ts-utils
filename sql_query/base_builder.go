@@ -33,6 +33,7 @@ type SQLCondition struct {
 	Value         interface{}   // could be a single value, slice, or nil.
 	IsRef         bool          // to determine whether WHERE is targeting literal value or reference, e.g. `"column_a" = value` vs `"column_a" = $2` based on given boolean.
 	SourceIsValue bool          // to determine whether WHERE is sourcing from literal value or reference, e.g. `"column_a" = value` vs `$2 = value` based on given boolean.
+	IsSubQuery    bool          // to determine whether WHERE is sourcing from a query e.g. WHERE category_id IN (SELECT id FROM category_tree).
 	ExtraArgs     []interface{} // for Operator `SQLOperatorRaw`
 }
 
