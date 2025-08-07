@@ -1001,23 +1001,23 @@ func TransactionRoleMultipleGroupAggregation(
 func transactionRoleMultiPermissionAggregationCTE(
 	loggedInUserId int,
 ) sql_query.SQLSelectChainBuilder {
-	return sql_query.NewSQLSelectBuilder[UserTransactionRole](
+	return sql_query.NewSQLSelectBuilder[any](
 		"user_transaction_roles utr",
 	).
 		Where(map[string]sql_query.SQLCondition{
-			"utr\".\"user_id": {
+			"utr.user_id": {
 				Operator: sql_query.SQLOperatorEqual,
 				Value:    loggedInUserId,
 			},
-			"utr\".\"is_active": {
+			"utr.is_active": {
 				Operator: sql_query.SQLOperatorEqual,
 				Value:    true,
 			},
-			"utr\".\"role_type": {
+			"utr.role_type": {
 				Operator: sql_query.SQLOperatorIn,
 				Value:    []string{"Monitoring", "Manager"},
 			},
-			"utr\".\"role_attribute": {
+			"utr.role_attribute": {
 				Operator: sql_query.SQLOperatorIn,
 				Value: []new_model.TransactionRoleAttribute{
 					new_model.TransactionRoleAttributeBorrowing,
@@ -1026,50 +1026,38 @@ func transactionRoleMultiPermissionAggregationCTE(
 				},
 			},
 		}).
-		Select("utr.group_id").
-		SelectJSONAggregate(
-			"manager",
-			map[string]string{
-				"borrowing": fmt.Sprintf(
-					"BOOL_OR(utr.role_type = '%s' AND utr.role_attribute = '%s')",
-					new_model.TransactionRoleTypeManager,
-					new_model.TransactionRoleAttributeBorrowing,
-				),
-				"transfer": fmt.Sprintf(
-					"BOOL_OR(utr.role_type = '%s' AND utr.role_attribute = '%s')",
-					new_model.TransactionRoleTypeManager,
-					new_model.TransactionRoleAttributeTransfer,
-				),
-				"disposal": fmt.Sprintf(
-					"BOOL_OR(utr.role_type = '%s' AND utr.role_attribute = '%s')",
-					new_model.TransactionRoleTypeManager,
-					new_model.TransactionRoleAttributeDisposal,
-				),
-			},
-			"",
-			false,
-		).
-		SelectJSONAggregate(
-			"monitoring",
-			map[string]string{
-				"borrowing": fmt.Sprintf(
-					"BOOL_OR(utr.role_type = '%s' AND utr.role_attribute = '%s')",
-					new_model.TransactionRoleTypeMonitoring,
-					new_model.TransactionRoleAttributeBorrowing,
-				),
-				"transfer": fmt.Sprintf(
-					"BOOL_OR(utr.role_type = '%s' AND utr.role_attribute = '%s')",
-					new_model.TransactionRoleTypeMonitoring,
-					new_model.TransactionRoleAttributeTransfer,
-				),
-				"disposal": fmt.Sprintf(
-					"BOOL_OR(utr.role_type = '%s' AND utr.role_attribute = '%s')",
-					new_model.TransactionRoleTypeMonitoring,
-					new_model.TransactionRoleAttributeDisposal,
-				),
-			},
-			"",
-			false,
+		Select(
+			"utr.group_id",
+			fmt.Sprintf(
+				`BOOL_OR(utr.role_type = '%s' AND utr.role_attribute = '%s') AS "manager_borrowing"`,
+				new_model.TransactionRoleTypeManager,
+				new_model.TransactionRoleAttributeBorrowing,
+			),
+			fmt.Sprintf(
+				`BOOL_OR(utr.role_type = '%s' AND utr.role_attribute = '%s') AS "manager_transfer"`,
+				new_model.TransactionRoleTypeManager,
+				new_model.TransactionRoleAttributeTransfer,
+			),
+			fmt.Sprintf(
+				`BOOL_OR(utr.role_type = '%s' AND utr.role_attribute = '%s') AS "manager_disposal"`,
+				new_model.TransactionRoleTypeManager,
+				new_model.TransactionRoleAttributeDisposal,
+			),
+			fmt.Sprintf(
+				`BOOL_OR(utr.role_type = '%s' AND utr.role_attribute = '%s') AS "monitoring_borrowing"`,
+				new_model.TransactionRoleTypeMonitoring,
+				new_model.TransactionRoleAttributeBorrowing,
+			),
+			fmt.Sprintf(
+				`BOOL_OR(utr.role_type = '%s' AND utr.role_attribute = '%s') AS "monitoring_transfer"`,
+				new_model.TransactionRoleTypeMonitoring,
+				new_model.TransactionRoleAttributeTransfer,
+			),
+			fmt.Sprintf(
+				`BOOL_OR(utr.role_type = '%s' AND utr.role_attribute = '%s') AS "monitoring_disposal"`,
+				new_model.TransactionRoleTypeMonitoring,
+				new_model.TransactionRoleAttributeDisposal,
+			),
 		).
 		GroupBy("utr.group_id")
 }
@@ -1080,14 +1068,11 @@ func TransactionRoleMultiPermissionAggregation(
 	groupColumn string,
 ) {
 	cteBuilder := transactionRoleMultiPermissionAggregationCTE(loggedInUserId)
+
 	builder.WithCTEBuilder("user_transaction_roles_cte", cteBuilder.(*sql_query.SelectBuilder).SQLEloquentQuery)
 	builder.LeftJoin(
 		"user_transaction_roles_cte utr",
 		fmt.Sprintf("utr.group_id = %s", groupColumn),
-	)
-	builder.Select(
-		"\"utr\".\"manager\" AS manager",
-		"\"utr\".\"monitoring\" AS monitoring",
 	)
 }
 
