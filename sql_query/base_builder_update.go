@@ -18,8 +18,8 @@ import (
 // }
 
 type UpdateCases interface {
-	Case(conditions MultiFilterCondition, value string, isRef bool)
-	Else(value string, isRef bool)
+	Case(conditions MultiFilterCondition, value interface{}, isRef bool)
+	Else(value interface{}, isRef bool)
 }
 
 // To ensure SQLUpdateBuilder has its own initial methods
@@ -155,8 +155,10 @@ func (s *UpdateBuilder) Conflict(constraint, do string) SQLUpdateChainBuilder {
 }
 
 func (s *UpdateBuilder) AddCase(setColumn string, fn func(b UpdateCases)) SQLUpdateChainBuilder {
+	s.UpdateCaseClauses = make(map[string][]UpdateCaseParam, 0)
 	s.UpdateCaseClauses[setColumn] = []UpdateCaseParam{}
 	s.currentUpdateCaseKey = setColumn
+	fn(s)
 	return s
 }
 
@@ -452,13 +454,21 @@ func buildUpdateCase(updateCaseClauses map[string][]UpdateCaseParam, tableName s
 	updateExpr += "SET\n"
 
 	for key, each := range updateCaseClauses {
-		updateExpr += key + " CASE\n"
+		updateExpr += key + " = CASE\n"
+		fmt.Println("each", each)
 
 		for _, param := range each {
-			updateExpr += "WHEN " + strings.Join(param.conditions, " AND ") + " THEN" + param.value
+			if param.isElse {
+				updateExpr += "ELSE " + param.value
+			} else {
+				updateExpr += "WHEN " + strings.Join(param.conditions, " AND ") + " THEN " + param.value
+			}
 			updateExpr += "\n"
 		}
+
+		updateExpr += "END,\n"
 	}
 
+	updateExpr += "updated_at = NOW()"
 	return updateExpr
 }
