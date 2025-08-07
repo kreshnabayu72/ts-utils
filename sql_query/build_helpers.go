@@ -119,6 +119,13 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 				break
 			}
 
+			if each.SourceIsValue {
+				s.Args = append(s.Args, column)
+				clause = fmt.Sprintf(`$%d %s $%d`, len(s.Args), each.Operator, len(s.Args)+1)
+				s.Args = append(s.Args, each.Value)
+				break
+			}
+
 			// Common operator, products.user.id = $1 (literal value with args)=
 			clause = fmt.Sprintf(`%s %s $%d`, escapeQuoteColumns(column), each.Operator, len(s.Args)+1)
 			s.Args = append(s.Args, each.Value)
