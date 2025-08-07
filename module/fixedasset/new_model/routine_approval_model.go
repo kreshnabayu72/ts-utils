@@ -20,9 +20,9 @@ type RoutineApproval struct {
 	IsApproved    *bool          `json:"isApproved" column:"is_approved" sql:"BOOLEAN NULL DEFAULT NULL"`
 	Notes         *string        `json:"notes" column:"notes" sql:"VARCHAR"`
 	Type          ApprovalType   `json:"type" column:"type" sql:"approval_type_enum NOT NULL"`
-	ApprovedAt    *time.Time     `json:"approvedAt" column:"approved_at" sql:"TIMESTAMP NULL DEFAULT NULL"`
-	CreatedAt     time.Time      `json:"createdAt" column:"created_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	UpdatedAt     time.Time      `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	ApprovedAt    *time.Time     `json:"approvedAt" column:"approved_at" sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
+	CreatedAt     time.Time      `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt     time.Time      `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 // TableName returns the name of the database table for this model.

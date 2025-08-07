@@ -32,7 +32,7 @@ type IotReader struct {
 
 	Status           ReaderStatus `json:"status" column:"status" sql:"reader_status_enum DEFAULT 'Available'"`
 	LastReportReason string       `json:"lastReportReason" column:"last_report_reason" sql:"reader_status_enum"`
-	LastReportAt     *time.Time   `json:"lastReportAt" column:"last_report_at" sql:"TIMESTAMP DEFAULT NULL"`
+	LastReportAt     *time.Time   `json:"lastReportAt" column:"last_report_at" sql:"TIMESTAMPTZ DEFAULT NULL"`
 
 	NetworkStatus string `json:"networkStatus" column:"network_status" sql:"network_status_enum DEFAULT 'Offline'"`
 	ResponseID    string `json:"responseId" column:"response_id" sql:"VARCHAR"`
@@ -41,8 +41,8 @@ type IotReader struct {
 	AssetControlActive         bool `json:"assetControlActive" column:"asset_control_active" sql:"BOOLEAN"`
 	AssetControlRoleRestricted bool `json:"assetControlRoleRestricted" column:"asset_control_role_restricted" sql:"BOOLEAN"`
 
-	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (i *IotReader) TableName() string {

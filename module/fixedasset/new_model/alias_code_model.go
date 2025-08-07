@@ -13,8 +13,8 @@ type AliasCodeData struct {
 	IsChecked   bool      `json:"isChecked" column:"acd.is_checked" sql:"BOOLEAN NOT NULL DEFAULT FALSE CHECK (is_checked IN (TRUE, FALSE))"`
 	Value       string    `json:"value" column:"acd.value" sql:"VARCHAR NOT NULL"`
 	Order       *int      `json:"order" column:"acd.order" sql:"INTEGER NULL UNIQUE"`
-	CreatedAt   time.Time `column:"acd.created_at" json:"createdAt" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	UpdatedAt   time.Time `column:"acd.updated_at" json:"updatedAt" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	CreatedAt   time.Time `column:"acd.created_at" json:"createdAt" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt   time.Time `column:"acd.updated_at" json:"updatedAt" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (m *AliasCodeData) TableName() string {
@@ -37,8 +37,8 @@ type AliasCode struct {
 	CompanyInitial string          `column:"ac.company_initial" json:"companyInitial" sql:"VARCHAR NOT NULL CHECK (char_length(company_initial) > 0)"`
 	Separator      string          `column:"ac.separator" json:"separator" sql:"VARCHAR NOT NULL CHECK (char_length(separator) > 0)"`
 	Data           []AliasCodeData `json:"data"`
-	CreatedAt      time.Time       `column:"ac.created_at" json:"createdAt" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	UpdatedAt      time.Time       `column:"ac.updated_at" json:"updatedAt" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	CreatedAt      time.Time       `column:"ac.created_at" json:"createdAt" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt      time.Time       `column:"ac.updated_at" json:"updatedAt" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (m *AliasCode) TableName() string {

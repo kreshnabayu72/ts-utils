@@ -11,8 +11,8 @@ type IotReaderGateReceivingGroup struct {
 	IotReaderID int `json:"iotReaderId" column:"iot_reader_id" sql:"BIGINT NOT NULL"`
 	GroupID     int `json:"groupId" column:"group_id" sql:"BIGINT NOT NULL"`
 
-	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (g *IotReaderGateReceivingGroup) TableName() string {

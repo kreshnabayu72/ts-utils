@@ -33,14 +33,14 @@ type Client struct {
 	GroupID            int           `json:"groupId" column:"group_id"` // TODO: sql
 	ModifiedByID       int           `json:"modifiedById" column:"modified_by_id" sql:"BIGINT"`
 	PartnerID          int           `json:"partnerId" column:"partner_id"` // TODO: sql
-	ExpiredAt          time.Time     `json:"expiredAt" column:"expired_at" sql:"TIMESTAMP NULL"`
-	CreatedAt          time.Time     `json:"createdAt" column:"created_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	UpdatedAt          time.Time     `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	ExpiredAt          time.Time     `json:"expiredAt" column:"expired_at" sql:"TIMESTAMPTZ NULL"`
+	CreatedAt          time.Time     `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt          time.Time     `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 
 	// ─────── Open API Settings ───────
 	OpenAPIStatus      *CompanyOpenAPIStatus `json:"openApiStatus" column:"open_api_status" sql:"open_api_status_enum NULL"`
-	OpenAPIRequestedAt *time.Time            `json:"openApiRequestedAt" column:"open_api_requested_at" sql:"TIMESTAMP NULL"`
-	OpenAPIApprovedAt  *time.Time            `json:"openApiApprovedAt" column:"open_api_approved_at" sql:"TIMESTAMP NULL"`
+	OpenAPIRequestedAt *time.Time            `json:"openApiRequestedAt" column:"open_api_requested_at" sql:"TIMESTAMPTZ NULL"`
+	OpenAPIApprovedAt  *time.Time            `json:"openApiApprovedAt" column:"open_api_approved_at" sql:"TIMESTAMPTZ NULL"`
 
 	// ─────── License Plan ───────
 	PlanFixedAsset       fixedasset_model.PlanTypes `json:"planFixedAsset" column:"plan_fixed_asset" sql:"license_plan_enum NULL"`

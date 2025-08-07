@@ -16,10 +16,10 @@ type RoutineSchedule struct {
 	Duration             int                      `json:"duration" column:"duration" sql:"INT NOT NULL"`
 	ModifiedByID         int                      `json:"modifiedById" column:"modified_by_id" sql:"BIGINT NOT NULL"`
 	IsDeleted            bool                     `json:"isDeleted" column:"is_deleted" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
-	DeletedAt            *time.Time               `json:"deletedAt" column:"deleted_at" sql:"TIMESTAMP DEFAULT NULL"`
-	NextSchedule         time.Time                `json:"nextSchedule" column:"next_schedule" sql:"TIMESTAMP NOT NULL"`
-	CreatedAt            time.Time                `json:"createdAt" column:"created_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	UpdatedAt            time.Time                `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	DeletedAt            *time.Time               `json:"deletedAt" column:"deleted_at" sql:"TIMESTAMPTZ DEFAULT NULL"`
+	NextSchedule         time.Time                `json:"nextSchedule" column:"next_schedule" sql:"TIMESTAMPTZ NOT NULL"`
+	CreatedAt            time.Time                `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt            time.Time                `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (m *RoutineSchedule) TableName() string {

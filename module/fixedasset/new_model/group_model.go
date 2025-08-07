@@ -34,10 +34,10 @@ type Group struct {
 	AssetControlRoleManagedByParent    bool `json:"assetControlRoleManagedByParent" column:"asset_control_role_managed_by_parent" sql:"BOOLEAN NOT NULL DEFAULT TRUE"`
 
 	IsDeleted bool       `json:"isDeleted" column:"is_deleted" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
-	DeletedAt *time.Time `json:"deletedAt" column:"deleted_at" sql:"TIMESTAMP NULL DEFAULT NULL"`
+	DeletedAt *time.Time `json:"deletedAt" column:"deleted_at" sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
 
-	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (m *Group) TableName() string {
@@ -71,8 +71,8 @@ type GroupQuota struct {
 	AllocatedToSubgroups int            `json:"allocatedToSubgroups" column:"allocated_to_sub_groups" sql:"INTEGER DEFAULT 0"`
 	Available            int            `json:"available" column:"available" sql:"INTEGER DEFAULT 0"`
 
-	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (m *GroupQuota) TableName() string {
@@ -92,8 +92,8 @@ type GroupApprovalType struct {
 	Transaction  GroupTransactionType `json:"transaction" column:"transaction" sql:"group_transaction_type_enum"`
 	ApprovalType ApprovalType         `json:"approvalType" column:"approval_type" sql:"approval_type_enum DEFAULT 'Or'"`
 
-	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (m *GroupApprovalType) TableName() string {

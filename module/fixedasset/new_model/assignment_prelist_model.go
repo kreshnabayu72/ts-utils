@@ -12,8 +12,8 @@ type AssignmentPrelist struct {
 	GroupID      int                   `json:"groupId" column:"group_id" sql:"BIGINT"`
 	AssignedToID int                   `json:"assignedToId" column:"assigned_to_id" sql:"BIGINT"`
 	Type         AssignmentPrelistType `json:"type" column:"type" sql:"assignment_prelist_type_enum"`
-	CreatedAt    time.Time             `json:"createdAt" column:"created_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	UpdatedAt    time.Time             `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	CreatedAt    time.Time             `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt    time.Time             `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 // TableName returns the name of the database table for this model.

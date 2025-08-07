@@ -18,8 +18,8 @@ type TransferTransaction struct {
 	CurrentApprovalType  TransferGroupType         `json:"currentApprovalType" column:"current_approval_type" sql:"transfer_group_type_enum NOT NULL"`
 	CurrentApprovalLevel int                       `json:"currentApprovalLevel" column:"current_approval_level" sql:"INTEGER DEFAULT 1"`
 	CurrentApprovalRound int                       `json:"currentApprovalRound" column:"current_approval_round" sql:"INTEGER DEFAULT 1"`
-	CreatedAt            time.Time                 `json:"createdAt" column:"created_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	UpdatedAt            time.Time                 `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	CreatedAt            time.Time                 `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt            time.Time                 `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 // TableName returns the name of the database table for this model.

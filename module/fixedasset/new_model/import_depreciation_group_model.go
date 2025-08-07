@@ -12,8 +12,8 @@ type ImportDepreciationGroup struct {
 	Name       string `json:"name" column:"name" sql:"VARCHAR NOT NULL"`
 	UsefulLife int    `json:"usefulLife" column:"useful_life" sql:"INTEGER CHECK(useful_life > 0)"`
 
-	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (g *ImportDepreciationGroup) TableName() string {
