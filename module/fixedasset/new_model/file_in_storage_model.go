@@ -19,9 +19,9 @@ type FileInStorage struct {
 	FileSize             string    `json:"fileSize" column:"file_size" sql:"VARCHAR"`
 	FileSizeKB           float64   `json:"fileSizeKb" column:"file_size_kb" sql:"FLOAT"`
 	IsDeleted            bool      `json:"isDeleted" column:"is_deleted" sql:"BOOLEAN"`
-	DeleteFromDatabaseAt time.Time `json:"deleteFromDatabaseAt" column:"deleted_at" sql:"TIMESTAMP NULL DEFAULT NULL"`
-	CreatedAt            time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	UpdatedAt            time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	DeleteFromDatabaseAt time.Time `json:"deleteFromDatabaseAt" column:"deleted_at" sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
+	CreatedAt            time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt            time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (f *FileInStorage) TableName() string {

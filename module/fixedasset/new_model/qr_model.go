@@ -12,8 +12,8 @@ type Qr struct {
 	Code   string    `json:"code" column:"code" sql:"VARCHAR NOT NULL CHECK (CHAR_LENGTH(code) > 0)"`
 	Status TagStatus `json:"status" column:"status" sql:"tag_status_enum NOT NULL"`
 
-	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (m *Qr) TableName() string {

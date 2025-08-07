@@ -14,8 +14,8 @@ type Attachment struct {
 	File      string         `json:"file" column:"file" sql:"VARCHAR NOT NULL"`
 	CreatedBy int            `json:"createdBy" column:"created_by" sql:"BIGINT"`
 
-	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (a *Attachment) TableName() string {

@@ -14,8 +14,8 @@ type ImportGroup struct {
 	GroupCode    string  `json:"groupCode" column:"group_code" sql:"VARCHAR NOT NULL"`
 	IsDisposable *string `json:"isDisposable" column:"is_disposable" sql:"yes_no_enum"`
 
-	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (g *ImportGroup) TableName() string {

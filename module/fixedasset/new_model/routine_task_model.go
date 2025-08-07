@@ -14,9 +14,9 @@ type RoutineTask struct {
 	Duration      int               `json:"duration" column:"duration" sql:"INT NOT NULL"`
 	ModifiedByID  int               `json:"modifiedById" column:"modified_by_id" sql:"BIGINT NOT NULL"`
 	ApprovalRound int               `json:"approvalRound" column:"approval_round" sql:"INT NOT NULL"`
-	StartAt       time.Time         `json:"startAt" column:"start_at" sql:"TIMESTAMP NOT NULL"`
-	CreatedAt     time.Time         `json:"createdAt" column:"created_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	UpdatedAt     time.Time         `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	StartAt       time.Time         `json:"startAt" column:"start_at" sql:"TIMESTAMPTZ NOT NULL"`
+	CreatedAt     time.Time         `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt     time.Time         `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (m *RoutineTask) TableName() string {

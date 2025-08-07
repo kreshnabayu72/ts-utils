@@ -10,8 +10,8 @@ type ReplaceTagPrelist struct {
 	ID      int `json:"_id" column:"id" sql:"BIGINT PRIMARY KEY"`
 	AssetId int `json:"assetId" column:"asset_id" sql:"BIGINT"`
 
-	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (r *ReplaceTagPrelist) TableName() string {

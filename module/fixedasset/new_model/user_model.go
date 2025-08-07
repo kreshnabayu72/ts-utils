@@ -19,7 +19,7 @@ type User struct {
 	IsTemporary            bool       `json:"isTemporary" column:"is_temporary" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
 	IsDefault              bool       `json:"isDefault" column:"is_default" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
 	IsEmailConfirmed       bool       `json:"isEmailConfirmed" column:"is_email_confirmed" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
-	ExpiryDate             *time.Time `json:"expiryDate" column:"expiry_date" sql:"TIMESTAMP NULL"`
+	ExpiryDate             *time.Time `json:"expiryDate" column:"expiry_date" sql:"TIMESTAMPTZ NULL"`
 	IsExpired              *bool      `json:"isExpired" column:"CASE WHEN expiry_date IS NULL THEN NULL ELSE expiry_date < NOW() END"`
 	Position               *string    `json:"position" column:"position" sql:"VARCHAR NULL"`
 	Division               string     `json:"division" column:"division" sql:"VARCHAR NOT NULL"`
@@ -38,9 +38,9 @@ type User struct {
 	ModifiedByLastName     string     `json:"modifiedByLastName" column:"modified_by_last_name" sql:"VARCHAR NOT NULL"`
 	ModifiedByFullName     string     `json:"modifiedByFullName" column:"modified_by_full_name" sql:"VARCHAR NOT NULL GENERATED ALWAYS AS (modified_by_first_name || ' ' || modified_by_last_name) STORED"`
 	IsDeleted              bool       `json:"isDeleted" column:"is_deleted" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
-	DeleteFromDatabaseAt   *time.Time `json:"deleteFromDatabaseAt" column:"deleted_at" sql:"TIMESTAMP NULL"`
-	CreatedAt              time.Time  `json:"createdAt" column:"created_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	UpdatedAt              time.Time  `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	DeleteFromDatabaseAt   *time.Time `json:"deleteFromDatabaseAt" column:"deleted_at" sql:"TIMESTAMPTZ NULL"`
+	CreatedAt              time.Time  `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt              time.Time  `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 type UserAttribute struct {

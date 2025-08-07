@@ -23,9 +23,9 @@ type HandheldReader struct {
 	Status           ReaderStatus `json:"status" column:"status" sql:"reader_status_enum NOT NULL DEFAULT 'Available'"`
 	LastReportReason ReaderStatus `json:"lastReportReason" column:"last_report_reason" sql:"reader_status_enum DEFAULT NULL"`
 
-	LastReportAt time.Time `json:"lastReportAt" column:"last_report_at" sql:"TIMESTAMP DEFAULT NULL"`
-	CreatedAt    time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	UpdatedAt    time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	LastReportAt time.Time `json:"lastReportAt" column:"last_report_at" sql:"TIMESTAMPTZ DEFAULT NULL"`
+	CreatedAt    time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt    time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (h *HandheldReader) TableName() string {

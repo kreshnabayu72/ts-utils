@@ -563,6 +563,8 @@ const (
 	TransferRequestStatusCompleted          TransferRequestStatus = "Completed"
 	TransferRequestStatusApproved           TransferRequestStatus = "Approved"
 	TransferRequestStatusRejected           TransferRequestStatus = "Rejected"
+	TransferRequestStatusCanceled           TransferRequestStatus = "Canceled"
+	TransferRequestStatusReportedMissing    TransferRequestStatus = "Reported Missing"
 )
 
 type TransferRequestAssetTagStatus string

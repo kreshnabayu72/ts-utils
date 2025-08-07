@@ -15,8 +15,8 @@ type ImportBrand struct {
 	CategoryCode string `json:"categoryCode" column:"category_code" sql:"VARCHAR NOT NULL"`
 	Models       string `json:"models" column:"models" sql:"VARCHAR NOT NULL"`
 
-	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (b *ImportBrand) TableName() string {

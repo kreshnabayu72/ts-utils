@@ -17,8 +17,8 @@ type RoutineScheduleIndicator struct {
 	IsMandatory         bool              `json:"isMandatory" column:"is_mandatory" sql:"BOOLEAN NOT NULL"`
 	IsHaveStandardValue bool              `json:"isHaveStandardValue" column:"is_have_standard_value" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
 	Options             []string          `json:"options" column:"options" sql:"TEXT[]"`
-	CreatedAt           time.Time         `json:"createdAt" column:"created_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	UpdatedAt           time.Time         `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	CreatedAt           time.Time         `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt           time.Time         `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (m *RoutineScheduleIndicator) TableName() string {

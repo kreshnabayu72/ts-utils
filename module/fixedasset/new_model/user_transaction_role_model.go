@@ -19,8 +19,8 @@ type UserTransactionRole struct {
 	ApprovalLevel *int   `json:"approvalLevel" column:"approval_level" sql:"INTEGER"`
 	ApprovalType  string `json:"approvalType" column:"approval_type" sql:"approval_type_enum NOT NULL"`
 
-	CreatedAt *time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMP NULL"`
-	UpdatedAt *time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NULL"`
+	CreatedAt *time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NULL"`
+	UpdatedAt *time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NULL"`
 }
 
 func (u *UserTransactionRole) TableName() string {

@@ -12,8 +12,8 @@ type CustomFieldCategory struct {
 	CustomFieldId int `json:"customFieldId" column:"custom_field_id" sql:"BIGINT UNIQUE"`
 	CategoryId    int `json:"categoryId" column:"category_id" sql:"BIGINT UNIQUE"`
 
-	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (c *CustomFieldCategory) TableName() string {
