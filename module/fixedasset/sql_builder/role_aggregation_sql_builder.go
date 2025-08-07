@@ -1001,23 +1001,23 @@ func TransactionRoleMultipleGroupAggregation(
 func transactionRoleMultiPermissionAggregationCTE(
 	loggedInUserId int,
 ) sql_query.SQLSelectChainBuilder {
-	return sql_query.NewSQLSelectBuilder[UserTransactionRole](
+	return sql_query.NewSQLSelectBuilder[any](
 		"user_transaction_roles utr",
 	).
 		Where(map[string]sql_query.SQLCondition{
-			"utr\".\"user_id": {
+			"utr.user_id": {
 				Operator: sql_query.SQLOperatorEqual,
 				Value:    loggedInUserId,
 			},
-			"utr\".\"is_active": {
+			"utr.is_active": {
 				Operator: sql_query.SQLOperatorEqual,
 				Value:    true,
 			},
-			"utr\".\"role_type": {
+			"utr.role_type": {
 				Operator: sql_query.SQLOperatorIn,
 				Value:    []string{"Monitoring", "Manager"},
 			},
-			"utr\".\"role_attribute": {
+			"utr.role_attribute": {
 				Operator: sql_query.SQLOperatorIn,
 				Value: []new_model.TransactionRoleAttribute{
 					new_model.TransactionRoleAttributeBorrowing,
