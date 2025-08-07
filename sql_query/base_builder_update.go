@@ -18,8 +18,21 @@ import (
 // }
 
 type UpdateCases interface {
-	Case(conditions MultiFilterCondition, value string, isRef bool)
-	Else(value string, isRef bool)
+	// Case adds a WHEN clause to the current CASE expression defined by AddCase.
+	// It appends the condition and its resulting value.
+	//
+	// Parameters:
+	//   - conditions: a MultiFilterCondition containing AND and OR filters used for this WHEN clause.
+	//   - value: the resulting value when the conditions match.
+	//   - isRef: whether the value is a SQL column reference (true) or a literal that should be parameterized (false).
+	Case(conditions MultiFilterCondition, value interface{}, isRef bool)
+	// Else sets the default ELSE value for the current CASE expression.
+	// It is used when none of the WHEN conditions match.
+	//
+	// Parameters:
+	//   - value: the fallback value if no WHEN clause matches.
+	//   - isRef: whether the value is a SQL column reference (true) or a literal that should be parameterized (false).
+	Else(value interface{}, isRef bool)
 }
 
 // To ensure SQLUpdateBuilder has its own initial methods
@@ -41,6 +54,21 @@ type SQLUpdateInitBuilder interface {
 	//	WHERE users.id = v.id
 	UpdateEach(values interface{}, rowIdentifier string) SQLUpdateChainBuilder
 
+	// AddCase initializes a conditional CASE expression for the given column in an UPDATE statement.
+	// It clears any existing CASE expressions and allows chaining multiple conditional branches using Case() and Else().
+	//
+	// Example:
+	//   builder.AddCase("status", func(b UpdateCases) {
+	//       b.Case(...)
+	//       b.Else(...)
+	//   })
+	//
+	// Parameters:
+	//   - setColumn: the name of the column to be conditionally updated.
+	//   - fn: a function that defines the CASE conditions using the provided UpdateCases interface.
+	//
+	// Returns:
+	//   - SQLUpdateChainBuilder: the builder itself for method chaining.
 	AddCase(setColumn string, fn func(b UpdateCases)) SQLUpdateChainBuilder
 
 	// Increment is used to replace Update() for adding int value cause update cant handle that
@@ -90,6 +118,21 @@ type SQLUpdateInitBuilder interface {
 // To ensure method .Update() has its own chaining methods
 // e.g. .Update(...).From(...).Build()
 type SQLUpdateChainBuilder interface {
+	// AddCase initializes a conditional CASE expression for the given column in an UPDATE statement.
+	// It clears any existing CASE expressions and allows chaining multiple conditional branches using Case() and Else().
+	//
+	// Example:
+	//   builder.AddCase("status", func(b UpdateCases) {
+	//       b.Case(...)
+	//       b.Else(...)
+	//   })
+	//
+	// Parameters:
+	//   - setColumn: the name of the column to be conditionally updated.
+	//   - fn: a function that defines the CASE conditions using the provided UpdateCases interface.
+	//
+	// Returns:
+	//   - SQLUpdateChainBuilder: the builder itself for method chaining.
 	AddCase(setColumn string, fn func(b UpdateCases)) SQLUpdateChainBuilder
 
 	// By default, the Update builder includes all fields, even if their values are zero or nil.
@@ -165,8 +208,10 @@ func (s *UpdateBuilder) Conflict(constraint, do string) SQLUpdateChainBuilder {
 }
 
 func (s *UpdateBuilder) AddCase(setColumn string, fn func(b UpdateCases)) SQLUpdateChainBuilder {
+	s.UpdateCaseClauses = make(map[string][]UpdateCaseParam, 0)
 	s.UpdateCaseClauses[setColumn] = []UpdateCaseParam{}
 	s.currentUpdateCaseKey = setColumn
+	fn(s)
 	return s
 }
 
@@ -534,20 +579,54 @@ func (s *UpdateBuilder) extractUpdateFieldsMap(v map[string]any) ([]string, bool
 	return setClauses, hasUpdatedAt
 }
 
+// buildUpdateCase constructs a SQL UPDATE statement with CASE expressions.
+//
+// It takes a map of column names to slices of UpdateCaseParam, where each slice
+// represents the WHEN/THEN/ELSE clauses for that column's CASE statement.
+//
+// Parameters:
+//   - updateCaseClauses: A map where each key is a column name, and each value is a
+//     slice of UpdateCaseParam defining the conditional logic for updating that column.
+//   - tableName: The name of the table to update.
+//
+// Returns:
+//   - A string containing the full SQL UPDATE query with conditional CASE logic.
+//
+// Example output:
+//
+//	UPDATE table_name
+//	SET
+//	  column1 = CASE
+//	    WHEN condition1 AND condition2 THEN value1
+//	    ELSE default_value
+//	  END,
+//	  updated_at = NOW()
+//
+// Notes:
+//   - The function appends "updated_at = NOW()" to the final SET clause.
+//   - It assumes all values and conditions are properly escaped/formatted.
 func buildUpdateCase(updateCaseClauses map[string][]UpdateCaseParam, tableName string) string {
 	var updateExpr string
 	updateExpr = "UPDATE " + tableName + "\n"
 	updateExpr += "SET\n"
 
 	for key, each := range updateCaseClauses {
-		updateExpr += key + " CASE\n"
+		updateExpr += key + " = CASE\n"
+		fmt.Println("each", each)
 
 		for _, param := range each {
-			updateExpr += "WHEN " + strings.Join(param.conditions, " AND ") + " THEN" + param.value
+			if param.isElse {
+				updateExpr += "ELSE " + param.value
+			} else {
+				updateExpr += "WHEN " + strings.Join(param.conditions, " AND ") + " THEN " + param.value
+			}
 			updateExpr += "\n"
 		}
+
+		updateExpr += "END,\n"
 	}
 
+	updateExpr += "updated_at = NOW()"
 	return updateExpr
 }
 

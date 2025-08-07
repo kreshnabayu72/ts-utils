@@ -29,10 +29,11 @@ type QueryBuilder interface {
 type SQLFilter map[string]SQLCondition
 
 type SQLCondition struct {
-	Operator  SQLOperators // e.g., '=', '>', '<=', 'LIKE', 'IN', 'IS NULL'
-	Value     interface{}  // could be a single value, slice, or nil
-	IsRef     bool         // to determine whether WHERE is targeting literal value or reference
-	ExtraArgs []interface{}
+	Operator      SQLOperators  // e.g., '=', '>', '<=', 'LIKE', 'IN', 'IS NULL'
+	Value         interface{}   // could be a single value, slice, or nil.
+	IsRef         bool          // to determine whether WHERE is targeting literal value or reference, e.g. `"column_a" = value` vs `"column_a" = $2` based on given boolean.
+	SourceIsValue bool          // to determine whether WHERE is sourcing from literal value or reference, e.g. `"column_a" = value` vs `$2 = value` based on given boolean.
+	ExtraArgs     []interface{} // for Operator `SQLOperatorRaw`
 }
 
 type UpdateCaseParam struct {
