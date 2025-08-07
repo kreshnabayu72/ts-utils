@@ -14,6 +14,7 @@ type AssignmentRequest struct {
 	ParentID      *int                    `json:"parentId" column:"parent_id" sql:"BIGINT"`
 	Status        AssignmentRequestStatus `json:"status" column:"status" sql:"assignment_request_status_enum"`
 	IsVerified    bool                    `json:"isVerified" column:"is_verified" sql:"BOOLEAN"`
+	Notes         string                  `json:"notes" column:"notes" sql:"VARCHAR"`
 	CreatedAt     time.Time               `json:"createdAt" column:"created_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
 	UpdatedAt     time.Time               `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
 }
