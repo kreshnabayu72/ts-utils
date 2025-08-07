@@ -211,6 +211,19 @@ type SQLSelectChainBuilder interface {
 	//	WITH recent_orders AS (SELECT id, user_id FROM orders) ...
 	WithCTEBuilder(cteName string, cteBuilder *SQLEloquentQuery) SQLSelectChainBuilder
 
+	// WithRecursiveCTEBuilder adds a Common Table Expression (CTE) to the query.
+	// It adjusts argument placeholders to avoid conflicts.
+	//
+	// Example:
+	//
+	//	cte := NewSQLSelectBuilder[Order]("orders").Select("id", "user_id")
+	//	builder.WithRecursiveCTEBuilder("recent_orders", cte.(*sql_query.SelectBuilder).SQLEloquentQuery)
+	//
+	// Generates:
+	//
+	//	WITH RECURSIVE recent_orders AS (SELECT id, user_id FROM orders) ...
+	WithRecursiveCTEBuilder(cteName string, cteBuilder *SQLEloquentQuery) SQLSelectChainBuilder
+
 	// Add "UNION ALL" in between the queries
 	// example:
 	//  SELECT id
@@ -550,6 +563,7 @@ func (s *SelectBuilder) WithRecursiveCTEBuilder(cteName string, cteBuilder *SQLE
 
 func (s *SelectBuilder) UnionAll(cteBuilders ...*SQLEloquentQuery) SQLSelectChainBuilder {
 	for _, cteBuilder := range cteBuilders {
+		s.useUnionAll = true // only set true if len >0
 		cteQuery, cteArgs, err := cteBuilder.Build()
 		if err != nil {
 			s.LastError = err
@@ -674,18 +688,21 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 	}
 
 	// SELECT
-	sb.WriteByte('\n')
-	sb.WriteString("SELECT ")
-	for i, col := range s.Columns {
-		if i > 0 {
-			sb.WriteByte(',')
+	// Dont need to use default select if using union All, since union typically uses SELECT inside of it
+	if !s.useUnionAll {
+		sb.WriteByte('\n')
+		sb.WriteString("SELECT ")
+		for i, col := range s.Columns {
+			if i > 0 {
+				sb.WriteByte(',')
+			}
+			sb.WriteString(col)
 		}
-		sb.WriteString(col)
+		sb.WriteByte('\n')
+		sb.WriteString("FROM ")
+		sb.WriteString(s.Table)
+		sb.WriteByte('\n')
 	}
-	sb.WriteByte('\n')
-	sb.WriteString("FROM ")
-	sb.WriteString(s.Table)
-	sb.WriteByte('\n')
 
 	// JOIN
 	if len(s.OtherTables) > 0 {
