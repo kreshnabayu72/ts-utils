@@ -18,6 +18,7 @@ type RolePermissionHelperSQL interface {
 
 	CheckGroupPermissionSQL(
 		service service.PostgreSqlService,
+		tableName string,
 		loggedInUser *string,
 		dataFilter map[string]sql_query.SQLCondition,
 		groupIdField string,
@@ -62,6 +63,7 @@ func (r *RolePermissionSQLHelperImpl) CheckSystemRolePermissionSQL(
 
 func (r *RolePermissionSQLHelperImpl) CheckGroupPermissionSQL(
 	service service.PostgreSqlService,
+	tableName string,
 	loggedInUser *string,
 	dataFilter map[string]sql_query.SQLCondition,
 	groupIdField string,
@@ -70,6 +72,7 @@ func (r *RolePermissionSQLHelperImpl) CheckGroupPermissionSQL(
 ) error {
 	return CheckGroupPermissionSQL(
 		service,
+		tableName,
 		loggedInUser,
 		dataFilter,
 		groupIdField,

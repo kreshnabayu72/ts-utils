@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/db"
-	util_db "gitea.qwertysystem.net/BETS/ts-utils/db"
 	"gitea.qwertysystem.net/BETS/ts-utils/entity"
 	"gitea.qwertysystem.net/BETS/ts-utils/middleware"
 	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
@@ -26,7 +25,7 @@ func CheckSystemRolePermissionSQL(ctx *fiber.Ctx, permissionKey new_model.Permis
 	permissionKeyStr := string(permissionKey)
 	companyCode := ctx.Locals(middleware.CompanyCodeKey).(string)
 
-	fixedAssetDbName := util_db.FixedAssetDBName.CompanyDBName(companyCode)
+	fixedAssetDbName := db.FixedAssetDBName.CompanyDBName(companyCode)
 	service := service.MakePostgreSqlService(fixedAssetDbName, db.UserSystemRoleTableName)
 
 	// Convert resourceTypes to a slice of strings
@@ -73,6 +72,7 @@ func CheckSystemRolePermissionSQL(ctx *fiber.Ctx, permissionKey new_model.Permis
 // Can handle multiple data with different groups
 func CheckGroupPermissionSQL(
 	service service.PostgreSqlService,
+	tableName string,
 	loggedInUser *string,
 	dataFilter map[string]sql_query.SQLCondition,
 	groupIdField string,
@@ -94,11 +94,11 @@ func CheckGroupPermissionSQL(
 		},
 	}
 
-	builder := sql_query.NewSQLSelectBuilder[any](fmt.Sprintf("%s as cgp", service.GetTableName()))
+	builder := sql_query.NewSQLSelectBuilder[any](tableName)
 
 	for _, systemRoleType := range systemRoleTypes {
 		for _, permission := range permissions {
-			var filterOr map[string]sql_query.SQLCondition
+			filterOr := make(map[string]sql_query.SQLCondition, 2)
 			filterOr["usr.role_attribute"] = sql_query.SQLCondition{Operator: sql_query.SQLOperatorEqual, Value: systemRoleType}
 			filterOr[fmt.Sprintf("usr.permission_%s", string(permission))] = sql_query.SQLCondition{Operator: sql_query.SQLOperatorEqual, Value: true}
 			builder.WhereOr(filterOr)
@@ -106,21 +106,19 @@ func CheckGroupPermissionSQL(
 	}
 
 	query, args, _ := builder.
-		Select("cgp.id::text").
-		LeftJoin(fmt.Sprintf("%s as usr", db.UserSystemRoleTableName), fmt.Sprintf("%s = usr.group_id", groupIdField)).
+		Select(tableName+".id", "usr.id as \"userSystemRoleId\"").
+		LeftJoin(fmt.Sprintf("%s as usr", db.UserSystemRoleTableName), fmt.Sprintf("%s = usr.group_id", groupIdField), filter).
 		Where(dataFilter).
-		Where(filter).
 		Build()
 
-	fmt.Println("query", query, args)
-	var permissionCheck []map[string]any
-	err := service.SelectMany(permissionCheck, context.Background(), query, args...)
+	permissionCheck := make([]map[string]any, 0)
+	err := service.SelectMany(&permissionCheck, context.Background(), query, args...)
 	if err != nil || len(permissionCheck) < 1 {
 		return errors.New("Data not found")
 	}
 
 	for _, data := range permissionCheck {
-		systemRoles, _ := data["systemRoles"]
+		systemRoles := data["userSystemRoleId"]
 		if systemRoles == nil {
 			// If ONE OF data have no permission, throw error
 			return errors.New("You have no permission")
@@ -168,7 +166,7 @@ func CheckTransactionRoleMultiGroupPermissionsSQL(
 		Where(dataFilter).
 		Build()
 
-	var permissionCheck []map[string]any
+	permissionCheck := make([]map[string]any, 0)
 	err := service.SelectMany(&permissionCheck, context.Background(), query, args...)
 	if err != nil {
 		fmt.Printf("ERR: %v\n", err.Error())
@@ -180,7 +178,7 @@ func CheckTransactionRoleMultiGroupPermissionsSQL(
 	}
 
 	for _, data := range permissionCheck {
-		transactionRoles, _ := data["userTransactionRoleId"]
+		transactionRoles := data["userTransactionRoleId"]
 		if transactionRoles == nil {
 			// If ONE OF data have no permission, throw error
 			return errors.New("You have no permission")
@@ -208,7 +206,7 @@ func CheckTransactionRolePermissionSQL(
 
 	companyCode := ctx.Locals(middleware.CompanyCodeKey).(string)
 
-	fixedAssetDbName := util_db.FixedAssetDBName.CompanyDBName(companyCode)
+	fixedAssetDbName := db.FixedAssetDBName.CompanyDBName(companyCode)
 	service := service.MakePostgreSqlService(fixedAssetDbName, db.UserTransactionRoleTableName)
 
 	filter := map[string]sql_query.SQLCondition{
@@ -248,7 +246,7 @@ func CheckTotalControlPermissionSQL(ctx *fiber.Ctx) *entity.HttpError {
 
 	companyCode := ctx.Locals(middleware.CompanyCodeKey).(string)
 
-	fixedAssetDbName := util_db.FixedAssetDBName.CompanyDBName(companyCode)
+	fixedAssetDbName := db.FixedAssetDBName.CompanyDBName(companyCode)
 	service := service.MakePostgreSqlService(fixedAssetDbName, db.UserTableName)
 
 	filter := map[string]sql_query.SQLCondition{

@@ -157,6 +157,17 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 //	)
 //	// Produces: (("role" = $1) OR ("role" = $2))
 func (s *SQLEloquentQuery) sharedWhereOrQuery(filters ...map[string]SQLCondition) {
+	s.whereOrDestination(filters)
+}
+
+// Core function of `Where Or` query.
+// WHERE filters for table won't be generated if you provide destination in params (pointer of slice string), but this function will assign value to the destination instead.
+func (s *SQLEloquentQuery) whereOrDestination(
+	filters []map[string]SQLCondition,
+	v ...*[]string,
+) {
+	var dest []string
+	useDestination := len(v) > 0
 	orConditions := []string{}
 
 	for _, filter := range filters {
@@ -167,7 +178,14 @@ func (s *SQLEloquentQuery) sharedWhereOrQuery(filters ...map[string]SQLCondition
 		s.Args = inner.Args
 	}
 
-	s.Filters = append(s.Filters, fmt.Sprintf("(%s)", strings.Join(orConditions, " OR ")))
+	if !useDestination {
+		s.Filters = append(s.Filters, fmt.Sprintf("(%s)", strings.Join(orConditions, " OR ")))
+	} else {
+		if v[0] == nil {
+			v[0] = &[]string{}
+		}
+		*v[0] = dest
+	}
 }
 
 func escapeQuoteColumns(column string) string {
