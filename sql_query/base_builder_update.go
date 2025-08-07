@@ -67,14 +67,24 @@ type SQLUpdateInitBuilder interface {
 	// setClauses contains: [value = v.value, ...etc].
 	// valueClauses contains: [value, ...etc].
 	// valuePlaceholders contains: [($1, $2, $3, ...etc), ($4, $5, ...etc), ...etc]
-	updateEachClausesGenerator(slice reflect.Value, rowIdentifier string) ([]string, []string, []string)
-	// extractUpdateFields goes through a struct's fields and turns them into
+	updateEachClausesGenerator(
+		slice reflect.Value,
+		rowIdentifier string,
+	) ([]string, []string, []string)
+
+	// extractUpdateFieldsStruct goes through a struct's fields and turns them into
 	// SET clauses for an UPDATE query. It uses the "column" or "json" tag (or
 	// the field name if tags are missing) to pick the column name.
 	//
 	// It also checks if an "updated_at" field exists, so the builder knows
 	// whether to add "updated_at = NOW()" automatically.
-	extractUpdateFields(v reflect.Value) ([]string, bool)
+	extractUpdateFieldsStruct(v reflect.Value) ([]string, bool)
+
+	// extractUpdateFieldsMap takes a map[string]interface{} and returns a slice of
+	// SET clauses for an UPDATE query. It uses the map keys as column names.
+	// It also checks if an "updated_at" key exists, so the builder knows
+	// whether to add "updated_at = NOW()" automatically.
+	extractUpdateFieldsMap(v map[string]any) ([]string, bool)
 }
 
 // To ensure method .Update() has its own chaining methods
@@ -208,12 +218,17 @@ func (s *UpdateBuilder) Else(value interface{}, isRef bool) {
 
 func (s *UpdateBuilder) Update(values interface{}) SQLUpdateChainBuilder {
 	v := reflect.ValueOf(values)
-	if v.Kind() != reflect.Struct {
-		s.LastError = fmt.Errorf("update one data must be a struct")
+
+	setClauses := []string{}
+	hasUpdatedAt := false
+	if v.Kind() == reflect.Struct {
+		setClauses, hasUpdatedAt = s.extractUpdateFieldsStruct(v)
+	} else if v.Kind() == reflect.Map {
+		setClauses, hasUpdatedAt = s.extractUpdateFieldsMap(values.(map[string]any))
+	} else {
+		s.LastError = fmt.Errorf("invalid update values: expected struct or map, got %T", values)
 		return s
 	}
-
-	setClauses, hasUpdatedAt := s.extractUpdateFields(v)
 
 	if !hasUpdatedAt {
 		setClauses = append(setClauses, `"updated_at" = NOW()`)
@@ -243,7 +258,10 @@ func (s *UpdateBuilder) UpdateEach(values interface{}, rowIdentifier string) SQL
 	// Main condition to make sure each row assigned by their respective value by matching row identifier
 	// Example input key is "id"/"name", value is given in slice data with column tag same as input key (rowIdentifier), operator is equal
 	// Assume v is aliased VALUES, example output id = v.id or could be name = v.name if this column is unique
-	s.Filters = append(s.Filters, fmt.Sprintf(`%s."%s" = v."%s"`, s.Table, rowIdentifier, rowIdentifier))
+	s.Filters = append(
+		s.Filters,
+		fmt.Sprintf(`%s."%s" = v."%s"`, s.Table, rowIdentifier, rowIdentifier),
+	)
 
 	// Generate clauses for everything in slice, then stored in main array
 	var setClauses, valueClauses, placeholders []string
@@ -253,7 +271,13 @@ func (s *UpdateBuilder) UpdateEach(values interface{}, rowIdentifier string) SQL
 	placeholders = append(placeholders, mappedPlaceholders...)
 
 	// Build everything into one query dedicated for update many
-	s.CustomQuery = fmt.Sprintf(`UPDATE %s SET %s FROM (VALUES %s) as v(%s)`, s.Table, strings.Join(setClauses, ", "), strings.Join(placeholders, ", "), strings.Join(valueClauses, ","))
+	s.CustomQuery = fmt.Sprintf(
+		`UPDATE %s SET %s FROM (VALUES %s) as v(%s)`,
+		s.Table,
+		strings.Join(setClauses, ", "),
+		strings.Join(placeholders, ", "),
+		strings.Join(valueClauses, ","),
+	)
 
 	return s
 }
@@ -342,7 +366,10 @@ func (s *SQLEloquentQuery) buildUpdateQuery() (string, []interface{}, error) {
 	return query, s.Args, nil
 }
 
-func (s *UpdateBuilder) updateEachClausesGenerator(slice reflect.Value, rowIdentifier string) ([]string, []string, []string) {
+func (s *UpdateBuilder) updateEachClausesGenerator(
+	slice reflect.Value,
+	rowIdentifier string,
+) ([]string, []string, []string) {
 	var args []interface{}
 	var setClauses, valueClauses, valuePlaceholders []string
 
@@ -379,18 +406,24 @@ func (s *UpdateBuilder) updateEachClausesGenerator(slice reflect.Value, rowIdent
 			field := t.Field(j)
 			transformTag := field.Tag.Get("transform")
 			args = append(args, v.Field(j).Interface())
-			rowPlaceholders = append(rowPlaceholders, fmt.Sprintf("$%d::%s", len(args), transformTag))
+			rowPlaceholders = append(
+				rowPlaceholders,
+				fmt.Sprintf("$%d::%s", len(args), transformTag),
+			)
 		}
 
 		// Append every placeholders to main array that will be returned
-		valuePlaceholders = append(valuePlaceholders, fmt.Sprintf("(%s)", strings.Join(rowPlaceholders, ", ")))
+		valuePlaceholders = append(
+			valuePlaceholders,
+			fmt.Sprintf("(%s)", strings.Join(rowPlaceholders, ", ")),
+		)
 	}
 
 	s.Args = args
 	return setClauses, valueClauses, valuePlaceholders
 }
 
-func (s *UpdateBuilder) extractUpdateFields(v reflect.Value) ([]string, bool) {
+func (s *UpdateBuilder) extractUpdateFieldsStruct(v reflect.Value) ([]string, bool) {
 	var setClauses []string
 	var hasUpdatedAt bool
 
@@ -427,7 +460,19 @@ func (s *UpdateBuilder) extractUpdateFields(v reflect.Value) ([]string, bool) {
 
 		// Recurse into nested structs (excluding time.Time)
 		if val.Kind() == reflect.Struct && field.Type != reflect.TypeOf(time.Time{}) {
-			childClauses, childHasUpdated := s.extractUpdateFields(val)
+			childClauses, childHasUpdated := s.extractUpdateFieldsStruct(val)
+			setClauses = append(setClauses, childClauses...)
+			if childHasUpdated {
+				hasUpdatedAt = true
+			}
+			continue
+		}
+
+		// If value is a map, recurse into it
+		if val.Kind() == reflect.Map {
+			childClauses, childHasUpdated := s.extractUpdateFieldsMap(
+				val.Interface().(map[string]any),
+			)
 			setClauses = append(setClauses, childClauses...)
 			if childHasUpdated {
 				hasUpdatedAt = true
@@ -441,6 +486,49 @@ func (s *UpdateBuilder) extractUpdateFields(v reflect.Value) ([]string, bool) {
 		if col == "updated_at" {
 			hasUpdatedAt = true
 		}
+	}
+
+	return setClauses, hasUpdatedAt
+}
+
+func (s *UpdateBuilder) extractUpdateFieldsMap(v map[string]any) ([]string, bool) {
+	setClauses := []string{}
+	hasUpdatedAt := false
+
+	for key, value := range v {
+		isZeroValue := isZeroValue(value)
+		if isZeroValue && s.excludeEmptyValue {
+			continue
+		}
+
+		v := reflect.ValueOf(value)
+		// if value is a struct, recurse into it
+		if v.Kind() == reflect.Struct && v.Type() != reflect.TypeOf(time.Time{}) {
+			childClauses, childHasUpdated := s.extractUpdateFieldsStruct(v)
+			setClauses = append(setClauses, childClauses...)
+			if childHasUpdated {
+				hasUpdatedAt = true
+			}
+			continue
+		}
+
+		// if value is map, recurse into it
+		if v.Kind() == reflect.Map {
+			childClauses, childHasUpdated := s.extractUpdateFieldsMap(value.(map[string]any))
+			setClauses = append(setClauses, childClauses...)
+			if childHasUpdated {
+				hasUpdatedAt = true
+			}
+			continue
+		}
+
+		// Use column name as key, or field name if not provided
+		col := key
+		if col == "updated_at" {
+			hasUpdatedAt = true
+		}
+		setClauses = append(setClauses, fmt.Sprintf(`"%s" = $%d`, col, len(s.Args)+1))
+		s.Args = append(s.Args, value)
 	}
 
 	return setClauses, hasUpdatedAt
@@ -461,4 +549,12 @@ func buildUpdateCase(updateCaseClauses map[string][]UpdateCaseParam, tableName s
 	}
 
 	return updateExpr
+}
+
+func isZeroValue(v interface{}) bool {
+	if v == nil {
+		return true
+	}
+
+	return reflect.DeepEqual(v, reflect.Zero(reflect.TypeOf(v)).Interface())
 }
