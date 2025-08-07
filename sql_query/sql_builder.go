@@ -33,7 +33,7 @@ func GenerateCTEOption(
 			fmt.Sprintf(
 				`jsonb_agg(
 					jsonb_build_object(
-						'label', "%s"."label",
+						'label', "%s"."key",
 						'value', "%s"."value"
 					)
 				) filter (WHERE "%s"."value" IS NOT NULL) AS "%s"`,
