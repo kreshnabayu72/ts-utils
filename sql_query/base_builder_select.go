@@ -166,6 +166,19 @@ type SQLSelectChainBuilder interface {
 	//
 	//	builder.LeftJoin("roles r", "r.id = u.role_id")
 	LeftJoin(table string, onCondition string, additionalConditions ...map[string]SQLCondition) SQLSelectChainBuilder
+
+	// Example:
+	//
+	// LeftJoinLateralWithQuery("ta", categoryWithRecursiveBuilder().(*sql_query.SelectBuilder).SQLEloquentQuery, "TRUE").
+	//
+	// Output:
+	//
+	// 	LEFT JOIN LATERAL (
+	//     `Sql queries here`
+	//   ) `alias` ON `condition`
+
+	LeftJoinLateralWithQuery(joinName string, joinQueryBuilder *SQLEloquentQuery, mainCondition string, additionalConditions ...map[string]SQLCondition) SQLSelectChainBuilder
+
 	// Paginate implements SQLSelectChainBuilder. (Overrides previous value if called again).
 	// Paginate applies LIMIT, OFFSET, and ORDER BY using a Pagination struct.
 	// It supports single or multiple sorting rules.
@@ -439,6 +452,37 @@ func (s *SelectBuilder) LeftJoin(table string, mainCondition string, additionalC
 	}
 
 	s.OtherTables = append(s.OtherTables, fmt.Sprintf("LEFT JOIN %s ON %s%s", table, mainCondition, filterSb.String()))
+	return s
+}
+
+func (s *SelectBuilder) LeftJoinLateralWithQuery(joinName string, joinQueryBuilder *SQLEloquentQuery, mainCondition string, additionalConditions ...map[string]SQLCondition) SQLSelectChainBuilder {
+	joinQuery, joinArgs, err := joinQueryBuilder.Build()
+	if err != nil {
+		s.LastError = err
+		return s
+	}
+
+	// Calculate the current argument offset
+	offset := len(s.Args)
+
+	// Shift the placeholders in the CTE query
+	shiftedCTEQuery := shiftSQLPlaceholders(joinQuery, offset)
+
+	s.Args = append(s.Args, joinArgs...)
+
+	//additional filter
+	var filterSb strings.Builder
+	if len(additionalConditions) > 0 {
+		var filters []string
+		s.sharedWhereAndQuery(additionalConditions[0], &filters)
+
+		for i := range filters {
+			filterSb.WriteString(" AND ")
+			filterSb.WriteString(filters[i])
+		}
+	}
+
+	s.OtherTables = append(s.OtherTables, fmt.Sprintf("LEFT JOIN LATERAL (%s) %s ON %s%s", shiftedCTEQuery, joinName, mainCondition, filterSb.String()))
 	return s
 }
 
