@@ -4,15 +4,17 @@ import (
 	"fmt"
 	"log"
 
+	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
 	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
 )
 
 type AggregationOptions struct {
-	TableName  string
-	LocalField string
-	Alias      string
-	UseArray   bool
-	Preserve   bool
+	TableName    string // Lookup target's table
+	LocalField   string // Foreign key of main table that reference to lookup target's table
+	Alias        string // Alias for generated jsonb
+	FilterClause string // Usage example: fmt.Sprintf("%s.id is not null", options.TableName) to filter out records that doesn't match
+	UseArray     bool   // Querying with jsonb_agg or jsonb_build_object based on given boolean
+	Preserve     bool   // Preserve null value
 }
 
 type AliasCode struct {
@@ -42,6 +44,17 @@ type Model struct {
 	Name            string `column:"models.name" json:"name"`
 }
 
+type Name struct {
+	ID      string            `column:"asset_names.id::text" json:"_id,omitempty"`
+	Name    string            `column:"asset_names.name" json:"name"`
+	TagType new_model.TagType `column:"asset_names.tag_type" json:"tagType"`
+}
+
+type DepreciationGroup struct {
+	ID   string `column:"depreciation_groups.id::text" json:"_id,omitempty"`
+	Name string `column:"depreciation_groups.name" json:"name"`
+}
+
 type Group struct {
 	ID   string `column:"groups.id::text" json:"_id,omitempty"`
 	Name string `column:"groups.name" json:"name"`
@@ -55,7 +68,8 @@ func AttributesAggregationBuilder(builder *sql_query.SelectBuilder, dto any, opt
 
 	joinType(options.TableName, fmt.Sprintf("%s.id = %s", options.TableName, options.LocalField))
 
-	builder.SelectJSONAggregate(options.Alias, dto, "", options.UseArray)
+	// Now `AttributesAggregationBuilder` implement filterclause option.
+	builder.SelectJSONAggregate(options.Alias, dto, options.FilterClause, options.UseArray)
 }
 
 // Tested result WTF/MG/ELEC/LTP/0724/1
