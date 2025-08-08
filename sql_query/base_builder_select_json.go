@@ -74,7 +74,7 @@ func (s *SelectBuilder) SelectJSONAggregate(alias string, dto any, condition str
 			formattedColumn = fmt.Sprintf("CASE WHEN %s THEN %s ELSE NULL END", condition, formattedColumn)
 		}
 	}
-	formattedColumn = fmt.Sprintf("%s AS %s", formattedColumn, alias)
+	formattedColumn = fmt.Sprintf(`%s AS "%s"`, formattedColumn, alias)
 
 	if s.WrapAggregation && !asArrayAggregation {
 		s.NestedAggregation = append(s.NestedAggregation, formattedColumn)
