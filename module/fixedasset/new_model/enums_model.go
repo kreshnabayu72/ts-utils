@@ -280,6 +280,19 @@ const (
 	TransactionRoleAttributeMissing      TransactionRoleAttribute = "missingRole"
 )
 
+var TransactionRoleAttributeEnum = map[string]TransactionRoleAttribute{
+	"borrowingRole":    TransactionRoleAttributeBorrowing,
+	"disposalRole":     TransactionRoleAttributeDisposal,
+	"transferRole":     TransactionRoleAttributeTransfer,
+	"auditRole":        TransactionRoleAttributeAudit,
+	"maintenanceRole":  TransactionRoleAttributeMaintenance,
+	"repairRole":       TransactionRoleAttributeRepair,
+	"assetControlRole": TransactionRoleAttributeAssetControl,
+	"trackingRole":     TransactionRoleAttributeTracking,
+	"damagedRole":      TransactionRoleAttributeDamaged,
+	"missingRole":      TransactionRoleAttributeMissing,
+}
+
 var TransactionRoleAttributeArray = []string{
 	string(TransactionRoleAttributeBorrowing),
 	string(TransactionRoleAttributeDisposal),

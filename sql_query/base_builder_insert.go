@@ -122,6 +122,10 @@ func (s *InsertBuilder) Insert(
 //
 //	builder := NewSQLInsertBuilder("users","u")
 func NewSQLInsertBuilder(tableName string, alias ...string) SQLInsertInitBuilder {
+	if len(alias) > 0 {
+		tableName = fmt.Sprintf("%s %s", tableName, strings.TrimSpace(alias[0]))
+	}
+
 	return &InsertBuilder{
 		&SQLEloquentQuery{
 			Table:       tableName,
