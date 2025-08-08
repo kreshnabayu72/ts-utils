@@ -23,7 +23,7 @@ func (s *SelectBuilder) SelectJSONArrayElements(alias string, arrayElements []ma
 	placeholder := len(s.Args) + 1
 	s.Args = append(s.Args, jsonStr)
 
-	formatted := fmt.Sprintf("jsonb_array_elements(%d::jsonb) AS %s", placeholder, alias)
+	formatted := fmt.Sprintf(`jsonb_array_elements(%d::jsonb) AS "%s"`, placeholder, alias)
 	s.Columns = append(s.Columns, formatted)
 
 	return s
@@ -95,7 +95,7 @@ func (s *SelectBuilder) SelectJSONAggregateFunc(alias string, fn func(builder *S
 
 	s.Columns = append(
 		s.Columns,
-		fmt.Sprintf("jsonb_build_object(%s) AS %s", strings.Join(s.NestedAggregation, ", "), alias),
+		fmt.Sprintf(`jsonb_build_object(%s) AS "%s"`, strings.Join(s.NestedAggregation, ", "), alias),
 	)
 
 	s.WrapAggregation = false
