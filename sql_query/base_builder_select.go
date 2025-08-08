@@ -613,6 +613,9 @@ func NewSQLSelectBuilder[T any](tableName string, alias ...string) SQLSelectChai
 func NewSQLCountBuilder(tableName string, alias ...string) SQLSelectChainBuilder {
 	defaultColumns := []string{"COUNT(*)"}
 
+	if len(alias) > 0 {
+		tableName = fmt.Sprintf("%s %s", tableName, strings.TrimSpace(alias[0]))
+	}
 	return &SelectBuilder{
 		&SQLEloquentQuery{
 			Table:           tableName,

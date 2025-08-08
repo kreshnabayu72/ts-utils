@@ -377,6 +377,10 @@ func (s *UpdateBuilder) From(tables []string) SQLUpdateChainBuilder {
 //	builder := NewSQLUpdateBuilder("users","u")
 //	builder.Update(user).Return("id").Build()
 func NewSQLUpdateBuilder(tableName string, alias ...string) SQLUpdateInitBuilder {
+	if len(alias) > 0 {
+		tableName = fmt.Sprintf("%s %s", tableName, strings.TrimSpace(alias[0]))
+	}
+
 	return &UpdateBuilder{
 		&SQLEloquentQuery{
 			Table:       tableName,

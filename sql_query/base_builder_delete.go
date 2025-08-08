@@ -101,6 +101,10 @@ func (s *DeleteBuilder) Using(tables []string) SQLDeleteChainBuilder {
 //
 //	builder := NewSQLDeleteBuilder("users","u")
 func NewSQLDeleteBuilder(tableName string, alias ...string) SQLDeleteInitBuilder {
+	if len(alias) > 0 {
+		tableName = fmt.Sprintf("%s %s", tableName, strings.TrimSpace(alias[0]))
+	}
+
 	return &DeleteBuilder{
 		&SQLEloquentQuery{
 			Table:       tableName,
