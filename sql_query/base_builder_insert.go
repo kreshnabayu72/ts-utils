@@ -120,8 +120,8 @@ func (s *InsertBuilder) Insert(
 // NewSQLInsertBuilder creates a new insert builder for a given table.
 // Example:
 //
-//	builder := NewSQLInsertBuilder("users")
-func NewSQLInsertBuilder(tableName string) SQLInsertInitBuilder {
+//	builder := NewSQLInsertBuilder("users","u")
+func NewSQLInsertBuilder(tableName string, alias ...string) SQLInsertInitBuilder {
 	return &InsertBuilder{
 		&SQLEloquentQuery{
 			Table:       tableName,

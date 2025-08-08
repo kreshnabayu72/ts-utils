@@ -374,9 +374,9 @@ func (s *UpdateBuilder) From(tables []string) SQLUpdateChainBuilder {
 //
 // Example:
 //
-//	builder := NewSQLUpdateBuilder("users")
+//	builder := NewSQLUpdateBuilder("users","u")
 //	builder.Update(user).Return("id").Build()
-func NewSQLUpdateBuilder(tableName string) SQLUpdateInitBuilder {
+func NewSQLUpdateBuilder(tableName string, alias ...string) SQLUpdateInitBuilder {
 	return &UpdateBuilder{
 		&SQLEloquentQuery{
 			Table:       tableName,
