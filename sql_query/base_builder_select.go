@@ -144,7 +144,7 @@ type SQLSelectChainBuilder interface {
 	//
 	// Example:
 	//
-	//	builder.Search("john", []string{"first_name", "last_name", "tags:array"})
+	//	builder.Search("john", []string{"status::text", "last_name", "tags:array"})
 	//
 	// Generates:
 	//
