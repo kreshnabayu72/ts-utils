@@ -45,10 +45,24 @@ func commonGetAssetListBuilder() *sql_query.SelectBuilder {
 		UseArray:   false,
 		Preserve:   true,
 	})
+	AttributesAggregationBuilder(assetBuilder, Name{}, AggregationOptions{
+		TableName:  "asset_names",
+		LocalField: "a.name_id",
+		Alias:      "name",
+		UseArray:   false,
+		Preserve:   true,
+	})
+	AttributesAggregationBuilder(assetBuilder, DepreciationGroup{}, AggregationOptions{
+		TableName:  "depreciation_groups",
+		LocalField: "asset_names.depreciation_group_id",
+		Alias:      "depreciationGroup",
+		UseArray:   false,
+		Preserve:   true,
+	})
 	GetAssetIDFromAliasCodeBuilder(assetBuilder, "assets a")
 
 	assetBuilder.
-		GroupBy("_id", "models.id", "brands.id", "brand_categories.id", "categories.id", "groups.id", "a.id")
+		GroupBy("_id", "models.id", "brands.id", "brand_categories.id", "categories.id", "groups.id", "asset_names.id", "depreciation_groups.id", "a.id")
 
 	return assetBuilder
 }
