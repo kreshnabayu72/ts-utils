@@ -60,16 +60,29 @@ type Group struct {
 	Name string `column:"groups.name" json:"name"`
 }
 
+// AttributesAggregationBuilder joins a related table and builds a JSON
+// aggregation for it.
+//
+// If Preserve is true → uses LEFT JOIN (keeps unmatched rows).
+// If UseArray is false → automatically GROUP BY <table>.id so the JSON
+// represents a single object instead of an array.
+//
+// Handy for quickly pulling related data into one field without manually
+// writing joins, JSON aggregation, or group by logic.
 func AttributesAggregationBuilder(builder *sql_query.SelectBuilder, dto any, options AggregationOptions) {
 	joinType := builder.Join
 	if options.Preserve {
 		joinType = builder.LeftJoin
 	}
 
-	joinType(options.TableName, fmt.Sprintf("%s.id = %s", options.TableName, options.LocalField))
+	joinType(options.TableName, options.TableName+".id"+" = "+options.LocalField)
 
 	// Now `AttributesAggregationBuilder` implement filterclause option.
 	builder.SelectJSONAggregate(options.Alias, dto, options.FilterClause, options.UseArray)
+
+	if !options.UseArray {
+		builder.GroupBy(options.TableName + ".id")
+	}
 }
 
 // Tested result WTF/MG/ELEC/LTP/0724/1
