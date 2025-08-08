@@ -208,7 +208,7 @@ func TransactionRolePermissionAggregation(
 	})
 
 	if len(filterOutEmptyRole) > 0 {
-		builder.HavingClauses = append(builder.HavingClauses, "COUNT(utr.id) > 0")
+		builder.HavingClauses = append(builder.HavingClauses, "COUNT(utr._id) > 0")
 	}
 }
 
