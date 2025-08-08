@@ -136,17 +136,19 @@ type SQLSelectChainBuilder interface {
 	// WhereOr implements SQLSelectChainBuilder. (Accumulates previous value if called again)
 	WhereOr(filters ...map[string]SQLCondition) SQLSelectChainBuilder
 
-	// Search implements SQLSelectChainBuilder. (Accumulates previous value if called again).
-	// Search adds a case-insensitive ILIKE condition across multiple fields.
-	// Each field is compared with the same keyword, combined using OR.
+	// Search implements SQLSelectChainBuilder and accumulates conditions if called multiple times.
+	// Adds a case-insensitive ILIKE condition across multiple fields, combined with OR.
+	//
+	// To search inside array columns, add suffix ":array" to the column name.
+	// This uses EXISTS + unnest for better performance & usabilitiy than array_to_string.
 	//
 	// Example:
 	//
-	//	builder.Search("john", []string{"first_name", "last_name"})
+	//	builder.Search("john", []string{"first_name", "last_name", "tags:array"})
 	//
 	// Generates:
 	//
-	//	(first_name ILIKE $1 OR last_name ILIKE $1)
+	//	(first_name ILIKE $1 OR last_name ILIKE $1 OR EXISTS (SELECT 1 FROM unnest(tags) AS val WHERE val ILIKE $1))
 	Search(keyword string, fields []string) SQLSelectChainBuilder
 	// SetLimit sets a fixed LIMIT value for the query (overwrites any previous limit).
 	//
@@ -284,7 +286,15 @@ func (s *SelectBuilder) Search(keyword string, fields []string) SQLSelectChainBu
 		orArgs := []interface{}{}
 
 		for _, field := range fields {
-			orClauses = append(orClauses, fmt.Sprintf("%s ILIKE $%d", field, len(s.Args)+len(orArgs)+1))
+			isArrayColumn := strings.HasSuffix(field, ":array")
+
+			if isArrayColumn {
+				cleanColumn := strings.TrimSuffix(field, ":array")
+				orClauses = append(orClauses, fmt.Sprintf("EXISTS (SELECT 1 FROM unnest(%s) as val WHERE val ILIKE $%d)", cleanColumn, len(s.Args)+len(orArgs)+1))
+			} else {
+				orClauses = append(orClauses, fmt.Sprintf("%s ILIKE $%d", field, len(s.Args)+len(orArgs)+1))
+			}
+
 			orArgs = append(orArgs, "%"+keyword+"%")
 		}
 
@@ -470,7 +480,7 @@ func (s *SelectBuilder) LeftJoinLateralWithQuery(joinName string, joinQueryBuild
 
 	s.Args = append(s.Args, joinArgs...)
 
-	//additional filter
+	// additional filter
 	var filterSb strings.Builder
 	if len(additionalConditions) > 0 {
 		var filters []string
