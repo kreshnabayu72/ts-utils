@@ -586,6 +586,10 @@ func (s *SelectBuilder) UnionAll(cteBuilders ...*SQLEloquentQuery) SQLSelectChai
 func NewSQLSelectBuilder[T any](tableName string, alias ...string) SQLSelectChainBuilder {
 	columns := ExtractJSONTags[T]()
 
+	if len(alias) > 0 {
+		tableName = fmt.Sprintf("%s %s", tableName, strings.TrimSpace(alias[0]))
+	}
+
 	defaultColumns := []string{}
 	if len(columns) > 0 {
 		defaultColumns = columns
