@@ -7,16 +7,17 @@ import (
 )
 
 type BorrowingRequest struct {
-	ID            int                    `json:"id" column:"id" sql:"BIGINT PRIMARY KEY"`
-	AssetID       int                    `json:"assetId" column:"asset_id" sql:"BIGINT"`
-	TransactionID int                    `json:"transactionId" column:"transaction_id" sql:"BIGINT"`
-	ParentID      *int                   `json:"parentId" column:"parent_id" sql:"BIGINT"`
-	Status        BorrowingRequestStatus `json:"status" column:"status" sql:"borrowing_request_status_enum"`
-	IsVerified    bool                   `json:"isVerified" column:"is_verified" sql:"BOOLEAN"`
-	Notes         string                 `json:"notes" column:"notes" sql:"VARCHAR"`
-	DueReturnDate time.Time              `json:"dueReturnDate" column:"due_return_date" sql:"TIMESTAMPTZ NOT NULL"`
-	CreatedAt     time.Time              `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt     time.Time              `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ID               int                    `json:"id" column:"id" sql:"BIGINT PRIMARY KEY"`
+	AssetID          int                    `json:"assetId" column:"asset_id" sql:"BIGINT"`
+	TransactionID    int                    `json:"transactionId" column:"transaction_id" sql:"BIGINT"`
+	ParentID         *int                   `json:"parentId" column:"parent_id" sql:"BIGINT"`
+	Status           BorrowingRequestStatus `json:"status" column:"status" sql:"borrowing_request_status_enum"`
+	IsVerified       bool                   `json:"isVerified" column:"is_verified" sql:"BOOLEAN"`
+	Notes            string                 `json:"notes" column:"notes" sql:"VARCHAR"`
+	ActualReturnDate time.Time              `json:"actualReturnDate" column:"actual_return_date" sql:"TIMESTAMPTZ NOT NULL"`
+	DueReturnDate    time.Time              `json:"dueReturnDate" column:"due_return_date" sql:"TIMESTAMPTZ NOT NULL"`
+	CreatedAt        time.Time              `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt        time.Time              `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (m *BorrowingRequest) TableName() string {
