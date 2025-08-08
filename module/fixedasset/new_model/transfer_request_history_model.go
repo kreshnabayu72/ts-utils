@@ -14,16 +14,21 @@ type TransferRequestHistory struct {
 	AssetID          string                     `json:"assetId"            column:"asset_id"           sql:"VARCHAR"`
 	AssetStatus      TransferRequestAssetStatus `json:"assetStatus" column:"asset_status" sql:"transfer_request_asset_status_enum"`
 	Name             string                     `json:"name"             column:"name"            sql:"VARCHAR"`
+	Brand            string                     `json:"brand"             column:"brand"            sql:"VARCHAR"`
+	Model            string                     `json:"model"             column:"model"            sql:"VARCHAR"`
 	NameWithSequence string                     `json:"nameWithSequence"   column:"name_with_sequence" sql:"VARCHAR"`
 	SequenceNumber   int                        `json:"sequenceNumber"     column:"sequence_number"    sql:"BIGINT"`
 	Image            *string                    `json:"image"         column:"image"        sql:"VARCHAR"`
 
-	Transaction      int                           `json:"transaction" column:"transaction" sql:"BIGINT"`
-	Status           TransferRequestStatus         `json:"status" column:"status" sql:"transfer_request_status_enum"`
-	TagStatus        TransferRequestAssetTagStatus `json:"tagStatus" column:"tag_status" sql:"transfer_request_asset_tag_status_enum"`
-	OriginGroup      string                        `json:"originGroup"   column:"origin_group" sql:"VARCHAR"`
-	DestinationGroup string                        `json:"destinationGroup"   column:"destination_group" sql:"VARCHAR"`
-	Manager          string                        `json:"manager"   column:"manager" sql:"VARCHAR"`
+	Transaction        int                           `json:"transaction" column:"transaction" sql:"BIGINT"`
+	Status             TransferRequestStatus         `json:"status" column:"status" sql:"transfer_request_status_enum"`
+	TagStatus          TransferRequestAssetTagStatus `json:"tagStatus" column:"tag_status" sql:"transfer_request_asset_tag_status_enum"`
+	OriginGroup        string                        `json:"originGroup"   column:"origin_group" sql:"VARCHAR"`
+	OriginGroupID      int                           `json:"originGroupId"   column:"origin_group_id" sql:"BIGINT"`
+	DestinationGroup   string                        `json:"destinationGroup"   column:"destination_group" sql:"VARCHAR"`
+	DestinationGroupID int                           `json:"destinationGroupId"   column:"destination_group_id" sql:"BIGINT"`
+	Manager            string                        `json:"manager"   column:"manager" sql:"VARCHAR"`
+	Notes              string                        `json:"notes" column:"notes" sql:"VARCHAR"`
 
 	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
