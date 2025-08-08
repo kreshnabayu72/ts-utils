@@ -17,7 +17,6 @@ func NewAssetsSQLBuilder() *sql_query.SelectBuilder {
 // Can be extended with select builder's chain methods or used in CTE.
 func CommonGetAssetListBuilder(excludeFields ...string) *sql_query.SelectBuilder {
 	assetBuilder := NewAssetsSQLBuilder()
-	assetBuilder.GroupBy("a.id")
 
 	if !sql_query.ArrayIncludes(excludeFields, "group") {
 		AttributesAggregationBuilder(assetBuilder, Group{}, AggregationOptions{

@@ -79,10 +79,6 @@ func AttributesAggregationBuilder(builder *sql_query.SelectBuilder, dto any, opt
 
 	// Now `AttributesAggregationBuilder` implement filterclause option.
 	builder.SelectJSONAggregate(options.Alias, dto, options.FilterClause, options.UseArray)
-
-	if !options.UseArray {
-		builder.GroupBy(options.TableName + ".id")
-	}
 }
 
 // Tested result WTF/MG/ELEC/LTP/0724/1
