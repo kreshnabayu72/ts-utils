@@ -582,8 +582,8 @@ func (s *SelectBuilder) UnionAll(cteBuilders ...*SQLEloquentQuery) SQLSelectChai
 //
 // Example:
 //
-//	builder := NewSQLSelectBuilder[User]("users").Select("id", "name")
-func NewSQLSelectBuilder[T any](tableName string) SQLSelectChainBuilder {
+//	builder := NewSQLSelectBuilder[User]("users","u").Select("id", "name")
+func NewSQLSelectBuilder[T any](tableName string, alias ...string) SQLSelectChainBuilder {
 	columns := ExtractJSONTags[T]()
 
 	defaultColumns := []string{}
@@ -607,7 +607,10 @@ func NewSQLSelectBuilder[T any](tableName string) SQLSelectChainBuilder {
 	}
 }
 
-func NewSQLCountBuilder(tableName string) SQLSelectChainBuilder {
+// Example:
+//
+//	builder := NewSQLCountBuilder("users","u").Where(...)
+func NewSQLCountBuilder(tableName string, alias ...string) SQLSelectChainBuilder {
 	defaultColumns := []string{"COUNT(*)"}
 
 	return &SelectBuilder{

@@ -99,8 +99,8 @@ func (s *DeleteBuilder) Using(tables []string) SQLDeleteChainBuilder {
 //
 // Example:
 //
-//	builder := NewSQLDeleteBuilder("users")
-func NewSQLDeleteBuilder(tableName string) SQLDeleteInitBuilder {
+//	builder := NewSQLDeleteBuilder("users","u")
+func NewSQLDeleteBuilder(tableName string, alias ...string) SQLDeleteInitBuilder {
 	return &DeleteBuilder{
 		&SQLEloquentQuery{
 			Table:       tableName,
