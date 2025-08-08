@@ -1,0 +1,34 @@
+package new_model
+
+import (
+	"time"
+
+	"gitea.qwertysystem.net/BETS/ts-utils/migration"
+)
+
+// TransferTransactionHistory represents the transfer_transactions table in the database.
+type TransferTransactionHistory struct {
+	ID               int                       `json:"_id" column:"id" sql:"BIGINT PRIMARY KEY"`
+	TransactionID    string                    `json:"transactionId" column:"transaction_id" sql:"VARCHAR UNIQUE"`
+	Manager          string                    `json:"manager" column:"manager" sql:"VARCHAR"`
+	OriginGroup      string                    `json:"originGroup" column:"origin_group" sql:"VARCHAR"`
+	DestinationGroup string                    `json:"destinationGroup" column:"destination_group" sql:"VARCHAR"`
+	Status           TransferTransactionStatus `json:"status" column:"status" sql:"transfer_transaction_status_enum"`
+	TotalAssets      int                       `json:"totalAssets" column:"total_assets" sql:"BIGINT"`
+	CreatedAt        time.Time                 `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt        time.Time                 `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+}
+
+// TableName returns the name of the database table for this model.
+func (m *TransferTransactionHistory) TableName() string {
+	return "transfer_transaction_histories"
+}
+
+// Up defines the migration logic to create the table and its constraints.
+func (m *TransferTransactionHistory) Up(builder *migration.MigrationBuilder) {
+	// Add all columns from the struct
+	builder.AddColumn(m)
+
+	// Add the unique index for transaction_id
+	builder.AddIndex("transfer_transaction_histories_transaction_id", "transaction_id", true, "")
+}

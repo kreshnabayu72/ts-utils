@@ -17,8 +17,8 @@ type TransferRequest struct {
 	AssetStatus    TransferRequestAssetStatus    `json:"assetStatus" column:"asset_status" sql:"transfer_request_asset_status_enum"`
 	IsVerified     bool                          `json:"isVerified" column:"is_verified" sql:"BOOLEAN"`
 	Notes          string                        `json:"notes" column:"notes" sql:"VARCHAR"`
-	CreatedAt      time.Time                     `json:"createdAt" column:"created_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
-	UpdatedAt      time.Time                     `json:"updatedAt" column:"updated_at" sql:"TIMESTAMP NOT NULL DEFAULT NOW()"`
+	CreatedAt      time.Time                     `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt      time.Time                     `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 // TableName returns the name of the database table for this model.
