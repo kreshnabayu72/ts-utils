@@ -115,21 +115,22 @@ func generateUserTransactionRolesBuilder(
 	loggedInUserId int,
 	transactionGroupAttribute fixedasset_model.TransactionGroupAttribute,
 ) sql_query.SQLSelectChainBuilder {
-	return sql_query.NewSQLSelectBuilder[UserTransactionRole]("user_transaction_roles utr").
+	return sql_query.NewSQLSelectBuilder[any]("user_transaction_roles utr").
+		Select("utr.group_id").
 		Where(map[string]sql_query.SQLCondition{
-			"utr\".\"user_id": {
+			"utr.user_id": {
 				Operator: sql_query.SQLOperatorEqual,
 				Value:    loggedInUserId,
 			},
-			"utr\".\"is_active": {
+			"utr.is_active": {
 				Operator: sql_query.SQLOperatorEqual,
 				Value:    true,
 			},
-			"utr\".\"role_type": {
+			"utr.role_type": {
 				Operator: sql_query.SQLOperatorIn,
 				Value:    []string{"Monitoring", "Manager"},
 			},
-			"utr\".\"role_attribute": {
+			"utr.role_attribute": {
 				Operator: sql_query.SQLOperatorEqual,
 				Value:    transactionGroupAttribute,
 			},
@@ -191,16 +192,17 @@ func TransactionRolePermissionAggregation(
 	filterOutEmptyRole ...bool,
 ) {
 	cteBuilder := generateUserTransactionRolesBuilder(loggedInUserId, transactionGroupAttribute)
+	GetHasTransactionRole(cteBuilder.(*sql_query.SelectBuilder), transactionGroupAttribute)
+	cteBuilder.GroupBy("utr.group_id")
 	builder.WithCTEBuilder("user_transaction_roles_cte", cteBuilder.(*sql_query.SelectBuilder).SQLEloquentQuery)
-
-	GetHasTransactionRole(builder, transactionGroupAttribute)
+	builder.Select(`utr."isManager"`, `utr."isMonitoring"`)
 
 	builder.LeftJoin(
 		"user_transaction_roles_cte utr",
 		fmt.Sprintf("utr.group_id = %s", groupColumn),
 	)
 	builder.Where(map[string]sql_query.SQLCondition{
-		"utr\".\"group_id": {
+		"utr.group_id": {
 			Operator: sql_query.SQLOperatorEqual,
 			Value:    groupColumn,
 			IsRef:    true,
@@ -226,15 +228,15 @@ func getTransactionRolePermission(
 func transactionRoleCTEBuilder(
 	loggedInUserId int,
 ) sql_query.SQLSelectChainBuilder {
-	return sql_query.NewSQLSelectBuilder[UserTransactionRole](
+	return sql_query.NewSQLSelectBuilder[any](
 		"user_transaction_roles utr",
 	).
 		Where(map[string]sql_query.SQLCondition{
-			"utr\".\"user_id": {
+			"utr.user_id": {
 				Operator: sql_query.SQLOperatorEqual,
 				Value:    loggedInUserId,
 			},
-			"utr\".\"is_active": {
+			"utr.is_active": {
 				Operator: sql_query.SQLOperatorEqual,
 				Value:    true,
 			},
