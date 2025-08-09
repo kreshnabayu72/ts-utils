@@ -66,7 +66,7 @@ type SQLUpdateInitBuilder interface {
 	UpdateEach(values interface{}, rowIdentifier string) SQLUpdateChainBuilder
 
 	// AddCase initializes a conditional CASE expression for the given column in an UPDATE statement.
-	// It clears any existing CASE expressions and allows chaining multiple conditional branches using Case() and Else().
+	// It use completely different CASE expressions from previous AddCase and allows chaining multiple conditional branches using Case() and Else().
 	//
 	// Example:
 	//   builder.AddCase("status", func(b UpdateCases) {
