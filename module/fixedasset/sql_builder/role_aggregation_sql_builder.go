@@ -195,7 +195,19 @@ func TransactionRolePermissionAggregation(
 	GetHasTransactionRole(cteBuilder.(*sql_query.SelectBuilder), transactionGroupAttribute)
 	cteBuilder.GroupBy("utr.group_id")
 	builder.WithCTEBuilder("user_transaction_roles_cte", cteBuilder.(*sql_query.SelectBuilder).SQLEloquentQuery)
-	builder.Select(`utr."isManager"`, `utr."isMonitoring"`)
+
+	for _, each := range filterOptions.TransactionRole.ManageType {
+		if each == fixedasset_new_model.TransactionRoleTypeManager {
+			builder.Select(`utr."isManager"`)
+		}
+		if each == fixedasset_new_model.TransactionRoleTypeMonitoring {
+			builder.Select(`utr."isMonitoring"`)
+		}
+		// Not used for now
+		// if each == fixedasset_new_model.TransactionRoleTypeStaff {
+		// 	builder.Select(`utr."isStaff"`)
+		// }
+	}
 
 	builder.LeftJoin(
 		"user_transaction_roles_cte utr",
