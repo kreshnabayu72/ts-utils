@@ -25,7 +25,7 @@ type SQLSelectChainBuilder interface {
 
 	// Select implements SQLSelectChainBuilder.
 	// Select defines one or more columns for the SELECT statement.
-	// If a column alias already exists, it will be replaced.
+	// If a column alias already exists, its expression will be overwritten with the new one.
 	//
 	// Example:
 	//
@@ -178,7 +178,6 @@ type SQLSelectChainBuilder interface {
 	// 	LEFT JOIN LATERAL (
 	//     `Sql queries here`
 	//   ) `alias` ON `condition`
-
 	LeftJoinLateralWithQuery(joinName string, joinQueryBuilder *SQLEloquentQuery, mainCondition string, additionalConditions ...map[string]SQLCondition) SQLSelectChainBuilder
 
 	// Paginate implements SQLSelectChainBuilder. (Overrides previous value if called again).
@@ -215,6 +214,8 @@ type SQLSelectChainBuilder interface {
 
 	// WithCTEBuilder adds a Common Table Expression (CTE) to the query.
 	// It adjusts argument placeholders to avoid conflicts.
+	// This function just add the defined CTE to the top of query.
+	// You need to JOIN/LEFT JOIN the CTE builder to let main expression know that it should use CTE.
 	//
 	// Example:
 	//
@@ -228,6 +229,8 @@ type SQLSelectChainBuilder interface {
 
 	// WithRecursiveCTEBuilder adds a Common Table Expression (CTE) to the query.
 	// It adjusts argument placeholders to avoid conflicts.
+	// This function just add the defined CTE to the top of query.
+	// You need to JOIN/LEFT JOIN the CTE builder to let main expression know that it should use CTE.
 	//
 	// Example:
 	//
