@@ -315,7 +315,8 @@ func (s *SelectBuilder) Distinct(alias string, columns ...string) SQLSelectChain
 		// Check if alias exists in current list
 		replaced := false
 		for i, existing := range s.DistinctBy {
-			if extractAlias(existing) == newAlias {
+			extracted := extractAlias(existing)
+			if extracted != "" && extracted == newAlias {
 				s.DistinctBy[i] = newCol // Overwrite
 				replaced = true
 				break
@@ -337,7 +338,8 @@ func (s *SelectBuilder) Select(columns ...string) SQLSelectChainBuilder {
 		// Check if alias exists in current list
 		replaced := false
 		for i, existing := range s.Columns {
-			if extractAlias(existing) == newAlias {
+			extracted := extractAlias(existing)
+			if extracted != "" && extracted == newAlias {
 				s.Columns[i] = newCol // Overwrite
 				replaced = true
 				break
@@ -357,7 +359,8 @@ func (s *SelectBuilder) SelectBoolOr(expr, alias string, args ...interface{}) SQ
 	// Check if alias exists in current list
 	replaced := false
 	for i, existing := range s.Columns {
-		if extractAlias(existing) == strings.ToLower(alias) {
+		extracted := extractAlias(existing)
+		if extracted != "" && extracted == strings.ToLower(alias) {
 			s.Columns[i] = boolOrColumn // Overwrite
 			replaced = true
 			break
@@ -390,7 +393,8 @@ func (s *SelectBuilder) SelectArrayAggregation(alias string, source string, conf
 
 	replaced := false
 	for i, existing := range s.Columns {
-		if extractAlias(existing) == strings.ToLower(alias) {
+		extracted := extractAlias(existing)
+		if extracted != "" && extracted == strings.ToLower(alias) {
 			s.Columns[i] = arrayAggColumn // Overwrite
 			replaced = true
 			break
@@ -410,7 +414,8 @@ func (s *SelectBuilder) SelectCaseWhen(thenExpr, elseExpr, alias string, whenCla
 	// Check if alias exists in current list
 	replaced := false
 	for i, existing := range s.Columns {
-		if extractAlias(existing) == strings.ToLower(alias) {
+		extracted := extractAlias(existing)
+		if extracted != "" && extracted == strings.ToLower(alias) {
 			s.Columns[i] = caseWhenColumn // Overwrite
 			replaced = true
 			break
