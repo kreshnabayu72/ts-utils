@@ -114,6 +114,13 @@ const (
 	TagTypeNonTAG = TagType("Non TAG")
 )
 
+type Permission struct {
+	Create bool
+	View   bool
+	Update bool
+	Delete bool
+}
+
 type PermissionType string
 
 const (
