@@ -392,7 +392,10 @@ func (s *SelectBuilder) SelectArrayAggregation(alias string, source string, conf
 		orderByClause = fmt.Sprintf(" ORDER BY %s %s", config.SortBy, order)
 	}
 
-	arrayAggColumn := fmt.Sprintf("(SELECT array_agg(%s%s) FROM %s) AS %s", config.Expr, orderByClause, source, alias)
+	if source != "" {
+		source = " FROM " + source
+	}
+	arrayAggColumn := fmt.Sprintf(`(SELECT array_agg(%s%s)%s) AS "%s"`, config.Expr, orderByClause, source, alias)
 
 	replaced := false
 	for i, existing := range s.Columns {
