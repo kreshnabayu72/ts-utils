@@ -35,8 +35,8 @@ func GenerateCTEOption(
 					jsonb_build_object(
 						'label', "%s"."key",
 						'value', "%s"."value"
-					) filter (WHERE "%s"."value" IS NOT NULL) AS "%s"
-				)`,
+					) filter (WHERE "%s"."value" IS NOT NULL)
+				) AS "%s"`,
 				snakeAliasName,
 				snakeAliasName,
 				snakeAliasName,
