@@ -9,13 +9,13 @@ import (
 type TransactionLog struct {
 	ID                        primitive.ObjectID     `json:"id,omitempty" bson:"_id,omitempty"`
 	Type                      string                 `json:"type" bson:"type"`
-	Transaction               int                    `json:"transaction" bson:"transaction"`
+	Transaction               string                 `json:"transaction" bson:"transaction"`
 	AssetName                 string                 `json:"assetName" bson:"assetName"`
-	AssetId                   int                    `json:"assetId" bson:"assetId"`
+	AssetId                   string                 `json:"assetId" bson:"assetId"`
 	AssetAliasCode            *string                `json:"assetAliasCode" bson:"assetAliasCode"`
 	AssetNameWithSequence     string                 `json:"assetNameWithSequence" bson:"assetNameWithSequence"`
 	Action                    string                 `json:"action" bson:"action"`
-	UserId                    *int                   `json:"userId" bson:"userId"`
+	UserId                    *string                `json:"userId" bson:"userId"`
 	UserFullName              *string                `json:"userFullName" bson:"userFullName"`
 	Detail                    map[string]interface{} `json:"detail" bson:"detail"`
 	OriginGroup               string                 `json:"originGroup" bson:"originGroup"`
