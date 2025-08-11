@@ -9,19 +9,19 @@ import (
 type TransactionLog struct {
 	ID                        primitive.ObjectID     `json:"id,omitempty" bson:"_id,omitempty"`
 	Type                      string                 `json:"type" bson:"type"`
-	Transaction               int                    `json:"transaction" bson:"transaction"`
+	Transaction               string                 `json:"transaction" bson:"transaction"`
 	AssetName                 string                 `json:"assetName" bson:"assetName"`
-	AssetId                   int                    `json:"assetId" bson:"assetId"`
+	AssetId                   string                 `json:"assetId" bson:"assetId"`
 	AssetAliasCode            *string                `json:"assetAliasCode" bson:"assetAliasCode"`
 	AssetNameWithSequence     string                 `json:"assetNameWithSequence" bson:"assetNameWithSequence"`
 	Action                    string                 `json:"action" bson:"action"`
-	UserId                    *int                   `json:"userId" bson:"userId"`
+	UserId                    *string                `json:"userId" bson:"userId"`
 	UserFullName              *string                `json:"userFullName" bson:"userFullName"`
 	Detail                    map[string]interface{} `json:"detail" bson:"detail"`
 	OriginGroup               string                 `json:"originGroup" bson:"originGroup"`
 	DestinationGroup          string                 `json:"destinationGroup" bson:"destinationGroup"`
 	TransactionId             string                 `json:"transactionId" bson:"transactionId"`
-	ReaderId                  int                    `json:"readerId" bson:"readerId"`
+	ReaderId                  string                 `json:"readerId" bson:"readerId"`
 	ReaderName                string                 `json:"readerName" bson:"readerName"`
 	ReaderNameWithoutSequence string                 `json:"readerNameWithoutSequence" bson:"readerNameWithoutSequence"`
 	ReaderType                string                 `json:"readerType" bson:"readerType"`
