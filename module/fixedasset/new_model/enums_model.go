@@ -27,6 +27,25 @@ const (
 	AssetStatusTAGNotSet          AssetStatus = "TAG Not Set"
 )
 
+type AssetLicenseStatus string
+
+const (
+	AssetLicenseStatusManaged           AssetLicenseStatus = "Managed"
+	AssetLicenseStatusUnmanaged         AssetLicenseStatus = "Unmanaged"
+	AssetLicenseStatusPendingActivation AssetLicenseStatus = "Pending Activation"
+)
+
+type AssetLicenseType string
+
+const (
+	AssetLicenseTypeFixedAsset      AssetLicenseType = "Fixed Asset"
+	AssetLicenseTypeMaintenance     AssetLicenseType = "Maintenance"
+	AssetLicenseTypeTracking        AssetLicenseType = "Tracking"
+	AssetLicenseTypeAssetControl    AssetLicenseType = "Asset Control"
+	AssetLicenseTypeAudit           AssetLicenseType = "Audit"
+	AssetLicenseTypeRepairTicketing AssetLicenseType = "Repair Ticketing"
+)
+
 type CustomFieldType string
 
 const (
