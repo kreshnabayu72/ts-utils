@@ -197,6 +197,11 @@ const (
 	SystemRoleTypeGlobal SystemRoleType = "Global"
 )
 
+var SystemRoleTypeEnum = map[string]SystemRoleType{
+	"Group":  SystemRoleTypeGroup,
+	"Global": SystemRoleTypeGlobal,
+}
+
 func GetSystemRoleTypeFromAttribute(attr SystemRoleAttribute) SystemRoleType {
 	switch attr {
 	case
