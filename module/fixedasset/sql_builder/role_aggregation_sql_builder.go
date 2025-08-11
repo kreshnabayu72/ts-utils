@@ -966,11 +966,12 @@ func TransactionRoleMultipleGroupAggregation(
 		LeftJoin(
 			"user_transaction_roles utr",
 			fmt.Sprintf(
-				"utr.user_id = %d AND utr.is_active = true AND utr.role_attribute = %s",
-				loggedInUserId,
-				transactionGroupAttribute,
+				"utr.user_id = $%d AND utr.is_active = true AND utr.role_attribute = $%d",
+				builder.GetCurrentArgIndex()+1,
+				builder.GetCurrentArgIndex()+2,
 			),
 		)
+	builder.AddArgs(loggedInUserId, transactionGroupAttribute)
 
 	if len(roleTypes) > 0 {
 		builder.Where(map[string]sql_query.SQLCondition{
@@ -985,19 +986,21 @@ func TransactionRoleMultipleGroupAggregation(
 	for _, groupField := range groupFieldsAndAttribute {
 		builder.SelectBoolOr(
 			fmt.Sprintf(
-				"utr.group_id = '%s' AND utr.role_type = '%s'",
+				"utr.group_id = %s AND utr.role_type = $%d",
 				groupField.Field,
-				fixedasset_new_model.TransactionRoleTypeManager,
+				builder.GetCurrentArgIndex()+1,
 			),
 			fmt.Sprintf("is%sManager", groupField.AttributeName),
+			fixedasset_new_model.TransactionRoleTypeManager,
 		)
 		builder.SelectBoolOr(
 			fmt.Sprintf(
-				"utr.group_id = '%s' AND utr.role_type = '%s'",
+				"utr.group_id = %s AND utr.role_type = $%d",
 				groupField.Field,
-				fixedasset_new_model.TransactionRoleTypeMonitoring,
+				builder.GetCurrentArgIndex()+1,
 			),
 			fmt.Sprintf("is%sMonitoring", groupField.AttributeName),
+			fixedasset_new_model.TransactionRoleTypeMonitoring,
 		)
 	}
 }
@@ -1005,7 +1008,7 @@ func TransactionRoleMultipleGroupAggregation(
 func transactionRoleMultiPermissionAggregationCTE(
 	loggedInUserId int,
 ) sql_query.SQLSelectChainBuilder {
-	return sql_query.NewSQLSelectBuilder[any](
+	builder := sql_query.NewSQLSelectBuilder[any](
 		"user_transaction_roles utr",
 	).
 		Where(map[string]sql_query.SQLCondition{
@@ -1029,41 +1032,58 @@ func transactionRoleMultiPermissionAggregationCTE(
 					fixedasset_new_model.TransactionRoleAttributeDisposal,
 				},
 			},
-		}).
-		Select(
-			"utr.group_id",
-			fmt.Sprintf(
-				`BOOL_OR(utr.role_type = '%s' AND utr.role_attribute = '%s') AS "manager_borrowing"`,
-				fixedasset_new_model.TransactionRoleTypeManager,
-				fixedasset_new_model.TransactionRoleAttributeBorrowing,
-			),
-			fmt.Sprintf(
-				`BOOL_OR(utr.role_type = '%s' AND utr.role_attribute = '%s') AS "manager_transfer"`,
-				fixedasset_new_model.TransactionRoleTypeManager,
-				fixedasset_new_model.TransactionRoleAttributeTransfer,
-			),
-			fmt.Sprintf(
-				`BOOL_OR(utr.role_type = '%s' AND utr.role_attribute = '%s') AS "manager_disposal"`,
-				fixedasset_new_model.TransactionRoleTypeManager,
-				fixedasset_new_model.TransactionRoleAttributeDisposal,
-			),
-			fmt.Sprintf(
-				`BOOL_OR(utr.role_type = '%s' AND utr.role_attribute = '%s') AS "monitoring_borrowing"`,
-				fixedasset_new_model.TransactionRoleTypeMonitoring,
-				fixedasset_new_model.TransactionRoleAttributeBorrowing,
-			),
-			fmt.Sprintf(
-				`BOOL_OR(utr.role_type = '%s' AND utr.role_attribute = '%s') AS "monitoring_transfer"`,
-				fixedasset_new_model.TransactionRoleTypeMonitoring,
-				fixedasset_new_model.TransactionRoleAttributeTransfer,
-			),
-			fmt.Sprintf(
-				`BOOL_OR(utr.role_type = '%s' AND utr.role_attribute = '%s') AS "monitoring_disposal"`,
-				fixedasset_new_model.TransactionRoleTypeMonitoring,
-				fixedasset_new_model.TransactionRoleAttributeDisposal,
-			),
-		).
-		GroupBy("utr.group_id")
+		})
+
+	builder.Select(
+		"utr.group_id",
+		fmt.Sprintf(
+			`BOOL_OR(utr.role_type = $%d AND utr.role_attribute = $%d) AS "manager_borrowing"`,
+			builder.GetCurrentArgIndex()+1,
+			builder.GetCurrentArgIndex()+2,
+		),
+		fmt.Sprintf(
+			`BOOL_OR(utr.role_type = $%d AND utr.role_attribute = $%d) AS "manager_transfer"`,
+			builder.GetCurrentArgIndex()+3,
+			builder.GetCurrentArgIndex()+4,
+		),
+		fmt.Sprintf(
+			`BOOL_OR(utr.role_type = $%d AND utr.role_attribute = $%d) AS "manager_disposal"`,
+			builder.GetCurrentArgIndex()+5,
+			builder.GetCurrentArgIndex()+6,
+		),
+		fmt.Sprintf(
+			`BOOL_OR(utr.role_type = $%d AND utr.role_attribute = $%d) AS "monitoring_borrowing"`,
+			builder.GetCurrentArgIndex()+7,
+			builder.GetCurrentArgIndex()+8,
+		),
+		fmt.Sprintf(
+			`BOOL_OR(utr.role_type = $%d AND utr.role_attribute = $%d) AS "monitoring_transfer"`,
+			builder.GetCurrentArgIndex()+9,
+			builder.GetCurrentArgIndex()+10,
+		),
+		fmt.Sprintf(
+			`BOOL_OR(utr.role_type = $%d AND utr.role_attribute = $%d) AS "monitoring_disposal"`,
+			builder.GetCurrentArgIndex()+11,
+			builder.GetCurrentArgIndex()+12,
+		),
+	)
+
+	builder.AddArgs(
+		fixedasset_new_model.TransactionRoleTypeManager,
+		fixedasset_new_model.TransactionRoleAttributeBorrowing,
+		fixedasset_new_model.TransactionRoleTypeManager,
+		fixedasset_new_model.TransactionRoleAttributeTransfer,
+		fixedasset_new_model.TransactionRoleTypeManager,
+		fixedasset_new_model.TransactionRoleAttributeDisposal,
+		fixedasset_new_model.TransactionRoleTypeMonitoring,
+		fixedasset_new_model.TransactionRoleAttributeBorrowing,
+		fixedasset_new_model.TransactionRoleTypeMonitoring,
+		fixedasset_new_model.TransactionRoleAttributeTransfer,
+		fixedasset_new_model.TransactionRoleTypeMonitoring,
+		fixedasset_new_model.TransactionRoleAttributeDisposal,
+	)
+
+	return builder.GroupBy("utr.group_id")
 }
 
 func TransactionRoleMultiPermissionAggregation(
@@ -1088,9 +1108,10 @@ func RoleRestrictionAggregation(
 ) {
 	if filterOptions.TransactionRole != nil {
 		joinCondition := fmt.Sprintf(
-			"utr.user_id = %d AND utr.is_active = true",
-			loggedInUserId,
+			"utr.user_id = $%d AND utr.is_active = true",
+			builder.GetCurrentArgIndex()+1,
 		)
+		builder.AddArgs(loggedInUserId)
 		if groupColumn != "" {
 			joinCondition += fmt.Sprintf(" AND utr.group_id = %s", groupColumn)
 		}
@@ -1104,14 +1125,17 @@ func RoleRestrictionAggregation(
 				"utr\".\"role_type": {
 					Operator: sql_query.SQLOperatorIn,
 					Value:    filterOptions.TransactionRole.ManageType,
-					IsRef:    true,
 				},
 			})
 	}
 
 	if filterOptions.SystemRole != nil {
 		joinCondition := fmt.Sprintf(
-			"usr.user_id = %d AND usr.is_active = true AND usr.role_attribute = '%s'",
+			"usr.user_id = $%d AND usr.is_active = true AND usr.role_attribute = $%d",
+			builder.GetCurrentArgIndex()+1,
+			builder.GetCurrentArgIndex()+2,
+		)
+		builder.AddArgs(
 			loggedInUserId,
 			filterOptions.SystemRole.RoleAttribute,
 		)
