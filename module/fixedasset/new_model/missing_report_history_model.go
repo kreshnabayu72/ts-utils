@@ -9,7 +9,9 @@ import (
 type MissingReportHistory struct {
 	ID int `json:"_id" column:"id" sql:"BIGINT PRIMARY KEY"`
 
-	Asset            string  `json:"asset"            column:"asset"           sql:"VARCHAR"`
+	// Foreign key to assets
+	Asset int `json:"asset"            column:"asset"           sql:"BIGINT"`
+	// Asset ID based on alias code
 	AssetID          string  `json:"assetId"            column:"asset_id"           sql:"VARCHAR"`
 	TagType          TagType `json:"tagType" column:"tag_type" sql:"tag_type_enum"`
 	Name             string  `json:"name"             column:"name"            sql:"VARCHAR"`

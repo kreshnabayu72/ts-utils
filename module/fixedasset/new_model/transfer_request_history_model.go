@@ -10,7 +10,9 @@ import (
 type TransferRequestHistory struct {
 	ID int `json:"id" column:"id" sql:"BIGINT PRIMARY KEY"`
 
-	Asset            string                     `json:"asset"            column:"asset"           sql:"VARCHAR"`
+	// Foreign key to assets
+	Asset int `json:"asset"            column:"asset"           sql:"BIGINT"`
+	// Asset ID based on alias code
 	AssetID          string                     `json:"assetId"            column:"asset_id"           sql:"VARCHAR"`
 	AssetStatus      TransferRequestAssetStatus `json:"assetStatus" column:"asset_status" sql:"transfer_request_asset_status_enum"`
 	Name             string                     `json:"name"             column:"name"            sql:"VARCHAR"`
@@ -20,6 +22,7 @@ type TransferRequestHistory struct {
 	SequenceNumber   int                        `json:"sequenceNumber"     column:"sequence_number"    sql:"BIGINT"`
 	Image            *string                    `json:"image"         column:"image"        sql:"VARCHAR"`
 
+	// Foreign key to transfer_transaction_histories
 	Transaction        int                           `json:"transaction" column:"transaction" sql:"BIGINT"`
 	Status             TransferRequestStatus         `json:"status" column:"status" sql:"transfer_request_status_enum"`
 	TagStatus          TransferRequestAssetTagStatus `json:"tagStatus" column:"tag_status" sql:"transfer_request_asset_tag_status_enum"`
