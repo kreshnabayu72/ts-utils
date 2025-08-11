@@ -713,7 +713,6 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 	}
 
 	var sb strings.Builder
-	var countQuery string
 	sb.Grow(256) // preallocate ~256 bytes
 
 	// WITH
@@ -835,8 +834,6 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 		sb.WriteByte('\n')
 	}
 
-	countQuery = sb.String()
-
 	// ORDER BY
 	if len(s.SortBy) > 0 {
 		sb.WriteString("ORDER BY ")
@@ -851,16 +848,17 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 
 	// LIMIT/OFFSET
 	if s.UsePagination {
+		var limitationSb strings.Builder
 		if s.Limit > 0 {
-			sb.WriteString("LIMIT ")
-			sb.WriteString(strconv.Itoa(s.Limit))
-			sb.WriteByte(' ')
+			limitationSb.WriteString("LIMIT ")
+			limitationSb.WriteString(strconv.Itoa(s.Limit))
+			limitationSb.WriteByte(' ')
 		}
-		sb.WriteString("OFFSET ")
-		sb.WriteString(strconv.Itoa(s.Offset))
-		sb.WriteByte('\n')
+		limitationSb.WriteString("OFFSET ")
+		limitationSb.WriteString(strconv.Itoa(s.Offset))
+		limitationSb.WriteByte('\n')
 
-		return PaginationQuery(sb.String(), countQuery), s.Args, nil
+		return PaginationQuery(sb.String(), limitationSb.String()), s.Args, nil
 	}
 
 	return sb.String(), s.Args, nil

@@ -361,18 +361,21 @@ func GenerateArrayFilter[T comparable](filter *[]T) SQLCondition {
 	}
 }
 
-func PaginationQuery(dataQuery, totalQuery string) string {
+func PaginationQuery(mainQuery, limitation string) string {
 	paginationQuery := fmt.Sprintf(`
 		WITH
-			paginated AS (%s),
-			totalRow AS (%s),
+			main AS (%s),
+			paginated AS (
+				SELECT * FROM main
+				%s
+			),
 			total AS (
-				SELECT COUNT(*) FROM totalRow
+				SELECT COUNT(*) FROM main
 			)
 		SELECT
 			COALESCE((SELECT jsonb_agg(paginated) FROM paginated), '[]') AS data,
 			(SELECT COUNT FROM total) AS totalRecords;
-	`, dataQuery, totalQuery)
+	`, mainQuery, limitation)
 
 	return paginationQuery
 }
