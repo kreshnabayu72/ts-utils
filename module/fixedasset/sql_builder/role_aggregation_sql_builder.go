@@ -428,11 +428,11 @@ func systemRoleCTEBuilder(
 ) sql_query.SQLSelectChainBuilder {
 	return sql_query.NewSQLSelectBuilder[UserSystemRole]("user_system_roles usr").
 		Where(map[string]sql_query.SQLCondition{
-			"usr\".\"user_id": {
+			"usr.user_id": {
 				Operator: sql_query.SQLOperatorEqual,
 				Value:    loggedInUserId,
 			},
-			"usr\".\"is_active": {
+			"usr.is_active": {
 				Operator: sql_query.SQLOperatorEqual,
 				Value:    true,
 			},
@@ -975,7 +975,7 @@ func TransactionRoleMultipleGroupAggregation(
 
 	if len(roleTypes) > 0 {
 		builder.Where(map[string]sql_query.SQLCondition{
-			"utr\".\"role_type": {
+			"utr.role_type": {
 				Operator: sql_query.SQLOperatorIn,
 				Value:    roleTypes,
 				IsRef:    true,
@@ -1122,7 +1122,7 @@ func RoleRestrictionAggregation(
 				joinCondition,
 			).
 			Where(map[string]sql_query.SQLCondition{
-				"utr\".\"role_type": {
+				"utr.role_type": {
 					Operator: sql_query.SQLOperatorIn,
 					Value:    filterOptions.TransactionRole.ManageType,
 				},
@@ -1150,22 +1150,22 @@ func RoleRestrictionAggregation(
 			).
 			WhereOr(
 				map[string]sql_query.SQLCondition{
-					"usr\".\"permission_create": {
+					"usr.permission_create": {
 						Operator: sql_query.SQLOperatorEqual,
 						Value:    filterOptions.SystemRole.Permissions.Create,
 						IsRef:    true,
 					},
-					"usr\".\"permission_view": {
+					"usr.permission_view": {
 						Operator: sql_query.SQLOperatorEqual,
 						Value:    filterOptions.SystemRole.Permissions.View,
 						IsRef:    true,
 					},
-					"usr\".\"permission_update": {
+					"usr.permission_update": {
 						Operator: sql_query.SQLOperatorEqual,
 						Value:    filterOptions.SystemRole.Permissions.Update,
 						IsRef:    true,
 					},
-					"usr\".\"permission_delete": {
+					"usr.permission_delete": {
 						Operator: sql_query.SQLOperatorEqual,
 						Value:    filterOptions.SystemRole.Permissions.Delete,
 						IsRef:    true,
