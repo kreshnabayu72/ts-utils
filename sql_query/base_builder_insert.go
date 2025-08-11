@@ -179,7 +179,7 @@ func (s *InsertBuilder) cachedInsertSingle(v reflect.Value) SQLInsertChainBuilde
 		var normalizedPlaceholders strings.Builder
 		columns := []string{"id"}
 		placeholders := []string{"($1"}
-		FieldIndexes := [][]int{}
+		FieldIndexes := [][]int{{0}}
 
 		for _, meta := range *fieldMeta {
 			if ArrayIncludes([]string{"_id", "id"}, meta.JSONTag) || meta.ColumnTag == "id" {
@@ -227,14 +227,18 @@ func (s *InsertBuilder) cachedInsertSingle(v reflect.Value) SQLInsertChainBuilde
 
 	args := make([]interface{}, 0, len(cachedTemplate.FieldIndexes)+1)
 	db.InitSnowflake()
-	args = append(args, db.Node.Generate().Int64()) // id in first position
 
 	for _, idx := range cachedTemplate.FieldIndexes {
 		val := v.FieldByIndex(idx)
-		if val.IsZero() && s.excludeEmptyValue {
+		if len(args) != 0 && val.IsZero() && s.excludeEmptyValue {
 			continue
 		}
-		args = append(args, val.Interface())
+
+		if len(args) == 0 && val.IsZero() {
+			args = append(args, db.Node.Generate().Int64()) // id in first position
+		} else {
+			args = append(args, val.Interface())
+		}
 	}
 
 	s.Args = args
@@ -322,6 +326,7 @@ func (s *InsertBuilder) cachedInsertMany(slice reflect.Value) SQLInsertChainBuil
 
 		// ID in first position
 		basePlaceholders = append(basePlaceholders, "$1")
+		FieldIndexes = append(FieldIndexes, []int{0})
 
 		for _, meta := range *fieldMeta {
 			if ArrayIncludes([]string{"_id", "id"}, meta.JSONTag) || meta.ColumnTag == "id" {
@@ -371,9 +376,6 @@ func (s *InsertBuilder) cachedInsertMany(slice reflect.Value) SQLInsertChainBuil
 		}
 		allPlaceholders.WriteByte('(')
 
-		args[argsPos] = db.Node.Generate().Int64()
-		argsPos++
-
 		for j, base := range cachedTemplate.basePlaceholders {
 			if j > 0 {
 				allPlaceholders.WriteByte(',')
@@ -384,11 +386,13 @@ func (s *InsertBuilder) cachedInsertMany(slice reflect.Value) SQLInsertChainBuil
 				continue
 			}
 
-			if j > 0 {
-				val := values.FieldByIndex(cachedTemplate.FieldIndexes[j-1])
+			val := values.FieldByIndex(cachedTemplate.FieldIndexes[j])
+			if base == "$1" && val.IsZero() {
+				args[argsPos] = db.Node.Generate().Int64()
+			} else {
 				args[argsPos] = val.Interface()
-				argsPos++
 			}
+			argsPos++
 
 			allPlaceholders.WriteByte('$')
 			allPlaceholders.WriteString(strconv.Itoa(argsPos))
