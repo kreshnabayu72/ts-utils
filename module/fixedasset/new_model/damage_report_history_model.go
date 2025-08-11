@@ -12,15 +12,15 @@ type DamageReportHistory struct {
 	// Foreign key to assets
 	Asset int `json:"asset"            column:"asset"           sql:"BIGINT"`
 	// Asset ID based on alias code
-	AssetID          string  `json:"assetId"            column:"asset_id"           sql:"VARCHAR"`
-	TagType          TagType `json:"tagType" column:"tag_type" sql:"tag_type_enum"`
-	Name             string  `json:"name"             column:"name"            sql:"VARCHAR"`
-	Brand            string  `json:"brand"             column:"brand"            sql:"VARCHAR"`
-	Model            string  `json:"model"             column:"model"            sql:"VARCHAR"`
-	NameWithSequence string  `json:"nameWithSequence"   column:"name_with_sequence" sql:"VARCHAR"`
-	SequenceNumber   int     `json:"sequenceNumber"     column:"sequence_number"    sql:"BIGINT"`
-	Group            string  `json:"group"   column:"group" sql:"VARCHAR"`
-	GroupID          int     `json:"groupId"   column:"group_id" sql:"BIGINT"`
+	AssetID          string   `json:"assetId"            column:"asset_id"           sql:"VARCHAR"`
+	TagType          *TagType `json:"tagType" column:"tag_type" sql:"tag_type_enum"`
+	Name             string   `json:"name"             column:"name"            sql:"VARCHAR"`
+	Brand            string   `json:"brand"             column:"brand"            sql:"VARCHAR"`
+	Model            string   `json:"model"             column:"model"            sql:"VARCHAR"`
+	NameWithSequence string   `json:"nameWithSequence"   column:"name_with_sequence" sql:"VARCHAR"`
+	SequenceNumber   int      `json:"sequenceNumber"     column:"sequence_number"    sql:"BIGINT"`
+	Group            string   `json:"group"   column:"group" sql:"VARCHAR"`
+	GroupID          int      `json:"groupId"   column:"group_id" sql:"BIGINT"`
 
 	ReportedBy  string             `json:"reportedBy" column:"reported_by" sql:"VARCHAR"`
 	DamageImage string             `json:"damageImage" column:"damage_image" sql:"VARCHAR NOT NULL CHECK (char_length(damage_image) > 0)"`
