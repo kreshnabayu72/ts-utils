@@ -181,6 +181,14 @@ func GetHasTransactionRole(
 		"isMonitoring",
 		transactionGroupAttribute,
 	)
+	builder.SelectBoolOr(
+		fmt.Sprintf(
+			"utr.role_type = 'Staff' AND utr.role_attribute = $%d",
+			len(builder.Args)+1,
+		),
+		"isStaff",
+		transactionGroupAttribute,
+	)
 }
 
 func TransactionRolePermissionAggregation(
@@ -195,35 +203,17 @@ func TransactionRolePermissionAggregation(
 	GetHasTransactionRole(cteBuilder.(*sql_query.SelectBuilder), transactionGroupAttribute)
 	cteBuilder.GroupBy("utr.group_id")
 	builder.WithCTEBuilder("user_transaction_roles_cte", cteBuilder.(*sql_query.SelectBuilder).SQLEloquentQuery)
+	builder.Select(`utr."isManager"`, `utr."isMonitoring"`)
 
-	for _, each := range filterOptions.TransactionRole.ManageType {
-		if each == fixedasset_new_model.TransactionRoleTypeManager {
-			builder.Select(`utr."isManager"`)
-		}
-		if each == fixedasset_new_model.TransactionRoleTypeMonitoring {
-			builder.Select(`utr."isMonitoring"`)
-		}
-		// Not used for now
-		// if each == fixedasset_new_model.TransactionRoleTypeStaff {
-		// 	builder.Select(`utr."isStaff"`)
-		// }
+	joinCteKeyword := builder.LeftJoin
+	if len(filterOutEmptyRole) > 0 && filterOutEmptyRole[0] {
+		joinCteKeyword = builder.Join
 	}
 
-	builder.LeftJoin(
+	joinCteKeyword(
 		"user_transaction_roles_cte utr",
 		fmt.Sprintf("utr.group_id = %s", groupColumn),
 	)
-	builder.Where(map[string]sql_query.SQLCondition{
-		"utr.group_id": {
-			Operator: sql_query.SQLOperatorEqual,
-			Value:    groupColumn,
-			IsRef:    true,
-		},
-	})
-
-	if len(filterOutEmptyRole) > 0 {
-		builder.HavingClauses = append(builder.HavingClauses, "COUNT(utr._id) > 0")
-	}
 }
 
 func getTransactionRolePermission(
