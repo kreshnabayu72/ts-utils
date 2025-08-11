@@ -209,21 +209,15 @@ func TransactionRolePermissionAggregation(
 		// }
 	}
 
-	builder.LeftJoin(
+	joinCteKeyword := builder.LeftJoin
+	if len(filterOutEmptyRole) > 0 && filterOutEmptyRole[0] {
+		joinCteKeyword = builder.Join
+	}
+
+	joinCteKeyword(
 		"user_transaction_roles_cte utr",
 		fmt.Sprintf("utr.group_id = %s", groupColumn),
 	)
-	builder.Where(map[string]sql_query.SQLCondition{
-		"utr.group_id": {
-			Operator: sql_query.SQLOperatorEqual,
-			Value:    groupColumn,
-			IsRef:    true,
-		},
-	})
-
-	if len(filterOutEmptyRole) > 0 {
-		builder.HavingClauses = append(builder.HavingClauses, "COUNT(utr._id) > 0")
-	}
 }
 
 func getTransactionRolePermission(
