@@ -71,12 +71,38 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 			if v.Kind() != reflect.Slice || v.Len() != 2 {
 				continue // Skip if length is not 2
 			}
-			clause = fmt.Sprintf(
-				`%s %s $%d AND $%d`,
-				escapeQuoteColumns(column), each.Operator,
-				len(s.Args)+1, len(s.Args)+2,
-			)
-			s.Args = append(s.Args, v.Index(0).Interface(), v.Index(1).Interface())
+
+			firstVal := getVal(v.Index(0))
+			secondVal := getVal(v.Index(1))
+
+			// Helper to get argument index in query ($1, $2, ...)
+			argIdx := func(offset int) int {
+				return len(s.Args) - offset
+			}
+
+			// Filtering for epoch time (in query struct, this field should be []*int to support nil value in slice)
+			if each.IsEpochTime {
+				// Both values present
+				if firstVal.IsValid() && secondVal.IsValid() {
+					s.Args = append(s.Args, firstVal.Int()/1000, secondVal.Int()/1000)
+					clause = fmt.Sprintf(`%s %s to_timestamp($%d) AND to_timestamp($%d)`,
+						escapeQuoteColumns(column), each.Operator, argIdx(1), argIdx(0))
+				} else if !firstVal.IsValid() { // only second value
+					s.Args = append(s.Args, secondVal.Int()/1000)
+					clause = fmt.Sprintf(`%s %s to_timestamp($%d)`,
+						escapeQuoteColumns(column), SQLOperatorLTE, argIdx(0))
+				} else { // only first value
+					s.Args = append(s.Args, firstVal.Int()/1000)
+					clause = fmt.Sprintf(`%s %s to_timestamp($%d)`,
+						escapeQuoteColumns(column), SQLOperatorGTE, argIdx(0))
+				}
+				break
+			}
+
+			// Non-epoch case
+			s.Args = append(s.Args, firstVal.Interface(), secondVal.Interface())
+			clause = fmt.Sprintf(`%s %s $%d AND $%d`,
+				escapeQuoteColumns(column), each.Operator, argIdx(1), argIdx(0))
 
 		/* ────────────────── = ANY($n) ─────────────────── */
 		// products.user.id = ANY ($1) (array became args)
@@ -84,9 +110,7 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 			quotedColumn := escapeQuoteColumns(column)
 
 			v := reflect.ValueOf(each.Value)
-			if v.Kind() == reflect.Ptr {
-				v = v.Elem()
-			}
+			v = getVal(v)
 
 			if !v.IsValid() || (v.Kind() == reflect.Slice && v.IsNil()) {
 				continue
@@ -200,6 +224,14 @@ func (s *SQLEloquentQuery) whereOrDestination(
 		}
 		*v[0] = dest
 	}
+}
+
+// Extract values (dereference if pointer)
+func getVal(val reflect.Value) reflect.Value {
+	if val.Kind() == reflect.Ptr {
+		return val.Elem()
+	}
+	return val
 }
 
 func escapeQuoteColumns(column string) string {
