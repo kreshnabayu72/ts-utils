@@ -14,7 +14,14 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// Group filter can be "$in":[] or "$eq":"" or just empty bson.M{}
+// CheckSystemRolePermissionSQL confirms if a user has a specific permission for a given group.
+//
+// This is a direct check for a single user, a single permission, and a single group. It's
+// ideal for simple validation, like checking if the logged-in user can 'view' a dashboard.
+// The function looks for an active system role entry that matches the user's ID, the specified
+// permission key (e.g., "view"), and the role attribute (e.g., "registerAssets").
+//
+// If no matching permission is found, it returns an HTTP unauthorized error.
 func CheckSystemRolePermissionSQL(ctx *fiber.Ctx, permissionKey new_model.PermissionType, resourceTypes []new_model.SystemRoleAttribute, groupFilter sql_query.SQLCondition) *entity.HttpError {
 	// Get userId from Locals in Fiber context
 	userId, ok := ctx.Locals(middleware.UserKey).(string)
@@ -68,8 +75,34 @@ func CheckSystemRolePermissionSQL(ctx *fiber.Ctx, permissionKey new_model.Permis
 	return nil
 }
 
-// For checking system role group permisson, usually for editing or deleting data
-// Can handle multiple data with different groups
+// CheckGroupPermissionSQL verifies that a user has the required permissions for a set of records,
+// even if those records belong to different groups.
+//
+// This helper is designed for bulk operations (like updating or deleting multiple items). It's
+// critical for ensuring a user has permissions for *every single item* in the list, not just some.
+//
+// It works by joining the main data table with the user's system roles. For each record, it
+// checks if there's a corresponding active permission. If even one record lacks a valid
+// permission, the function fails, preventing partial or unauthorized updates.
+//
+// Parameters:
+//   - service: PostgreSQL service used to execute the query.
+//   - tableName: The name of the main table to check permissions against.
+//   - loggedInUser: The ID of the currently logged-in user (pointer to string).
+//   - dataFilter: Additional SQL filter conditions to apply to the query.
+//   - groupIdField: The column in the main table that maps to the group ID.
+//   - permissions: The set of permission types (e.g., view, edit, delete) the user must have.
+//   - systemRoleTypes: The system role attributes that qualify the user for the action.
+//
+// Returns:
+//   - error: Returns "Data not found" if no matching data exists, or
+//     "You have no permission" if the user lacks access to at least one record.
+//
+// Example scenario:
+//   - You have an "assets" table, where each asset belongs to a group via `assets.group_id`.
+//   - A user tries to update several assets at once.
+//   - `CheckGroupPermissionSQL` ensures the user has the correct role and update
+//     permission for every asset's group before allowing the operation.
 func CheckGroupPermissionSQL(
 	service service.PostgreSqlService,
 	tableName string,
@@ -128,8 +161,57 @@ func CheckGroupPermissionSQL(
 	return nil
 }
 
-// For checking system role group permisson, usually for editing or deleting data
-// Can handle multiple data with different groups
+// CheckTransactionRoleMultiGroupPermissionsSQL verifies that a user has the required transaction
+// roles for a set of records across multiple groups.
+//
+// This function is the transaction-specific version of `CheckGroupPermissionSQL`. It's used for
+// actions like asset transfers or approvals, where a user's role might be limited to certain
+// groups or transaction types.
+//
+// It performs a comprehensive check on all specified records, ensuring the user has the correct
+// combination of `transactionType` and `roleType` for each item. If any item is found without
+// a valid, active transaction role, the function returns an error, preventing the operation.
+//
+// Parameters:
+//   - service: The PostgreSQL service used to execute the permission check query.
+//   - tableName: Name of the target table (e.g., "assets") to check permissions against.
+//   - loggedInUser: Pointer to the ID of the currently logged-in user.
+//   - dataFilter: Additional SQL conditions applied to filter the target table rows
+//     (e.g., filter by asset IDs).
+//   - groupIdField: The name of the group ID column in the target table used for joining
+//     with the `user_transaction_role` table.
+//   - transactionType: List of allowed transaction role attributes
+//     (e.g., TransactionRoleAttributeTransfer).
+//   - roleType: List of allowed transaction role types
+//     (e.g., TransactionRoleTypeManager).
+//
+// Returns:
+//   - nil if the user has the required permission for all matching rows.
+//   - error if the user is missing the required permission or no matching data is found.
+//
+// Example:
+//
+//	Logged in user should have role attribute of "transferRole" and role type of "Manager" to be able to process assets in `assetIds`.
+//
+//	err := util_fixedasset_helper.CheckTransactionRoleMultiGroupPermissionsSQL(
+//		u.AssetService,
+//		"assets",
+//		&param.LoggedInUserId,
+//		map[string]util_sql_query.SQLCondition{
+//			"assets.id": {Operator: util_sql_query.SQLOperatorAny, Value: assetIds},
+//		},
+//		"assets.group_id",
+//		[]util_fixedasset_new_model.TransactionRoleAttribute{
+//			util_fixedasset_new_model.TransactionRoleAttributeTransfer,
+//		},
+//		[]util_fixedasset_new_model.TransactionRoleType{
+//			util_fixedasset_new_model.TransactionRoleTypeManager,
+//		},
+//	)
+//
+//	if err != nil {
+//		// Handle missing permission
+//	}
 func CheckTransactionRoleMultiGroupPermissionsSQL(
 	service service.PostgreSqlService, // service for data (assets, transactions, etc)
 	tableName string,
@@ -188,8 +270,18 @@ func CheckTransactionRoleMultiGroupPermissionsSQL(
 	return nil
 }
 
-// For checking transaction role permisson
-// Group filter is sql_query.SQLCondition so it can be bson.M{"$eq":group} or bson.M{"$in":groups}
+// CheckTransactionRolePermissionSQL confirms if a user holds a specific transaction role
+// within a designated group or set of groups.
+//
+// This is a straightforward permission check, much like `CheckSystemRolePermissionSQL`. It
+// quickly verifies if the user has an active transaction role (e.g., "transfer manager")
+// for the group(s) specified in the filter.
+//
+// **Important Note:** This helper should not be used for checking permissions on a list of
+// items that might belong to different groups. For that, use `CheckTransactionRoleMultiGroupPermissionsSQL`
+// to avoid false positives. This function will return `true` if the user has permission in
+// *any* of the groups, which can be misleading for bulk actions.
+//
 // CANNOT HANDLE INPUT ARRAY WITH POTENTIALLY DIFFERENT GROUPS FOR EACH ITEM
 // (e.g Have role in Group 1, but no role in Group 2: It will still pass)
 func CheckTransactionRolePermissionSQL(
@@ -237,6 +329,14 @@ func CheckTransactionRolePermissionSQL(
 	return nil
 }
 
+// CheckTotalControlPermissionSQL confirms if a user has "total control" access.
+//
+// This is the highest level of permission check. It doesn't use groups or roles but directly
+// queries the user's account to see if they are a designated "total control" user.
+//
+// This helper is for actions that bypass all other group-based permissions, such as
+// system-wide configuration changes or data migration. It returns an unauthorized
+// error if the user is not a total control.
 func CheckTotalControlPermissionSQL(ctx *fiber.Ctx) *entity.HttpError {
 	// Get userId from Locals in Fiber context
 	userId, ok := ctx.Locals(middleware.UserKey).(string)
