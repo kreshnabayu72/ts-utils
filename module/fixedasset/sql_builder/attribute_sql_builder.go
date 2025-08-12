@@ -3,6 +3,7 @@ package sql_builder
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
 	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
@@ -12,7 +13,7 @@ type AggregationOptions struct {
 	TableName    string // Lookup target's table
 	LocalField   string // Foreign key of main table that reference to lookup target's table
 	Alias        string // Alias for generated jsonb
-	FilterClause string // Usage example: fmt.Sprintf("%s.id is not null", options.TableName) to filter out records that doesn't match
+	FilterClause string // Usage example: fmt.Sprintf("%s.id is not null", options.TableName) to serve value as null if doesn't match
 	UseArray     bool   // Querying with jsonb_agg or jsonb_build_object based on given boolean
 	Preserve     bool   // Preserve null value
 }
@@ -75,7 +76,16 @@ func AttributesAggregationBuilder(builder *sql_query.SelectBuilder, dto any, opt
 		joinType = builder.LeftJoin
 	}
 
-	joinType(options.TableName, options.TableName+".id"+" = "+options.LocalField)
+	var tableAlias string
+
+	splitTableName := strings.Split(options.TableName, " ")
+	if len(splitTableName) > 1 {
+		tableAlias = splitTableName[1]
+	} else {
+		tableAlias = options.TableName
+	}
+
+	joinType(options.TableName, tableAlias+".id"+" = "+options.LocalField)
 
 	// Now `AttributesAggregationBuilder` implement filterclause option.
 	builder.SelectJSONAggregate(options.Alias, dto, options.FilterClause, options.UseArray)
