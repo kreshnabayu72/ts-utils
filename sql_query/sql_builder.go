@@ -17,6 +17,7 @@ func GenerateCTEOption(
 		snakeAliasName := CamelToSnake(aliasName)
 
 		cteBuilder := sourceBuilder.
+			ClearSelects().
 			Distinct(
 				fmt.Sprintf(`%s AS "value"`, labelValue),
 				labelValue,
