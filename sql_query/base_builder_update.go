@@ -395,6 +395,10 @@ func NewSQLUpdateBuilder(tableName string, alias ...string) SQLUpdateInitBuilder
 }
 
 func (s *SQLEloquentQuery) buildUpdateQuery() (string, []interface{}, error) {
+	if s.LastError != nil {
+		return "", nil, errors.New(s.LastError.Error())
+	}
+
 	if s.CustomQuery == "" {
 		return "", nil, errors.New("invalid update query: CustomQuery not set")
 	}
