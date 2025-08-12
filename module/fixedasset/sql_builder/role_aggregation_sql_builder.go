@@ -82,30 +82,30 @@ func generateUserSystemRolesBuilder(
 			},
 		)
 
-	builder.WhereOr(
-		map[string]sql_query.SQLCondition{
-			// If the system role type is 'Global', skip checking for the group_id.
-			"usr.role_type": {
-				Operator: sql_query.SQLOperatorEqual,
-				Value:    fixedasset_new_model.SystemRoleTypeGlobal,
+	roleType := fixedasset_new_model.GetSystemRoleTypeFromAttribute(roleAttribute)
+
+	if roleType == fixedasset_new_model.SystemRoleTypeGroup {
+		//System Role: Group
+		builder.Where(
+			map[string]sql_query.SQLCondition{
+				"usr.group_id": {
+					Operator: sql_query.SQLOperatorEqual,
+					Value:    groupColumn,
+					IsRef:    true,
+				},
 			},
-			"usr.group_id": {
-				Operator: sql_query.SQLOperatorEqual,
-				Value:    groupColumn,
-				IsRef:    true,
-			},
-		},
-	)
+		)
+
+		builder.Join(mainTable, "true")
+		builder.Select(fmt.Sprintf("%s.id AS id", mainTable))
+	}
 
 	builder.Select(
-		fmt.Sprintf("%s.id AS id", mainTable),
 		"usr.permission_create AS \"create\"",
 		"usr.permission_view AS \"view\"",
 		"usr.permission_update AS \"update\"",
 		"usr.permission_delete AS \"delete\"",
 	)
-
-	builder.Join(mainTable, "true")
 
 	return builder
 }
@@ -160,7 +160,14 @@ func SystemRolePermissionAggregation(
 			cteBuilder.(*sql_query.SelectBuilder).SQLEloquentQuery,
 		)
 
-		builder.LeftJoin(cteName, fmt.Sprintf("%s.id = %s.id", aliasTable, cteName))
+		roleType := fixedasset_new_model.GetSystemRoleTypeFromAttribute(roleAttribute)
+		fmt.Println("IS GROUP "+roleType == fixedasset_new_model.SystemRoleTypeGroup)
+		if roleType == fixedasset_new_model.SystemRoleTypeGroup {
+			builder.LeftJoin(cteName, fmt.Sprintf("%s.id = %s.id", aliasTable, cteName))
+		} else {
+			//dont need to filter by group.id if its global role
+			builder.LeftJoin(cteName, "TRUE")
+		}
 	}
 }
 
