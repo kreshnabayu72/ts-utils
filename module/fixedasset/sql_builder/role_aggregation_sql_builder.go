@@ -101,7 +101,7 @@ func generateUserSystemRolesBuilder(
 	roleType := fixedasset_new_model.GetSystemRoleTypeFromAttribute(roleAttribute)
 
 	if roleType == fixedasset_new_model.SystemRoleTypeGroup {
-		//System Role: Group
+		// System Role: Group
 		builder.Where(
 			map[string]sql_query.SQLCondition{
 				"usr.group_id": {
@@ -173,6 +173,11 @@ func generateUserTransactionRolesBuilder(
 // system role and then joins it back to the main query builder. This approach efficiently
 // denormalizes the user's permissions into the main query's result set.
 //
+// The join condition for the CTE is now conditional:
+// - For group-specific roles, it joins on a matching ID from the main table (`%s.id = %s.id`).
+// - For global roles, it performs a LEFT JOIN on `TRUE`, making the permissions available
+// to the main query without a group-based filter.
+//
 // Parameters:
 //   - builder: The main `sql_query.SelectBuilder` to which the CTEs and joins will be added.
 //   - loggedInUserId: The ID of the currently authenticated user.
@@ -208,7 +213,7 @@ func SystemRolePermissionAggregation(
 		if roleType == fixedasset_new_model.SystemRoleTypeGroup {
 			builder.LeftJoin(cteName, fmt.Sprintf("%s.id = %s.id", aliasTable, cteName))
 		} else {
-			//dont need to filter by group.id if its global role
+			// dont need to filter by group.id if its global role
 			builder.LeftJoin(cteName, "TRUE")
 		}
 	}
