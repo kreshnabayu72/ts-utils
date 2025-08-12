@@ -31,6 +31,26 @@ type SQLSelectChainBuilder interface {
 	//
 	//	builder.Select("u.id AS user_id", "u.name")
 	Select(columns ...string) SQLSelectChainBuilder
+
+	// USE WITH CAUTION
+	// Reset all previous appended selects
+	// Useful for this part in GenerateCTEOption
+	// cteBuilder := sourceBuilder.
+	//		ClearSelects(). -- without this the previous selects inside the source builder will get included
+	// 		Distinct(
+	// 			fmt.Sprintf(`%s AS "value"`, labelValue),
+	// 			labelValue,
+	// 		).
+	// 		Select(
+	// 			fmt.Sprintf(`%s AS "key"`, labelKey),
+	// 			fmt.Sprintf(`"%s"."id" AS "id"`, refTable),
+	// 		)
+	//
+	// Example usage:
+	//
+	//	builder.ClearSelect()
+	ClearSelects() SQLSelectChainBuilder
+
 	// SelectCaseWhen adds a CASE WHEN expression as a column.
 	//
 	// Example:
@@ -331,6 +351,11 @@ func (s *SelectBuilder) Distinct(alias string, columns ...string) SQLSelectChain
 		}
 	}
 
+	return s
+}
+
+func (s *SelectBuilder) ClearSelects() SQLSelectChainBuilder {
+	s.Columns = []string{}
 	return s
 }
 
