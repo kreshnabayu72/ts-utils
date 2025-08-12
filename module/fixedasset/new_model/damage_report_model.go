@@ -18,8 +18,9 @@ type DamageReport struct {
 	ReportSource   AssetReportSource  `json:"reportSource" column:"report_source" sql:"asset_report_source_enum NOT NULL"`
 	Notes          string             `json:"notes" column:"notes" sql:"VARCHAR"`
 
-	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	RepairedAt *time.Time `json:"repairedAt" column:"repaired_at" sql:"TIMESTAMPTZ DEFAULT NULL"`
+	CreatedAt  time.Time  `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt  time.Time  `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (d *DamageReport) TableName() string {
