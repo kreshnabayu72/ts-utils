@@ -79,7 +79,7 @@ DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'custom_field_data_type_enum') THEN
         CREATE TYPE custom_field_data_type_enum AS ENUM ('Text',
-         'Textarea','Dropdown','Multidropdown','Radio button','Checkbox',
+         'Textarea','Dropdown','MultiDropdown','Radio button','Checkbox',
          'Date','Datetime','Currency','Numeric','Phone','Percentage','Email','URL','Document');
     END IF;
 END$$;
