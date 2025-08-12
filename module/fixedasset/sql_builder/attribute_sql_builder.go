@@ -3,6 +3,7 @@ package sql_builder
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
 	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
@@ -75,7 +76,16 @@ func AttributesAggregationBuilder(builder *sql_query.SelectBuilder, dto any, opt
 		joinType = builder.LeftJoin
 	}
 
-	joinType(options.TableName, options.TableName+".id"+" = "+options.LocalField)
+	var tableAlias string
+
+	splitTableName := strings.Split(options.TableName, " ")
+	if len(splitTableName) > 1 {
+		tableAlias = splitTableName[1]
+	} else {
+		tableAlias = options.TableName
+	}
+
+	joinType(options.TableName, tableAlias+".id"+" = "+options.LocalField)
 
 	// Now `AttributesAggregationBuilder` implement filterclause option.
 	builder.SelectJSONAggregate(options.Alias, dto, options.FilterClause, options.UseArray)
