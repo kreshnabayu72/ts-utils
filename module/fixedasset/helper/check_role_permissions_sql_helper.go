@@ -61,7 +61,7 @@ func CheckSystemRolePermissionSQL(ctx *fiber.Ctx, permissionKey new_model.Permis
 		}
 
 		// Check for matching documents where the resource type is in the given array
-		count, err := service.CountWithFilter(ctx.Context(), filter)
+		count, err := service.CountWithFilter(ctx.Context(), db.UserSystemRoleTableName, filter)
 		if err != nil {
 			return entity.InternalServerError(err.Error())
 		}
@@ -317,7 +317,7 @@ func CheckTransactionRolePermissionSQL(
 		"group_id": groupIdFilter,
 	}
 
-	count, err := service.CountWithFilter(ctx.Context(), filter)
+	count, err := service.CountWithFilter(ctx.Context(), db.UserTransactionRoleTableName, filter)
 	if err != nil {
 		return entity.InternalServerError(err.Error())
 	}
@@ -364,7 +364,7 @@ func CheckTotalControlPermissionSQL(ctx *fiber.Ctx) *entity.HttpError {
 		},
 	}
 
-	count, err := service.CountWithFilter(ctx.Context(), filter)
+	count, err := service.CountWithFilter(ctx.Context(), db.UserTableName, filter)
 	if err != nil {
 		return entity.InternalServerError(err.Error())
 	}
