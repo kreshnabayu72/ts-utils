@@ -361,21 +361,23 @@ func GenerateArrayFilter[T comparable](filter *[]T) SQLCondition {
 	}
 }
 
-func PaginationQuery(mainQuery, limitation string) string {
+func PaginationQuery(withQuery, mainQuery, filteredDataQuery, paginatedDataQuery, paginatedCountQuery string) string {
+	cleanWithQuery := strings.TrimPrefix(strings.TrimSpace(withQuery), "WITH")
+	if cleanWithQuery != "" {
+		cleanWithQuery = cleanWithQuery + ","
+	}
+
 	paginationQuery := fmt.Sprintf(`
 		WITH
-			main AS (%s),
-			paginated AS (
-				SELECT * FROM main
-				%s
-			),
-			total AS (
-				SELECT COUNT(*) FROM main
-			)
+			%s
+			filtered_ids AS (%s),
+			paginated_ids AS (%s),
+			total_query AS (%s),
+			data_query AS (%s)
 		SELECT
-			COALESCE((SELECT jsonb_agg(paginated) FROM paginated), '[]') AS data,
-			(SELECT COUNT FROM total) AS totalRecords;
-	`, mainQuery, limitation)
+			COALESCE((SELECT jsonb_agg(data_query) FROM data_query), '[]') AS data,
+			(SELECT COUNT FROM total_query) AS totalRecords;
+	`, cleanWithQuery, filteredDataQuery, paginatedDataQuery, paginatedCountQuery, mainQuery)
 
 	return paginationQuery
 }

@@ -737,30 +737,42 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 		s.Columns = []string{"*"}
 	}
 
-	var sb strings.Builder
-	sb.Grow(256) // preallocate ~256 bytes
+	var withSb strings.Builder
+	var selectSb strings.Builder
+	var joinSb strings.Builder
+	var whereSb strings.Builder
+	var groupSb strings.Builder
+	var orderSb strings.Builder
+	var havingSb strings.Builder
+	withSb.Grow(256)   // preallocate ~256 bytes
+	selectSb.Grow(256) // preallocate ~256 bytes
+	joinSb.Grow(256)   // preallocate ~256 bytes
+	whereSb.Grow(256)  // preallocate ~256 bytes
+	groupSb.Grow(256)  // preallocate ~256 bytes
+	orderSb.Grow(256)  // preallocate ~256 bytes
+	havingSb.Grow(256) // preallocate ~256 bytes
 
 	// WITH
 	if len(s.WithClauses) > 0 {
-		sb.WriteByte('\n')
-		sb.WriteString("WITH ")
+		withSb.WriteByte('\n')
+		withSb.WriteString("WITH ")
 		for i, c := range s.WithClauses {
 			if i > 0 {
-				sb.WriteString(", ")
+				withSb.WriteString(", ")
 			}
-			sb.WriteString(c)
+			withSb.WriteString(c)
 		}
 	}
 
 	// WITH RECURSIVE
 	if len(s.WithRecursiveClauses) > 0 {
-		sb.WriteByte('\n')
-		sb.WriteString("WITH RECURSIVE ")
+		withSb.WriteByte('\n')
+		withSb.WriteString("WITH RECURSIVE ")
 		for i, c := range s.WithRecursiveClauses {
 			if i > 0 {
-				sb.WriteString(", ")
+				withSb.WriteString(", ")
 			}
-			sb.WriteString(c)
+			withSb.WriteString(c)
 		}
 	}
 
@@ -789,86 +801,83 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 	// SELECT
 	// Dont need to use default select if using union All, since union typically uses SELECT inside of it
 	if !s.useUnionAll {
-		sb.WriteByte('\n')
-		sb.WriteString("SELECT ")
+		selectSb.WriteByte('\n')
+		selectSb.WriteString("SELECT ")
 		for i, col := range s.Columns {
 			if i > 0 {
-				sb.WriteByte(',')
+				selectSb.WriteByte(',')
 			}
-			sb.WriteString(col)
+			selectSb.WriteString(col)
 		}
-		sb.WriteByte('\n')
-		sb.WriteString("FROM ")
-		sb.WriteString(s.Table)
-		sb.WriteByte('\n')
+		selectSb.WriteByte('\n')
+		selectSb.WriteString("FROM ")
+		selectSb.WriteString(s.Table)
+		selectSb.WriteByte('\n')
+	} else if len(s.UnionAllQueries) > 0 { // UNION ALL
+		for i, u := range s.UnionAllQueries {
+			if i > 0 {
+				selectSb.WriteString("UNION ALL")
+				selectSb.WriteByte('\n')
+			}
+			selectSb.WriteString(u)
+		}
+		selectSb.WriteByte('\n')
 	}
 
 	// JOIN
 	if len(s.OtherTables) > 0 {
 		for _, j := range s.OtherTables {
-			sb.WriteString(j)
-			sb.WriteByte('\n')
+			joinSb.WriteString(j)
+			joinSb.WriteByte('\n')
 		}
 	}
 
 	// WHERE
 	if len(s.Filters) > 0 {
-		sb.WriteString("WHERE ")
+		whereSb.WriteString("WHERE ")
 		for i, f := range s.Filters {
 			if i > 0 {
-				sb.WriteString(" AND ")
+				whereSb.WriteString(" AND ")
 			}
-			sb.WriteString(f)
+			whereSb.WriteString(f)
 		}
-		sb.WriteByte('\n')
+		whereSb.WriteByte('\n')
 	}
 
 	// GROUP BY
 	if len(s.Grouping) > 0 {
-		sb.WriteString("GROUP BY ")
+		groupSb.WriteString("GROUP BY ")
 		for i, g := range s.Grouping {
 			if i > 0 {
-				sb.WriteString(", ")
+				groupSb.WriteString(", ")
 			}
-			sb.WriteString(g)
+			groupSb.WriteString(g)
 		}
-		sb.WriteByte('\n')
-	}
-
-	// UNION ALL
-	if len(s.UnionAllQueries) > 0 {
-		for i, u := range s.UnionAllQueries {
-			if i > 0 {
-				sb.WriteString("UNION ALL")
-				sb.WriteByte('\n')
-			}
-			sb.WriteString(u)
-		}
-		sb.WriteByte('\n')
+		groupSb.WriteByte('\n')
 	}
 
 	// HAVING
 	if len(s.HavingClauses) > 0 {
-		sb.WriteString("HAVING ")
+		havingSb.WriteString("HAVING ")
 		for i, h := range s.HavingClauses {
 			if i > 0 {
-				sb.WriteString(" AND ")
+				havingSb.WriteString(" AND ")
 			}
-			sb.WriteString(h)
+			havingSb.WriteString(h)
 		}
-		sb.WriteByte('\n')
+		havingSb.WriteByte('\n')
 	}
 
 	// ORDER BY
 	if len(s.SortBy) > 0 {
-		sb.WriteString("ORDER BY ")
+		orderSb.WriteString("ORDER BY ")
 		for i, srt := range s.SortBy {
 			if i > 0 {
-				sb.WriteString(", ")
+				orderSb.WriteString(", ")
 			}
-			sb.WriteString(srt)
+			orderSb.WriteString(srt)
 		}
-		sb.WriteByte('\n')
+		orderSb.WriteByte('\n')
 	}
 
 	// LIMIT/OFFSET
@@ -883,10 +892,21 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 		limitationSb.WriteString(strconv.Itoa(s.Offset))
 		limitationSb.WriteByte('\n')
 
-		return PaginationQuery(sb.String(), limitationSb.String()), s.Args, nil
+		splittedTableName := strings.Split(s.Table, " ")
+		prefix := splittedTableName[0]
+		if len(splittedTableName) > 1 {
+			prefix = splittedTableName[1]
+		}
+
+		mainQuery := selectSb.String() + joinSb.String() + fmt.Sprintf("JOIN paginated_ids ON paginated_ids.id = %s.id\n", prefix) + groupSb.String() + havingSb.String()
+		filteredData := fmt.Sprintf("SELECT %s.id as id from %s\n", prefix, s.Table) + joinSb.String() + whereSb.String() + groupSb.String() + havingSb.String() + orderSb.String()
+		paginatedDataQuery := "SELECT id as id from filtered_ids\n" + limitationSb.String()
+		paginatedCountQuery := "SELECT COUNT(id) from filtered_ids\n"
+		return PaginationQuery(withSb.String(), mainQuery, filteredData, paginatedDataQuery, paginatedCountQuery), s.Args, nil
 	}
 
-	return sb.String(), s.Args, nil
+	query := withSb.String() + selectSb.String() + joinSb.String() + whereSb.String() + groupSb.String() + havingSb.String() + orderSb.String()
+	return query, s.Args, nil
 }
 
 // Internal Utils for builder select
