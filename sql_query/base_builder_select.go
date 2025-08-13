@@ -737,7 +737,189 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 		s.Columns = []string{"*"}
 	}
 
+	var withSb strings.Builder
+	var selectSb strings.Builder
+	var joinSb strings.Builder
+	var whereSb strings.Builder
+	var groupSb strings.Builder
+	var orderSb strings.Builder
+	var havingSb strings.Builder
+	withSb.Grow(256)   // preallocate ~256 bytes
+	selectSb.Grow(256) // preallocate ~256 bytes
+	joinSb.Grow(256)   // preallocate ~256 bytes
+	whereSb.Grow(256)  // preallocate ~256 bytes
+	groupSb.Grow(256)  // preallocate ~256 bytes
+	orderSb.Grow(256)  // preallocate ~256 bytes
+	havingSb.Grow(256) // preallocate ~256 bytes
+
+	// WITH
+	if len(s.WithClauses) > 0 {
+		withSb.WriteByte('\n')
+		withSb.WriteString("WITH ")
+		for i, c := range s.WithClauses {
+			if i > 0 {
+				withSb.WriteString(", ")
+			}
+			withSb.WriteString(c)
+		}
+	}
+
+	// WITH RECURSIVE
+	if len(s.WithRecursiveClauses) > 0 {
+		withSb.WriteByte('\n')
+		withSb.WriteString("WITH RECURSIVE ")
+		for i, c := range s.WithRecursiveClauses {
+			if i > 0 {
+				withSb.WriteString(", ")
+			}
+			withSb.WriteString(c)
+		}
+	}
+
+	// DISTINCT
+	var db strings.Builder
+	if len(s.DistinctBy) > 0 {
+		db.WriteString("DISTINCT ON ")
+		db.WriteString("(")
+		for i, d := range s.DistinctBy {
+			if i > 0 {
+				db.WriteString(",")
+			}
+			db.WriteString(d)
+		}
+		db.WriteString(")")
+		db.WriteString(" " + s.DistinctAlias)
+
+		tmp := make([]string, len(s.Columns))
+
+		// Prepend distinct to the column clause.
+		copy(tmp, s.Columns)
+		s.Columns = []string{db.String()}
+		s.Columns = append(s.Columns, tmp...)
+	}
+
+	// SELECT
+	// Dont need to use default select if using union All, since union typically uses SELECT inside of it
+	if !s.useUnionAll {
+		selectSb.WriteByte('\n')
+		selectSb.WriteString("SELECT ")
+		for i, col := range s.Columns {
+			if i > 0 {
+				selectSb.WriteByte(',')
+			}
+			selectSb.WriteString(col)
+		}
+		selectSb.WriteByte('\n')
+		selectSb.WriteString("FROM ")
+		selectSb.WriteString(s.Table)
+		selectSb.WriteByte('\n')
+	} else if len(s.UnionAllQueries) > 0 { // UNION ALL
+		for i, u := range s.UnionAllQueries {
+			if i > 0 {
+				selectSb.WriteString("UNION ALL")
+				selectSb.WriteByte('\n')
+			}
+			selectSb.WriteString(u)
+		}
+		selectSb.WriteByte('\n')
+	}
+
+	// JOIN
+	if len(s.OtherTables) > 0 {
+		for _, j := range s.OtherTables {
+			joinSb.WriteString(j)
+			joinSb.WriteByte('\n')
+		}
+	}
+
+	// WHERE
+	if len(s.Filters) > 0 {
+		whereSb.WriteString("WHERE ")
+		for i, f := range s.Filters {
+			if i > 0 {
+				whereSb.WriteString(" AND ")
+			}
+			whereSb.WriteString(f)
+		}
+		whereSb.WriteByte('\n')
+	}
+
+	// GROUP BY
+	if len(s.Grouping) > 0 {
+		groupSb.WriteString("GROUP BY ")
+		for i, g := range s.Grouping {
+			if i > 0 {
+				groupSb.WriteString(", ")
+			}
+			groupSb.WriteString(g)
+		}
+		groupSb.WriteByte('\n')
+	}
+
+	// HAVING
+	if len(s.HavingClauses) > 0 {
+		havingSb.WriteString("HAVING ")
+		for i, h := range s.HavingClauses {
+			if i > 0 {
+				havingSb.WriteString(" AND ")
+			}
+			havingSb.WriteString(h)
+		}
+		havingSb.WriteByte('\n')
+	}
+
+	// ORDER BY
+	if len(s.SortBy) > 0 {
+		orderSb.WriteString("ORDER BY ")
+		for i, srt := range s.SortBy {
+			if i > 0 {
+				orderSb.WriteString(", ")
+			}
+			orderSb.WriteString(srt)
+		}
+		orderSb.WriteByte('\n')
+	}
+
+	// LIMIT/OFFSET
+	if s.UsePagination {
+		var limitationSb strings.Builder
+		if s.Limit > 0 {
+			limitationSb.WriteString("LIMIT ")
+			limitationSb.WriteString(strconv.Itoa(s.Limit))
+			limitationSb.WriteByte(' ')
+		}
+		limitationSb.WriteString("OFFSET ")
+		limitationSb.WriteString(strconv.Itoa(s.Offset))
+		limitationSb.WriteByte('\n')
+
+		splittedTableName := strings.Split(s.Table, " ")
+		prefix := splittedTableName[0]
+		if len(splittedTableName) > 1 {
+			prefix = splittedTableName[1]
+		}
+
+		mainQuery := selectSb.String() + joinSb.String() + fmt.Sprintf("JOIN paginated_ids ON paginated_ids.id = %s.id\n", prefix) + groupSb.String() + havingSb.String()
+		filteredData := fmt.Sprintf("SELECT %s.id as id from %s\n", prefix, s.Table) + joinSb.String() + whereSb.String() + groupSb.String() + havingSb.String() + orderSb.String()
+		paginatedDataQuery := "SELECT id as id from filtered_ids\n" + limitationSb.String()
+		paginatedCountQuery := "SELECT COUNT(id) from filtered_ids\n"
+		return PaginationQuery(withSb.String(), mainQuery, filteredData, paginatedDataQuery, paginatedCountQuery), s.Args, nil
+	}
+
+	query := withSb.String() + selectSb.String() + joinSb.String() + whereSb.String() + groupSb.String() + havingSb.String() + orderSb.String()
+	return query, s.Args, nil
+}
+
+func (s *SQLEloquentQuery) buildSelectQuery_old() (string, []interface{}, error) {
+	if len(s.HavingClauses) > 0 && len(s.Grouping) == 0 {
+		return "", nil, errors.New("HAVING clauses only allowed if GROUP BY clause is exists")
+	}
+
+	if len(s.Columns) == 0 {
+		s.Columns = []string{"*"}
+	}
+
 	var sb strings.Builder
+	var countQuery string
 	sb.Grow(256) // preallocate ~256 bytes
 
 	// WITH
@@ -859,6 +1041,8 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 		sb.WriteByte('\n')
 	}
 
+	countQuery = sb.String()
+
 	// ORDER BY
 	if len(s.SortBy) > 0 {
 		sb.WriteString("ORDER BY ")
@@ -873,17 +1057,16 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 
 	// LIMIT/OFFSET
 	if s.UsePagination {
-		var limitationSb strings.Builder
 		if s.Limit > 0 {
-			limitationSb.WriteString("LIMIT ")
-			limitationSb.WriteString(strconv.Itoa(s.Limit))
-			limitationSb.WriteByte(' ')
+			sb.WriteString("LIMIT ")
+			sb.WriteString(strconv.Itoa(s.Limit))
+			sb.WriteByte(' ')
 		}
-		limitationSb.WriteString("OFFSET ")
-		limitationSb.WriteString(strconv.Itoa(s.Offset))
-		limitationSb.WriteByte('\n')
+		sb.WriteString("OFFSET ")
+		sb.WriteString(strconv.Itoa(s.Offset))
+		sb.WriteByte('\n')
 
-		return PaginationQuery(sb.String(), limitationSb.String()), s.Args, nil
+		return PaginationQuery_old(sb.String(), countQuery), s.Args, nil
 	}
 
 	return sb.String(), s.Args, nil
