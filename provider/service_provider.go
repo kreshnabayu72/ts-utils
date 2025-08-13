@@ -41,14 +41,7 @@ func (m *MockServiceProvider) MakeService(
 
 func (m *MockServiceProvider) MakePostgreSqlService(
 	dbName db.DBName,
-	tableName ...string,
 ) service.PostgreSqlService {
-	var args mock.Arguments
-
-	if len(tableName) > 0 {
-		args = m.Called(dbName, tableName)
-	} else {
-		args = m.Called(dbName)
-	}
+	args := m.Called(dbName)
 	return args.Get(0).(service.PostgreSqlService)
 }
