@@ -24,19 +24,22 @@ type Asset struct {
 	PreviousStatus   *string           `json:"previousStatus"     column:"previous_status"    sql:"asset_status_enum NOT NULL"`
 
 	// ─────── References ───────
-	GroupID        int  `json:"groupId"        column:"group_id" sql:"BIGINT"`
-	ModelID        int  `json:"modelId"        column:"model_id" sql:"BIGINT"`
-	AssignedToID   *int `json:"assignedToId"   column:"assigned_to_id" sql:"BIGINT"`
-	BorrowerID     *int `json:"borrowerId"     column:"borrower_id" sql:"BIGINT"`
-	LastModifiedID *int `json:"lastModifiedId" column:"last_modified_id" sql:"BIGINT"`
-	ParentID       *int `json:"parentId"       column:"parent_id" sql:"BIGINT"`
+	GroupID        int  `json:"groupId"             column:"group_id" sql:"BIGINT"`
+	ModelID        int  `json:"modelId"             column:"model_id" sql:"BIGINT"`
+	AssignedToID   *int `json:"assignedToId"        column:"assigned_to_id" sql:"BIGINT"`
+	BorrowerID     *int `json:"borrowerId"          column:"borrower_id" sql:"BIGINT"`
+	LastModifiedID *int `json:"lastModifiedId"      column:"last_modified_id" sql:"BIGINT"`
+	ParentID       *int `json:"parentId"            column:"parent_id" sql:"BIGINT"`
+	// For future reference, this is used for the basic version.
+	// Basic version bypass the creation of depreciation group through asset name, so we set it immediately to the asset.
+	DepreciationGroupID *int `json:"depreciationGroupId" column:"depreciation_group_id" sql:"BIGINT"`
 
 	// ─────── Purchase Info ───────
-	PurchaseDate           *time.Time `json:"purchaseDate"            column:"purchase_date" sql:"TIMESTAMPTZ"`
-	PurchaseCost           *float64   `json:"purchaseCost"            column:"purchase_cost" sql:"FLOAT"`
-	PurchaseCurrency       *string    `json:"purchaseCurrency"        column:"purchase_currency" sql:"VARCHAR"`
+	PurchaseDate           *time.Time `json:"purchaseDate"             column:"purchase_date" sql:"TIMESTAMPTZ"`
+	PurchaseCost           *float64   `json:"purchaseCost"             column:"purchase_cost" sql:"FLOAT"`
+	PurchaseCurrency       *string    `json:"purchaseCurrency"         column:"purchase_currency" sql:"VARCHAR"`
 	PurchaseWarrantyYears  *int       `json:"purchaseWarrantyDuration" column:"purchase_warranty_duration" sql:"INTEGER"`
-	PurchaseCurrencySymbol *string    `json:"purchaseCurrencySymbol"  column:"purchase_currency_symbol" sql:"VARCHAR"`
+	PurchaseCurrencySymbol *string    `json:"purchaseCurrencySymbol"   column:"purchase_currency_symbol" sql:"VARCHAR"`
 
 	// ─────── Metadata ───────
 	IsDeleted     bool       `json:"isDeleted"      column:"is_deleted" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
