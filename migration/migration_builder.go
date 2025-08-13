@@ -3,6 +3,7 @@ package migration
 import (
 	"fmt"
 	"reflect"
+	"strings"
 )
 
 type enum struct {
@@ -41,6 +42,11 @@ func (b *MigrationBuilder) AddColumn(dest any) {
 		field := t.Elem().Field(i)
 		tag := field.Tag.Get("sql")
 		columnName := field.Tag.Get("column")
+		if strings.Contains(columnName, ".") {
+			parts := strings.Split(columnName, ".")
+			len := len(parts)
+			columnName = parts[len-1] // Use the last part as the column name
+		}
 		if tag != "" {
 			query := fmt.Sprintf("\"%s\"", columnName) + " " + tag
 			b.columns = append(b.columns, query)
