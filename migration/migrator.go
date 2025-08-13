@@ -238,6 +238,7 @@ func (m *Migrator) Exec(dbName, query string) error {
 
 	_, err = pool.Exec(context.Background(), query)
 	if err != nil {
+		log.Println(query)
 		return fmt.Errorf("failed to execute query: %w", err)
 	}
 
