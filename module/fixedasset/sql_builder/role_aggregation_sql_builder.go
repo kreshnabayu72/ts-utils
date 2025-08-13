@@ -78,7 +78,7 @@ func generateUserSystemRolesBuilder(
 	loggedInUserId int,
 	roleAttribute fixedasset_new_model.SystemRoleAttribute,
 ) sql_query.SQLSelectChainBuilder {
-	builder := sql_query.NewSQLSelectBuilder[UserSystemRole]("user_system_roles usr").
+	builder := sql_query.NewSQLSelectBuilder[any]("user_system_roles usr").
 		Where(
 			map[string]sql_query.SQLCondition{
 				"usr.user_id": {
