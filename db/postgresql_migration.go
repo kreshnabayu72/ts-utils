@@ -204,6 +204,7 @@ func migrateFixedAssetDB(dbName string, migrator *migration.Migrator) error {
 	}
 
 	err = migrator.MigrateModels(dbName, models...)
+	log.Println("Migrate model error:", err)
 
 	viewQueryPath := filepath.Join(baseDir, "migration/fixed_asset_view.sql")
 	err = migrator.ExecFile(dbName, viewQueryPath)
