@@ -110,7 +110,6 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationToTransactionRolesSQL(
 ) *entity.HttpError {
 	userTransactionRoleService := serviceProvider.MakePostgreSqlService(
 		db.FixedAssetDBName.CompanyDBName(companyCode),
-		db.UserTransactionRoleTableName,
 	)
 
 	builder := sql_query.NewSQLSelectBuilder[util_fixedasset_new_model.UserTransactionRole](db.UserTransactionRoleTableName)
@@ -164,7 +163,6 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationToSystemRolesSQL(
 ) *entity.HttpError {
 	userSystemRoleService := serviceProvider.MakePostgreSqlService(
 		db.FixedAssetDBName.CompanyDBName(companyCode),
-		db.UserSystemRoleTableName,
 	)
 
 	query, args, _ := sql_query.NewSQLSelectBuilder[util_fixedasset_new_model.UserSystemRole](db.UserSystemRoleTableName).
@@ -218,7 +216,6 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationToUsersSQL(
 	}
 	userService := serviceProvider.MakePostgreSqlService(
 		db.FixedAssetDBName.CompanyDBName(companyCode),
-		db.UserTableName,
 	)
 
 	query, args, _ := sql_query.NewSQLSelectBuilder[util_fixedasset_new_model.User](db.UserTableName).

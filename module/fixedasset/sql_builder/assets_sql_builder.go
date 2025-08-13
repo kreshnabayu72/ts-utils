@@ -93,10 +93,12 @@ func CommonGetAssetListBuilder(excludeFields ...string) *sql_query.SelectBuilder
 	return assetBuilder
 }
 
+// Ex-dummy experiment
 func GetAllAssetsBuilder(filters map[string]sql_query.SQLCondition) (string, []interface{}, error) {
 	return CommonGetAssetListBuilder().Where(filters).Build()
 }
 
+// Ex-dummy experiment
 func GetAllAssetsWithRoleBuilder(filters map[string]sql_query.SQLCondition) (string, []interface{}, error) {
 	commonBuilder := CommonGetAssetListBuilder()
 	TransactionRolePermissionAggregation(

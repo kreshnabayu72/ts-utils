@@ -64,12 +64,34 @@ type Group struct {
 // AttributesAggregationBuilder joins a related table and builds a JSON
 // aggregation for it.
 //
-// If Preserve is true → uses LEFT JOIN (keeps unmatched rows).
-// If UseArray is false → automatically GROUP BY <table>.id so the JSON
-// represents a single object instead of an array.
+// This helper simplifies the process of including data from a related table
+// directly as a JSON object or array within your main query results. It handles
+// the SQL join and JSON aggregation logic automatically, so you don't have to
+// write it manually.
 //
-// Handy for quickly pulling related data into one field without manually
-// writing joins, JSON aggregation, or group by logic.
+//   - If `Preserve` is true, it uses a `LEFT JOIN` to keep all rows from the
+//     main table, even if there's no match in the related table.
+//   - If `UseArray` is false, it automatically groups the results to return
+//     the related data as a single JSON object rather than a list.
+//
+// This is perfect for quickly enriching a query with sub-documents, like
+// fetching a user's address or a product's category in one go.
+//
+// Example:
+//
+//	// Assuming 'assetBuilder' is an instance of sql_query.SelectBuilder for the 'assets' table.
+//	// This will join the 'models' table and include the model data as a JSON object
+//	// named 'model' in the final asset result.
+//	AttributesAggregationBuilder(assetBuilder, Model{}, AggregationOptions{
+//	    TableName:  "models",
+//	    LocalField: "a.model_id",
+//	    Alias:      "model",
+//	    UseArray:   false,
+//	    Preserve:   true,
+//	})
+//
+// In this example, the final result for each asset will contain a `model` field
+// with a JSON representation of the corresponding row from the `models` table.
 func AttributesAggregationBuilder(builder *sql_query.SelectBuilder, dto any, options AggregationOptions) {
 	joinType := builder.Join
 	if options.Preserve {

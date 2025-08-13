@@ -9,7 +9,16 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// Not filtered by group
+// GlobalSystemRoleRestrictionSQL creates a middleware that restricts access based on a user's
+// system role permissions, regardless of which group they belong to (which means global system role).
+//
+// This is used for routes where a user only needs to have a specific permission *somewhere*
+// in the system, not tied to a particular group context. It checks for a user's
+// permission (e.g., "edit") and role attribute (e.g., "assetAttribute") without
+// filtering by a specific group ID. If the user has a matching permission in any group,
+// they are granted access.
+//
+// Use this for global actions or routes that display information not specific to a single group.
 func GlobalSystemRoleRestrictionSQL(permission new_model.PermissionType, resourceTypes []new_model.SystemRoleAttribute) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		isTest := c.Locals(middleware.IsTest)
@@ -31,6 +40,15 @@ func GlobalSystemRoleRestrictionSQL(permission new_model.PermissionType, resourc
 }
 
 // Check user data, totalControl.isAssigned & totalControl.isActive
+// TotalControlRoleRestrictionSQL creates a middleware that grants access only to users with
+// "total control" administrative privileges.
+//
+// This is the highest level of access control. It's intended for routes that handle
+// system-wide settings, sensitive data, or critical administrative functions that should
+// bypass all other group-based permissions. It directly checks the user's account for
+// the "total control" flags.
+//
+// Only use this for routes where a user must have full, unrestricted access.
 func TotalControlRoleRestrictionSQL() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		isTest := c.Locals(middleware.IsTest)
@@ -49,7 +67,15 @@ func TotalControlRoleRestrictionSQL() fiber.Handler {
 	}
 }
 
-// Not filtered by group
+// TransactionRoleRestrictionSQL creates a middleware that checks for a user's transaction
+// role permissions, ignoring group filters.
+//
+// This is similar to `GlobalSystemRoleRestrictionSQL` but for transaction-specific roles. It's
+// useful for routes where the user needs a certain transaction role (e.g., a "manager" role for
+// "transfer" transactions) in any group they belong to. The check is passed if an active
+// transaction role is found that matches the provided types and attributes.
+//
+// This helper assumes that the action itself is not group-specific.
 func TransactionRoleRestrictionSQL(roleTypes []new_model.TransactionRoleType, transactionAttributes []new_model.TransactionRoleAttribute) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		isTest := c.Locals(middleware.IsTest)
@@ -70,7 +96,16 @@ func TransactionRoleRestrictionSQL(roleTypes []new_model.TransactionRoleType, tr
 	}
 }
 
-// Not filtered by group
+// AssetListRoleRestrictionSQL creates a middleware to determine if a user has any permission
+// to view assets.
+//
+// This middleware is a combination of both system and transaction role checks. It grants
+// access if the user has **either** a view-related system role permission or any of the
+// listed transaction-based permissions. This is designed for routes that display a list of
+// assets, as a user might be authorized to see assets for a variety of reasons (e.g.,
+// being a 'Manager' for 'borrowingRole' or having a 'view' system permission for 'registerAsset').
+//
+// The check succeeds if at least one of the two permission checks passes.
 func AssetListRoleRestrictionSQL() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		isTest := c.Locals(middleware.IsTest)
