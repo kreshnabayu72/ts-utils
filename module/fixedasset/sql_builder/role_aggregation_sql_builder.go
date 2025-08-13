@@ -76,8 +76,6 @@ func ToSnakeCase(s string) string {
 // executed or used as a Common Table Expression (CTE).
 func generateUserSystemRolesBuilder(
 	loggedInUserId int,
-	groupColumn string,
-	mainTable string,
 	roleAttribute fixedasset_new_model.SystemRoleAttribute,
 ) sql_query.SQLSelectChainBuilder {
 	builder := sql_query.NewSQLSelectBuilder[UserSystemRole]("user_system_roles usr").
@@ -98,30 +96,15 @@ func generateUserSystemRolesBuilder(
 			},
 		)
 
-	roleType := fixedasset_new_model.GetSystemRoleTypeFromAttribute(roleAttribute)
-
-	if roleType == fixedasset_new_model.SystemRoleTypeGroup {
-		// System Role: Group
-		builder.Where(
-			map[string]sql_query.SQLCondition{
-				"usr.group_id": {
-					Operator: sql_query.SQLOperatorEqual,
-					Value:    groupColumn,
-					IsRef:    true,
-				},
-			},
-		)
-
-		builder.Join(mainTable, "true")
-		builder.Select(fmt.Sprintf("%s.id AS id", mainTable))
-	}
-
 	builder.Select(
-		"usr.permission_create AS \"create\"",
-		"usr.permission_view AS \"view\"",
-		"usr.permission_update AS \"update\"",
-		"usr.permission_delete AS \"delete\"",
+		"usr.group_id",
+		"bool_or(usr.permission_create) AS \"create\"",
+		"bool_or(usr.permission_view)   AS \"view\"",
+		"bool_or(usr.permission_update) AS \"update\"",
+		"bool_or(usr.permission_delete) AS \"delete\"",
 	)
+
+	builder.GroupBy("usr.group_id")
 
 	return builder
 }
@@ -198,8 +181,6 @@ func SystemRolePermissionAggregation(
 
 		cteBuilder := generateUserSystemRolesBuilder(
 			loggedInUserId,
-			groupColumn,
-			mainTable,
 			roleAttribute,
 		)
 
@@ -209,9 +190,8 @@ func SystemRolePermissionAggregation(
 		)
 
 		roleType := fixedasset_new_model.GetSystemRoleTypeFromAttribute(roleAttribute)
-		fmt.Println("IS GROUP "+roleType == fixedasset_new_model.SystemRoleTypeGroup)
 		if roleType == fixedasset_new_model.SystemRoleTypeGroup {
-			builder.LeftJoin(cteName, fmt.Sprintf("%s.id = %s.id", aliasTable, cteName))
+			builder.LeftJoin(cteName, fmt.Sprintf("%s.group_id = %s.group_id", aliasTable, cteName))
 		} else {
 			// dont need to filter by group.id if its global role
 			builder.LeftJoin(cteName, "TRUE")
