@@ -259,10 +259,7 @@ type BasePostgreSqlService struct {
 }
 
 // MakePostgreSqlService creates a new PostgreSqlService instance.
-//
-// Deprecated: The `tableName` parameter is no longer used and has no effect.
-// It will be removed in a future version.
-func MakePostgreSqlService(dbName db.DBName, tableName ...string) PostgreSqlService {
+func MakePostgreSqlService(dbName db.DBName) PostgreSqlService {
 	pool := db.ConnectPostgres(dbName)
 
 	return &BasePostgreSqlService{Pool: pool}

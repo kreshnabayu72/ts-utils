@@ -33,7 +33,7 @@ func CheckSystemRolePermissionSQL(ctx *fiber.Ctx, permissionKey new_model.Permis
 	companyCode := ctx.Locals(middleware.CompanyCodeKey).(string)
 
 	fixedAssetDbName := db.FixedAssetDBName.CompanyDBName(companyCode)
-	service := service.MakePostgreSqlService(fixedAssetDbName, db.UserSystemRoleTableName)
+	service := service.MakePostgreSqlService(fixedAssetDbName)
 
 	// Convert resourceTypes to a slice of strings
 	resourceTypeStrs := make([]string, len(resourceTypes))
@@ -299,7 +299,7 @@ func CheckTransactionRolePermissionSQL(
 	companyCode := ctx.Locals(middleware.CompanyCodeKey).(string)
 
 	fixedAssetDbName := db.FixedAssetDBName.CompanyDBName(companyCode)
-	service := service.MakePostgreSqlService(fixedAssetDbName, db.UserTransactionRoleTableName)
+	service := service.MakePostgreSqlService(fixedAssetDbName)
 
 	filter := map[string]sql_query.SQLCondition{
 		"user_id": {
@@ -347,7 +347,7 @@ func CheckTotalControlPermissionSQL(ctx *fiber.Ctx) *entity.HttpError {
 	companyCode := ctx.Locals(middleware.CompanyCodeKey).(string)
 
 	fixedAssetDbName := db.FixedAssetDBName.CompanyDBName(companyCode)
-	service := service.MakePostgreSqlService(fixedAssetDbName, db.UserTableName)
+	service := service.MakePostgreSqlService(fixedAssetDbName)
 
 	filter := map[string]sql_query.SQLCondition{
 		"id": {
