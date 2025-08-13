@@ -41,7 +41,7 @@ func GetLicensePlanSQL() fiber.Handler {
 
 		company := ctx.Locals(Company).(string)
 
-		companyService := service.MakePostgreSqlService(db.AdminDBName, db.ClientTableName)
+		companyService := service.MakePostgreSqlService(db.AdminDBName)
 
 		query, args, err := sql_query.NewSQLSelectBuilder[dto.ClientPlan](db.ClientTableName).
 			Where(map[string]sql_query.SQLCondition{

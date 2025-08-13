@@ -9,7 +9,7 @@ import (
 
 type ServiceProvider interface {
 	MakeService(dbName db.DBName, collection string) service.Service
-	MakePostgreSqlService(dbName db.DBName, tableName ...string) service.PostgreSqlService
+	MakePostgreSqlService(dbName db.DBName) service.PostgreSqlService
 }
 
 type ServiceProviderImpl struct{}
@@ -23,9 +23,8 @@ func (sf *ServiceProviderImpl) MakeService(
 
 func (sf *ServiceProviderImpl) MakePostgreSqlService(
 	dbName db.DBName,
-	tableName ...string,
 ) service.PostgreSqlService {
-	return service.MakePostgreSqlService(dbName, tableName...)
+	return service.MakePostgreSqlService(dbName)
 }
 
 type MockServiceProvider struct {

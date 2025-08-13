@@ -40,7 +40,7 @@ func (f *FileManagerHelperImpl) CreateFileManagerSQL(
 ) *entity.HttpError {
 	// ─────── Check & update storage ───────
 	adminDb := utildb.AdminDBName
-	clientService := serviceFactory.MakePostgreSqlService(adminDb, db.ClientTableName)
+	clientService := serviceFactory.MakePostgreSqlService(adminDb)
 
 	// Check if the company exists
 	queryStr, args, _ := sql_query.NewSQLSelectBuilder[int](db.ClientTableName).
@@ -107,7 +107,6 @@ func (f *FileManagerHelperImpl) CreateFileManagerSQL(
 	fixedAssetDBName := utildb.FixedAssetDBName.CompanyDBName(companyCode)
 	fileService := serviceFactory.MakePostgreSqlService(
 		fixedAssetDBName,
-		db.FilesInStorageTableName,
 	)
 
 	queryStr, args, _ = sql_query.NewSQLInsertBuilder(db.FilesInStorageTableName).
@@ -129,7 +128,7 @@ func (f *FileManagerHelperImpl) DeleteFileManagerSQL(
 	fileType new_model.FileType,
 ) *entity.HttpError {
 	fixedAssetDB := utildb.FixedAssetDBName.CompanyDBName(companyCode)
-	fileService := serviceFactory.MakePostgreSqlService(fixedAssetDB, db.FilesInStorageTableName)
+	fileService := serviceFactory.MakePostgreSqlService(fixedAssetDB)
 
 	// ─────── Find the file ───────
 	if len(filter) == 0 {
@@ -159,7 +158,7 @@ func (f *FileManagerHelperImpl) DeleteFileManagerSQL(
 
 	// ─────── Check & update storage ───────
 	adminDb := utildb.AdminDBName
-	clientService := serviceFactory.MakePostgreSqlService(adminDb, db.ClientTableName)
+	clientService := serviceFactory.MakePostgreSqlService(adminDb)
 
 	queryStr, args, _ = sql_query.NewSQLSelectBuilder[int](db.ClientTableName).
 		Where(map[string]sql_query.SQLCondition{
