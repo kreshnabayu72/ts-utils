@@ -382,6 +382,22 @@ func PaginationQuery(withQuery, mainQuery, filteredDataQuery, paginatedDataQuery
 	return paginationQuery
 }
 
+func PaginationQuery_old(dataQuery, totalQuery string) string {
+	paginationQuery := fmt.Sprintf(`
+		WITH
+			paginated AS (%s),
+			totalRow AS (%s),
+			total AS (
+				SELECT COUNT(*) FROM totalRow
+			)
+		SELECT
+			COALESCE((SELECT jsonb_agg(paginated) FROM paginated), '[]') AS data,
+			(SELECT COUNT FROM total) AS totalRecords;
+	`, dataQuery, totalQuery)
+
+	return paginationQuery
+}
+
 func ArrayIncludes[T comparable](slice []T, value T) bool {
 	for _, each := range slice {
 		if each == value {

@@ -909,6 +909,169 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 	return query, s.Args, nil
 }
 
+func (s *SQLEloquentQuery) buildSelectQuery_old() (string, []interface{}, error) {
+	if len(s.HavingClauses) > 0 && len(s.Grouping) == 0 {
+		return "", nil, errors.New("HAVING clauses only allowed if GROUP BY clause is exists")
+	}
+
+	if len(s.Columns) == 0 {
+		s.Columns = []string{"*"}
+	}
+
+	var sb strings.Builder
+	var countQuery string
+	sb.Grow(256) // preallocate ~256 bytes
+
+	// WITH
+	if len(s.WithClauses) > 0 {
+		sb.WriteByte('\n')
+		sb.WriteString("WITH ")
+		for i, c := range s.WithClauses {
+			if i > 0 {
+				sb.WriteString(", ")
+			}
+			sb.WriteString(c)
+		}
+	}
+
+	// WITH RECURSIVE
+	if len(s.WithRecursiveClauses) > 0 {
+		sb.WriteByte('\n')
+		sb.WriteString("WITH RECURSIVE ")
+		for i, c := range s.WithRecursiveClauses {
+			if i > 0 {
+				sb.WriteString(", ")
+			}
+			sb.WriteString(c)
+		}
+	}
+
+	// DISTINCT
+	var db strings.Builder
+	if len(s.DistinctBy) > 0 {
+		db.WriteString("DISTINCT ON ")
+		db.WriteString("(")
+		for i, d := range s.DistinctBy {
+			if i > 0 {
+				db.WriteString(",")
+			}
+			db.WriteString(d)
+		}
+		db.WriteString(")")
+		db.WriteString(" " + s.DistinctAlias)
+
+		tmp := make([]string, len(s.Columns))
+
+		// Prepend distinct to the column clause.
+		copy(tmp, s.Columns)
+		s.Columns = []string{db.String()}
+		s.Columns = append(s.Columns, tmp...)
+	}
+
+	// SELECT
+	// Dont need to use default select if using union All, since union typically uses SELECT inside of it
+	if !s.useUnionAll {
+		sb.WriteByte('\n')
+		sb.WriteString("SELECT ")
+		for i, col := range s.Columns {
+			if i > 0 {
+				sb.WriteByte(',')
+			}
+			sb.WriteString(col)
+		}
+		sb.WriteByte('\n')
+		sb.WriteString("FROM ")
+		sb.WriteString(s.Table)
+		sb.WriteByte('\n')
+	}
+
+	// JOIN
+	if len(s.OtherTables) > 0 {
+		for _, j := range s.OtherTables {
+			sb.WriteString(j)
+			sb.WriteByte('\n')
+		}
+	}
+
+	// WHERE
+	if len(s.Filters) > 0 {
+		sb.WriteString("WHERE ")
+		for i, f := range s.Filters {
+			if i > 0 {
+				sb.WriteString(" AND ")
+			}
+			sb.WriteString(f)
+		}
+		sb.WriteByte('\n')
+	}
+
+	// GROUP BY
+	if len(s.Grouping) > 0 {
+		sb.WriteString("GROUP BY ")
+		for i, g := range s.Grouping {
+			if i > 0 {
+				sb.WriteString(", ")
+			}
+			sb.WriteString(g)
+		}
+		sb.WriteByte('\n')
+	}
+
+	// UNION ALL
+	if len(s.UnionAllQueries) > 0 {
+		for i, u := range s.UnionAllQueries {
+			if i > 0 {
+				sb.WriteString("UNION ALL")
+				sb.WriteByte('\n')
+			}
+			sb.WriteString(u)
+		}
+		sb.WriteByte('\n')
+	}
+
+	// HAVING
+	if len(s.HavingClauses) > 0 {
+		sb.WriteString("HAVING ")
+		for i, h := range s.HavingClauses {
+			if i > 0 {
+				sb.WriteString(" AND ")
+			}
+			sb.WriteString(h)
+		}
+		sb.WriteByte('\n')
+	}
+
+	countQuery = sb.String()
+
+	// ORDER BY
+	if len(s.SortBy) > 0 {
+		sb.WriteString("ORDER BY ")
+		for i, srt := range s.SortBy {
+			if i > 0 {
+				sb.WriteString(", ")
+			}
+			sb.WriteString(srt)
+		}
+		sb.WriteByte('\n')
+	}
+
+	// LIMIT/OFFSET
+	if s.UsePagination {
+		if s.Limit > 0 {
+			sb.WriteString("LIMIT ")
+			sb.WriteString(strconv.Itoa(s.Limit))
+			sb.WriteByte(' ')
+		}
+		sb.WriteString("OFFSET ")
+		sb.WriteString(strconv.Itoa(s.Offset))
+		sb.WriteByte('\n')
+
+		return PaginationQuery_old(sb.String(), countQuery), s.Args, nil
+	}
+
+	return sb.String(), s.Args, nil
+}
+
 // Internal Utils for builder select
 func extractAlias(column string) string {
 	parts := strings.Split(strings.ToLower(column), " as ")
