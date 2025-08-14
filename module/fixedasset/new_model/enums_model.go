@@ -642,6 +642,12 @@ const (
 	DisposalLastConditionDamaged        DisposalLastCondition = "Damaged"
 )
 
+var DisposalLastCoditionEnum = map[string]DisposalLastCondition{
+	"No Salvage Value": DisposalLastConditionNoSalvageValue,
+	"Missing":          DisposalLastConditionMissing,
+	"Damaged":          DisposalLastConditionDamaged,
+}
+
 type DisposalMethod string
 
 const (
