@@ -382,6 +382,21 @@ func CheckTotalControlPermissionSQL(ctx *fiber.Ctx) *entity.HttpError {
 // provided `groupId`. It identifies the highest ancestor as the group with a parent_id of 0.
 // It then checks for an active "Approval" role that matches the specified `roleAttribute`
 // on that single, top-level ancestor. It returns `true` if such a role is found, otherwise `false`.
+//
+// Example:
+//
+// The function is typically used to determine a transfer request's initial status.
+// A common use case is to check for an approval role on the highest ancestor group,
+// and set the transaction status accordingly:
+//
+//	hasApproval, err := helper.CheckApprovalExistance(u.FixedAssetService, ctx, groupId, util_fixedasset_new_model.TransactionRoleAttributeTransfer)
+//	if err != nil { ... }
+//
+//	if hasApproval {
+//		return "WaitingForApproval"
+//	}
+//
+//	return "WaitingForHandover"
 func CheckApprovalExistance(
 	service service.PostgreSqlService,
 	ctx context.Context,
