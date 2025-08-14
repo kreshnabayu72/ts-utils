@@ -375,3 +375,58 @@ func CheckTotalControlPermissionSQL(ctx *fiber.Ctx) *entity.HttpError {
 
 	return nil
 }
+
+// CheckApprovalExistance finds the top-level ancestor (level 1) of a given group and checks for an active "Approval" role.
+//
+// The function uses a recursive SQL query to traverse the group hierarchy upwards from the
+// provided `groupId`. It identifies the highest ancestor as the group with a parent_id of 0.
+// It then checks for an active "Approval" role that matches the specified `roleAttribute`
+// on that single, top-level ancestor. It returns `true` if such a role is found, otherwise `false`.
+func CheckApprovalExistance(
+	service service.PostgreSqlService,
+	ctx context.Context,
+	groupId int,
+	roleAttribute new_model.TransactionRoleAttribute,
+) (bool, error) {
+	// Defined as anchor, starting point to recursively check the groups upwards
+	groupCTE := sql_query.NewSQLSelectBuilder[any](db.GroupTableName).
+		Select("id", "parent_id").
+		Where(map[string]sql_query.SQLCondition{
+			"id": {Operator: sql_query.SQLOperatorEqual, Value: groupId},
+		})
+
+	// Recursive step to climbs up, find the parent of current chain
+	groupParentCTE := sql_query.NewSQLSelectBuilder[any](db.GroupTableName, "g").
+		Select("g.id", "g.parent_id").
+		Join("parent_groups pg", "g.id = pg.parent_id")
+
+	// Write "WITH RECURSIVE" CTE to main query
+	withRecursiveCTE := sql_query.NewSQLSelectBuilder[any](db.GroupTableName).
+		UnionAll(
+			groupCTE.(*sql_query.SelectBuilder).SQLEloquentQuery,
+			groupParentCTE.(*sql_query.SelectBuilder).SQLEloquentQuery,
+		)
+
+	// Build final query, `select` basically just contain "hasApproval"
+	query, args, _ := sql_query.NewSQLSelectBuilder[any]("parent_groups pg").
+		Select(`COUNT(utr.id) > 0 as "hasApproval"`).
+		WithRecursiveCTEBuilder("parent_groups", withRecursiveCTE.(*sql_query.SelectBuilder).SQLEloquentQuery).
+		Join(db.UserTransactionRoleTableName+" utr", "utr.group_id = pg.id").
+		Where(map[string]sql_query.SQLCondition{
+			// Top level parent (level 1)
+			"pg.parent_id":       {Operator: sql_query.SQLOperatorEqual, Value: 0},
+			"utr.role_type":      {Operator: sql_query.SQLOperatorEqual, Value: "Approval"},
+			"utr.role_attribute": {Operator: sql_query.SQLOperatorEqual, Value: roleAttribute},
+			"utr.is_active":      {Operator: sql_query.SQLOperatorEqual, Value: true},
+		}).
+		Build()
+
+	var result struct{ HasApproval bool }
+	err := service.SelectOne(&result, ctx, query, args...)
+	if err != nil {
+		return false, err
+	}
+	fmt.Println("result", result)
+
+	return result.HasApproval, nil
+}
