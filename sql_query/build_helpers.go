@@ -43,7 +43,7 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 		if each.IsSubQuery {
 			clause = fmt.Sprintf(`%s %s %v`, column, each.Operator, each.Value)
 			s.Filters = append(s.Filters, clause)
-			break
+			continue
 		}
 
 		switch each.Operator {
