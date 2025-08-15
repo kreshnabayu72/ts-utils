@@ -254,6 +254,8 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationToUsersSQL(
 			Category:   notificationDataWithoutUser.Category,
 			Type:       notificationDataWithoutUser.Type,
 			Data:       notificationDataWithoutUser.Data,
+			Plan:       notificationDataWithoutUser.Plan,
+			IsManager:  notificationDataWithoutUser.IsManager,
 			CreatedAt:  time.Now(),
 			UpdatedAt:  time.Now(),
 		})
@@ -361,6 +363,7 @@ func (r *SendNotificationSQLHelperImpl) SendMobileNotificationSQL(data util_fixe
 	dataPayload["detail"] = data.Detail
 	dataPayload["user"] = data.UserKey
 	dataPayload["isReadOnly"] = fmt.Sprintf("%v", data.IsReadOnly)
+	dataPayload["isManager"] = fmt.Sprintf("%v", data.IsManager)
 	dataPayload["plan"] = data.Plan
 	dataPayload["module"] = string(data.Module)
 	dataPayload["status"] = string(data.Status)
