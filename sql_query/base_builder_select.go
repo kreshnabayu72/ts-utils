@@ -660,7 +660,12 @@ func (s *SelectBuilder) UnionAll(cteBuilders ...*SQLEloquentQuery) SQLSelectChai
 			return s
 		}
 
-		s.UnionAllQueries = append(s.UnionAllQueries, cteQuery)
+		offset := len(s.Args)
+
+		// Shift the placeholders in the CTE query
+		shiftedQuery := shiftSQLPlaceholders(cteQuery, offset)
+
+		s.UnionAllQueries = append(s.UnionAllQueries, shiftedQuery)
 		s.Args = append(s.Args, cteArgs...)
 	}
 
