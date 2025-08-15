@@ -903,7 +903,7 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 			prefix = splittedTableName[1]
 		}
 
-		mainQuery := selectSb.String() + joinSb.String() + fmt.Sprintf("JOIN paginated_ids ON paginated_ids.id = %s.id\n", prefix) + groupSb.String() + havingSb.String()
+		mainQuery := selectSb.String() + joinSb.String() + fmt.Sprintf("JOIN paginated_ids ON paginated_ids.id = %s.id\n", prefix) + groupSb.String() + havingSb.String() + orderSb.String()
 		filteredData := fmt.Sprintf("SELECT %s.id as id from %s\n", prefix, s.Table) + joinSb.String() + whereSb.String() + groupSb.String() + havingSb.String() + orderSb.String()
 		paginatedDataQuery := "SELECT id as id from filtered_ids\n" + limitationSb.String()
 		paginatedCountQuery := "SELECT COUNT(id) from filtered_ids\n"
