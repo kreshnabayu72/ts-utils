@@ -47,6 +47,10 @@ type PostgreSqlService interface {
 	// and executes it.
 	CountWithFilter(ctx context.Context, tableName string, filter map[string]sql_query.SQLCondition) (int, error)
 
+	// Execute executes a query that wont return any value
+	// Useful for defining temporary function and tables/views, so that the overall query is cleaner
+	Execute(ctx context.Context, queryString string) error
+
 	// SelectOne executes a SELECT query that returns a single row
 	// and scans the result into the provided struct pointer v
 	// (e.g., *dto.GetLoggedInUser).
@@ -304,6 +308,29 @@ func (s *BasePostgreSqlService) Count(
 	}
 
 	return count, nil
+}
+
+func (s *BasePostgreSqlService) Execute(
+	ctx context.Context,
+	queryString string,
+) error {
+	shouldShowQuery(s.debugLevel, queryString)
+
+	var rows pgx.Rows
+	var err error
+
+	if s.Transaction != nil {
+		rows, err = s.Transaction.Query(ctx, queryString)
+	} else {
+		rows, err = s.Pool.Query(ctx, queryString)
+	}
+
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	return nil
 }
 
 func (s *BasePostgreSqlService) CountWithFilter(
