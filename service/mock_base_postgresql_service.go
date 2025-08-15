@@ -44,6 +44,11 @@ func (m *MockBasePostgreSqlService) CountWithFilter(
 	return arg.Get(0).(int), arg.Error(1)
 }
 
+func (m *MockBasePostgreSqlService) Execute(ctx context.Context, queryString string) error {
+	arg := m.Called(ctx, queryString)
+	return arg.Error(0)
+}
+
 func (m *MockBasePostgreSqlService) SelectOne(
 	v any,
 	ctx context.Context,
