@@ -19,6 +19,7 @@ type Group struct {
 	Level int `json:"level" column:"level" sql:"BIGINT"`
 
 	IsDisposable        bool `json:"isDisposable" column:"is_disposable" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
+	AncestorID          int  `json:"ancestorId" column:"ancestor_id" sql:"BIGINT"`
 	ParentID            int  `json:"parentId" column:"parent_id" sql:"BIGINT"`
 	ParentQuotaSourceID int  `json:"parentQuotaSourceId" column:"parent_quota_source_id" sql:"BIGINT"`
 
