@@ -226,10 +226,10 @@ func GetAssetIdFromAliasCode(
 		).
 		Addfields(bson.M{
 			"previousAssetId": "$assetId",
-			"assetId": bson.M{
+			"name.aliasCode": bson.M{
 				"$cond": bson.A{
-					bson.M{"$eq": bson.A{bson.M{"$size": "$assetIdMap"}, 0}},
-					"$assetId",
+					bson.M{"$eq": bson.A{"$aliasCode", nil}},
+					"$name.aliasCode",
 					bson.M{
 						"$reduce": bson.M{
 							"input":        "$assetIdMap",
@@ -245,13 +245,6 @@ func GetAssetIdFromAliasCode(
 							},
 						},
 					},
-				},
-			},
-			"name.aliasCode": bson.M{
-				"$cond": bson.A{
-					bson.M{"$eq": bson.A{"$aliasCode", nil}},
-					"$name.aliasCode",
-					"$assetId",
 				},
 			},
 		})
