@@ -9,7 +9,11 @@ import (
 type DamageReport struct {
 	ID int `json:"_id" column:"id" sql:"BIGINT PRIMARY KEY"`
 
-	AssetId      int `json:"assetId" column:"asset_id" sql:"BIGINT"`
+	// Foreign key to assets
+	Asset int `json:"asset" column:"asset" sql:"BIGINT"`
+	// Asset's unique id from alias code
+	AssetID string `json:"assetId" column:"asset_id" sql:"VARCHAR"`
+
 	ReportedById int `json:"reportedById" column:"reported_by_id" sql:"BIGINT"`
 
 	DamageImage    string             `json:"damageImage" column:"damage_image" sql:"VARCHAR NOT NULL CHECK (char_length(damage_image) > 0)"`
