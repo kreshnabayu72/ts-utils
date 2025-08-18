@@ -46,9 +46,10 @@ type Model struct {
 }
 
 type Name struct {
-	ID      string            `column:"asset_names.id::text" json:"_id,omitempty"`
-	Name    string            `column:"asset_names.name" json:"name"`
-	TagType new_model.TagType `column:"asset_names.tag_type" json:"tagType"`
+	ID               string            `column:"asset_names.id::text" json:"_id,omitempty"`
+	Name             string            `column:"asset_names.name" json:"name"`
+	TagType          new_model.TagType `column:"asset_names.tag_type" json:"tagType"`
+	NameWithSequence string            `column:"concat(asset_names.name, ' - ', a.sequence_number)" json:"nameWithSequence"`
 }
 
 type DepreciationGroup struct {
