@@ -244,7 +244,8 @@ func CheckTransactionRoleMultiGroupPermissionsSQL(
 
 	query, args, _ := builder.
 		Select(tableName+".id", "utr.id as \"userTransactionRoleId\"").
-		LeftJoin(fmt.Sprintf("%s as utr", db.UserTransactionRoleTableName), fmt.Sprintf("%s = utr.group_id", groupIdField), filter).
+		Join("groups g", "g.id = "+groupIdField).
+		LeftJoin(fmt.Sprintf("%s as utr", db.UserTransactionRoleTableName), "g.ancestor_id = utr.group_id", filter).
 		Where(dataFilter).
 		Build()
 
@@ -314,10 +315,15 @@ func CheckTransactionRolePermissionSQL(
 			Operator: sql_query.SQLOperatorIn,
 			Value:    transactionType,
 		},
-		"group_id": groupIdFilter,
+		"g.id": groupIdFilter,
 	}
 
-	count, err := service.CountWithFilter(ctx.Context(), db.UserTransactionRoleTableName, filter)
+	query, args, _ := sql_query.NewSQLCountBuilder(db.UserTransactionRoleTableName).
+		Join("groups g", "group_id = g.ancestor_id").
+		Where(filter).
+		Build()
+
+	count, err := service.Count(ctx.Context(), query, args...)
 	if err != nil {
 		return entity.InternalServerError(err.Error())
 	}
