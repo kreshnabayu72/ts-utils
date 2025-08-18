@@ -228,7 +228,13 @@ func (s *InsertBuilder) cachedInsertSingle(v reflect.Value) SQLInsertChainBuilde
 	args := make([]interface{}, 0, len(cachedTemplate.FieldIndexes)+1)
 	db.InitSnowflake()
 
-	for _, idx := range cachedTemplate.FieldIndexes {
+	for i, idx := range cachedTemplate.FieldIndexes {
+		normalizedFieldMeta := *fieldMeta
+		if len(args) == 0 && normalizedFieldMeta[i].Name != "ID" {
+			args = append(args, db.Node.Generate().Int64()) // id in first position
+			continue
+		}
+
 		val := v.FieldByIndex(idx)
 		if len(args) != 0 && val.IsZero() && s.excludeEmptyValue {
 			continue
@@ -386,14 +392,19 @@ func (s *InsertBuilder) cachedInsertMany(slice reflect.Value) SQLInsertChainBuil
 				continue
 			}
 
-			val := values.FieldByIndex(cachedTemplate.FieldIndexes[j])
-			if base == "$1" && val.IsZero() {
-				args[argsPos] = db.Node.Generate().Int64()
+			normalizedFieldMeta := *fieldMeta
+			if base == "$1" && normalizedFieldMeta[j].Name != "ID" {
+				args[argsPos] = db.Node.Generate().Int64() // id in first position
 			} else {
-				args[argsPos] = val.Interface()
+				val := values.FieldByIndex(cachedTemplate.FieldIndexes[j])
+				if base == "$1" && val.IsZero() {
+					args[argsPos] = db.Node.Generate().Int64()
+				} else {
+					args[argsPos] = val.Interface()
+				}
 			}
-			argsPos++
 
+			argsPos++
 			allPlaceholders.WriteByte('$')
 			allPlaceholders.WriteString(strconv.Itoa(argsPos))
 		}
