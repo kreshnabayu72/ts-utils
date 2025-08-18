@@ -11,8 +11,6 @@ type MissingReport struct {
 
 	// Foreign key to assets
 	Asset int `json:"asset" column:"asset" sql:"BIGINT"`
-	// Asset's unique id from alias code
-	AssetID string `json:"assetId" column:"asset_id" sql:"VARCHAR"`
 
 	ReportedById int `json:"reportedById" column:"reported_by_id" sql:"BIGINT"`
 

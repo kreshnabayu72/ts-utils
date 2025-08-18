@@ -10,9 +10,7 @@ import (
 type TransferRequest struct {
 	ID             int                           `json:"id" column:"id" sql:"BIGINT PRIMARY KEY"`
 	Asset          int                           `json:"asset" column:"asset" sql:"BIGINT"`
-	AssetID        string                        `json:"assetId" column:"asset_id" sql:"VARCHAR"`
 	Transaction    int                           `json:"transaction" column:"transaction" sql:"BIGINT"`
-	TransactionID  string                        `json:"transactionId" column:"transaction_id" sql:"VARCHAR"`
 	ParentID       *int                          `json:"parentId" column:"parent_id" sql:"BIGINT"`
 	Status         TransferRequestStatus         `json:"status" column:"status" sql:"transfer_request_status_enum"`
 	AssetTagStatus TransferRequestAssetTagStatus `json:"assetTagStatus" column:"asset_tag_status" sql:"transfer_request_asset_tag_status_enum"`
