@@ -7,9 +7,17 @@ import (
 )
 
 type BorrowingRequest struct {
-	ID               int                    `json:"id" column:"id" sql:"BIGINT PRIMARY KEY"`
-	AssetID          int                    `json:"assetId" column:"asset_id" sql:"BIGINT"`
-	TransactionID    int                    `json:"transactionId" column:"transaction_id" sql:"BIGINT"`
+	ID int `json:"id" column:"id" sql:"BIGINT PRIMARY KEY"`
+
+	// Foreign key to assets
+	Asset int `json:"asset" column:"asset" sql:"BIGINT"`
+	// Asset's unique id from alias code
+	AssetID string `json:"assetId" column:"asset_id" sql:"VARCHAR"`
+	// Foreign key to related transaction
+	Transaction int `json:"transaction" column:"transaction" sql:"BIGINT"`
+	// Transaction's unique code based on creation time
+	TransactionID string `json:"transactionId" column:"transaction_id" sql:"VARCHAR"`
+
 	ParentID         *int                   `json:"parentId" column:"parent_id" sql:"BIGINT"`
 	Status           BorrowingRequestStatus `json:"status" column:"status" sql:"borrowing_request_status_enum"`
 	IsVerified       bool                   `json:"isVerified" column:"is_verified" sql:"BOOLEAN"`
