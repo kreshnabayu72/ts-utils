@@ -12,12 +12,8 @@ type AssignmentRequest struct {
 
 	// Foreign key to assets
 	Asset int `json:"asset" column:"asset" sql:"BIGINT"`
-	// Asset's unique id from alias code
-	AssetID string `json:"assetId" column:"asset_id" sql:"VARCHAR"`
 	// Foreign key to related transaction
 	Transaction int `json:"transaction" column:"transaction" sql:"BIGINT"`
-	// Transaction's unique code based on creation time
-	TransactionID string `json:"transactionId" column:"transaction_id" sql:"VARCHAR"`
 
 	ParentID   *int                    `json:"parentId" column:"parent_id" sql:"BIGINT"`
 	Status     AssignmentRequestStatus `json:"status" column:"status" sql:"assignment_request_status_enum"`

@@ -10,9 +10,7 @@ import (
 type DisposalRequest struct {
 	ID                      int                   `json:"id" column:"id" sql:"BIGINT PRIMARY KEY"`
 	Asset                   int                   `json:"asset" column:"asset" sql:"BIGINT"`
-	AssetID                 string                `json:"assetId" column:"asset_id" sql:"VARCHAR"`
 	Transaction             int                   `json:"transaction" column:"transaction" sql:"BIGINT"`
-	TransactionID           string                `json:"transactionId" column:"transaction_id" sql:"VARCHAR"`
 	ReportID                *int                  `json:"reportId" column:"report_id" sql:"BIGINT"`
 	PreviousStatus          AssetStatus           `json:"previousStatus" column:"previous_status" sql:"asset_status_enum"`
 	Status                  DisposalRequestStatus `json:"status" column:"status" sql:"disposal_request_status_enum"`
