@@ -71,3 +71,23 @@ func (m *MockNotificationSQLHelper) RefreshNotificationSseSQL(userIds []string) 
 	args := m.Mock.Called(userIds)
 	return args.Get(0).(*entity.HttpError)
 }
+
+func (m *MockNotificationSQLHelper) EmitApprovalSseSQL(userIds []string) *entity.HttpError {
+	args := m.Mock.Called(userIds)
+	return args.Get(0).(*entity.HttpError)
+}
+
+func (m *MockNotificationSQLHelper) EmitLoggedOutSseSQL(userIds []string) *entity.HttpError {
+	args := m.Mock.Called(userIds)
+	return args.Get(0).(*entity.HttpError)
+}
+
+func (m *MockNotificationSQLHelper) UpdateUserSseSQL(userIds []string) *entity.HttpError {
+	args := m.Mock.Called(userIds)
+	return args.Get(0).(*entity.HttpError)
+}
+
+func (m *MockNotificationSQLHelper) EmitLoggedOutByAdminSseSQL(userIds []string) *entity.HttpError {
+	args := m.Mock.Called(userIds)
+	return args.Get(0).(*entity.HttpError)
+}
