@@ -21,6 +21,7 @@ FROM (
         borrowing_transactions.borrower_id AS user_id,
         borrowing_requests.asset AS asset,
         borrowing_requests.status::text AS status,
+        borrowing_requests.updated_at AS updated_at,
         borrowing_requests.created_at AS created_at
     FROM borrowing_requests
         LEFT JOIN borrowing_transactions ON borrowing_transactions.id = borrowing_requests.transaction
@@ -31,6 +32,7 @@ FROM (
         assignment_transactions.assigned_to_id AS user_id,
         assignment_requests.asset AS asset,
         assignment_requests.status::text AS status,
+        assignment_requests.updated_at AS updated_at,
         assignment_requests.created_at AS created_at
     FROM assignment_requests
         LEFT JOIN assignment_transactions ON assignment_transactions.id = assignment_requests.transaction

@@ -116,17 +116,19 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationToTransactionRolesSQL(
 		db.FixedAssetDBName.CompanyDBName(companyCode),
 	)
 
-	builder := sql_query.NewSQLSelectBuilder[util_fixedasset_new_model.UserTransactionRole](db.UserTransactionRoleTableName)
+	builder := sql_query.NewSQLSelectBuilder[any](db.UserTransactionRoleTableName, "utr")
+	builder.Select("utr.user_id")
+	builder.Join("groups g", "g.ancestor_id = utr.group_id")
 	builder.Where(map[string]sql_query.SQLCondition{
 		"is_active":      {Operator: sql_query.SQLOperatorEqual, Value: true},
 		"role_type":      {Operator: sql_query.SQLOperatorIn, Value: roleType},
 		"role_attribute": {Operator: sql_query.SQLOperatorIn, Value: transactionType},
-		"group_id":       groupIdFilter,
+		"g.id":           groupIdFilter,
 	})
 
 	query, args, _ := builder.Build()
 
-	var roles []util_fixedasset_new_model.UserTransactionRole
+	var roles []map[string]int
 	err := userTransactionRoleService.SelectMany(
 		&roles,
 		context.Background(),
@@ -142,12 +144,12 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationToTransactionRolesSQL(
 
 	for _, role := range roles {
 		// if user id already used, continue/skip
-		if _, ok := uniqueUserIdsCheck[strconv.Itoa(role.UserID)]; ok {
+		if _, ok := uniqueUserIdsCheck[strconv.Itoa(role["user_id"])]; ok {
 			continue
 		}
 
-		uniqueUserIds = append(uniqueUserIds, strconv.Itoa(role.UserID))
-		uniqueUserIdsCheck[strconv.Itoa(role.UserID)] = true
+		uniqueUserIds = append(uniqueUserIds, strconv.Itoa(role["user_id"]))
+		uniqueUserIdsCheck[strconv.Itoa(role["user_id"])] = true
 	}
 
 	return r.SendNotificationToUsersSQL(
