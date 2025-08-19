@@ -13,7 +13,7 @@ import (
 // DisposalApproval represents the disposal_approvals table in the database.
 type DisposalApproval struct {
 	ID            int               `json:"id" column:"id" sql:"BIGINT PRIMARY KEY"`
-	Transaction   *int              `json:"transaction" column:"transaction" sql:"BIGINT"`
+	TransactionID *int              `json:"transactionId" column:"transaction_id" sql:"BIGINT"`
 	RequestID     *int              `json:"requestId" column:"request_id" sql:"BIGINT"`
 	ApproverID    int               `json:"approverId" column:"approver_id" sql:"BIGINT"`
 	ApprovalRound int               `json:"approvalRound" column:"approval_round" sql:"INTEGER"`
