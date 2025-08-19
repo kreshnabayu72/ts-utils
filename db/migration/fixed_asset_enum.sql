@@ -369,6 +369,7 @@ DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'borrowing_transaction_status_enum') THEN
         CREATE TYPE borrowing_transaction_status_enum AS ENUM (
+            'Canceled',
             'Waiting for Approval',
             'Waiting for Handover',
             'Borrowed',
@@ -384,6 +385,7 @@ DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'borrowing_request_status_enum') THEN
         CREATE TYPE borrowing_request_status_enum AS ENUM (
+            'Canceled',
             'Waiting for Approval',
             'Waiting for Handover',
             'Borrowed',
@@ -405,6 +407,7 @@ DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'assignment_transaction_status_enum') THEN
         CREATE TYPE assignment_transaction_status_enum AS ENUM (
+            'Canceled',
             'Waiting for Approval',
             'Waiting for Handover',
             'Assigned',
@@ -418,6 +421,7 @@ DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'assignment_request_status_enum') THEN
         CREATE TYPE assignment_request_status_enum AS ENUM (
+            'Canceled',
             'Waiting for Approval',
             'Waiting for Handover',
             'Assigned',
@@ -470,6 +474,7 @@ DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'transfer_transaction_status_enum') THEN
         CREATE TYPE transfer_transaction_status_enum AS ENUM (
+            'Canceled',
             'Waiting for Approval',
             'Waiting for Handover',
             'Completed',
@@ -482,6 +487,8 @@ DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'transfer_request_status_enum') THEN
         CREATE TYPE transfer_request_status_enum AS ENUM (
+            'Canceled',
+            'Reported Missing',
             'Waiting for Approval',
             'Waiting for Handover',
             'Completed',
@@ -541,6 +548,7 @@ DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'disposal_transaction_status_enum') THEN
         CREATE TYPE disposal_transaction_status_enum AS ENUM (
+            'Canceled',
             'Waiting for Approval',
             'Waiting for Verification',
             'On Progress',
@@ -555,6 +563,7 @@ DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'disposal_request_status_enum') THEN
         CREATE TYPE disposal_request_status_enum AS ENUM (
+            'Canceled',
             'Waiting for Approval',
             'Waiting for Verification',
             'On Progress',
