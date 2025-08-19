@@ -337,6 +337,19 @@ var TransactionRoleAttributeArray = []string{
 	string(TransactionRoleAttributeMissing),
 }
 
+var TransactionRoleNameArray = []string{
+	string(TransactionRoleNameBorrowingAssignment),
+	string(TransactionRoleNameDisposal),
+	string(TransactionRoleNameTransfer),
+	string(TransactionRoleNameAudit),
+	string(TransactionRoleNameMaintenanceRoutine),
+	string(TransactionRoleNameRepairTicketing),
+	string(TransactionRoleNameAssetControl),
+	string(TransactionRoleNameTracking),
+	string(TransactionRoleNameDamaged),
+	string(TransactionRoleNameMissing),
+}
+
 type TransactionRoleName string
 
 const (
