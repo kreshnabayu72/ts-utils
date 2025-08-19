@@ -14,6 +14,8 @@ type BorrowingRequest struct {
 	// Foreign key to related transaction
 	Transaction int `json:"transaction" column:"transaction" sql:"BIGINT"`
 
+	ApprovalRound int `json:"approval_round" column:"approval_round" sql:"INTEGER DEFAULT 1"`
+
 	ParentID         *int                   `json:"parentId" column:"parent_id" sql:"BIGINT"`
 	Status           BorrowingRequestStatus `json:"status" column:"status" sql:"borrowing_request_status_enum"`
 	IsVerified       bool                   `json:"isVerified" column:"is_verified" sql:"BOOLEAN"`
