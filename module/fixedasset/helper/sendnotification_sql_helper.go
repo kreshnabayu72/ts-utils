@@ -58,6 +58,10 @@ type NotificationHelperSQL interface {
 	) *entity.HttpError
 
 	RefreshNotificationSseSQL(userIds []string) *entity.HttpError
+	EmitApprovalSseSQL(userIds []string) *entity.HttpError
+	EmitLoggedOutSseSQL(userIds []string) *entity.HttpError
+	UpdateUserSseSQL(userIds []string) *entity.HttpError
+	EmitLoggedOutByAdminSseSQL(userIds []string) *entity.HttpError
 }
 
 type SendNotificationSQLHelperImpl struct {
@@ -415,9 +419,7 @@ func (r *SendNotificationSQLHelperImpl) SendMobileNotificationSQL(data util_fixe
 	return nil
 }
 
-func (r *SendNotificationSQLHelperImpl) RefreshNotificationSseSQL(
-	userIds []string,
-) *entity.HttpError {
+func emitRefreshSse(userIds []string, message string, reason ...string) *entity.HttpError {
 	notificationApi := os.Getenv("NOTIFICATION_API")
 	if notificationApi == "" {
 		log.Println("REFRESH SSE: NOTIFICATION_API not set")
@@ -425,13 +427,18 @@ func (r *SendNotificationSQLHelperImpl) RefreshNotificationSseSQL(
 	}
 
 	for _, userId := range userIds {
-		resp, err := http.Get(
-			fmt.Sprintf(
-				"%s/v2/sse/send?id=%s&message=user:unread-notification",
-				notificationApi,
-				url.QueryEscape(userId),
-			),
+		path := fmt.Sprintf(
+			"%s/v2/sse/send?id=%s&message=%s",
+			notificationApi,
+			url.QueryEscape(userId),
+			message,
 		)
+
+		if len(reason) > 0 {
+			path += fmt.Sprintf("&reason=%s", reason[0])
+		}
+
+		resp, err := http.Get(path)
 		// Dont throw error, if notif is down, let transaction continue
 		if err != nil {
 			fmt.Println("RefreshNotificationSseSQL: " + err.Error())
@@ -444,4 +451,34 @@ func (r *SendNotificationSQLHelperImpl) RefreshNotificationSseSQL(
 	}
 
 	return nil
+}
+
+func (r *SendNotificationSQLHelperImpl) RefreshNotificationSseSQL(
+	userIds []string,
+) *entity.HttpError {
+	return emitRefreshSse(userIds, "user:unread-notification")
+}
+
+func (r *SendNotificationSQLHelperImpl) EmitApprovalSseSQL(
+	userIds []string,
+) *entity.HttpError {
+	return emitRefreshSse(userIds, "user:approval")
+}
+
+func (r *SendNotificationSQLHelperImpl) EmitLoggedOutSseSQL(
+	userIds []string,
+) *entity.HttpError {
+	return emitRefreshSse(userIds, "user:logout")
+}
+
+func (r *SendNotificationSQLHelperImpl) UpdateUserSseSQL(
+	userIds []string,
+) *entity.HttpError {
+	return emitRefreshSse(userIds, "user:update")
+}
+
+func (r *SendNotificationSQLHelperImpl) EmitLoggedOutByAdminSseSQL(
+	userIds []string,
+) *entity.HttpError {
+	return emitRefreshSse(userIds, "user:logout", "LOGGED_OUT_BY_ADMINISTRATOR")
 }
