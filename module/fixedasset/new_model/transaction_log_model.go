@@ -18,13 +18,13 @@ type TransactionLog struct {
 	UserId                    *string                `json:"userId" bson:"userId"`
 	UserFullName              *string                `json:"userFullName" bson:"userFullName"`
 	Detail                    map[string]interface{} `json:"detail" bson:"detail"`
-	OriginGroup               string                 `json:"originGroup" bson:"originGroup"`
-	DestinationGroup          string                 `json:"destinationGroup" bson:"destinationGroup"`
+	OriginGroup               *string                `json:"originGroup" bson:"originGroup"`
+	DestinationGroup          *string                `json:"destinationGroup" bson:"destinationGroup"`
 	TransactionId             string                 `json:"transactionId" bson:"transactionId"`
-	ReaderId                  string                 `json:"readerId" bson:"readerId"`
-	ReaderName                string                 `json:"readerName" bson:"readerName"`
-	ReaderNameWithoutSequence string                 `json:"readerNameWithoutSequence" bson:"readerNameWithoutSequence"`
-	ReaderType                string                 `json:"readerType" bson:"readerType"`
+	ReaderId                  *string                `json:"readerId" bson:"readerId"`
+	ReaderName                *string                `json:"readerName" bson:"readerName"`
+	ReaderNameWithoutSequence *string                `json:"readerNameWithoutSequence" bson:"readerNameWithoutSequence"`
+	ReaderType                *string                `json:"readerType" bson:"readerType"`
 	Module                    string                 `json:"module"     bson:"module"`
 	Borrower                  *string                `json:"borrower" bson:"borrower"`
 	AssignedTo                *string                `json:"assignedTo" bson:"assignedTo"`
