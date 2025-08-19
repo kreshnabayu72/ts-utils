@@ -516,6 +516,7 @@ const (
 	AssignmentTransactionStatusWaitingForApproval AssignmentTransactionStatus = "Waiting for Approval"
 	AssignmentTransactionStatusWaitingForHandover AssignmentTransactionStatus = "Waiting for Handover"
 	AssignmentTransactionStatusAssigned           AssignmentTransactionStatus = "Assigned"
+	AssignmentTransactionStatusCanceled           AssignmentTransactionStatus = "Canceled"
 	AssignmentTransactionStatusUnassigned         AssignmentTransactionStatus = "Unassigned"
 	AssignmentTransactionStatusRejected           AssignmentTransactionStatus = "Rejected"
 )
@@ -526,6 +527,7 @@ const (
 	AssignmentRequestStatusWaitingForApproval    AssignmentRequestStatus = "Waiting for Approval"
 	AssignmentRequestStatusWaitingForHandover    AssignmentRequestStatus = "Waiting for Handover"
 	AssignmentRequestStatusAssigned              AssignmentRequestStatus = "Assigned"
+	AssignmentRequestStatusCanceled              AssignmentRequestStatus = "Canceled"
 	AssignmentRequestStatusUnassigned            AssignmentRequestStatus = "Unassigned"
 	AssignmentRequestStatusApproved              AssignmentRequestStatus = "Approved"
 	AssignmentRequestStatusRejected              AssignmentRequestStatus = "Rejected"
@@ -544,6 +546,7 @@ const (
 	BorrowingTransactionStatusWaitingForApproval BorrowingTransactionStatus = "Waiting for Approval"
 	BorrowingTransactionStatusWaitingForHandover BorrowingTransactionStatus = "Waiting for Handover"
 	BorrowingTransactionStatusBorrowed           BorrowingTransactionStatus = "Borrowed"
+	BorrowingTransactionStatusCanceled           BorrowingTransactionStatus = "Canceled"
 	BorrowingTransactionStatusReturned           BorrowingTransactionStatus = "Returned"
 	BorrowingTransactionStatusExtendApproval     BorrowingTransactionStatus = "Extend Approval"
 	BorrowingTransactionStatusRequestExtension   BorrowingTransactionStatus = "Request Extension"
@@ -556,6 +559,7 @@ const (
 	BorrowingRequestStatusWaitingForApproval        BorrowingRequestStatus = "Waiting for Approval"
 	BorrowingRequestStatusWaitingForHandover        BorrowingRequestStatus = "Waiting for Handover"
 	BorrowingRequestStatusBorrowed                  BorrowingRequestStatus = "Borrowed"
+	BorrowingRequestStatusCanceled                  BorrowingRequestStatus = "Canceled"
 	BorrowingRequestStatusReturned                  BorrowingRequestStatus = "Returned"
 	BorrowingRequestStatusApproved                  BorrowingRequestStatus = "Approved"
 	BorrowingRequestStatusRejected                  BorrowingRequestStatus = "Rejected"
@@ -597,6 +601,7 @@ const (
 	TransferTransactionStatusWaitingForHandover TransferTransactionStatus = "Waiting for Handover"
 	TransferTransactionStatusCompleted          TransferTransactionStatus = "Completed"
 	TransferTransactionStatusRejected           TransferTransactionStatus = "Rejected"
+	TransferTransactionStatusCanceled           TransferTransactionStatus = "Canceled"
 )
 
 type TransferRequestStatus string
@@ -665,6 +670,7 @@ const (
 	DisposalTransactionStatusOnProgress             DisposalTransactionStatus = "On Progress"
 	DisposalTransactionStatusCompletionApproval     DisposalTransactionStatus = "Completion Approval"
 	DisposalTransactionStatusCompleted              DisposalTransactionStatus = "Completed"
+	DisposalTransactionStatusCanceled               DisposalTransactionStatus = "Canceled"
 	DisposalTransactionStatusRejected               DisposalTransactionStatus = "Rejected"
 )
 
@@ -675,6 +681,7 @@ const (
 	DisposalRequestStatusWaitingForVerification DisposalRequestStatus = "Waiting for Verification"
 	DisposalRequestStatusOnProgress             DisposalRequestStatus = "On Progress"
 	DisposalRequestStatusCompleted              DisposalRequestStatus = "Completed"
+	DisposalRequestStatusCanceled               DisposalRequestStatus = "Canceled"
 	DisposalRequestStatusApproved               DisposalRequestStatus = "Approved"
 	DisposalRequestStatusRejected               DisposalRequestStatus = "Rejected"
 )
