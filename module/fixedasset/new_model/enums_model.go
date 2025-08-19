@@ -392,6 +392,33 @@ func GetTransactionRoleNameFromAttribute(attr TransactionRoleAttribute) Transact
 	}
 }
 
+func GetTransactionRoleAttributeFromName(name TransactionRoleName) TransactionRoleAttribute {
+	switch name {
+	case TransactionRoleNameBorrowingAssignment:
+		return TransactionRoleAttributeBorrowing
+	case TransactionRoleNameDisposal:
+		return TransactionRoleAttributeDisposal
+	case TransactionRoleNameTransfer:
+		return TransactionRoleAttributeTransfer
+	case TransactionRoleNameAudit:
+		return TransactionRoleAttributeAudit
+	case TransactionRoleNameMaintenanceRoutine:
+		return TransactionRoleAttributeMaintenance
+	case TransactionRoleNameRepairTicketing:
+		return TransactionRoleAttributeRepair
+	case TransactionRoleNameAssetControl:
+		return TransactionRoleAttributeAssetControl
+	case TransactionRoleNameTracking:
+		return TransactionRoleAttributeTracking
+	case TransactionRoleNameDamaged:
+		return TransactionRoleAttributeDamaged
+	case TransactionRoleNameMissing:
+		return TransactionRoleAttributeMissing
+	default:
+		return TransactionRoleAttribute(name) // fallback: cast name as-is
+	}
+}
+
 type TransactionRoleType string
 
 const (
