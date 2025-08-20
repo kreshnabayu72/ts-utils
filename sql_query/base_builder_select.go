@@ -122,6 +122,12 @@ type SQLSelectChainBuilder interface {
 	//	jsonb_agg(jsonb_build_object('id', items.id, 'name', items.name) ORDER BY items.created_at)
 	//	  FILTER (WHERE items.is_active = TRUE) AS order_items
 	SelectJSONAggregate(alias string, dto any, condition string, asArrayAggregation bool, orderByClauses ...string) SQLSelectChainBuilder
+	// Read documentation for SelectJSONAggregate since the function is similar but with additional DISTINCT
+	// Generates:
+	//
+	//	jsonb_agg(DISTINCT jsonb_build_object('id', items.id, 'name', items.name) ORDER BY items.created_at)
+	//	  FILTER (WHERE items.is_active = TRUE) AS order_items
+	SelectJSONAggregateDistinct(alias string, dto any, condition string, asArrayAggregation bool, orderByClauses ...string) SQLSelectChainBuilder
 	// SelectJSONAggregateFunc builds a nested JSON object by executing a callback
 	// that itself adds JSON aggregate fields. The resulting fields are combined
 	// into a single jsonb_build_object aliased as `alias`.
