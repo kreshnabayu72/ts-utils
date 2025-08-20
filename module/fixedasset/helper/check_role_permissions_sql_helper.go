@@ -382,72 +382,48 @@ func CheckTotalControlPermissionSQL(ctx *fiber.Ctx) *entity.HttpError {
 	return nil
 }
 
-// CheckApprovalExistance finds the top-level ancestor (level 1) of a given group and checks for an active "Approval" role.
+// GetTopLevelTransactionRoles finds all transaction roles for a specific role attribute and
+// type that are assigned to the top-level ancestor of a given group.
 //
-// The function uses a recursive SQL query to traverse the group hierarchy upwards from the
-// provided `groupId`. It identifies the highest ancestor as the group with a parent_id of 0.
-// It then checks for an active "Approval" role that matches the specified `roleAttribute`
-// on that single, top-level ancestor. It returns `true` if such a role is found, otherwise `false`.
+// The function performs a LEFT JOIN on the groups table, matching the user transaction role's
+// group ID to the ancestor ID of the groups table. This ensures the query only
+// returns roles that are explicitly assigned to an ancestor. The query is then filtered by
+// role type, role attribute, and the provided group ID.
 //
-// Example:
+// Generic type for flexible collected data, like an example you can give your own struct that defines user_id as string (column add suffix "::text") or keep it int as your needs for your next process.
 //
-// The function is typically used to determine a transfer request's initial status.
-// A common use case is to check for an approval role on the highest ancestor group,
-// and set the transaction status accordingly:
+// Parameters:
+//   - service: The PostgreSQL service used to execute the query.
+//   - ctx: The context for the database operation.
+//   - groupId: The ID of the group for which to find the top-level ancestor.
+//   - roleAttribute: The specific attribute of the transaction role to search for.
+//   - roleType: The type of transaction role (e.g., "Approval").
 //
-//	hasApproval, err := helper.CheckApprovalExistance(u.FixedAssetService, ctx, groupId, util_fixedasset_new_model.TransactionRoleAttributeTransfer)
-//	if err != nil { ... }
-//
-//	if hasApproval {
-//		return "WaitingForApproval"
-//	}
-//
-//	return "WaitingForHandover"
-func CheckApprovalExistance(
+// Returns:
+//   - A pointer to a slice of generic type T, containing the found transaction roles.
+//   - An error if the database operation fails.
+func GetTopLevelTransactionRoles[T any](
 	service service.PostgreSqlService,
 	ctx context.Context,
 	groupId int,
 	roleAttribute new_model.TransactionRoleAttribute,
-) (bool, error) {
-	// Defined as anchor, starting point to recursively check the groups upwards
-	groupCTE := sql_query.NewSQLSelectBuilder[any](db.GroupTableName).
-		Select("id", "parent_id").
+	roleType new_model.TransactionRoleType,
+) (*[]T, error) {
+	query, args, _ := sql_query.NewSQLSelectBuilder[T](db.UserTransactionRoleTableName, "utr").
+		Join(db.GroupTableName+" g", "utr.group_id = g.ancestor_id").
 		Where(map[string]sql_query.SQLCondition{
-			"id": {Operator: sql_query.SQLOperatorEqual, Value: groupId},
-		})
-
-	// Recursive step to climbs up, find the parent of current chain
-	groupParentCTE := sql_query.NewSQLSelectBuilder[any](db.GroupTableName, "g").
-		Select("g.id", "g.parent_id").
-		Join("parent_groups pg", "g.id = pg.parent_id")
-
-	// Write "WITH RECURSIVE" CTE to main query
-	withRecursiveCTE := sql_query.NewSQLSelectBuilder[any](db.GroupTableName).
-		UnionAll(
-			groupCTE.(*sql_query.SelectBuilder).SQLEloquentQuery,
-			groupParentCTE.(*sql_query.SelectBuilder).SQLEloquentQuery,
-		)
-
-	// Build final query, `select` basically just contain "hasApproval"
-	query, args, _ := sql_query.NewSQLSelectBuilder[any]("parent_groups pg").
-		Select(`COUNT(utr.id) > 0 as "hasApproval"`).
-		WithRecursiveCTEBuilder("parent_groups", withRecursiveCTE.(*sql_query.SelectBuilder).SQLEloquentQuery).
-		Join(db.UserTransactionRoleTableName+" utr", "utr.group_id = pg.id").
-		Where(map[string]sql_query.SQLCondition{
-			// Top level parent (level 1)
-			"pg.parent_id":       {Operator: sql_query.SQLOperatorEqual, Value: 0},
-			"utr.role_type":      {Operator: sql_query.SQLOperatorEqual, Value: "Approval"},
+			"utr.role_type":      {Operator: sql_query.SQLOperatorEqual, Value: roleType},
 			"utr.role_attribute": {Operator: sql_query.SQLOperatorEqual, Value: roleAttribute},
 			"utr.is_active":      {Operator: sql_query.SQLOperatorEqual, Value: true},
+			"g.id":               {Operator: sql_query.SQLOperatorEqual, Value: groupId},
 		}).
 		Build()
 
-	var result struct{ HasApproval bool }
-	err := service.SelectOne(&result, ctx, query, args...)
+	result := new([]T)
+	err := service.SelectMany(result, ctx, query, args...)
 	if err != nil {
-		return false, err
+		return nil, err
 	}
-	fmt.Println("result", result)
 
-	return result.HasApproval, nil
+	return result, nil
 }
