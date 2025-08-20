@@ -27,6 +27,8 @@ const (
 	BrandCategoriesTableName                  = "brand_categories"
 	BorrowingApprovalTableName                = "borrowing_approvals"
 	BorrowingRequestTableName                 = "borrowing_requests"
+	BorrowingPrelistRequestTableName          = "borrowing_prelist_requests"
+	BorrowingPrelistTableName                 = "borrowing_prelist"
 	BorrowingTransactionTableName             = "borrowing_transactions"
 	BorrowingRequestHistoryTableName          = "borrowing_request_histories"
 	BorrowingTransactionHistoryTableName      = "borrowing_transaction_histories"
