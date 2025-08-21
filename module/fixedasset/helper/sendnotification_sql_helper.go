@@ -441,7 +441,7 @@ func emitRefreshSse(userIds []string, message string, reason ...string) *entity.
 		}
 
 		resp, err := http.Get(path)
-		// Dont throw error, if notif is down, let transaction continue
+		// Don't throw error, if notif is down, let transaction continue
 		if err != nil {
 			fmt.Println("RefreshNotificationSseSQL: " + err.Error())
 			continue
@@ -449,7 +449,7 @@ func emitRefreshSse(userIds []string, message string, reason ...string) *entity.
 
 		// Drain & close body so the connection can be reused
 		_, _ = io.Copy(io.Discard, resp.Body)
-		resp.Body.Close()
+		_ = resp.Body.Close()
 	}
 
 	return nil
