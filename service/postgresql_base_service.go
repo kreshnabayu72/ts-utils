@@ -844,6 +844,6 @@ func shouldShowQuery(level int, query string, args ...any) {
 	case 2:
 		log.Println("query and args", query, args)
 	case 3:
-		log.Println("query with args", sql_query.InterpolateQuery(query, args))
+		log.Println("query with args", sql_query.InterpolateQuery(query, args...))
 	}
 }
