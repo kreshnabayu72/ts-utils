@@ -37,6 +37,7 @@ const (
 	CategoryTableName                         = "categories"
 	ChangelogTableName                        = "change_logs"
 	ClientTableName                           = "clients"
+	ClientLicenseTableName                    = "client_licenses"
 	CustomFieldTableName                      = "custom_fields"
 	CustomFieldCategoriesTableName            = "custom_field_categories"
 	DamageReportTableName                     = "damage_reports"
