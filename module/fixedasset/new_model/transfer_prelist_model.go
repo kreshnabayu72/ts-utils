@@ -40,4 +40,12 @@ func (m *TransferPrelist) Up(builder *migration.MigrationBuilder) {
 		"id",
 		"",
 	)
+
+	// Add the unique index for origin group id and destination group id
+	builder.AddIndex(
+		"transfer_prelists_origin_group_id_destination_group_id",
+		"origin_group_id,destination_group_id",
+		true,
+		"",
+	)
 }

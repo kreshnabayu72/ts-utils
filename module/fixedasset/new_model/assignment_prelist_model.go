@@ -41,4 +41,12 @@ func (m *AssignmentPrelist) Up(builder *migration.MigrationBuilder) {
 		"id",
 		"",
 	)
+
+	// Add the unique index for user id, group id, and type
+	builder.AddIndex(
+		"assignment_prelists_group_id_assigned_to_id_type",
+		"group_id,assigned_to_id,type",
+		true,
+		"",
+	)
 }
