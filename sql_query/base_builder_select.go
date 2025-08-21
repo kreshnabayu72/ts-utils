@@ -566,6 +566,11 @@ type Sort struct {
 	SortOrder int    `json:"sortOrder"`
 }
 
+type SQLSort struct {
+	SortBy    string `json:"sortBy"`
+	SortOrder string `json:"sortOrder"` // ASC | DESC
+}
+
 type Pagination struct {
 	Page        int    `json:"page"      transform:"int"`
 	Limit       int    `json:"limit"     transform:"int"`
