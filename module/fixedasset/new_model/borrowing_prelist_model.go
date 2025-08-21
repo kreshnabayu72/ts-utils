@@ -36,4 +36,12 @@ func (m *BorrowingPrelist) Up(builder *migration.MigrationBuilder) {
 		"id",
 		"",
 	)
+
+	// Add the unique index for user id, group id
+	builder.AddIndex(
+		"borrowing_prelists_group_id_borrower_id",
+		"group_id,borrower_id",
+		true,
+		"",
+	)
 }
