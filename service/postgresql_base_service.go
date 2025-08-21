@@ -29,7 +29,8 @@ type PostgreSqlService interface {
 	//
 	//	0 → no logs
 	//	1 → log queries
-	//	2 → log queries and arguments
+	//	2 → log queries and arguments (separated)
+	//  3 → log queries and arguments (combined in the string)
 	//
 	// Defaults to level 1 if an invalid level is passed.
 	// Remove its usage in production
@@ -270,7 +271,7 @@ func MakePostgreSqlService(dbName db.DBName) PostgreSqlService {
 }
 
 func (s *BasePostgreSqlService) Debug(level ...int) {
-	if len(level) > 0 && sql_query.ArrayIncludes([]int{1, 2}, level[0]) {
+	if len(level) > 0 && sql_query.ArrayIncludes([]int{1, 2, 3}, level[0]) {
 		s.debugLevel = level[0]
 		return
 	}
@@ -842,5 +843,7 @@ func shouldShowQuery(level int, query string, args ...any) {
 		log.Println("query", query)
 	case 2:
 		log.Println("query and args", query, args)
+	case 3:
+		log.Println("query with args", sql_query.InterpolateQuery(query, args))
 	}
 }
