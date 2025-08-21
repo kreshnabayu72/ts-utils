@@ -36,4 +36,12 @@ func (m *BorrowingPrelistRequest) Up(builder *migration.MigrationBuilder) {
 		"id",
 		"",
 	)
+
+	// Add the unique index for prelist id and asset id
+	builder.AddIndex(
+		"borrowing_prelist_requests_prelist_id_asset_id",
+		"prelist_id,asset_id",
+		true,
+		"",
+	)
 }
