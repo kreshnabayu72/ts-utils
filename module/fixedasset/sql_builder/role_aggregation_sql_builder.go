@@ -232,6 +232,14 @@ func GetHasTransactionRole(
 		"isStaff",
 		transactionGroupAttribute,
 	)
+	builder.SelectBoolOr(
+		fmt.Sprintf(
+			"utr.role_type = 'Approval' AND utr.role_attribute = $%d",
+			len(builder.Args)+1,
+		),
+		"isApprover",
+		transactionGroupAttribute,
+	)
 }
 
 // TransactionRolePermissionAggregation constructs and attaches a Common Table Expression (CTE)
@@ -262,7 +270,12 @@ func TransactionRolePermissionAggregation(
 	GetHasTransactionRole(cteBuilder.(*sql_query.SelectBuilder), transactionGroupAttribute)
 	cteBuilder.GroupBy("utr.group_id")
 	builder.WithCTEBuilder("user_transaction_roles_cte", cteBuilder.(*sql_query.SelectBuilder).SQLEloquentQuery)
-	builder.Select(`utr."isManager"`, `utr."isMonitoring"`)
+	builder.Select(
+		`utr."isManager"`,
+		`utr."isMonitoring"`,
+		`utr."isStaff"`,
+		`utr."isApprover"`,
+	)
 
 	joinCteKeyword := builder.LeftJoin
 	if len(filterOutEmptyRole) > 0 && filterOutEmptyRole[0] {
