@@ -44,7 +44,8 @@ const (
 type NotificationApp string
 
 const (
-	NotificationAppFixedAsset NotificationModule = "Fixed Asset"
+	NotificationAppFixedAsset  NotificationApp = "Fixed Asset"
+	NotificationAppSupplyAsset NotificationApp = "Supply Asset"
 )
 
 type Notification struct {
