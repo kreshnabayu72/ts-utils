@@ -148,12 +148,12 @@ func (s *SQLEloquentQuery) buildInsertQuery() (string, []interface{}, error) {
 		)
 	}
 
-	if len(s.Columns) > 0 {
-		s.CustomQuery += " RETURNING " + strings.Join(s.Columns, ",")
-	}
-
 	if s.ConflictClause != "" {
 		s.CustomQuery += s.ConflictClause
+	}
+
+	if len(s.Columns) > 0 {
+		s.CustomQuery += " RETURNING " + strings.Join(s.Columns, ",")
 	}
 
 	return s.CustomQuery, s.Args, nil
