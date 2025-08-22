@@ -7,7 +7,7 @@ import (
 )
 
 type AssetName struct {
-	ID   int    `json:"_id" column:"id" sql:"BIGINT PRIMARY KEY"`
+	ID   int    `json:"_id"  column:"id"   sql:"BIGINT PRIMARY KEY"`
 	Name string `json:"name" column:"name" sql:"VARCHAR NOT NULL CHECK (CHAR_LENGTH(name) > 0)"`
 	Code string `json:"code" column:"code" sql:"VARCHAR NULL DEFAULT NULL"`
 
