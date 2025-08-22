@@ -20,7 +20,7 @@ type AggregationOptions struct {
 }
 
 type AliasCode struct {
-	AssetID string `column:"CONCAT_WS(ac.separator, MAX(CASE WHEN acd.name = 'Initial' AND acd.is_checked THEN ac.company_initial END), MAX(CASE WHEN acd.name = 'Group' AND acd.is_checked THEN g.code END), MAX(CASE WHEN acd.name = 'Category' AND acd.is_checked THEN c.code END), MAX(CASE WHEN acd.name = 'Asset Name' AND acd.is_checked THEN an.code END), MAX(CASE WHEN acd.name = 'Purchase Date' AND acd.is_checked THEN TO_CHAR(a.purchase_date, 'MMYY') END), MAX(CASE WHEN acd.name = 'Increment' AND acd.is_checked THEN LPAD(a.sequence_number::text, 4, '0') END))" json:"assetId"`
+	AssetID string `column:"CONCAT_WS(ac.separator, MAX(CASE WHEN acd.name = 'Initial' AND acd.is_checked THEN ac.company_initial END), MAX(CASE WHEN acd.name = 'Group' AND acd.is_checked THEN g.code END), MAX(CASE WHEN acd.name = 'Category' AND acd.is_checked THEN c.code END), MAX(CASE WHEN acd.name = 'Asset Name' AND acd.is_checked THEN an.code END), MAX(CASE WHEN acd.name = 'Purchase Date' AND acd.is_checked THEN TO_CHAR(inner_a.purchase_date, 'MMYY') END), MAX(CASE WHEN acd.name = 'Increment' AND acd.is_checked THEN LPAD(inner_a.sequence_number::text, 4, '0') END))" json:"assetId"`
 }
 
 type Brand struct {
@@ -50,7 +50,7 @@ type Name struct {
 	ID               string            `column:"asset_names.id::text" json:"_id,omitempty"`
 	Name             string            `column:"asset_names.name" json:"name"`
 	TagType          new_model.TagType `column:"asset_names.tag_type" json:"tagType"`
-	NameWithSequence string            `column:"concat(asset_names.name, ' - ', a.sequence_number)" json:"nameWithSequence"`
+	NameWithSequence string            `column:"a.name_with_sequence" json:"nameWithSequence"`
 }
 
 type DepreciationGroup struct {
@@ -116,18 +116,14 @@ func AttributesAggregationBuilder(builder *sql_query.SelectBuilder, dto any, opt
 }
 
 // Tested result WTF/MG/ELEC/LTP/0724/1
-func GetAssetIDFromAliasCodeBuilder(builder *sql_query.SelectBuilder, tableName string) {
-	splittedTableName := strings.Split(tableName, " ")
-	relationAlias := tableName
-	if len(splittedTableName) == 2 {
-		relationAlias = splittedTableName[1]
-	}
+func GetAssetIDFromAliasCodeBuilder(builder *sql_query.SelectBuilder, localAssetColumn string) {
 	res, args, err := sql_query.NewSQLSelectBuilder[AliasCode](db.AliasCodeTableName, "ac").
-		Join("groups g", "g.id = "+relationAlias+".group_id").
-		Join("models m", "m.id = "+relationAlias+".model_id").
+		Join("assets inner_a", "inner_a.id = "+localAssetColumn).
+		Join("groups g", "g.id = inner_a.group_id").
+		Join("models m", "m.id = inner_a.model_id").
 		Join("brand_categories bc", "bc.id = m.brand_category_id").
 		Join("categories c", "c.id = bc.category_id").
-		Join("asset_names an", "an.id = "+relationAlias+".name_id").
+		Join("asset_names an", "an.id = inner_a.name_id").
 		LeftJoin("alias_codes_data acd", "acd.alias_code_id = ac.id").
 		GroupBy("ac.separator").
 		SetLimit(1).
