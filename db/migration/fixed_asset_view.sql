@@ -1,5 +1,5 @@
 CREATE OR REPLACE VIEW "category_tree" AS
-SELECT build_category_tree(NULL, ARRAY_AGG(node)) AS tree
+SELECT build_category_tree(NULL, ARRAY_AGG(node  ORDER BY  (node->>'name'))) AS tree
 FROM (
     SELECT jsonb_build_object(
         '_id', id,
