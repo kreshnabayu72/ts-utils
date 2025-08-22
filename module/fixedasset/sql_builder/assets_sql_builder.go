@@ -87,7 +87,7 @@ func CommonGetAssetListBuilder(excludeFields ...string) *sql_query.SelectBuilder
 	}
 
 	if !sql_query.ArrayIncludes(excludeFields, "assetId") {
-		GetAssetIDFromAliasCodeBuilder(assetBuilder, "assets a")
+		GetAssetIDFromAliasCodeBuilder(assetBuilder, "a.id")
 	}
 
 	return assetBuilder
