@@ -5,6 +5,7 @@ import (
 	"log"
 	"strings"
 
+	"gitea.qwertysystem.net/BETS/ts-utils/db"
 	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
 	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
 )
@@ -116,13 +117,17 @@ func AttributesAggregationBuilder(builder *sql_query.SelectBuilder, dto any, opt
 
 // Tested result WTF/MG/ELEC/LTP/0724/1
 func GetAssetIDFromAliasCodeBuilder(builder *sql_query.SelectBuilder, tableName string) {
-	res, args, err := sql_query.NewSQLSelectBuilder[AliasCode](tableName).
-		Join("alias_codes ac", "true").
-		Join("groups g", "g.id = a.group_id").
-		Join("models m", "m.id = a.model_id").
+	splittedTableName := strings.Split(tableName, " ")
+	relationAlias := tableName
+	if len(splittedTableName) == 2 {
+		relationAlias = splittedTableName[1]
+	}
+	res, args, err := sql_query.NewSQLSelectBuilder[AliasCode](db.AliasCodeTableName, "ac").
+		Join("groups g", "g.id = "+relationAlias+".group_id").
+		Join("models m", "m.id = "+relationAlias+".model_id").
 		Join("brand_categories bc", "bc.id = m.brand_category_id").
 		Join("categories c", "c.id = bc.category_id").
-		Join("asset_names an", "an.id = a.name_id").
+		Join("asset_names an", "an.id = "+relationAlias+".name_id").
 		LeftJoin("alias_codes_data acd", "acd.alias_code_id = ac.id").
 		GroupBy("ac.separator").
 		SetLimit(1).
