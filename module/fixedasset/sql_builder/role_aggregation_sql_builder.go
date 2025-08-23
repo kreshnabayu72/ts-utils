@@ -1052,15 +1052,15 @@ func FindUserTransactionRoles[T any](
 ) error {
 	var err error
 
-	transactionRoleBuilder := sql_query.NewSQLSelectBuilder[T]("user_transaction_roles")
-	transactionRoleBuilder.LeftJoin("groups gp", "gp.ancestor_id = user_transaction_roles.group_id")
+	transactionRoleBuilder := sql_query.NewSQLSelectBuilder[T]("user_transaction_roles", "utr")
+	transactionRoleBuilder.LeftJoin("groups gp", "gp.ancestor_id = utr.group_id")
 
 	filter := map[string]sql_query.SQLCondition{
-		"user_id": {
+		"utr.user_id": {
 			Operator: sql_query.SQLOperatorEqual,
 			Value:    loggedInUserId,
 		},
-		"is_active": {
+		"utr.is_active": {
 			Operator: sql_query.SQLOperatorEqual,
 			Value:    true,
 		},
@@ -1070,10 +1070,10 @@ func FindUserTransactionRoles[T any](
 	for _, each := range roleFilter {
 		filterPart := map[string]sql_query.SQLCondition{}
 		if each.RoleAttribute != "" {
-			filterPart["role_attribute"] = sql_query.SQLCondition{Operator: sql_query.SQLOperatorEqual, Value: each.RoleAttribute}
+			filterPart["utr.role_attribute"] = sql_query.SQLCondition{Operator: sql_query.SQLOperatorEqual, Value: each.RoleAttribute}
 		}
 		if each.RoleType != "" {
-			filterPart["role_type"] = sql_query.SQLCondition{Operator: sql_query.SQLOperatorEqual, Value: each.RoleType}
+			filterPart["utr.role_type"] = sql_query.SQLCondition{Operator: sql_query.SQLOperatorEqual, Value: each.RoleType}
 		}
 		if each.GroupID != nil {
 			filterPart["gp.id"] = sql_query.SQLCondition{Operator: sql_query.SQLOperatorEqual, Value: each.GroupID}
