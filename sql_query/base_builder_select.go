@@ -888,37 +888,49 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 	// ORDER BY
 	if len(s.SortBy) > 0 {
 		orderSb.WriteString("ORDER BY ")
+
+		asSplit := regexp.MustCompile(`(?i)\s+AS\s+`)
+		stripDir := regexp.MustCompile(`\s+(?i)(asc|desc)\s*$`)
+
+		// map for transforming alias ("dataType") to column ("data_type")
+		aliasToExpr := make(map[string]string, len(s.Columns))
+		for _, col := range s.Columns {
+			col = strings.TrimSpace(col)
+			parts := asSplit.Split(col, 2)
+			if len(parts) == 2 {
+				expr := strings.TrimSpace(parts[0])  // e.g. "cf.data_type"
+				alias := strings.TrimSpace(parts[1]) // e.g. "dataType"
+				aliasToExpr[strings.ToLower(alias)] = expr
+			}
+		}
+
 		for i, srt := range s.SortBy {
 			if i > 0 {
 				orderSb.WriteString(", ")
 			}
 
-			//Get sort without asc/desc
-			re := regexp.MustCompile(`\s+(?i)(asc|desc)$`)
-			sortBy := strings.TrimSpace(re.ReplaceAllString(srt, ""))
+			srt = strings.TrimSpace(srt)
 
-			//Find 'aliased' column string,
-			// Example:
-			// if one of select query is "data_type as dataType" and sortBy = dataType
-			// then transform the order by query to "order by data_type"
-			for _, col := range s.Columns {
-				parts := strings.Split(col, "as")
-
-				// If the select doesnt have alias (AS), dont change the order by
-				if len(parts) < 2 {
-					continue
-				}
-
-				if strings.EqualFold(strings.TrimSpace(parts[len(parts)-1]), strings.TrimSpace(sortBy)) {
-					srt = parts[0]
-				}
+			// get dir if present (keep original casing)
+			fields := strings.Fields(srt)
+			dir := ""
+			if len(fields) > 1 && (strings.EqualFold(fields[len(fields)-1], "asc") || strings.EqualFold(fields[len(fields)-1], "desc")) {
+				dir = " " + fields[len(fields)-1]
 			}
 
-			orderSb.WriteString(srt)
+			// key without ASC/DESC
+			key := strings.TrimSpace(stripDir.ReplaceAllString(srt, ""))
+			keyLower := strings.ToLower(key)
+
+			// resolve alias -> expression (this is the “compare srt to col” you meant, but via the map)
+			if expr, ok := aliasToExpr[keyLower]; ok {
+				key = expr
+			}
+
+			orderSb.WriteString(key + dir)
 		}
 		orderSb.WriteByte('\n')
 	}
-
 	// LIMIT/OFFSET
 	if s.UsePagination {
 		var limitationSb strings.Builder
