@@ -886,21 +886,39 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 	}
 
 	// ORDER BY
+	// ORDER BY
 	if len(s.SortBy) > 0 {
 		orderSb.WriteString("ORDER BY ")
 
 		asSplit := regexp.MustCompile(`(?i)\s+AS\s+`)
 		stripDir := regexp.MustCompile(`\s+(?i)(asc|desc)\s*$`)
 
-		// map for transforming alias ("dataType") to column ("data_type")
+		// helper: trim space, trailing comma, and surrounding double quotes
+		clean := func(s string) string {
+			s = strings.TrimSpace(s)
+			s = strings.TrimSuffix(s, ",")
+			if len(s) >= 2 && s[0] == '"' && s[len(s)-1] == '"' {
+				s = s[1 : len(s)-1]
+			}
+			return s
+		}
+
+		// map for transforming alias ("dataType") to column ("cf.data_type")
 		aliasToExpr := make(map[string]string, len(s.Columns))
 		for _, col := range s.Columns {
 			col = strings.TrimSpace(col)
 			parts := asSplit.Split(col, 2)
+
 			if len(parts) == 2 {
-				expr := strings.TrimSpace(parts[0])  // e.g. "cf.data_type"
-				alias := strings.TrimSpace(parts[1]) // e.g. "dataType"
-				aliasToExpr[strings.ToLower(alias)] = expr
+				expr := strings.TrimSpace(parts[0]) // e.g. cf.data_type
+				alias := clean(parts[1])            // e.g. "dataType" -> dataType
+				key := strings.ToLower(alias)
+				aliasToExpr[key] = expr
+			} else {
+				// support bare columns too (no AS)
+				ident := clean(col)
+				key := strings.ToLower(ident)
+				aliasToExpr[key] = ident
 			}
 		}
 
@@ -914,23 +932,25 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 			// get dir if present (keep original casing)
 			fields := strings.Fields(srt)
 			dir := ""
-			if len(fields) > 1 && (strings.EqualFold(fields[len(fields)-1], "asc") || strings.EqualFold(fields[len(fields)-1], "desc")) {
-				dir = " " + fields[len(fields)-1]
+			if n := len(fields); n > 1 && (strings.EqualFold(fields[n-1], "asc") || strings.EqualFold(fields[n-1], "desc")) {
+				dir = " " + fields[n-1]
 			}
 
-			// key without ASC/DESC
+			// key without ASC/DESC, then unquote/clean
 			key := strings.TrimSpace(stripDir.ReplaceAllString(srt, ""))
-			keyLower := strings.ToLower(key)
+			key = clean(key)
+			lookup := strings.ToLower(key)
 
-			// resolve alias -> expression (this is the “compare srt to col” you meant, but via the map)
-			if expr, ok := aliasToExpr[keyLower]; ok {
-				key = expr
+			// resolve alias -> expression (fallback to key as-is)
+			if expr, ok := aliasToExpr[lookup]; ok {
+				orderSb.WriteString(expr + dir)
+			} else {
+				orderSb.WriteString(key + dir)
 			}
-
-			orderSb.WriteString(key + dir)
 		}
 		orderSb.WriteByte('\n')
 	}
+
 	// LIMIT/OFFSET
 	if s.UsePagination {
 		var limitationSb strings.Builder
