@@ -3,6 +3,7 @@ package sql_query
 import (
 	"errors"
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -891,6 +892,28 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 			if i > 0 {
 				orderSb.WriteString(", ")
 			}
+
+			//Get sort without asc/desc
+			re := regexp.MustCompile(`\s+(?i)(asc|desc)$`)
+			sortBy := strings.TrimSpace(re.ReplaceAllString(srt, ""))
+
+			//Find 'aliased' column string,
+			// Example:
+			// if one of select query is "data_type as dataType" and sortBy = dataType
+			// then transform the order by query to "order by data_type"
+			for _, col := range s.Columns {
+				parts := strings.Split(col, "as")
+
+				// If the select doesnt have alias (AS), dont change the order by
+				if len(parts) < 2 {
+					continue
+				}
+
+				if strings.EqualFold(strings.TrimSpace(parts[len(parts)-1]), strings.TrimSpace(sortBy)) {
+					srt = parts[0]
+				}
+			}
+
 			orderSb.WriteString(srt)
 		}
 		orderSb.WriteByte('\n')
@@ -923,169 +946,6 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 
 	query := withSb.String() + selectSb.String() + joinSb.String() + whereSb.String() + groupSb.String() + havingSb.String() + orderSb.String()
 	return query, s.Args, nil
-}
-
-func (s *SQLEloquentQuery) buildSelectQuery_old() (string, []interface{}, error) {
-	if len(s.HavingClauses) > 0 && len(s.Grouping) == 0 {
-		return "", nil, errors.New("HAVING clauses only allowed if GROUP BY clause is exists")
-	}
-
-	if len(s.Columns) == 0 {
-		s.Columns = []string{"*"}
-	}
-
-	var sb strings.Builder
-	var countQuery string
-	sb.Grow(256) // preallocate ~256 bytes
-
-	// WITH
-	if len(s.WithClauses) > 0 {
-		sb.WriteByte('\n')
-		sb.WriteString("WITH ")
-		for i, c := range s.WithClauses {
-			if i > 0 {
-				sb.WriteString(", ")
-			}
-			sb.WriteString(c)
-		}
-	}
-
-	// WITH RECURSIVE
-	if len(s.WithRecursiveClauses) > 0 {
-		sb.WriteByte('\n')
-		sb.WriteString("WITH RECURSIVE ")
-		for i, c := range s.WithRecursiveClauses {
-			if i > 0 {
-				sb.WriteString(", ")
-			}
-			sb.WriteString(c)
-		}
-	}
-
-	// DISTINCT
-	var db strings.Builder
-	if len(s.DistinctBy) > 0 {
-		db.WriteString("DISTINCT ON ")
-		db.WriteString("(")
-		for i, d := range s.DistinctBy {
-			if i > 0 {
-				db.WriteString(",")
-			}
-			db.WriteString(d)
-		}
-		db.WriteString(")")
-		db.WriteString(" " + s.DistinctAlias)
-
-		tmp := make([]string, len(s.Columns))
-
-		// Prepend distinct to the column clause.
-		copy(tmp, s.Columns)
-		s.Columns = []string{db.String()}
-		s.Columns = append(s.Columns, tmp...)
-	}
-
-	// SELECT
-	// Dont need to use default select if using union All, since union typically uses SELECT inside of it
-	if !s.useUnionAll {
-		sb.WriteByte('\n')
-		sb.WriteString("SELECT ")
-		for i, col := range s.Columns {
-			if i > 0 {
-				sb.WriteByte(',')
-			}
-			sb.WriteString(col)
-		}
-		sb.WriteByte('\n')
-		sb.WriteString("FROM ")
-		sb.WriteString(s.Table)
-		sb.WriteByte('\n')
-	}
-
-	// JOIN
-	if len(s.OtherTables) > 0 {
-		for _, j := range s.OtherTables {
-			sb.WriteString(j)
-			sb.WriteByte('\n')
-		}
-	}
-
-	// WHERE
-	if len(s.Filters) > 0 {
-		sb.WriteString("WHERE ")
-		for i, f := range s.Filters {
-			if i > 0 {
-				sb.WriteString(" AND ")
-			}
-			sb.WriteString(f)
-		}
-		sb.WriteByte('\n')
-	}
-
-	// GROUP BY
-	if len(s.Grouping) > 0 {
-		sb.WriteString("GROUP BY ")
-		for i, g := range s.Grouping {
-			if i > 0 {
-				sb.WriteString(", ")
-			}
-			sb.WriteString(g)
-		}
-		sb.WriteByte('\n')
-	}
-
-	// UNION ALL
-	if len(s.UnionAllQueries) > 0 {
-		for i, u := range s.UnionAllQueries {
-			if i > 0 {
-				sb.WriteString("UNION ALL")
-				sb.WriteByte('\n')
-			}
-			sb.WriteString(u)
-		}
-		sb.WriteByte('\n')
-	}
-
-	// HAVING
-	if len(s.HavingClauses) > 0 {
-		sb.WriteString("HAVING ")
-		for i, h := range s.HavingClauses {
-			if i > 0 {
-				sb.WriteString(" AND ")
-			}
-			sb.WriteString(h)
-		}
-		sb.WriteByte('\n')
-	}
-
-	countQuery = sb.String()
-
-	// ORDER BY
-	if len(s.SortBy) > 0 {
-		sb.WriteString("ORDER BY ")
-		for i, srt := range s.SortBy {
-			if i > 0 {
-				sb.WriteString(", ")
-			}
-			sb.WriteString(srt)
-		}
-		sb.WriteByte('\n')
-	}
-
-	// LIMIT/OFFSET
-	if s.UsePagination {
-		if s.Limit > 0 {
-			sb.WriteString("LIMIT ")
-			sb.WriteString(strconv.Itoa(s.Limit))
-			sb.WriteByte(' ')
-		}
-		sb.WriteString("OFFSET ")
-		sb.WriteString(strconv.Itoa(s.Offset))
-		sb.WriteByte('\n')
-
-		return PaginationQuery_old(sb.String(), countQuery), s.Args, nil
-	}
-
-	return sb.String(), s.Args, nil
 }
 
 // Internal Utils for builder select
