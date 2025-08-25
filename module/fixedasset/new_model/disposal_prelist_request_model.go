@@ -38,6 +38,6 @@ func (m *DisposalPrelistRequest) Up(builder *migration.MigrationBuilder) {
 		"prelist_id",
 		"disposal_prelists",
 		"id",
-		"",
+		"CASCADE",
 	)
 }
