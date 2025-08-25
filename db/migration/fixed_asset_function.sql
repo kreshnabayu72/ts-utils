@@ -76,7 +76,7 @@ BEGIN
 
         IF parent_id IS NOT DISTINCT FROM parent THEN
             current_id := (node->>'_id')::TEXT;
-            children := build_category_tree(current_id, nodes);
+            children := build_group_tree(current_id, nodes);
 
             result := result || jsonb_build_object(
                 '_id', current_id,
@@ -84,7 +84,8 @@ BEGIN
                 'code', node->>'code',
                 'key', node->'key',
                 'children', children,
-				'is_deleted',(node->'is_deleted')::BOOLEAN
+				'is_deleted',(node->'is_deleted')::BOOLEAN,
+                'hasSystemRole',   node ->'hasSystemRole'
             );
         END IF;
     END LOOP;

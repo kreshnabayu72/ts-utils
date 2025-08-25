@@ -10,8 +10,9 @@ type Rfid struct {
 	ID int `json:"_id" column:"id" sql:"BIGINT PRIMARY KEY"`
 
 	Code            string      `json:"code" column:"code" sql:"VARCHAR NOT NULL CHECK (CHAR_LENGTH(code) > 0)"`
+	ShortCode       string      `json:"shortCode" column:"short_code" sql:"VARCHAR NOT NULL CHECK (CHAR_LENGTH(short_code) > 0)"`
 	Status          TagStatus   `json:"status" column:"status" sql:"tag_status_enum NOT NULL"`
-	LastAssetStatus AssetStatus `json:"lastAssetStatus" column:"asset_status" sql:"asset_status_enum NOT NULL"`
+	LastAssetStatus AssetStatus `json:"lastAssetStatus" column:"asset_status" sql:"asset_status_enum NULL"`
 
 	HolderId *int `json:"holderId" column:"holder_id" sql:"BIGINT"`
 
