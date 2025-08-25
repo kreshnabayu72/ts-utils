@@ -38,7 +38,7 @@ func (m *AssignmentPrelistRequest) Up(builder *migration.MigrationBuilder) {
 		"prelist_id",
 		"assignment_prelists",
 		"id",
-		"",
+		"CASCADE",
 	)
 
 	// Add the unique index for prelist id and asset id
