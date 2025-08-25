@@ -11,7 +11,7 @@ type Rfid struct {
 
 	Code            string      `json:"code" column:"code" sql:"VARCHAR NOT NULL CHECK (CHAR_LENGTH(code) > 0)"`
 	Status          TagStatus   `json:"status" column:"status" sql:"tag_status_enum NOT NULL"`
-	LastAssetStatus AssetStatus `json:"lastAssetStatus" column:"asset_status" sql:"asset_status_enum NOT NULL"`
+	LastAssetStatus AssetStatus `json:"lastAssetStatus" column:"asset_status" sql:"asset_status_enum NULL"`
 
 	HolderId *int `json:"holderId" column:"holder_id" sql:"BIGINT"`
 

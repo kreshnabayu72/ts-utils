@@ -13,6 +13,7 @@ FROM (
     FROM categories
 ) AS all_nodes;
 
+
 CREATE OR REPLACE VIEW "group_tree" AS
 SELECT build_group_tree(NULL, ARRAY_AGG(node  ORDER BY  (node->>'name'))) AS tree
 FROM (
@@ -25,7 +26,7 @@ FROM (
         'children', '[]'::jsonb,
         'is_deleted', is_deleted
     ) AS node
-    FROM categories
+    FROM groups
 ) AS all_nodes;
 
 CREATE OR REPLACE VIEW "my_asset_histories" AS
