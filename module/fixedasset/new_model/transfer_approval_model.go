@@ -42,7 +42,7 @@ func (m *TransferApproval) Up(builder *migration.MigrationBuilder) {
 		"request_id",
 		"transfer_requests",
 		"id",
-		"",
+		"CASCADE",
 	)
 	builder.AddForeignKey(
 		"fk_transfer_approvals_approver",
