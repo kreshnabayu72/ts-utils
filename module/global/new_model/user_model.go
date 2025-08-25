@@ -25,6 +25,8 @@ type User struct {
 	EmployeeID     *string                          `json:"employeeId" column:"employee_id" sql:"VARCHAR NULL"`
 	Access         []fixed_asset_model.ModuleAccess `json:"access" column:"access"`
 	ModifiedBy     int                              `json:"modifiedById" column:"modified_by_id" sql:"BIGINT REFERENCES users(id)"`
+	IsTemporary    bool                             `json:"isTemporary" column:"is_temporary" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
+	ExpiryDate     *time.Time                       `json:"expiryDate" column:"expiry_date" sql:"TIMESTAMPTZ NULL"`
 
 	CreatedAt *time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 	UpdatedAt *time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
