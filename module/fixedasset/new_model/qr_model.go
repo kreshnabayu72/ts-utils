@@ -9,7 +9,9 @@ import (
 type Qr struct {
 	ID int `json:"_id" column:"id" sql:"BIGINT PRIMARY KEY"`
 
-	Code   string    `json:"code" column:"code" sql:"VARCHAR NOT NULL CHECK (CHAR_LENGTH(code) > 0)"`
+	Code      string `json:"code" column:"code" sql:"VARCHAR NOT NULL CHECK (CHAR_LENGTH(code) > 0)"`
+	ShortCode string `json:"shortCode" column:"short_code" sql:"VARCHAR NOT NULL CHECK (CHAR_LENGTH(short_code) > 0)"`
+
 	Status TagStatus `json:"status" column:"status" sql:"tag_status_enum NOT NULL"`
 
 	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
