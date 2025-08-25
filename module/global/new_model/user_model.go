@@ -10,12 +10,13 @@ import (
 type User struct {
 	ID int `json:"_id" column:"id" sql:"BIGINT PRIMARY KEY"`
 
-	FirstName string `json:"firstName" column:"first_name" sql:"VARCHAR NOT NULL"`
-	LastName  string `json:"lastName" column:"last_name" sql:"VARCHAR NOT NULL"`
-	FullName  string `json:"fullName" column:"full_name" sql:"VARCHAR GENERATED ALWAYS AS (first_name || ' ' || last_name) STORED"`
-	Email     string `json:"email" column:"email" sql:"VARCHAR NOT NULL"`
-	IsActive  bool   `json:"isActive" column:"is_active" sql:"BOOLEAN NOT NULL DEFAULT TRUE"`
-	IsDefault bool   `json:"isDefault" column:"is_default" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
+	FirstName          string  `json:"firstName" column:"first_name" sql:"VARCHAR NOT NULL"`
+	LastName           string  `json:"lastName" column:"last_name" sql:"VARCHAR NOT NULL"`
+	FullName           string  `json:"fullName" column:"full_name" sql:"VARCHAR GENERATED ALWAYS AS (first_name || ' ' || last_name) STORED"`
+	Email              string  `json:"email" column:"email" sql:"VARCHAR NOT NULL"`
+	PendingEmailChange *string `json:"pendingEmailChange" column:"pending_email_change" sql:"VARCHAR NULL"`
+	IsActive           bool    `json:"isActive" column:"is_active" sql:"BOOLEAN NOT NULL DEFAULT TRUE"`
+	IsDefault          bool    `json:"isDefault" column:"is_default" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
 
 	PositionID     *int                             `json:"positionId" column:"position_id" sql:"BIGINT"`
 	DivisionID     int                              `json:"divisionId" column:"division_id" sql:"BIGINT"`
