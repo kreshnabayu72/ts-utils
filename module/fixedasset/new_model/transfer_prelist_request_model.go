@@ -38,7 +38,7 @@ func (m *TransferPrelistRequest) Up(builder *migration.MigrationBuilder) {
 		"prelist_id",
 		"transfer_prelists",
 		"id",
-		"",
+		"CASCADE",
 	)
 
 	// Add the unique index for prelist id and asset id

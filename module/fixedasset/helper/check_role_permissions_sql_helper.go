@@ -36,6 +36,9 @@ func CheckSystemRolePermissionSQL(ctx *fiber.Ctx, permissionKey new_model.Permis
 	service := service.MakePostgreSqlService(fixedAssetDbName)
 
 	// Convert resourceTypes to a slice of strings
+
+	accumulatedCount := 0
+
 	resourceTypeStrs := make([]string, len(resourceTypes))
 	for i, resourceType := range resourceTypes {
 		resourceTypeStrs[i] = string(resourceType)
@@ -66,10 +69,11 @@ func CheckSystemRolePermissionSQL(ctx *fiber.Ctx, permissionKey new_model.Permis
 			return entity.InternalServerError(err.Error())
 		}
 
-		if count < 1 {
-			fmt.Printf("FILTER: %v\n", filter)
-			return entity.Unauthorized("You do not have the required permissions")
-		}
+		accumulatedCount += count
+	}
+
+	if accumulatedCount < 1 {
+		return entity.Unauthorized("You do not have the required permissions")
 	}
 
 	return nil

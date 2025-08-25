@@ -117,15 +117,14 @@ func AttributesAggregationBuilder(builder *sql_query.SelectBuilder, dto any, opt
 
 // Tested result WTF/MG/ELEC/LTP/0724/1
 func GetAssetIDFromAliasCodeBuilder(builder *sql_query.SelectBuilder, localAssetColumn string) {
-	res, args, err := sql_query.NewSQLSelectBuilder[AliasCode](db.AliasCodeTableName, "ac").
+	res, args, err := sql_query.NewSQLSelectBuilder[any](db.AliasCodeTableName, "ac").
+		SelectCaseWhen(
+			"inner_a.alias_code",
+			"inner_a.asset_id",
+			"assetId",
+			"ac.is_active = true",
+		).
 		Join("assets inner_a", "inner_a.id = "+localAssetColumn).
-		Join("groups g", "g.id = inner_a.group_id").
-		Join("models m", "m.id = inner_a.model_id").
-		Join("brand_categories bc", "bc.id = m.brand_category_id").
-		Join("categories c", "c.id = bc.category_id").
-		Join("asset_names an", "an.id = inner_a.name_id").
-		LeftJoin("alias_codes_data acd", "acd.alias_code_id = ac.id").
-		GroupBy("ac.separator").
 		SetLimit(1).
 		Build()
 	if err != nil {
@@ -134,4 +133,22 @@ func GetAssetIDFromAliasCodeBuilder(builder *sql_query.SelectBuilder, localAsset
 
 	builder.Columns = append(builder.Columns, fmt.Sprintf("(%s) AS assetId", res))
 	builder.Args = append(builder.Args, args...)
+
+	// res, args, err := sql_query.NewSQLSelectBuilder[AliasCode](db.AliasCodeTableName, "ac").
+	// 	Join("assets inner_a", "inner_a.id = "+localAssetColumn).
+	// 	Join("groups g", "g.id = inner_a.group_id").
+	// 	Join("models m", "m.id = inner_a.model_id").
+	// 	Join("brand_categories bc", "bc.id = m.brand_category_id").
+	// 	Join("categories c", "c.id = bc.category_id").
+	// 	Join("asset_names an", "an.id = inner_a.name_id").
+	// 	LeftJoin("alias_codes_data acd", "acd.alias_code_id = ac.id").
+	// 	GroupBy("ac.separator").
+	// 	SetLimit(1).
+	// 	Build()
+	// if err != nil {
+	// 	log.Println(err)
+	// }
+
+	// builder.Columns = append(builder.Columns, fmt.Sprintf("(%s) AS assetId", res))
+	// builder.Args = append(builder.Args, args...)
 }
