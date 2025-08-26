@@ -485,6 +485,13 @@ const (
 	ModuleAccessSupplyAsset    = ModuleAccess("Supply Asset")
 )
 
+var ModuleAccessEnum = map[string]ModuleAccess{
+	"Fixed Asset":     ModuleAccessFixedAsset,
+	"Settings Portal": ModuleAccessSettingsPortal,
+	"Admin Console":   ModuleAccessAdminConsole,
+	"Supply Asset":    ModuleAccessSupplyAsset,
+}
+
 type LicenseModuleType string
 
 const (
