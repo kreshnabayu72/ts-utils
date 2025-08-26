@@ -13,6 +13,7 @@ type User struct {
 	FirstName          string  `json:"firstName" column:"first_name" sql:"VARCHAR NOT NULL"`
 	LastName           string  `json:"lastName" column:"last_name" sql:"VARCHAR NOT NULL"`
 	FullName           string  `json:"fullName" column:"full_name" sql:"VARCHAR GENERATED ALWAYS AS (first_name || ' ' || last_name) STORED"`
+	PhoneNumber        string  `json:"phoneNumber" column:"phone_number" sql:"VARCHAR NOT NULL"`
 	Email              string  `json:"email" column:"email" sql:"VARCHAR NOT NULL"`
 	PendingEmailChange *string `json:"pendingEmailChange" column:"pending_email_change" sql:"VARCHAR NULL"`
 	IsActive           bool    `json:"isActive" column:"is_active" sql:"BOOLEAN NOT NULL DEFAULT TRUE"`
