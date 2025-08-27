@@ -16,8 +16,9 @@ type Rfid struct {
 
 	HolderId *int `json:"holderId" column:"holder_id" sql:"BIGINT"`
 
-	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ToBeReturnedAt *time.Time `json:"toBeReturnedAt" column:"to_be_returned_at" sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
+	CreatedAt      time.Time  `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt      time.Time  `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (m *Rfid) TableName() string {
