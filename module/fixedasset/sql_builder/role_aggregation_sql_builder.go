@@ -1166,6 +1166,15 @@ func TransactionRoleMultipleGroupAggregation(
 				fmt.Sprintf("is%sMonitoring", groupField.AttributeName),
 				fixedasset_new_model.TransactionRoleTypeMonitoring,
 			)
+			builder.SelectBoolOr(
+				fmt.Sprintf(
+					"utr.group_id = gp%d.ancestor_id AND utr.role_type = $%d",
+					idx,
+					builder.GetCurrentArgIndex()+1,
+				),
+				fmt.Sprintf("is%sStaff", groupField.AttributeName),
+				fixedasset_new_model.TransactionRoleTypeStaff,
+			)
 		}
 	}
 }
