@@ -81,7 +81,7 @@ const (
 	IOTActivityLogTableName                   = "iot_activity_logs"
 	IOTAntennaTableName                       = "iot_antennas"
 	IOTReaderTableName                        = "iot_readers"
-	ReaderTableName                           = "readers"
+	HandheldReaderTableName                   = "handheld_readers"
 	MeasurementTableName                      = "measurements"
 	MissingReportTableName                    = "missing_reports"
 	ModelTableName                            = "models"
