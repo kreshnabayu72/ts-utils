@@ -1122,6 +1122,7 @@ func TransactionRoleMultipleGroupAggregation(
 	groupFieldsAndAttribute []GroupFieldAndAttributeName,
 	transactionGroupAttribute fixedasset_new_model.TransactionRoleAttribute,
 	roleTypes []fixedasset_new_model.TransactionRoleType,
+	hideField ...bool,
 ) {
 	builder.
 		LeftJoin(
@@ -1146,24 +1147,35 @@ func TransactionRoleMultipleGroupAggregation(
 
 	for idx, groupField := range groupFieldsAndAttribute {
 		builder.Join(fmt.Sprintf("groups gp%d", idx), fmt.Sprintf("gp%d.id = %s", idx, groupField.Field))
-		builder.SelectBoolOr(
-			fmt.Sprintf(
-				"utr.group_id = gp%d.ancestor_id AND utr.role_type = $%d",
-				idx,
-				builder.GetCurrentArgIndex()+1,
-			),
-			fmt.Sprintf("is%sManager", groupField.AttributeName),
-			fixedasset_new_model.TransactionRoleTypeManager,
-		)
-		builder.SelectBoolOr(
-			fmt.Sprintf(
-				"utr.group_id = gp%d.ancestor_id AND utr.role_type = $%d",
-				idx,
-				builder.GetCurrentArgIndex()+1,
-			),
-			fmt.Sprintf("is%sMonitoring", groupField.AttributeName),
-			fixedasset_new_model.TransactionRoleTypeMonitoring,
-		)
+		if len(hideField) > 0 && !hideField[0] {
+			builder.SelectBoolOr(
+				fmt.Sprintf(
+					"utr.group_id = gp%d.ancestor_id AND utr.role_type = $%d",
+					idx,
+					builder.GetCurrentArgIndex()+1,
+				),
+				fmt.Sprintf("is%sManager", groupField.AttributeName),
+				fixedasset_new_model.TransactionRoleTypeManager,
+			)
+			builder.SelectBoolOr(
+				fmt.Sprintf(
+					"utr.group_id = gp%d.ancestor_id AND utr.role_type = $%d",
+					idx,
+					builder.GetCurrentArgIndex()+1,
+				),
+				fmt.Sprintf("is%sMonitoring", groupField.AttributeName),
+				fixedasset_new_model.TransactionRoleTypeMonitoring,
+			)
+			builder.SelectBoolOr(
+				fmt.Sprintf(
+					"utr.group_id = gp%d.ancestor_id AND utr.role_type = $%d",
+					idx,
+					builder.GetCurrentArgIndex()+1,
+				),
+				fmt.Sprintf("is%sStaff", groupField.AttributeName),
+				fixedasset_new_model.TransactionRoleTypeStaff,
+			)
+		}
 	}
 }
 
