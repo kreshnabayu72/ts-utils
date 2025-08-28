@@ -16,9 +16,9 @@ type HandheldReader struct {
 
 	SerialNumber string `json:"serialNumber" column:"serial_number" sql:"VARCHAR NOT NULL"`
 
-	DeviceNameId       int `json:"deviceNameId" column:"device_name_id" sql:"BIGINT NOT NULL"`
-	DeviceNameName     int `json:"deviceNameName" column:"device_name_name" sql:"VARCHAR NOT NULL"`
-	DeviceNameSequence int `json:"deviceNameSequence" column:"device_name_sequence" sql:"INTEGER NOT NULL"`
+	DeviceNameId       int    `json:"deviceNameId" column:"device_name_id" sql:"BIGINT NOT NULL"`
+	DeviceNameName     string `json:"deviceNameName" column:"device_name_name" sql:"VARCHAR NOT NULL"`
+	DeviceNameSequence int    `json:"deviceNameSequence" column:"device_name_sequence" sql:"INTEGER NOT NULL"`
 
 	Status           ReaderStatus `json:"status" column:"status" sql:"reader_status_enum NOT NULL DEFAULT 'Available'"`
 	LastReportReason ReaderStatus `json:"lastReportReason" column:"last_report_reason" sql:"reader_status_enum DEFAULT NULL"`
