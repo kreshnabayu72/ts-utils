@@ -1,8 +1,3 @@
-package migration
-
-//using read sql file is a better practice but it currently doesnt work
-
-var ClientLicensePostQuery string = `
 INSERT INTO client_licenses (
     id,
     client_id,
@@ -26,4 +21,3 @@ VALUES
 (10, 1, 'supply_asset_stock_opname',       0, 0,  0,  0, 'Purchase'),
 (11, 1, 'supply_asset_tracking',           0, 0,  0,  0, 'Purchase'),
 (12, 1, 'inventory',                       0, 0,  0,  0, 'Purchase');
-`

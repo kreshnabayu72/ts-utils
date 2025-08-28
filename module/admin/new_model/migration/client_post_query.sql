@@ -1,8 +1,3 @@
-package migration
-
-//using read sql file is a better practice but it currently doesnt work
-
-var ClientPostQuery string = `
 INSERT INTO clients (
     id,
     name,
@@ -37,4 +32,3 @@ VALUES (
     'User 1',
     'user1@qwertysystem.net'
 );
-`
