@@ -1,14 +1,10 @@
 package new_model
 
 import (
-	"fmt"
-	"log"
-	"os"
-	"path/filepath"
-	"runtime"
 	"time"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/migration"
+	fixed_asset_migration "gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model/migration"
 )
 
 type RepairApproval struct {
@@ -28,7 +24,7 @@ type RepairApproval struct {
 
 // TableName returns the name of the database table for this model.
 func (m *RepairApproval) TableName() string {
-	return "routine_approvals"
+	return "repair_approvals"
 }
 
 // Up defines the migration logic to create the table and its constraints.
@@ -52,15 +48,7 @@ func (m *RepairApproval) Up(builder *migration.MigrationBuilder) {
 		"CASCADE",
 	)
 
-	// Insert default data
-	_, filename, _, _ := runtime.Caller(0)
-	baseDir := filepath.Dir(filename)
-	path := filepath.Join(baseDir, "migration/repair_approval_post_query.sql")
-
-	postQuery, err := os.ReadFile(path)
-	if err != nil {
-		fmt.Println("Error path: " + path)
-		log.Fatal(err)
-	}
-	builder.SetPostQuery(string(postQuery))
+	// ─────── Insert default data ───────
+	// NOTE: reading from sql file has been tried and doesnt work in server, so use string instead
+	builder.SetPostQuery(fixed_asset_migration.RepairApprovalPostQuery)
 }
