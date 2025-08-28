@@ -1,13 +1,10 @@
 package new_model
 
 import (
-	"log"
-	"os"
-	"path/filepath"
-	"runtime"
 	"time"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/migration"
+	admin_migration "gitea.qwertysystem.net/BETS/ts-utils/module/admin/migration"
 	fixedasset_model "gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
 )
 
@@ -154,13 +151,5 @@ func (m *Client) Up(builder *migration.MigrationBuilder) {
 	builder.AddIndex("clients_client_id_uindex", "client_id", true, "")
 
 	// ─────── Additional Queries ───────
-	_, filename, _, _ := runtime.Caller(0)
-	baseDir := filepath.Dir(filename)
-	postQuery, err := os.ReadFile(
-		filepath.Join(baseDir, "..", "migration/client_post_query.sql"),
-	)
-	if err != nil {
-		log.Fatal(err)
-	}
-	builder.SetPostQuery(string(postQuery))
+	builder.SetPostQuery(admin_migration.ClientPostQuery)
 }

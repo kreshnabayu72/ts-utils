@@ -26,7 +26,7 @@ type User struct {
 	RfidCode       *string                          `json:"rfidCode" column:"rfid_code" sql:"VARCHAR NULL"`
 	ProfilePicture *string                          `json:"profilePicture" column:"profile_picture" sql:"VARCHAR NULL"`
 	EmployeeID     *string                          `json:"employeeId" column:"employee_id" sql:"VARCHAR NULL"`
-	Access         []fixed_asset_model.ModuleAccess `json:"access" column:"access"`
+	Access         []fixed_asset_model.ModuleAccess `json:"access" column:"access" sql:"TEXT[]"`
 	ModifiedBy     int                              `json:"modifiedById" column:"modified_by_id" sql:"BIGINT REFERENCES users(id)"`
 	IsTemporary    bool                             `json:"isTemporary" column:"is_temporary" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
 	ExpiryDate     *time.Time                       `json:"expiryDate" column:"expiry_date" sql:"TIMESTAMPTZ NULL"`
