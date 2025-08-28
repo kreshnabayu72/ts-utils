@@ -611,3 +611,33 @@ BEGIN
             );
     END IF;
 END$$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'tracking_status_enum') THEN
+        CREATE TYPE tracking_status_enum AS ENUM (
+            'On Tracking',
+            'Tracked by User',
+            'Tracked by Maintenance',
+            'Tracked by Audit',
+            'Tracked by IOT',
+            'Tracked by Tracking',
+            'Reported as Permanently Missing',
+            'Permanently Missing',
+            'Reported Disposal',
+            'On Disposal Process',
+            'Disposed'
+            );
+    END IF;
+END$$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'tracking_condition_enum') THEN
+        CREATE TYPE tracking_condition_enum AS ENUM (
+            'Asset found, normal condition',
+            'Asset found, damaged condition',
+            'TAG found, asset missing',
+            );
+    END IF;
+END$$;
