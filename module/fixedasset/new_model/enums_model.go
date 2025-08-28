@@ -25,6 +25,7 @@ const (
 	AssetStatusExpiredLicense     AssetStatus = "Expired License"
 	AssetStatusTAGReported        AssetStatus = "TAG Reported"
 	AssetStatusTAGNotSet          AssetStatus = "TAG Not Set"
+	AssetStatusNotPairedYet       AssetStatus = "Not Paired Yet"
 )
 
 type AssetLicenseStatus string
