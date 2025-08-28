@@ -33,7 +33,10 @@ func GenerateCTEOption(
 			)
 
 		mainBuilder.WithCTEBuilder(snakeAliasName, cteBuilder.(*SelectBuilder).SQLEloquentQuery)
-		mainBuilder.LeftJoin(snakeAliasName, fmt.Sprintf(`"%s"."id" = "%s"."id"`, snakeAliasName, refTable))
+		mainBuilder.LeftJoin(
+			snakeAliasName,
+			fmt.Sprintf(`"%s"."id" = "%s"."id"`, snakeAliasName, refTable),
+		)
 
 		mainBuilder.Select(
 			fmt.Sprintf(
