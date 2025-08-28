@@ -81,7 +81,7 @@ func migrateAdminDB(dbName string, migrator *migration.Migrator) error {
 		}
 	}
 
-	err := migrator.ExecFile(dbName, db_migration.AdminConsoleEnum)
+	err := migrator.Exec(dbName, db_migration.AdminConsoleEnum)
 	if err != nil {
 		return err
 	}
@@ -199,12 +199,12 @@ func migrateFixedAssetDB(dbName string, migrator *migration.Migrator) error {
 		}
 	}
 
-	err := migrator.ExecFile(dbName, db_migration.FixedAssetFunction)
+	err := migrator.Exec(dbName, db_migration.FixedAssetFunction)
 	if err != nil {
 		return err
 	}
 
-	err = migrator.ExecFile(dbName, db_migration.FixedAssetEnum)
+	err = migrator.Exec(dbName, db_migration.FixedAssetEnum)
 	if err != nil {
 		return err
 	}
@@ -212,7 +212,7 @@ func migrateFixedAssetDB(dbName string, migrator *migration.Migrator) error {
 	err = migrator.MigrateModels(dbName, models...)
 	log.Println("Migrate model error:", err)
 
-	err = migrator.ExecFile(dbName, db_migration.FixedAssetView)
+	err = migrator.Exec(dbName, db_migration.FixedAssetView)
 	if err != nil {
 		return err
 	}
