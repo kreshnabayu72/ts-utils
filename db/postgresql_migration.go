@@ -181,6 +181,7 @@ func migrateFixedAssetDB(dbName string, migrator *migration.Migrator) error {
 		&fixedasset_model.RoutineApproval{},
 		&fixedasset_model.RepairTicketing{},
 		&fixedasset_model.RepairApproval{},
+		&fixedasset_model.Tracking{},
 	}
 
 	isDBExist := migrator.IsDBExist(dbName)

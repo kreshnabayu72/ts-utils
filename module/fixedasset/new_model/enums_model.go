@@ -821,3 +821,47 @@ var RepairTicketingMethodEnum = map[string]RepairTicketingMethod{
 	"Third Party":     RepairTicketingMethodThirdParty,
 	"Warranty Claim":  RepairTicketingMethodWarrantyClaim,
 }
+
+type TrackingStatus string
+
+const (
+	TrackingStatusOnTracking                   TrackingStatus = "On Tracking"
+	TrackingStatusTrackedByUser                TrackingStatus = "Tracked by User"
+	TrackingStatusTrackedByMaintenance         TrackingStatus = "Tracked by Maintenance"
+	TrackingStatusTrackedByAudit               TrackingStatus = "Tracked by Audit"
+	TrackingStatusTrackedByIOT                 TrackingStatus = "Tracked by IOT"
+	TrackingStatusTrackedByTracking            TrackingStatus = "Tracked by Tracking"
+	TrackingStatusReportedAsPermanentlyMissing TrackingStatus = "Reported as Permanently Missing"
+	TrackingStatusPermanentlyMissing           TrackingStatus = "Permanently Missing"
+	TrackingStatusReportedDisposal             TrackingStatus = "Reported Disposal"
+	TrackingStatusOnDisposalProcess            TrackingStatus = "On Disposal Process"
+	TrackingStatusDisposed                     TrackingStatus = "Disposed"
+)
+
+var TrackingStatusEnum = map[string]TrackingStatus{
+	"On Tracking":                     TrackingStatusOnTracking,
+	"Tracked by User":                 TrackingStatusTrackedByUser,
+	"Tracked by Maintenance":          TrackingStatusTrackedByMaintenance,
+	"Tracked by Audit":                TrackingStatusTrackedByAudit,
+	"Tracked by IOT":                  TrackingStatusTrackedByIOT,
+	"Tracked by Tracking":             TrackingStatusTrackedByTracking,
+	"Reported as Permanently Missing": TrackingStatusReportedAsPermanentlyMissing,
+	"Permanently Missing":             TrackingStatusPermanentlyMissing,
+	"Reported Disposal":               TrackingStatusReportedDisposal,
+	"On Disposal Process":             TrackingStatusOnDisposalProcess,
+	"Disposed":                        TrackingStatusDisposed,
+}
+
+type TrackingCondition string
+
+const (
+	TrackingConditionNormal   TrackingCondition = "Asset found, normal condition"
+	TrackingConditionDamaged  TrackingCondition = "Asset found, damaged condition"
+	TrackingConditionTAGFound TrackingCondition = "TAG found, asset missing"
+)
+
+var TrackingConditionEnum = map[string]TrackingCondition{
+	"Asset found, normal condition":  TrackingConditionNormal,
+	"Asset found, damaged condition": TrackingConditionDamaged,
+	"TAG found, asset missing":       TrackingConditionTAGFound,
+}
