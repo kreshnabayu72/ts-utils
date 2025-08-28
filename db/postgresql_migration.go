@@ -69,6 +69,7 @@ func migrateRootDB(dbName string, migrator *migration.Migrator) error {
 func migrateAdminDB(dbName string, migrator *migration.Migrator) error {
 	models := []migration.Model{
 		&admin_model.Client{},
+		&admin_model.ClientLicense{},
 		&admin_model.User{},
 	}
 
@@ -87,9 +88,9 @@ func migrateAdminDB(dbName string, migrator *migration.Migrator) error {
 
 func migrateGlobalDB(dbName string, migrator *migration.Migrator) error {
 	models := []migration.Model{
-		&global_model.User{},
 		&global_model.Position{},
 		&global_model.Division{},
+		&global_model.User{},
 	}
 
 	isDBExist := migrator.IsDBExist(dbName)
