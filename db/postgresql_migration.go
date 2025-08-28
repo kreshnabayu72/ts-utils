@@ -68,6 +68,7 @@ func migrateRootDB(dbName string, migrator *migration.Migrator) error {
 
 func migrateAdminDB(dbName string, migrator *migration.Migrator) error {
 	models := []migration.Model{
+		&admin_model.Group{},
 		&admin_model.Client{},
 		&admin_model.ClientLicense{},
 		&admin_model.User{},
