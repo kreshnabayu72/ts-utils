@@ -583,3 +583,31 @@ BEGIN
             );
     END IF;
 END$$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'repair_ticketing_status_enum') THEN
+        CREATE TYPE repair_ticketing_status_enum AS ENUM (
+            'Reported Damaged',
+            'Under Repair',
+            'Waiting for Confirmation',
+            'Waiting for Approval',
+            'Repaired',
+            'Pemranently Damaged',
+            'Reported Disposal',
+            'On Disposal Process',
+            'Disposed'
+            );
+    END IF;
+END$$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'repair_ticketing_method_enum') THEN
+        CREATE TYPE repair_ticketing_method_enum AS ENUM (
+            'Internal Repair',
+            'Third Party',
+            'Warranty Claim'
+            );
+    END IF;
+END$$;

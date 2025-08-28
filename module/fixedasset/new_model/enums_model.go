@@ -781,3 +781,43 @@ const (
 	RoutineTaskStatusReportedDamaged      RoutineTaskStatus = "Reported Damaged"
 	RoutineTaskStatusStopped              RoutineTaskStatus = "Stopped"
 )
+
+type RepairTicketingStatus string
+
+const (
+	RepairTicketingStatusReportedDamaged        RepairTicketingStatus = "Reported Damaged"
+	RepairTicketingStatusUnderRepair            RepairTicketingStatus = "Under Repair"
+	RepairTicketingStatusWaitingForConfirmation RepairTicketingStatus = "Waiting for Confirmation"
+	RepairTicketingStatusWaitingForApproval     RepairTicketingStatus = "Waiting for Approval"
+	RepairTicketingStatusRepaired               RepairTicketingStatus = "Repaired"
+	RepairTicketingStatusPermanentlyDamaged     RepairTicketingStatus = "Permanently Damaged"
+	RepairTicketingStatusReportedDisposal       RepairTicketingStatus = "Reported Disposal"
+	RepairTicketingStatusOnDisposalProcess      RepairTicketingStatus = "On Disposal Process"
+	RepairTicketingStatusDisposed               RepairTicketingStatus = "Disposed"
+)
+
+var RepairTicketingStatusEnum = map[string]RepairTicketingStatus{
+	"Reported Damaged":         RepairTicketingStatusReportedDamaged,
+	"Under Repair":             RepairTicketingStatusUnderRepair,
+	"Waiting for Confirmation": RepairTicketingStatusWaitingForConfirmation,
+	"Waiting for Approval":     RepairTicketingStatusWaitingForApproval,
+	"Repaired":                 RepairTicketingStatusRepaired,
+	"Permanently Damaged":      RepairTicketingStatusPermanentlyDamaged,
+	"Reported Disposal":        RepairTicketingStatusReportedDisposal,
+	"On Disposal Process":      RepairTicketingStatusOnDisposalProcess,
+	"Disposed":                 RepairTicketingStatusDisposed,
+}
+
+type RepairTicketingMethod string
+
+const (
+	RepairTicketingMethodInternalRepair RepairTicketingMethod = "Internal Repair"
+	RepairTicketingMethodThirdParty     RepairTicketingMethod = "Third Party"
+	RepairTicketingMethodWarrantyClaim  RepairTicketingMethod = "Warranty Claim"
+)
+
+var RepairTicketingMethodEnum = map[string]RepairTicketingMethod{
+	"Internal Repair": RepairTicketingMethodInternalRepair,
+	"Third Party":     RepairTicketingMethodThirdParty,
+	"Warranty Claim":  RepairTicketingMethodWarrantyClaim,
+}
