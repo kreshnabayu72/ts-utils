@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/migration"
+	global_migration "gitea.qwertysystem.net/BETS/ts-utils/module/global/migration"
 )
 
 type Division struct {
@@ -19,4 +20,7 @@ func (m *Division) TableName() string {
 
 func (m *Division) Up(builder *migration.MigrationBuilder) {
 	builder.AddColumn(m)
+
+	// ─────── Additional Queries ───────
+	builder.SetPostQuery(global_migration.DivisionPostQuery)
 }
