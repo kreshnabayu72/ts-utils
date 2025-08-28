@@ -151,8 +151,8 @@ func (m *Client) Up(builder *migration.MigrationBuilder) {
 	builder.AddIndex("clients_client_id_uindex", "client_id", true, "")
 
 	// ─────── Foreign Keys ───────
-	builder.AddForeignKey("fk_client_group", "group_id", "groups", "id", "SET NULL")
-	builder.AddForeignKey("fk_client_modified_by_id", "modified_by_id", "users", "id", "SET NULL")
+	// builder.AddForeignKey("fk_client_group", "group_id", "groups", "id", "SET NULL")
+	// builder.AddForeignKey("fk_client_modified_by_id", "modified_by_id", "users", "id", "SET NULL")
 	// builder.AddForeignKey("fk_client_partner_id", "partner_id", "partners", "id", "SET NULL")
 
 	// ─────── Additional Queries ───────

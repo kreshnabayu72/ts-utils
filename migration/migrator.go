@@ -175,9 +175,6 @@ func (m *Migrator) isTableExist(pool *pgxpool.Pool, tableName string) bool {
 }
 
 func (m *Migrator) MigrateModels(dbName string, models ...Model) error {
-	//TEMP LOG
-	fmt.Println("MIGRATE TABLE" + dbName)
-
 	postgresUri := fmt.Sprintf(
 		"postgres://%s:%s@%s/%s?sslmode=%s",
 		m.Username,
@@ -209,6 +206,8 @@ func (m *Migrator) MigrateModels(dbName string, models ...Model) error {
 	}
 
 	for _, builder := range migrationBuilders {
+		fmt.Printf("Migrating model %v\n", builder.TableName)
+
 		err := m.migrateModel(pool, migrationBuilders, builder)
 		if err != nil {
 			return fmt.Errorf("migration failed for model %s: %w", builder.TableName, err)
