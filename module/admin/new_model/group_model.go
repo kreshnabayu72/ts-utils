@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/migration"
+	admin_migration "gitea.qwertysystem.net/BETS/ts-utils/module/admin/migration"
 )
 
 type Group struct {
@@ -30,4 +31,7 @@ func (m *Group) Up(builder *migration.MigrationBuilder) {
 	builder.AddColumn(m)
 
 	builder.AddIndex("idx_groups_name", "name", false, "")
+
+	// ─────── Additional Queries ───────
+	builder.SetPostQuery(admin_migration.GroupPostQuery)
 }
