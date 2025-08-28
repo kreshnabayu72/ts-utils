@@ -1,6 +1,9 @@
 package new_model
 
-import "gitea.qwertysystem.net/BETS/ts-utils/migration"
+import (
+	"gitea.qwertysystem.net/BETS/ts-utils/migration"
+	admin_migration "gitea.qwertysystem.net/BETS/ts-utils/module/admin/migration"
+)
 
 type ClientLicense struct {
 	ID           int                 `json:"_id"          column:"client_licenses.id"            sql:"BIGINT PRIMARY KEY"`
@@ -27,4 +30,7 @@ func (m *ClientLicense) Up(builder *migration.MigrationBuilder) {
 		"id",
 		"CASCADE",
 	)
+
+	// ─────── Additional Queries ───────
+	builder.SetPostQuery(admin_migration.ClientLicensePostQuery)
 }

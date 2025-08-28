@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/migration"
+	global_migration "gitea.qwertysystem.net/BETS/ts-utils/module/global/migration"
 )
 
 type Position struct {
@@ -19,4 +20,6 @@ func (m *Position) TableName() string {
 
 func (m *Position) Up(builder *migration.MigrationBuilder) {
 	builder.AddColumn(m)
+
+	builder.SetPostQuery(global_migration.PositionPostQuery)
 }
