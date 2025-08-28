@@ -19,6 +19,7 @@ type User struct {
 	IsActive           bool    `json:"isActive" column:"is_active" sql:"BOOLEAN NOT NULL DEFAULT TRUE"`
 	IsDefault          bool    `json:"isDefault" column:"is_default" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
 	IsDeleted          bool    `json:"isDeleted" column:"is_deleted" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
+	IsEmailConfirmed   bool    `json:"isEmailConfirmed" column:"is_email_confirmed" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
 
 	PositionID     *int                             `json:"positionId" column:"position_id" sql:"BIGINT"`
 	DivisionID     int                              `json:"divisionId" column:"division_id" sql:"BIGINT"`
