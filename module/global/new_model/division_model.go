@@ -1,10 +1,14 @@
 package new_model
 
 import (
+	"fmt"
+	"log"
+	"os"
+	"path/filepath"
+	"runtime"
 	"time"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/migration"
-	global_migration "gitea.qwertysystem.net/BETS/ts-utils/module/global/migration"
 )
 
 type Division struct {
@@ -21,6 +25,15 @@ func (m *Division) TableName() string {
 func (m *Division) Up(builder *migration.MigrationBuilder) {
 	builder.AddColumn(m)
 
-	// ─────── Additional Queries ───────
-	builder.SetPostQuery(global_migration.DivisionPostQuery)
+	// Insert default data
+	_, filename, _, _ := runtime.Caller(0)
+	baseDir := filepath.Dir(filename)
+	path := filepath.Join(baseDir, "migration/division_post_query.sql")
+
+	postQuery, err := os.ReadFile(path)
+	if err != nil {
+		fmt.Println("Error path: " + path)
+		log.Fatal(err)
+	}
+	builder.SetPostQuery(string(postQuery))
 }
