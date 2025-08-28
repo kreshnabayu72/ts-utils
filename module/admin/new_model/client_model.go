@@ -1,10 +1,14 @@
 package new_model
 
 import (
+	"fmt"
+	"log"
+	"os"
+	"path/filepath"
+	"runtime"
 	"time"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/migration"
-	admin_migration "gitea.qwertysystem.net/BETS/ts-utils/module/admin/migration"
 	fixedasset_model "gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
 )
 
@@ -156,5 +160,14 @@ func (m *Client) Up(builder *migration.MigrationBuilder) {
 	// builder.AddForeignKey("fk_client_partner_id", "partner_id", "partners", "id", "SET NULL")
 
 	// ─────── Additional Queries ───────
-	builder.SetPostQuery(admin_migration.ClientPostQuery)
+	_, filename, _, _ := runtime.Caller(0)
+	baseDir := filepath.Dir(filename)
+	path := filepath.Join(baseDir, "migration/client_post_query.sql")
+
+	postQuery, err := os.ReadFile(path)
+	if err != nil {
+		fmt.Println("Error path: " + path)
+		log.Fatal(err)
+	}
+	builder.SetPostQuery(string(postQuery))
 }

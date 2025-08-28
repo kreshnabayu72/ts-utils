@@ -1,10 +1,14 @@
 package new_model
 
 import (
+	"fmt"
+	"log"
+	"os"
+	"path/filepath"
+	"runtime"
 	"time"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/migration"
-	admin_migration "gitea.qwertysystem.net/BETS/ts-utils/module/admin/migration"
 )
 
 type Group struct {
@@ -33,5 +37,14 @@ func (m *Group) Up(builder *migration.MigrationBuilder) {
 	builder.AddIndex("idx_groups_name", "name", false, "")
 
 	// ─────── Additional Queries ───────
-	builder.SetPostQuery(admin_migration.GroupPostQuery)
+	_, filename, _, _ := runtime.Caller(0)
+	baseDir := filepath.Dir(filename)
+	path := filepath.Join(baseDir, "migration/group_post_query.sql")
+
+	postQuery, err := os.ReadFile(path)
+	if err != nil {
+		fmt.Println("Error path: " + path)
+		log.Fatal(err)
+	}
+	builder.SetPostQuery(string(postQuery))
 }

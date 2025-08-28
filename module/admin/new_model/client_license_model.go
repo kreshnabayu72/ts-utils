@@ -1,8 +1,13 @@
 package new_model
 
 import (
+	"fmt"
+	"log"
+	"os"
+	"path/filepath"
+	"runtime"
+
 	"gitea.qwertysystem.net/BETS/ts-utils/migration"
-	admin_migration "gitea.qwertysystem.net/BETS/ts-utils/module/admin/migration"
 )
 
 type ClientLicense struct {
@@ -32,5 +37,14 @@ func (m *ClientLicense) Up(builder *migration.MigrationBuilder) {
 	)
 
 	// ─────── Additional Queries ───────
-	builder.SetPostQuery(admin_migration.ClientLicensePostQuery)
+	_, filename, _, _ := runtime.Caller(0)
+	baseDir := filepath.Dir(filename)
+	path := filepath.Join(baseDir, "migration/client_license_post_query.sql")
+
+	postQuery, err := os.ReadFile(path)
+	if err != nil {
+		fmt.Println("Error path: " + path)
+		log.Fatal(err)
+	}
+	builder.SetPostQuery(string(postQuery))
 }

@@ -82,7 +82,15 @@ func migrateAdminDB(dbName string, migrator *migration.Migrator) error {
 		}
 	}
 
-	err := migrator.MigrateModels(dbName, models...)
+	_, filename, _, _ := runtime.Caller(0)
+	baseDir := filepath.Dir(filename)
+	functionQueryPath := filepath.Join(baseDir, "migration/admin_console_enum.sql")
+	err := migrator.ExecFile(dbName, functionQueryPath)
+	if err != nil {
+		return err
+	}
+
+	err = migrator.MigrateModels(dbName, models...)
 
 	return err
 }
