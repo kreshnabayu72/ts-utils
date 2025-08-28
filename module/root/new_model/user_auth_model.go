@@ -18,7 +18,7 @@ type UserAuth struct {
 }
 
 func (m *UserAuth) TableName() string {
-	return "user_auth"
+	return "user_auths"
 }
 
 func (m *UserAuth) Up(builder *migration.MigrationBuilder) {

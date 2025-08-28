@@ -16,7 +16,7 @@ type Client struct {
 	// ─────── Company Information ───────
 	Name               string        `json:"name" column:"name" sql:"VARCHAR NOT NULL"`
 	ClientID           string        `json:"clientId"  column:"client_id" sql:"VARCHAR NOT NULL"`
-	Status             CompanyStatus `json:"status" column:"status" sql:"client_status_enum NOT NULL"`
+	Status             CompanyStatus `json:"status" column:"status" sql:"client_status_enum NOT NULL DEFAULT 'Active'"`
 	Email              *string       `json:"email" column:"email" sql:"VARCHAR NULL"`
 	IsEmailConfirmed   bool          `json:"isEmailConfirmed" column:"is_email_confirmed" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
 	Country            string        `json:"country" column:"country" sql:"VARCHAR NOT NULL"`
@@ -28,29 +28,29 @@ type Client struct {
 	Address            string        `json:"address" column:"address" sql:"VARCHAR NOT NULL"`
 	ContactPersonName  string        `json:"contactPersonName" column:"contact_person_name" sql:"VARCHAR NOT NULL"`
 	ContactPersonEmail string        `json:"contactPersonEmail" column:"contact_person_email" sql:"VARCHAR NOT NULL"`
-	PendingEmailChange *string       `json:"pendingEmailChange" column:"pending_email_change" sql:"VARCHAR NULL"`
-	Image              *string       `json:"image" column:"image" sql:"VARCHAR NULL"`
+	PendingEmailChange *string       `json:"pendingEmailChange" column:"pending_email_change" sql:"VARCHAR NULL DEFAULT NULL"`
+	Image              *string       `json:"image" column:"image" sql:"VARCHAR NULL DEFAULT NULL"`
 	GroupID            int           `json:"groupId" column:"group_id"` // TODO: sql
 	ModifiedByID       int           `json:"modifiedById" column:"modified_by_id" sql:"BIGINT"`
 	PartnerID          int           `json:"partnerId" column:"partner_id"` // TODO: sql
-	ExpiredAt          time.Time     `json:"expiredAt" column:"expired_at" sql:"TIMESTAMPTZ NULL"`
+	ExpiredAt          time.Time     `json:"expiredAt" column:"expired_at" sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
 	CreatedAt          time.Time     `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 	UpdatedAt          time.Time     `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 
 	// ─────── Open API Settings ───────
-	OpenAPIStatus      *CompanyOpenAPIStatus `json:"openApiStatus" column:"open_api_status" sql:"open_api_status_enum NULL"`
-	OpenAPIRequestedAt *time.Time            `json:"openApiRequestedAt" column:"open_api_requested_at" sql:"TIMESTAMPTZ NULL"`
-	OpenAPIApprovedAt  *time.Time            `json:"openApiApprovedAt" column:"open_api_approved_at" sql:"TIMESTAMPTZ NULL"`
+	OpenAPIStatus      *CompanyOpenAPIStatus `json:"openApiStatus" column:"open_api_status" sql:"open_api_status_enum NULL DEFAULT NULL"`
+	OpenAPIRequestedAt *time.Time            `json:"openApiRequestedAt" column:"open_api_requested_at" sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
+	OpenAPIApprovedAt  *time.Time            `json:"openApiApprovedAt" column:"open_api_approved_at" sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
 
 	// ─────── License Plan ───────
-	PlanFixedAsset       fixedasset_model.PlanTypes `json:"planFixedAsset" column:"plan_fixed_asset" sql:"license_plan_enum NULL"`
-	PlanSupplyAsset      fixedasset_model.PlanTypes `json:"planSupplyAsset" column:"plan_supply_asset" sql:"license_plan_enum NULL"`
-	PlanInventory        fixedasset_model.PlanTypes `json:"planInventory" column:"plan_inventory_asset" sql:"license_plan_enum NULL"`
-	PlanProcurementAsset fixedasset_model.PlanTypes `json:"planProcurementAsset" column:"plan_procurement_asset" sql:"license_plan_enum NULL"`
+	PlanFixedAsset       fixedasset_model.PlanTypes `json:"planFixedAsset" column:"plan_fixed_asset" sql:"license_plan_enum DEFAULT 'Basic'"`
+	PlanSupplyAsset      fixedasset_model.PlanTypes `json:"planSupplyAsset" column:"plan_supply_asset" sql:"license_plan_enum DEFAULT 'Basic'"`
+	PlanInventory        fixedasset_model.PlanTypes `json:"planInventory" column:"plan_inventory_asset" sql:"license_plan_enum DEFAULT 'Basic'"`
+	PlanProcurementAsset fixedasset_model.PlanTypes `json:"planProcurementAsset" column:"plan_procurement_asset" sql:"license_plan_enum DEFAULT 'Basic'"`
 
 	// ─────── Deprec Method ───────
-	DepreciationMethod        CompanyDepreciationMethod  `json:"depreciationMethod" column:"depreciation_method" sql:"depreciation_method_enum NOT NULL"`
-	PendingDepreciationMethod *CompanyDepreciationMethod `json:"pendingDepreciationMethod" column:"pending_depreciation_method" sql:"depreciation_method_enum NULL"`
+	DepreciationMethod        CompanyDepreciationMethod  `json:"depreciationMethod" column:"depreciation_method" sql:"depreciation_method_enum NOT NULL DEFAULT 'Straight-Line'"`
+	PendingDepreciationMethod *CompanyDepreciationMethod `json:"pendingDepreciationMethod" column:"pending_depreciation_method" sql:"depreciation_method_enum NULL DEFAULT NULL"`
 
 	// ─────── Add On Status ───────
 	AddOnRepairTicketing bool `json:"addOnRepairTicketing" column:"addon_repair_ticketing" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
@@ -60,36 +60,36 @@ type Client struct {
 	AddOnAudit           bool `json:"addOnAudit" column:"addon_audit" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
 
 	// ─────── Transaction Settings ───────
-	AuditAttrsMaxGracePeriod           int `json:"auditAttrsMaxGracePeriod" column:"audit_attrs_max_grace_period" sql:"INTEGER"`
-	TransferAttrsTransactionTimeout    int `json:"transferAttrsTransactionTimeout" column:"transfer_attrs_transaction_timeout" sql:"INTEGER"`
-	TransferAttrsAssetControlToMissing int `json:"transferAttrsAssetControlToMissing" column:"transfer_attrs_asset_control_to_missing" sql:"INTEGER"`
-	BorrowingAttrsMaxBorrowingTime     int `json:"borrowingAttrsMaxBorrowingTime" column:"borrowing_attrs_max_borrowing_time" sql:"INTEGER"`
-	BorrowingAttrsDefaultBorrowingTime int `json:"borrowingAttrsDefaultBorrowingTime" column:"borrowing_attrs_default_borrowing_time" sql:"INTEGER"`
-	BorrowingAttrsConfirmationTimeout  int `json:"borrowingAttrsConfirmationTimeout" column:"borrowing_attrs_confirmation_timeout" sql:"INTEGER"`
-	BorrowingAttrsTransactionTimeout   int `json:"borrowingAttrsTransactionTimeout" column:"borrowing_attrs_transaction_timeout" sql:"INTEGER"`
-	DisposalAttrsTransactionTimeout    int `json:"disposalAttrsTransactionTimeout" column:"disposal_attrs_transaction_timeout" sql:"INTEGER"`
+	AuditAttrsMaxGracePeriod           int `json:"auditAttrsMaxGracePeriod" column:"audit_attrs_max_grace_period" sql:"INTEGER DEFAULT 3"`
+	TransferAttrsTransactionTimeout    int `json:"transferAttrsTransactionTimeout" column:"transfer_attrs_transaction_timeout" sql:"INTEGER DEFAULT 5"`
+	TransferAttrsAssetControlToMissing int `json:"transferAttrsAssetControlToMissing" column:"transfer_attrs_asset_control_to_missing" sql:"INTEGER DEFAULT 1"`
+	BorrowingAttrsMaxBorrowingTime     int `json:"borrowingAttrsMaxBorrowingTime" column:"borrowing_attrs_max_borrowing_time" sql:"INTEGER DEFAULT 15"`
+	BorrowingAttrsDefaultBorrowingTime int `json:"borrowingAttrsDefaultBorrowingTime" column:"borrowing_attrs_default_borrowing_time" sql:"INTEGER DEFAULT 7"`
+	BorrowingAttrsConfirmationTimeout  int `json:"borrowingAttrsConfirmationTimeout" column:"borrowing_attrs_confirmation_timeout" sql:"INTEGER DEFAULT 24"`
+	BorrowingAttrsTransactionTimeout   int `json:"borrowingAttrsTransactionTimeout" column:"borrowing_attrs_transaction_timeout" sql:"INTEGER DEFAULT 5"`
+	DisposalAttrsTransactionTimeout    int `json:"disposalAttrsTransactionTimeout" column:"disposal_attrs_transaction_timeout" sql:"INTEGER DEFAULT 5"`
 
 	// ─────── General Settings ───────
-	LoginSessionMinutes int    `json:"loginSessionMinutes" column:"login_session_minutes" sql:"INTEGER NULL"`
-	DateFormat          string `json:"dateFormat" column:"date_format" sql:"VARCHAR NOT NULL"`
-	TimeFormat          string `json:"timeFormat" column:"time_format" sql:"VARCHAR NOT NULL DEFAULT FALSE"`
+	LoginSessionMinutes int    `json:"loginSessionMinutes" column:"login_session_minutes" sql:"INTEGER DEFAULT 30"`
+	DateFormat          string `json:"dateFormat" column:"date_format" sql:"VARCHAR DEFAULT '02/01/06'"`
+	TimeFormat          string `json:"timeFormat" column:"time_format" sql:"VARCHAR NOT NULL DEFAULT '15:04:05'"`
 	Geolocation         bool   `json:"geolocation" column:"geolocation" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
-	TimeZone            string `json:"timeZone" column:"time_zone" sql:"VARCHAR NOT NULL"`
-	PIN                 string `json:"pin" column:"pin" sql:"VARCHAR(6) NOT NULL"`
-	CurrencySymbol      string `json:"currencySymbol" column:"currency_symbol" sql:"VARCHAR NOT NULL"`
-	CurrencyCurrency    string `json:"currencyCurrency" column:"currency_currency" sql:"VARCHAR NOT NULL"`
-	CurrencyLocale      string `json:"currencyLocale" column:"currency_locale" sql:"VARCHAR NOT NULL"`
-	CurrencyLabel       string `json:"currencyLabel" column:"currency_label" sql:"VARCHAR NOT NULL"`
+	TimeZone            string `json:"timeZone" column:"time_zone" sql:"VARCHAR default 'Asia/Jakarta'"`
+	PIN                 string `json:"pin" column:"pin" sql:"VARCHAR(6) DEFAULT '123456'"`
+	CurrencySymbol      string `json:"currencySymbol" column:"currency_symbol" sql:"VARCHAR DEFAULT IDR"`
+	CurrencyCurrency    string `json:"currencyCurrency" column:"currency_currency" sql:"VARCHAR DEFAULT Rp"`
+	CurrencyLocale      string `json:"currencyLocale" column:"currency_locale" sql:"VARCHAR DEFAULT id-ID"`
+	CurrencyLabel       string `json:"currencyLabel" column:"currency_label" sql:"VARCHAR DEFAULT Rp - Indonesian Rupiah"`
 
 	// ─────── File Storage ───────
-	FileStorageTotalKB           float64 `json:"fileStorageTotalKB" column:"file_storage_total_kb" sql:"FLOAT"`
-	FileStorageAvailableKB       float64 `json:"fileStorageAvailableKB" column:"file_storage_available_kb" sql:"FLOAT"`
-	FileStorageUsedKB            float64 `json:"fileStorageUsedKB" column:"file_storage_used_kb" sql:"FLOAT"`
-	FileStorageAttachmentKB      float64 `json:"fileStorageAttachmentKB" column:"file_storage_attachment_kb" sql:"FLOAT"`
-	FileStorageDamagedKB         float64 `json:"fileStorageDamagedKB" column:"file_storage_damage_kb" sql:"FLOAT"`
-	FileStorageDisposalKB        float64 `json:"fileStorageDisposalKB" column:"file_storage_disposal_kb" sql:"FLOAT"`
-	FileStorageRepairTicketingKB float64 `json:"fileStorageRepairTicketingKB" column:"file_storage_repair_ticketing_kb" sql:"FLOAT"`
-	FileStorageRoutineKB         float64 `json:"fileStorageRoutineKB" column:"file_storage_routine_kb" sql:"FLOAT"`
+	FileStorageTotalKB           float64 `json:"fileStorageTotalKB" column:"file_storage_total_kb" sql:"FLOAT DEFAULT 5242880"`         //5 gb
+	FileStorageAvailableKB       float64 `json:"fileStorageAvailableKB" column:"file_storage_available_kb" sql:"FLOAT DEFAULT 5242880"` //5gb
+	FileStorageUsedKB            float64 `json:"fileStorageUsedKB" column:"file_storage_used_kb" sql:"FLOAT DEFAULT 0"`
+	FileStorageAttachmentKB      float64 `json:"fileStorageAttachmentKB" column:"file_storage_attachment_kb" sql:"FLOAT DEFAULT 0"`
+	FileStorageDamagedKB         float64 `json:"fileStorageDamagedKB" column:"file_storage_damage_kb" sql:"FLOAT DEFAULT 0"`
+	FileStorageDisposalKB        float64 `json:"fileStorageDisposalKB" column:"file_storage_disposal_kb" sql:"FLOAT DEFAULT 0"`
+	FileStorageRepairTicketingKB float64 `json:"fileStorageRepairTicketingKB" column:"file_storage_repair_ticketing_kb" sql:"FLOAT DEFAULT 0"`
+	FileStorageRoutineKB         float64 `json:"fileStorageRoutineKB" column:"file_storage_routine_kb" sql:"FLOAT DEFAULT 0"`
 }
 
 func (m *Client) TableName() string {
