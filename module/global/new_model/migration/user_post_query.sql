@@ -1,0 +1,2 @@
+INSERT INTO users (id, first_name, last_name, phone_number, email, position_id, division_id, access, modified_by_id)
+VALUES (1, 'User', 'Satu', '081333','user1@qwertysystem.net', 1, 1, ARRAY['Global Settings', 'Fixed Asset'], 1)

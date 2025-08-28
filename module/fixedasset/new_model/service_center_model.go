@@ -1,6 +1,11 @@
 package new_model
 
 import (
+	"fmt"
+	"log"
+	"os"
+	"path/filepath"
+	"runtime"
 	"time"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/migration"
@@ -20,7 +25,7 @@ type ServiceCenter struct {
 	PhoneNumber    string     `json:"phoneNumber" column:"phone_number" sql:"VARCHAR"`
 	PicPhoneNumber string     `json:"picPhoneNumber" column:"pic_phone_number" sql:"VARCHAR"`
 	PicName        string     `json:"picName" column:"pic_name" sql:"VARCHAR"`
-	ModifiedById   *int       `json:"modifiedById" column:"modified_by_id" sql:"BIGINT REFERENCES users(id)"`
+	ModifiedById   *int       `json:"modifiedById" column:"modified_by_id" sql:"BIGINT"`
 	IsDeleted      bool       `json:"isDeleted" column:"is_deleted" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
 	DeletedAt      *time.Time `json:"deletedAt" column:"deleted_at" sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
 	CreatedAt      time.Time  `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
@@ -42,4 +47,16 @@ func (m *ServiceCenter) Up(builder *migration.MigrationBuilder) {
 		"id",
 		"SET NULL",
 	)
+
+	// Insert default data
+	_, filename, _, _ := runtime.Caller(0)
+	baseDir := filepath.Dir(filename)
+	path := filepath.Join(baseDir, "migration/service_center_post_query.sql")
+
+	postQuery, err := os.ReadFile(path)
+	if err != nil {
+		fmt.Println("Error path: " + path)
+		log.Fatal(err)
+	}
+	builder.SetPostQuery(string(postQuery))
 }

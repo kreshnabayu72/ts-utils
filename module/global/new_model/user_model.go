@@ -1,6 +1,11 @@
 package new_model
 
 import (
+	"fmt"
+	"log"
+	"os"
+	"path/filepath"
+	"runtime"
 	"time"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/migration"
@@ -47,4 +52,16 @@ func (m *User) Up(builder *migration.MigrationBuilder) {
 	builder.AddForeignKey("fk_global_user_modified_by", "modified_by_id", "users", "id", "SET NULL")
 
 	builder.AddIndex("users_email_uindex", "email", true, "")
+
+	// Insert default data
+	_, filename, _, _ := runtime.Caller(0)
+	baseDir := filepath.Dir(filename)
+	path := filepath.Join(baseDir, "migration/user_post_query.sql")
+
+	postQuery, err := os.ReadFile(path)
+	if err != nil {
+		fmt.Println("Error path: " + path)
+		log.Fatal(err)
+	}
+	builder.SetPostQuery(string(postQuery))
 }

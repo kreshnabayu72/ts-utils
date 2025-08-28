@@ -1,6 +1,7 @@
 package new_model
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -52,12 +53,14 @@ func (m *TransferApproval) Up(builder *migration.MigrationBuilder) {
 		"",
 	)
 
+	// Insert default data
 	_, filename, _, _ := runtime.Caller(0)
 	baseDir := filepath.Dir(filename)
-	postQuery, err := os.ReadFile(
-		filepath.Join(baseDir, "..", "migration/transfer_approval_post_query.sql"),
-	)
+	path := filepath.Join(baseDir, "migration/transfer_approval_post_query.sql")
+
+	postQuery, err := os.ReadFile(path)
 	if err != nil {
+		fmt.Println("Error path: " + path)
 		log.Fatal(err)
 	}
 	builder.SetPostQuery(string(postQuery))
