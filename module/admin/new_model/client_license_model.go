@@ -8,12 +8,12 @@ import (
 type ClientLicense struct {
 	ID           int                 `json:"_id"          column:"client_licenses.id"            sql:"BIGINT PRIMARY KEY"`
 	ClientID     int                 `json:"clientId"     column:"client_licenses.client_id"     sql:"BIGINT"`
-	Type         LicenseType         `json:"type"         column:"client_licenses.type"` // TODO: sql
+	Type         LicenseType         `json:"type"         column:"client_licenses.type" sql:"license_type_enum NOT NULL"`
 	Managed      int                 `json:"managed"      column:"client_licenses.managed"       sql:"INTEGER"`
 	Unmanaged    int                 `json:"unmanaged"    column:"client_licenses.unmanaged"     sql:"INTEGER"`
 	Available    int                 `json:"available"    column:"client_licenses.available"     sql:"INTEGER"`
 	Total        int                 `json:"total"        column:"client_licenses.total"         sql:"INTEGER"`
-	PurchaseType LicensePurchaseType `json:"purchaseType" column:"client_licenses.purchase_type"` // TODO: sql
+	PurchaseType LicensePurchaseType `json:"purchaseType" column:"client_licenses.purchase_type" sql:"license_purchase_type_enum NOT NULL"`
 }
 
 func (m *ClientLicense) TableName() string {
