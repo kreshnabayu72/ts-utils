@@ -1,4 +1,6 @@
-CREATE OR REPLACE VIEW "category_tree" AS
+package migration
+
+var FixedAssetView string = `CREATE OR REPLACE VIEW "category_tree" AS
 SELECT build_category_tree(NULL, ARRAY_AGG(node  ORDER BY  (node->>'name'))) AS tree
 FROM (
     SELECT jsonb_build_object(
@@ -54,3 +56,5 @@ FROM (
         LEFT JOIN assignment_transactions ON assignment_transactions.id = assignment_requests.transaction
     WHERE assignment_requests.status::text IN ('Unassigned', 'Rejected')
 ) AS my_asset_histories;
+ 
+ `

@@ -2,10 +2,9 @@ package db
 
 import (
 	"log"
-	"path/filepath"
-	"runtime"
 	"strings"
 
+	db_migration "gitea.qwertysystem.net/BETS/ts-utils/db/migration"
 	"gitea.qwertysystem.net/BETS/ts-utils/migration"
 	admin_model "gitea.qwertysystem.net/BETS/ts-utils/module/admin/new_model"
 	fixedasset_model "gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
@@ -82,10 +81,7 @@ func migrateAdminDB(dbName string, migrator *migration.Migrator) error {
 		}
 	}
 
-	_, filename, _, _ := runtime.Caller(0)
-	baseDir := filepath.Dir(filename)
-	functionQueryPath := filepath.Join(baseDir, "migration/admin_console_enum.sql")
-	err := migrator.ExecFile(dbName, functionQueryPath)
+	err := migrator.ExecFile(dbName, db_migration.AdminConsoleEnum)
 	if err != nil {
 		return err
 	}
@@ -203,16 +199,12 @@ func migrateFixedAssetDB(dbName string, migrator *migration.Migrator) error {
 		}
 	}
 
-	_, filename, _, _ := runtime.Caller(0)
-	baseDir := filepath.Dir(filename)
-	functionQueryPath := filepath.Join(baseDir, "migration/fixed_asset_function.sql")
-	err := migrator.ExecFile(dbName, functionQueryPath)
+	err := migrator.ExecFile(dbName, db_migration.FixedAssetFunction)
 	if err != nil {
 		return err
 	}
 
-	enumQueryPath := filepath.Join(baseDir, "migration/fixed_asset_enum.sql")
-	err = migrator.ExecFile(dbName, enumQueryPath)
+	err = migrator.ExecFile(dbName, db_migration.FixedAssetEnum)
 	if err != nil {
 		return err
 	}
@@ -220,8 +212,7 @@ func migrateFixedAssetDB(dbName string, migrator *migration.Migrator) error {
 	err = migrator.MigrateModels(dbName, models...)
 	log.Println("Migrate model error:", err)
 
-	viewQueryPath := filepath.Join(baseDir, "migration/fixed_asset_view.sql")
-	err = migrator.ExecFile(dbName, viewQueryPath)
+	err = migrator.ExecFile(dbName, db_migration.FixedAssetView)
 	if err != nil {
 		return err
 	}

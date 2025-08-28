@@ -1,4 +1,6 @@
-CREATE OR REPLACE FUNCTION set_default_approval_status()
+package migration
+
+var FixedAssetFunction string = `CREATE OR REPLACE FUNCTION set_default_approval_status()
 RETURNS TRIGGER AS $$
 BEGIN
     IF NEW.status IS NULL THEN
@@ -92,4 +94,4 @@ BEGIN
 
     RETURN result;
 END;
-$$;
+$$;`
