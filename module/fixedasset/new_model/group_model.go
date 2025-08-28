@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/migration"
-	fixed_asset_migration "gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/migration"
+	fixed_asset_migration "gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model/migration"
 )
 
 type Group struct {
@@ -48,6 +48,8 @@ func (m *Group) Up(builder *migration.MigrationBuilder) {
 	builder.AddIndex("idx_groups_name", "name", false, "")
 	builder.AddIndex("groups_code_uindex", "code", true, "code IS NOT NULL")
 
+	// ─────── Insert default data ───────
+	// NOTE: reading from sql file has been tried and doesnt work in server, so use string instead
 	builder.SetPostQuery(fixed_asset_migration.GroupPostQuery)
 }
 
@@ -73,6 +75,7 @@ func (m *GroupQuota) Up(builder *migration.MigrationBuilder) {
 	builder.AddColumn(m)
 
 	builder.AddIndex("group_quotas_primary_key", "group_id,type", true, "")
+
 }
 
 type GroupApprovalType struct {

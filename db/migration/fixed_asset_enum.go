@@ -1,5 +1,6 @@
--- NOTE: WITHOUT CHECKING, IT WILL THROW ERROR IF TYPE ALREADY EXIST
+package migration
 
+var FixedAssetEnum string = `-- NOTE: WITHOUT CHECKING, IT WILL THROW ERROR IF TYPE ALREADY EXIST
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'approval_type_enum') THEN
@@ -640,4 +641,4 @@ BEGIN
             'TAG found, asset missing',
             );
     END IF;
-END$$;
+END$$;`

@@ -1,14 +1,10 @@
 package new_model
 
 import (
-	"fmt"
-	"log"
-	"os"
-	"path/filepath"
-	"runtime"
 	"time"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/migration"
+	root_migration "gitea.qwertysystem.net/BETS/ts-utils/module/root/new_model/migration"
 )
 
 type UserAuth struct {
@@ -32,15 +28,7 @@ func (m *UserAuth) Up(builder *migration.MigrationBuilder) {
 	builder.AddIndex("user_auths_email_uindex", "email", true, "")
 	builder.AddIndex("user_auths_company_code_uindex", "company_code", true, "")
 
-	// Insert default data
-	_, filename, _, _ := runtime.Caller(0)
-	baseDir := filepath.Dir(filename)
-	path := filepath.Join(baseDir, "migration/user_auth_post_query.sql")
-
-	postQuery, err := os.ReadFile(path)
-	if err != nil {
-		fmt.Println("Error path: " + path)
-		log.Fatal(err)
-	}
-	builder.SetPostQuery(string(postQuery))
+	// ─────── Insert default data ───────
+	// NOTE: reading from sql file has been tried and doesnt work in server, so use string instead
+	builder.SetPostQuery(root_migration.UserAuthPostQuery)
 }

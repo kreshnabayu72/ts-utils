@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/migration"
+	fixed_asset_migration "gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model/migration"
 )
 
 type User struct {
@@ -58,4 +59,8 @@ func (m *User) Up(builder *migration.MigrationBuilder) {
 
 	builder.AddIndex("users_email_uindex", "email", true, "")
 	builder.AddIndex("users_rfid_code_uindex", "rfid_code", true, "")
+
+	// ─────── Insert default data ───────
+	// NOTE: reading from sql file has been tried and doesnt work in server, so use string instead
+	builder.SetPostQuery(fixed_asset_migration.UserPostQuery)
 }

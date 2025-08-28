@@ -1,5 +1,6 @@
--- SAFE ENUM CREATION (PostgreSQL)
+package migration
 
+var AdminConsoleEnum string = `-- SAFE ENUM CREATION (PostgreSQL)
 -- client_status_enum
 DO $$
 BEGIN
@@ -60,3 +61,4 @@ BEGIN
     );
   END IF;
 END $$;
+`
