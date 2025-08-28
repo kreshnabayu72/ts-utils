@@ -1,14 +1,10 @@
 package new_model
 
 import (
-	"fmt"
-	"log"
-	"os"
-	"path/filepath"
-	"runtime"
 	"time"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/migration"
+	fixed_asset_migration "gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model/migration"
 )
 
 type Category struct {
@@ -39,15 +35,7 @@ func (m *Category) Up(builder *migration.MigrationBuilder) {
 		"code IS NOT NULL AND is_deleted = FALSE",
 	)
 
-	// Insert default data
-	_, filename, _, _ := runtime.Caller(0)
-	baseDir := filepath.Dir(filename)
-	path := filepath.Join(baseDir, "migration/category_post_query.sql")
-
-	postQuery, err := os.ReadFile(path)
-	if err != nil {
-		fmt.Println("Error path: " + path)
-		log.Fatal(err)
-	}
-	builder.SetPostQuery(string(postQuery))
+	// ─────── Insert default data ───────
+	// NOTE: reading from sql file has been tried and doesnt work in server, so use string instead
+	builder.SetPostQuery(fixed_asset_migration.CategoryPostQuery)
 }

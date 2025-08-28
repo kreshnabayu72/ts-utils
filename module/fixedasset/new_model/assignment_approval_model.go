@@ -1,14 +1,10 @@
 package new_model
 
 import (
-	"fmt"
-	"log"
-	"os"
-	"path/filepath"
-	"runtime"
 	"time"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/migration"
+	fixed_asset_migration "gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model/migration"
 )
 
 // AssignmentApproval represents the assignment_approvals table in the database.
@@ -52,15 +48,8 @@ func (m *AssignmentApproval) Up(builder *migration.MigrationBuilder) {
 		"",
 	)
 
-	// Insert default data
-	_, filename, _, _ := runtime.Caller(0)
-	baseDir := filepath.Dir(filename)
-	path := filepath.Join(baseDir, "migration/assignment_approval_post_query.sql")
+	// ─────── Insert default data ───────
+	// NOTE: reading from sql file has been tried and doesnt work in server, so use string instead
 
-	postQuery, err := os.ReadFile(path)
-	if err != nil {
-		fmt.Println("Error path: " + path)
-		log.Fatal(err)
-	}
-	builder.SetPostQuery(string(postQuery))
+	builder.SetPostQuery(fixed_asset_migration.AssignmentApprovalPostQuery)
 }
