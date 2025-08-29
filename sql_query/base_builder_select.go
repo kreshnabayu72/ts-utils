@@ -15,6 +15,10 @@ type SQLSelectChainBuilder interface {
 	// AddArgs appends one or more arguments to the query's argument list.
 	// Can be used to manually manage parameter placeholders.
 	AddArgs(arg ...interface{}) SQLSelectChainBuilder
+	// StartPlaceholderFrom set starting point of next generated placeholders.
+	// Useful for creating sub query from this builder for another main query.
+	// Placeholders for this sub query will be started from this given value.
+	StartPlaceholderFrom(index int) SQLSelectChainBuilder
 
 	// Distinct implements SQLSelectChainBuilder.
 	// Distinct defines one or more columns for the DISTINCT ON(...) statement.
@@ -62,6 +66,16 @@ type SQLSelectChainBuilder interface {
 	//
 	//	CASE WHEN role = 'admin' THEN 'Yes' ELSE 'No' END AS is_admin
 	SelectCaseWhen(thenExpr, elseExpr, alias string, whenClause string, whenArgs ...interface{}) SQLSelectChainBuilder
+	// SelectBoolAnd adds a bool_or aggregate column with an alias.
+	//
+	// Example:
+	//
+	//	builder.SelectBoolAnd("is_active", "any_active")
+	//
+	// Generates:
+	//
+	//	bool_and(is_active) AS any_active
+	SelectBoolAnd(expr, alias string, args ...interface{}) SQLSelectChainBuilder
 	// SelectBoolOr adds a bool_or aggregate column with an alias.
 	//
 	// Example:
@@ -310,6 +324,38 @@ func (s *SelectBuilder) AddArgs(arg ...interface{}) SQLSelectChainBuilder {
 	return s
 }
 
+func (s *SelectBuilder) StartPlaceholderFrom(index int) SQLSelectChainBuilder {
+	if index < 1 {
+		index = 1
+	}
+
+	if len(s.Args) > 0 {
+		// Need to pad so that first existing arg becomes $index
+		pad := index - 1
+		if pad > 0 {
+			temp := make([]interface{}, pad+len(s.Args))
+			// fill padding with nils
+			for i := 0; i < pad; i++ {
+				temp[i] = nil
+			}
+			// copy old args after padding
+			copy(temp[pad:], s.Args)
+			s.Args = temp
+		}
+	} else {
+		// If empty, just pad with nils up to index-1
+		if index > 1 {
+			temp := make([]interface{}, index-1)
+			for i := 0; i < index-1; i++ {
+				temp[i] = nil
+			}
+			s.Args = temp
+		}
+	}
+
+	return s
+}
+
 func (s *SelectBuilder) Search(keyword string, fields []string) SQLSelectChainBuilder {
 	if keyword != "" && len(fields) > 0 {
 		var orClauses []string
@@ -385,6 +431,28 @@ func (s *SelectBuilder) Select(columns ...string) SQLSelectChainBuilder {
 			s.Columns = append(s.Columns, newCol)
 		}
 	}
+	return s
+}
+
+func (s *SelectBuilder) SelectBoolAnd(expr, alias string, args ...interface{}) SQLSelectChainBuilder {
+	boolAndColumn := fmt.Sprintf("bool_and(%s) AS \"%s\"", expr, alias)
+
+	// Check if alias exists in current list
+	replaced := false
+	for i, existing := range s.Columns {
+		extracted := extractAlias(existing)
+		if extracted != "" && extracted == strings.ToLower(alias) {
+			s.Columns[i] = boolAndColumn // Overwrite
+			replaced = true
+			break
+		}
+	}
+
+	if !replaced {
+		s.Columns = append(s.Columns, boolAndColumn)
+	}
+
+	s.Args = append(s.Args, args...)
 	return s
 }
 
