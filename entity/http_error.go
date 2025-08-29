@@ -73,3 +73,7 @@ func ToHttpError(err error) *HttpError {
 
 	return InternalServerError(err.Error())
 }
+
+// ─────── Specific error messages ───────
+
+// Auth
