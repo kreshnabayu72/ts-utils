@@ -16,7 +16,8 @@ INSERT INTO clients (
     fax,
     address,
     contact_person_name,
-    contact_person_email
+    contact_person_email,
+    is_default
 )
 VALUES (
     1,
@@ -33,7 +34,8 @@ VALUES (
     '+62-1234',
     'Kelapa gading',
     'User 1',
-    'user1@qwertysystem.net'
+    'user1@qwertysystem.net',
+    TRUE
 );
 `
 var ClientLicensePostQuery string = `INSERT INTO client_licenses (
