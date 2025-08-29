@@ -157,5 +157,5 @@ func (m *Client) Up(builder *migration.MigrationBuilder) {
 
 	// ─────── Additional Queries ───────
 	// NOTE: reading from sql file has been tried and doesnt work in server, so use string instead
-	builder.SetPostQuery(admin_migration.ClientLicensePostQuery)
+	builder.SetPostQuery(admin_migration.ClientPostQuery)
 }
