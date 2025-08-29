@@ -54,7 +54,7 @@ END;
 $$;`
 
 var GroupPostQuery string = `INSERT INTO groups (
-    id, name, code, parent_id, parent_quota_source_id, level,
+    id, name, code, parent_id, parent_quota_source_id, level
 ) VALUES
 (0, 'All', 'ALL', NULL, 0, -1),
 (1, 'Default','0000', 0, 0, 1);`
@@ -119,20 +119,20 @@ END;
 $$;`
 
 var UserPostQuery string = `INSERT INTO users (id, first_name, last_name, phone_number, email, division, position,
- modified_by_id, modified_by_first_name, modified_by_last_name, modified_by_full_name, is_email_confirmed,
+ modified_by_id, modified_by_first_name, modified_by_last_name,  is_email_confirmed,
  read_only_is_active, read_only_is_assigned, total_control_is_active, total_control_is_assigned, is_default
-),
-VALUES (1, 'User', 'Satu', '081333','user1@qwertysystem.net', 'Default Division', 'Default Position',
- 1, 'User', 'Satu', 'User Satu',TRUE,
- FALSE, FALSE, TRUE, TRUE, TRUE
 )
+VALUES (1, 'User', 'Satu', '081333','user1@qwertysystem.net', 'Default Division', 'Default Position',
+ 1, 'User', 'Satu', TRUE,
+ FALSE, FALSE, TRUE, TRUE, TRUE
+);
 `
 var UserSystemRolePostQuery string = `INSERT INTO user_system_roles (
   id, role_type, group_id, user_id, role_name, role_attribute
 ) VALUES
   (1, 'Group',  1,    1, 'Register assets', 'registerAsset'),
   (2, 'Group',  1,    1, 'Manage group', 'group'),
-  (3, 'Global',  NULL, 1, 'Manage asset names, brands, categories, and custom fields', 'assetAttribute')
+  (3, 'Global',  NULL, 1, 'Manage asset names, brands, categories, and custom fields', 'assetAttribute'),
   (4 , 'Global', NULL, 1, 'Import data', 'importData'),
   (5 , 'Global', NULL, 1, 'Manage asset policy', 'assetPolicies'),
   (6 , 'Global', NULL, 1, 'Manage depreciation group', 'depreciationGroup'),

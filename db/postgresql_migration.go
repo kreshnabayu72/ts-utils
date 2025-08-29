@@ -199,26 +199,35 @@ func migrateFixedAssetDB(dbName string, migrator *migration.Migrator) error {
 		}
 	}
 
+	// ─────── !!! Migrating order matters !!! ───────
+	// Example: If triggers are using table names, insert it after MigrateModels
 	err := migrator.Exec(dbName, db_migration.FixedAssetTrigger)
 	if err != nil {
+		log.Println("Migrate trigger error:", err)
 		return err
 	}
 
 	err = migrator.Exec(dbName, db_migration.FixedAssetEnum)
 	if err != nil {
+		log.Println("Migrate enum error:", err)
 		return err
 	}
 
 	err = migrator.MigrateModels(dbName, models...)
-	log.Println("Migrate model error:", err)
+	if err != nil {
+		log.Println("Migrate model error:", err)
+		return err
+	}
 
 	err = migrator.Exec(dbName, db_migration.FixedAssetFunction)
 	if err != nil {
+		log.Println("Migrate function error:", err)
 		return err
 	}
 
 	err = migrator.Exec(dbName, db_migration.FixedAssetView)
 	if err != nil {
+		log.Println("Migrate view error:", err)
 		return err
 	}
 
