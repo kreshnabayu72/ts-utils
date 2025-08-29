@@ -1,6 +1,8 @@
 package sql_query
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func GenerateCTEOption(
 	sourceBuilder *SelectBuilder,
@@ -33,7 +35,10 @@ func GenerateCTEOption(
 			)
 
 		mainBuilder.WithCTEBuilder(snakeAliasName, cteBuilder.(*SelectBuilder).SQLEloquentQuery)
-		mainBuilder.LeftJoin(snakeAliasName, fmt.Sprintf(`"%s"."id" = "%s"."id"`, snakeAliasName, refTable))
+		mainBuilder.LeftJoin(
+			snakeAliasName,
+			fmt.Sprintf(`"%s"."id" = "%s"."id"`, snakeAliasName, refTable),
+		)
 
 		mainBuilder.Select(
 			fmt.Sprintf(

@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/migration"
+	global_migration "gitea.qwertysystem.net/BETS/ts-utils/module/global/new_model/migration"
 )
 
 type Position struct {
@@ -19,4 +20,8 @@ func (m *Position) TableName() string {
 
 func (m *Position) Up(builder *migration.MigrationBuilder) {
 	builder.AddColumn(m)
+
+	// ─────── Insert default data ───────
+	// NOTE: reading from sql file has been tried and doesnt work in server, so use string instead
+	builder.SetPostQuery(global_migration.PositionPostQuery)
 }

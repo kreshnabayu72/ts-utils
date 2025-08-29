@@ -95,6 +95,7 @@ const (
 	ReaderAuthTableName                       = "reader_auths"
 	RepairApprovalTableName                   = "repair_approvals"
 	RepairTableName                           = "repairs"
+	RepairTicketingTableName                  = "repair_ticketings"
 	ReportTableName                           = "reports"
 	RfIdTagTableName                          = "rfids"
 	RoleTableName                             = "roles"

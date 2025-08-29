@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/migration"
+	root_migration "gitea.qwertysystem.net/BETS/ts-utils/module/root/new_model/migration"
 )
 
 type UserAuth struct {
@@ -25,5 +26,7 @@ func (m *UserAuth) Up(builder *migration.MigrationBuilder) {
 	builder.AddColumn(m)
 
 	builder.AddIndex("user_auths_email_uindex", "email", true, "")
-	builder.AddIndex("user_auths_company_code_uindex", "company_code", true, "")
+	// ─────── Insert default data ───────
+	// NOTE: reading from sql file has been tried and doesnt work in server, so use string instead
+	builder.SetPostQuery(root_migration.UserAuthPostQuery)
 }

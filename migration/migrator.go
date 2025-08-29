@@ -206,6 +206,8 @@ func (m *Migrator) MigrateModels(dbName string, models ...Model) error {
 	}
 
 	for _, builder := range migrationBuilders {
+		fmt.Printf("Migrating model %v\n", builder.TableName)
+
 		err := m.migrateModel(pool, migrationBuilders, builder)
 		if err != nil {
 			return fmt.Errorf("migration failed for model %s: %w", builder.TableName, err)

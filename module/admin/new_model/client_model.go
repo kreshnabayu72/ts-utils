@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/migration"
-	admin_migration "gitea.qwertysystem.net/BETS/ts-utils/module/admin/migration"
+	admin_migration "gitea.qwertysystem.net/BETS/ts-utils/module/admin/new_model/migration"
 	fixedasset_model "gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
 )
 
@@ -27,9 +27,9 @@ type Client struct {
 	ContactPersonEmail string        `json:"contactPersonEmail" column:"contact_person_email" sql:"VARCHAR NOT NULL"`
 	PendingEmailChange *string       `json:"pendingEmailChange" column:"pending_email_change" sql:"VARCHAR NULL DEFAULT NULL"`
 	Image              *string       `json:"image" column:"image" sql:"VARCHAR NULL DEFAULT NULL"`
-	GroupID            int           `json:"groupId" column:"group_id"` // TODO: sql
-	ModifiedByID       int           `json:"modifiedById" column:"modified_by_id" sql:"BIGINT"`
-	PartnerID          int           `json:"partnerId" column:"partner_id"` // TODO: sql
+	GroupID            int           `json:"groupId" column:"group_id" sql:"BIGINT NULL"`
+	ModifiedByID       int           `json:"modifiedById" column:"modified_by_id" sql:"BIGINT NULL"`
+	PartnerID          int           `json:"partnerId" column:"partner_id" sql:"BIGINT NULL"`
 	ExpiredAt          time.Time     `json:"expiredAt" column:"expired_at" sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
 	CreatedAt          time.Time     `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 	UpdatedAt          time.Time     `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
@@ -146,10 +146,16 @@ func (m *Client) Up(builder *migration.MigrationBuilder) {
 		},
 	)
 
-	// ─────── Foreign Keys ───────
+	// ─────── Index ───────
 	builder.AddIndex("clients_name_uindex", "name", true, "")
 	builder.AddIndex("clients_client_id_uindex", "client_id", true, "")
 
+	// ─────── Foreign Keys ─────── (Not priority for now)
+	// builder.AddForeignKey("fk_client_group", "group_id", "groups", "id", "SET NULL")
+	// builder.AddForeignKey("fk_client_modified_by_id", "modified_by_id", "users", "id", "SET NULL")
+	// builder.AddForeignKey("fk_client_partner_id", "partner_id", "partners", "id", "SET NULL")
+
 	// ─────── Additional Queries ───────
+	// NOTE: reading from sql file has been tried and doesnt work in server, so use string instead
 	builder.SetPostQuery(admin_migration.ClientPostQuery)
 }

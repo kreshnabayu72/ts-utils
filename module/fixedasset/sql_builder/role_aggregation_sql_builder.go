@@ -1205,7 +1205,7 @@ func transactionRoleMultiPermissionAggregationCTE(
 			},
 			"utr.role_type": {
 				Operator: sql_query.SQLOperatorIn,
-				Value:    []string{"Monitoring", "Manager"},
+				Value:    []string{"Monitoring", "Manager", "Approval", "Staff"},
 			},
 			"utr.role_attribute": {
 				Operator: sql_query.SQLOperatorIn,
@@ -1249,6 +1249,21 @@ func transactionRoleMultiPermissionAggregationCTE(
 			builder.GetCurrentArgIndex()+11,
 			builder.GetCurrentArgIndex()+12,
 		),
+		fmt.Sprintf(
+			`BOOL_OR(utr.role_type = $%d AND utr.role_attribute = $%d) AS "approval_borrowing"`,
+			builder.GetCurrentArgIndex()+13,
+			builder.GetCurrentArgIndex()+14,
+		),
+		fmt.Sprintf(
+			`BOOL_OR(utr.role_type = $%d AND utr.role_attribute = $%d) AS "approval_transfer"`,
+			builder.GetCurrentArgIndex()+15,
+			builder.GetCurrentArgIndex()+16,
+		),
+		fmt.Sprintf(
+			`BOOL_OR(utr.role_type = $%d AND utr.role_attribute = $%d) AS "approval_disposal"`,
+			builder.GetCurrentArgIndex()+17,
+			builder.GetCurrentArgIndex()+18,
+		),
 	)
 
 	builder.AddArgs(
@@ -1263,6 +1278,12 @@ func transactionRoleMultiPermissionAggregationCTE(
 		fixedasset_new_model.TransactionRoleTypeMonitoring,
 		fixedasset_new_model.TransactionRoleAttributeTransfer,
 		fixedasset_new_model.TransactionRoleTypeMonitoring,
+		fixedasset_new_model.TransactionRoleAttributeDisposal,
+		fixedasset_new_model.TransactionRoleTypeApproval,
+		fixedasset_new_model.TransactionRoleAttributeBorrowing,
+		fixedasset_new_model.TransactionRoleTypeApproval,
+		fixedasset_new_model.TransactionRoleAttributeTransfer,
+		fixedasset_new_model.TransactionRoleTypeApproval,
 		fixedasset_new_model.TransactionRoleAttributeDisposal,
 	)
 

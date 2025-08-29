@@ -4,11 +4,12 @@ import (
 	"time"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/migration"
+	fixed_asset_migration "gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model/migration"
 )
 
 type UserTransactionRole struct {
 	ID       int  `json:"_id" column:"id" sql:"BIGINT PRIMARY KEY"`
-	IsActive bool `json:"isActive" column:"is_active" sql:"BOOLEAN NOT NULL"`
+	IsActive bool `json:"isActive" column:"is_active" sql:"BOOLEAN DEFAULT TRUE"`
 	UserID   int  `json:"userId" column:"user_id" sql:"BIGINT NOT NULL"`
 
 	RoleAttribute TransactionRoleAttribute `json:"roleAttribute" column:"role_attribute" sql:"transaction_role_attribute_enum NOT NULL"`
@@ -48,8 +49,12 @@ func (u *UserTransactionRole) Up(builder *migration.MigrationBuilder) {
 
 	builder.AddIndex(
 		"user_transaction_roles_unique_index",
-		"group_id,user_id,role_type",
+		"group_id,user_id,role_type,role_attribute",
 		true,
 		"",
 	)
+
+	// ─────── Insert default data ───────
+	// NOTE: reading from sql file has been tried and doesnt work in server, so use string instead
+	builder.SetPostQuery(fixed_asset_migration.UserTransactionRolePostQuery)
 }

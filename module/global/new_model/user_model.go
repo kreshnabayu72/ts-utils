@@ -5,6 +5,7 @@ import (
 
 	"gitea.qwertysystem.net/BETS/ts-utils/migration"
 	fixed_asset_model "gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
+	global_migration "gitea.qwertysystem.net/BETS/ts-utils/module/global/new_model/migration"
 )
 
 type User struct {
@@ -31,6 +32,8 @@ type User struct {
 	IsTemporary    bool                             `json:"isTemporary" column:"is_temporary" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
 	ExpiryDate     *time.Time                       `json:"expiryDate" column:"expiry_date" sql:"TIMESTAMPTZ NULL"`
 
+	FCMToken string `json:"fcmToken"    column:"fcm_token" sql:"VARCHAR NULL"`
+
 	CreatedAt *time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 	UpdatedAt *time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
@@ -47,4 +50,8 @@ func (m *User) Up(builder *migration.MigrationBuilder) {
 	builder.AddForeignKey("fk_global_user_modified_by", "modified_by_id", "users", "id", "SET NULL")
 
 	builder.AddIndex("users_email_uindex", "email", true, "")
+
+	// ─────── Insert default data ───────
+	// NOTE: reading from sql file has been tried and doesnt work in server, so use string instead
+	builder.SetPostQuery(global_migration.UserPostQuery)
 }

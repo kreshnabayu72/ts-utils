@@ -2,10 +2,9 @@ package db
 
 import (
 	"log"
-	"path/filepath"
-	"runtime"
 	"strings"
 
+	db_migration "gitea.qwertysystem.net/BETS/ts-utils/db/migration"
 	"gitea.qwertysystem.net/BETS/ts-utils/migration"
 	admin_model "gitea.qwertysystem.net/BETS/ts-utils/module/admin/new_model"
 	fixedasset_model "gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
@@ -68,8 +67,10 @@ func migrateRootDB(dbName string, migrator *migration.Migrator) error {
 
 func migrateAdminDB(dbName string, migrator *migration.Migrator) error {
 	models := []migration.Model{
-		&admin_model.Client{},
+		&admin_model.Group{},
 		&admin_model.User{},
+		&admin_model.Client{},
+		&admin_model.ClientLicense{},
 	}
 
 	isDBExist := migrator.IsDBExist(dbName)
@@ -80,16 +81,21 @@ func migrateAdminDB(dbName string, migrator *migration.Migrator) error {
 		}
 	}
 
-	err := migrator.MigrateModels(dbName, models...)
+	err := migrator.Exec(dbName, db_migration.AdminConsoleEnum)
+	if err != nil {
+		return err
+	}
+
+	err = migrator.MigrateModels(dbName, models...)
 
 	return err
 }
 
 func migrateGlobalDB(dbName string, migrator *migration.Migrator) error {
 	models := []migration.Model{
-		&global_model.User{},
 		&global_model.Position{},
 		&global_model.Division{},
+		&global_model.User{},
 	}
 
 	isDBExist := migrator.IsDBExist(dbName)
@@ -134,16 +140,18 @@ func migrateFixedAssetDB(dbName string, migrator *migration.Migrator) error {
 		&fixedasset_model.ImportUser{},
 		&fixedasset_model.Model{},
 		&fixedasset_model.Qr{},
-		&fixedasset_model.QrRfidPair{},
 		&fixedasset_model.Rfid{},
+		&fixedasset_model.QrRfidPair{},
 		&fixedasset_model.UserTransactionRole{},
 		&fixedasset_model.AssetCustomField{},
 		&fixedasset_model.Attachment{},
+
+		&fixedasset_model.BorrowingTransaction{},
+		&fixedasset_model.BorrowingRequest{},
 		&fixedasset_model.BorrowingApproval{},
 		&fixedasset_model.BorrowingPrelist{},
 		&fixedasset_model.BorrowingPrelistRequest{},
-		&fixedasset_model.BorrowingRequest{},
-		&fixedasset_model.BorrowingTransaction{},
+
 		&fixedasset_model.CustomFieldCategory{},
 		&fixedasset_model.DamageReport{},
 		&fixedasset_model.FileInStorage{},
@@ -156,29 +164,40 @@ func migrateFixedAssetDB(dbName string, migrator *migration.Migrator) error {
 		&fixedasset_model.MissingReport{},
 		&fixedasset_model.ReplaceTagPrelist{},
 		&fixedasset_model.UserSystemRole{},
+
+		&fixedasset_model.AssignmentTransaction{},
+		&fixedasset_model.AssignmentRequest{},
 		&fixedasset_model.AssignmentApproval{},
 		&fixedasset_model.AssignmentPrelist{},
 		&fixedasset_model.AssignmentPrelistRequest{},
-		&fixedasset_model.AssignmentRequest{},
-		&fixedasset_model.AssignmentTransaction{},
+
+		&fixedasset_model.DisposalTransaction{},
+		&fixedasset_model.DisposalRequest{},
 		&fixedasset_model.DisposalApproval{},
 		&fixedasset_model.DisposalPrelist{},
 		&fixedasset_model.DisposalPrelistRequest{},
-		&fixedasset_model.DisposalRequest{},
-		&fixedasset_model.DisposalTransaction{},
+
+		&fixedasset_model.TransferTransaction{},
+		&fixedasset_model.TransferRequest{},
 		&fixedasset_model.TransferApproval{},
 		&fixedasset_model.TransferPrelist{},
 		&fixedasset_model.TransferPrelistRequest{},
-		&fixedasset_model.TransferRequest{},
-		&fixedasset_model.TransferTransaction{},
+
 		&fixedasset_model.RoutineSchedule{},
 		&fixedasset_model.RoutineScheduleStaff{},
 		&fixedasset_model.RoutineScheduledAsset{},
 		&fixedasset_model.RoutineScheduleIndicator{},
+
 		&fixedasset_model.RoutineTask{},
 		&fixedasset_model.RoutineTaskStaff{},
 		&fixedasset_model.RoutineTaskIndicator{},
 		&fixedasset_model.RoutineApproval{},
+
+		&fixedasset_model.RepairTicketing{},
+		&fixedasset_model.RepairApproval{},
+
+		&fixedasset_model.Tracking{},
+		&fixedasset_model.TrackingApproval{},
 	}
 
 	isDBExist := migrator.IsDBExist(dbName)
@@ -189,26 +208,35 @@ func migrateFixedAssetDB(dbName string, migrator *migration.Migrator) error {
 		}
 	}
 
-	_, filename, _, _ := runtime.Caller(0)
-	baseDir := filepath.Dir(filename)
-	functionQueryPath := filepath.Join(baseDir, "migration/fixed_asset_function.sql")
-	err := migrator.ExecFile(dbName, functionQueryPath)
+	// ─────── !!! Migrating order matters !!! ───────
+	// Example: If triggers are using table names, insert it after MigrateModels
+	err := migrator.Exec(dbName, db_migration.FixedAssetTrigger)
 	if err != nil {
+		log.Println("Migrate trigger error:", err)
 		return err
 	}
 
-	enumQueryPath := filepath.Join(baseDir, "migration/fixed_asset_enum.sql")
-	err = migrator.ExecFile(dbName, enumQueryPath)
+	err = migrator.Exec(dbName, db_migration.FixedAssetEnum)
 	if err != nil {
+		log.Println("Migrate enum error:", err)
 		return err
 	}
 
 	err = migrator.MigrateModels(dbName, models...)
-	log.Println("Migrate model error:", err)
-
-	viewQueryPath := filepath.Join(baseDir, "migration/fixed_asset_view.sql")
-	err = migrator.ExecFile(dbName, viewQueryPath)
 	if err != nil {
+		log.Println("Migrate model error:", err)
+		return err
+	}
+
+	err = migrator.Exec(dbName, db_migration.FixedAssetFunction)
+	if err != nil {
+		log.Println("Migrate function error:", err)
+		return err
+	}
+
+	err = migrator.Exec(dbName, db_migration.FixedAssetView)
+	if err != nil {
+		log.Println("Migrate view error:", err)
 		return err
 	}
 

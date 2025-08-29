@@ -1,5 +1,6 @@
--- NOTE: WITHOUT CHECKING, IT WILL THROW ERROR IF TYPE ALREADY EXIST
+package migration
 
+var FixedAssetEnum string = `-- NOTE: WITHOUT CHECKING, IT WILL THROW ERROR IF TYPE ALREADY EXIST
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'approval_type_enum') THEN
@@ -583,3 +584,63 @@ BEGIN
             );
     END IF;
 END$$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'repair_ticketing_status_enum') THEN
+        CREATE TYPE repair_ticketing_status_enum AS ENUM (
+            'Reported Damaged',
+            'Under Repair',
+            'Waiting for Confirmation',
+            'Waiting for Approval',
+            'Repaired',
+            'Pemranently Damaged',
+            'Reported Disposal',
+            'On Disposal Process',
+            'Disposed'
+            );
+    END IF;
+END$$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'repair_ticketing_method_enum') THEN
+        CREATE TYPE repair_ticketing_method_enum AS ENUM (
+            'Internal Repair',
+            'Third Party',
+            'Warranty Claim'
+            );
+    END IF;
+END$$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'tracking_status_enum') THEN
+        CREATE TYPE tracking_status_enum AS ENUM (
+            'On Tracking',
+            'Tracked by User',
+            'Tracked by Maintenance',
+            'Tracked by Audit',
+            'Tracked by IOT',
+            'Tracked by Tracking',
+            'Reported as Permanently Missing',
+            'Permanently Missing',
+            'Reported Disposal',
+            'On Disposal Process',
+            'Disposed'
+            );
+    END IF;
+END$$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'tracking_condition_enum') THEN
+        CREATE TYPE tracking_condition_enum AS ENUM (
+            'Asset found, normal condition',
+            'Asset found, damaged condition',
+            'TAG found, asset missing'
+            );
+    END IF;
+END$$;
+
+`
