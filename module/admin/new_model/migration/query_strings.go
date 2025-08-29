@@ -1,4 +1,42 @@
-INSERT INTO client_licenses (
+package migration
+
+var ClientPostQuery string = `
+INSERT INTO clients (
+    id,
+    name,
+    client_id,
+    modified_by_id,
+    email,
+    is_email_confirmed,
+    country,
+    state,
+    city,
+    zip,
+    phone_number,
+    fax,
+    address,
+    contact_person_name,
+    contact_person_email
+)
+VALUES (
+    1,
+    'PT ASDF',
+    '80000001',
+    101,
+    'asdf@asdf.com',
+    TRUE,
+    'Indonesia',
+    'Jakarta',
+    'Jakarta Utara',
+    '90001',
+    '+62-1234',
+    '+62-1234',
+    'Kelapa gading',
+    'User 1',
+    'user1@qwertysystem.net'
+);
+`
+var ClientLicensePostQuery string = `INSERT INTO client_licenses (
     id,
     client_id,
     type,
@@ -20,4 +58,11 @@ VALUES
 (9 , 1, 'supply_asset_asset_control',      0, 0,  0,  0, 'Purchase'),
 (10, 1, 'supply_asset_stock_opname',       0, 0,  0,  0, 'Purchase'),
 (11, 1, 'supply_asset_tracking',           0, 0,  0,  0, 'Purchase'),
-(12, 1, 'inventory',                       0, 0,  0,  0, 'Purchase');
+(12, 1, 'inventory',                       0, 0,  0,  0, 'Purchase');`
+
+var GroupPostQuery string = `
+
+INSERT INTO groups (id, name,  parent_id,level)
+VALUES (0, 'All', NULL,0);--ID needs to be 0
+
+`
