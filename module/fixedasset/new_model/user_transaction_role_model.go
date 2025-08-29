@@ -9,7 +9,7 @@ import (
 
 type UserTransactionRole struct {
 	ID       int  `json:"_id" column:"id" sql:"BIGINT PRIMARY KEY"`
-	IsActive bool `json:"isActive" column:"is_active" sql:"BOOLEAN NOT NULL"`
+	IsActive bool `json:"isActive" column:"is_active" sql:"BOOLEAN DEFAULT TRUE"`
 	UserID   int  `json:"userId" column:"user_id" sql:"BIGINT NOT NULL"`
 
 	RoleAttribute TransactionRoleAttribute `json:"roleAttribute" column:"role_attribute" sql:"transaction_role_attribute_enum NOT NULL"`
