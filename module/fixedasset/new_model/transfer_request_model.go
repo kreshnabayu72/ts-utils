@@ -41,7 +41,7 @@ func (m *TransferRequest) Up(builder *migration.MigrationBuilder) {
 	)
 	builder.AddForeignKey(
 		"fk_transfer_request_transaction",
-		"transaction_id",
+		"transaction",
 		"transfer_transactions",
 		"id",
 		"",

@@ -53,7 +53,7 @@ func (m *AssignmentRequestHistory) Up(builder *migration.MigrationBuilder) {
 	)
 	builder.AddForeignKey(
 		"fk_assignment_request_history_transaction",
-		"transaction_id",
+		"transaction",
 		"assignment_transaction_histories",
 		"id",
 		"",
