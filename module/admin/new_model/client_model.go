@@ -1,14 +1,10 @@
 package new_model
 
 import (
-	"fmt"
-	"log"
-	"os"
-	"path/filepath"
-	"runtime"
 	"time"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/migration"
+	admin_migration "gitea.qwertysystem.net/BETS/ts-utils/module/admin/new_model/migration"
 	fixedasset_model "gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
 )
 
@@ -154,20 +150,12 @@ func (m *Client) Up(builder *migration.MigrationBuilder) {
 	builder.AddIndex("clients_name_uindex", "name", true, "")
 	builder.AddIndex("clients_client_id_uindex", "client_id", true, "")
 
-	// ─────── Foreign Keys ───────
+	// ─────── Foreign Keys ─────── (Not priority for now)
 	// builder.AddForeignKey("fk_client_group", "group_id", "groups", "id", "SET NULL")
 	// builder.AddForeignKey("fk_client_modified_by_id", "modified_by_id", "users", "id", "SET NULL")
 	// builder.AddForeignKey("fk_client_partner_id", "partner_id", "partners", "id", "SET NULL")
 
 	// ─────── Additional Queries ───────
-	_, filename, _, _ := runtime.Caller(0)
-	baseDir := filepath.Dir(filename)
-	path := filepath.Join(baseDir, "migration/client_post_query.sql")
-
-	postQuery, err := os.ReadFile(path)
-	if err != nil {
-		fmt.Println("Error path: " + path)
-		log.Fatal(err)
-	}
-	builder.SetPostQuery(string(postQuery))
+	// NOTE: reading from sql file has been tried and doesnt work in server, so use string instead
+	builder.SetPostQuery(admin_migration.ClientLicensePostQuery)
 }
