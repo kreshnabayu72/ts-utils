@@ -35,7 +35,7 @@ func (m *BorrowingRequest) Up(builder *migration.MigrationBuilder) {
 
 	builder.AddForeignKey(
 		"fk_borrowing_request_asset",
-		"asset_id",
+		"asset",
 		"assets",
 		"id",
 		"",

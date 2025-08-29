@@ -45,23 +45,23 @@ func (m *AssignmentRequestHistory) Up(builder *migration.MigrationBuilder) {
 
 	// Add foreign key constraints as defined in the SQL migration file
 	builder.AddForeignKey(
-		"fk_assignment_request_asset",
-		"asset_id",
+		"fk_assignment_history_asset",
+		"asset",
 		"assets",
 		"id",
 		"",
 	)
 	builder.AddForeignKey(
-		"fk_assignment_request_transaction",
+		"fk_assignment_request_history_transaction",
 		"transaction_id",
-		"assignment_transactions",
+		"assignment_transaction_histories",
 		"id",
 		"",
 	)
 	builder.AddForeignKey(
-		"fk_assignment_request_parent",
+		"fk_assignment_request_history_parent",
 		"parent_id",
-		"assignment_requests",
+		"assignment_request_histories",
 		"id",
 		"",
 	)
