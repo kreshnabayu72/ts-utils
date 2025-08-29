@@ -28,4 +28,30 @@ func (b *BorrowingTransactionHistory) TableName() string {
 
 func (b *BorrowingTransactionHistory) Up(builder *migration.MigrationBuilder) {
 	builder.AddColumn(b)
+
+	// Add foreign key constraints as defined in the SQL migration file
+	builder.AddForeignKey(
+		"fk_borrowing_transaction_borrower",
+		"borrower_id",
+		"users",
+		"id",
+		"",
+	)
+	builder.AddForeignKey(
+		"fk_borrowing_transaction_manager",
+		"manager_id",
+		"users",
+		"id",
+		"",
+	)
+	builder.AddForeignKey(
+		"fk_borrowing_transaction_group",
+		"group_id",
+		"groups",
+		"id",
+		"",
+	)
+
+	// Add the unique index for transaction_id
+	builder.AddIndex("borrowing_transactions_transaction_id", "transaction_id", true, "")
 }
