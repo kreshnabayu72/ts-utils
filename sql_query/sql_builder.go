@@ -2,7 +2,6 @@ package sql_query
 
 import (
 	"fmt"
-	"strings"
 )
 
 func GenerateCTEOption(
@@ -16,12 +15,8 @@ func GenerateCTEOption(
 	customSort ...Sort,
 ) {
 	if optionsQuery {
-		if !strings.Contains(labelKey, "->>") {
-			labelKey = escapeQuoteColumns(labelKey)
-		}
-		if !strings.Contains(labelValue, "->>") {
-			labelValue = escapeQuoteColumns(labelValue)
-		}
+		labelKey = escapeQuoteColumns(labelKey)
+		labelValue = escapeQuoteColumns(labelValue)
 		snakeAliasName := CamelToSnake(aliasName)
 
 		orderString := fmt.Sprintf(`%s ASC`, labelKey)

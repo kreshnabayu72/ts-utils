@@ -383,6 +383,12 @@ func escapeQuoteColumns(column string) string {
 		suffix = "::" + splittedByCast[len(splittedByCast)-1]
 		column = splittedByCast[0]
 	}
+	if strings.Contains(column, "->>") {
+		hasSuffix = true
+		splittedByOperator := strings.Split(column, "->>")
+		suffix = "->>" + splittedByOperator[len(splittedByOperator)-1]
+		column = splittedByOperator[0]
+	}
 
 	parts := strings.Split(column, ".")
 	for i, part := range parts {
