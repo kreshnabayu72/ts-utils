@@ -42,7 +42,7 @@ func (m *DisposalRequest) Up(builder *migration.MigrationBuilder) {
 	)
 	builder.AddForeignKey(
 		"fk_disposal_request_transaction",
-		"transaction_id",
+		"transaction",
 		"disposal_transactions",
 		"id",
 		"",
