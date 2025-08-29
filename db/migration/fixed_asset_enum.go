@@ -638,7 +638,7 @@ BEGIN
         CREATE TYPE tracking_condition_enum AS ENUM (
             'Asset found, normal condition',
             'Asset found, damaged condition',
-            'TAG found, asset missing',
+            'TAG found, asset missing'
             );
     END IF;
 END$$;`
