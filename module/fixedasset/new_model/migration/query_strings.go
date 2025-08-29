@@ -125,6 +125,10 @@ var UserPostQuery string = `INSERT INTO users (id, first_name, last_name, phone_
 VALUES (1, 'User', 'Satu', '081333','user1@qwertysystem.net', 'Default Division', 'Default Position',
  1, 'User', 'Satu', TRUE,
  FALSE, FALSE, TRUE, TRUE, TRUE
+),
+(2, 'User', 'Dua', '081333','user2@qwertysystem.net', 'Default Division', 'Default Position',
+ 1, 'User', 'Dua', TRUE,
+ FALSE, FALSE, TRUE, TRUE, TRUE
 );
 `
 var UserSystemRolePostQuery string = `INSERT INTO user_system_roles (
