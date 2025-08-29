@@ -49,7 +49,7 @@ func (u *UserTransactionRole) Up(builder *migration.MigrationBuilder) {
 
 	builder.AddIndex(
 		"user_transaction_roles_unique_index",
-		"group_id,user_id,role_type",
+		"group_id,user_id,role_type,role_attribute",
 		true,
 		"",
 	)
