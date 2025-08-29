@@ -25,8 +25,7 @@ func (m *UserAuth) TableName() string {
 func (m *UserAuth) Up(builder *migration.MigrationBuilder) {
 	builder.AddColumn(m)
 
-	builder.AddIndex("user_auths_email_company_code_uindex", "company_code,email", true, "")
-
+	builder.AddIndex("user_auths_email_uindex", "email", true, "")
 	// ─────── Insert default data ───────
 	// NOTE: reading from sql file has been tried and doesnt work in server, so use string instead
 	builder.SetPostQuery(root_migration.UserAuthPostQuery)
