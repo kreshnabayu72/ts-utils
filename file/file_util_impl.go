@@ -35,7 +35,7 @@ func (f *FileUtilImpl) SaveFile(
 	writer := multipart.NewWriter(body)
 
 	// Extra form fields
-	_ = writer.WriteField("ditName", folderName)
+	_ = writer.WriteField("dirName", folderName)
 	_ = writer.WriteField("filePrefix", filePrefix)
 
 	// Attach each file
