@@ -1,6 +1,8 @@
 package sql_query
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func GenerateCTEOption(
 	sourceBuilder *SelectBuilder,
