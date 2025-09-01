@@ -171,6 +171,7 @@ func migrateFixedAssetDB(dbName string, migrator *migration.Migrator) error {
 		&fixedasset_model.AssignmentPrelist{},
 		&fixedasset_model.AssignmentPrelistRequest{},
 
+		&fixedasset_model.DisposalReport{},
 		&fixedasset_model.DisposalTransaction{},
 		&fixedasset_model.DisposalRequest{},
 		&fixedasset_model.DisposalApproval{},
