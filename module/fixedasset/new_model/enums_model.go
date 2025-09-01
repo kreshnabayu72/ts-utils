@@ -481,14 +481,14 @@ type ModuleAccess string
 
 const (
 	ModuleAccessFixedAsset     = ModuleAccess("Fixed Asset")
-	ModuleAccessSettingsPortal = ModuleAccess("Settings Portal")
+	ModuleAccessGlobalSettings = ModuleAccess("Global Settings")
 	ModuleAccessAdminConsole   = ModuleAccess("Admin Console")
 	ModuleAccessSupplyAsset    = ModuleAccess("Supply Asset")
 )
 
 var ModuleAccessEnum = map[string]ModuleAccess{
 	"Fixed Asset":     ModuleAccessFixedAsset,
-	"Settings Portal": ModuleAccessSettingsPortal,
+	"Global Settings": ModuleAccessGlobalSettings,
 	"Admin Console":   ModuleAccessAdminConsole,
 	"Supply Asset":    ModuleAccessSupplyAsset,
 }
