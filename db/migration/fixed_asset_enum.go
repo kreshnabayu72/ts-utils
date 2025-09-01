@@ -233,7 +233,7 @@ END$$;
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'module_access_enum') THEN
-        CREATE TYPE module_access_enum AS ENUM ('Fixed Asset', 'Settings Portal','Admin Console','Supply Asset');
+        CREATE TYPE module_access_enum AS ENUM ('Fixed Asset', 'Global Settings','Admin Console','Supply Asset');
     END IF;
 END$$;
 
