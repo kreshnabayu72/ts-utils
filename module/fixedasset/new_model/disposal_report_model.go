@@ -12,6 +12,7 @@ type DisposalReport struct {
 	AssetID       int                   `json:"assetId" column:"asset_id" sql:"BIGINT"`
 	ReportedByID  int                   `json:"reportedById" column:"reported_by_id" sql:"BIGINT"`
 	LastCondition DisposalLastCondition `json:"lastCondition" column:"last_condition" sql:"disposal_last_condition_enum"`
+	Note          string                `json:"note" column:"note" sql:"VARCHAR"`
 	IsDeleted     bool                  `json:"isDeleted" column:"is_deleted" sql:"BOOLEAN"`
 	CreatedAt     time.Time             `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 	UpdatedAt     time.Time             `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
