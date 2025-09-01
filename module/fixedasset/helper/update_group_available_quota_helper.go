@@ -3,7 +3,7 @@ package helper
 import (
 	"context"
 	"errors"
-	"fmt"
+	"log"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/db"
 	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
@@ -55,9 +55,9 @@ func ChangeFixedAssetQuota(
 
 	// Step 1: update current group
 	setValue := map[string]any{
-		"available":     fmt.Sprintf("CASE WHEN available IS NULL THEN NULL ELSE available - %d END", amount),
-		"used_by_group": fmt.Sprintf("used_by_group + %d", amount),
-		"used":          fmt.Sprintf("used + %d", amount),
+		"available":          sql_query.UpdateRawSQL{Expr: "CASE WHEN available IS NULL THEN NULL ELSE available - ? END", Args: []any{amount}},
+		"used_by_this_group": sql_query.UpdateRawSQL{Expr: "used_by_this_group + ?", Args: []interface{}{amount}},
+		"used":               sql_query.UpdateRawSQL{Expr: "used + ?", Args: []interface{}{amount}},
 	}
 	if err := UpdateGroupQuota(service, ctx, setValue, groupData.ID, quotaType); err != nil {
 		return err
@@ -74,7 +74,7 @@ func ChangeFixedAssetQuota(
 	for parentId != nil {
 		// Add to allocatedToSubGroups
 		setParent := map[string]any{
-			"allocated_to_subgroups": fmt.Sprintf("allocated_to_subgroups + %d", amount),
+			"allocated_to_subgroups": sql_query.UpdateRawSQL{Expr: "allocated_to_subgroups + ?", Args: []interface{}{amount}},
 		}
 		if err := UpdateGroupQuota(service, ctx, setParent, *parentId, quotaType); err != nil {
 			return err
@@ -98,8 +98,8 @@ func ChangeFixedAssetQuota(
 	// Step 4: deduct from the parent with available > 0
 	if groupToUpdate != nil {
 		setFinal := map[string]any{
-			"available": fmt.Sprintf("available - %d", amount),
-			"used":      fmt.Sprintf("used + %d", amount),
+			"available": sql_query.UpdateRawSQL{Expr: "available - ?", Args: []interface{}{amount}},
+			"used":      sql_query.UpdateRawSQL{Expr: "used + ?", Args: []interface{}{amount}},
 		}
 		if err := UpdateGroupQuota(service, ctx, setFinal, groupToUpdate.ID, quotaType); err != nil {
 			return err
@@ -122,7 +122,7 @@ func UpdateGroupQuota(service service.PostgreSqlService, ctx context.Context, se
 	queryQuota, argsQuota, _ := sql_query.NewSQLUpdateBuilder(
 		db.GroupQuotaModelName,
 	).
-		Increment(setValue).
+		Update(setValue).
 		Where(map[string]sql_query.SQLCondition{
 			"group_id": {Operator: sql_query.SQLOperatorEqual, Value: groupId},
 			"type":     {Operator: sql_query.SQLOperatorEqual, Value: licenseType},
@@ -133,6 +133,7 @@ func UpdateGroupQuota(service service.PostgreSqlService, ctx context.Context, se
 		queryQuota,
 		argsQuota...,
 	); err != nil {
+		log.Println("err", err)
 		return err
 	}
 
