@@ -17,7 +17,7 @@ type Group struct {
 
 	IsDisposable        bool `json:"isDisposable" column:"is_disposable" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
 	AncestorID          int  `json:"ancestorId" column:"ancestor_id" sql:"BIGINT"`
-	ParentID            int  `json:"parentId" column:"parent_id" sql:"BIGINT"`
+	ParentID            *int `json:"parentId" column:"parent_id" sql:"BIGINT"`
 	ParentQuotaSourceID int  `json:"parentQuotaSourceId" column:"parent_quota_source_id" sql:"BIGINT"`
 
 	BorrowingRoleManagedByParent       bool `json:"borrowingRoleManagedByParent" column:"borrowing_role_managed_by_parent" sql:"BOOLEAN NOT NULL DEFAULT TRUE"`
@@ -75,7 +75,6 @@ func (m *GroupQuota) Up(builder *migration.MigrationBuilder) {
 	builder.AddColumn(m)
 
 	builder.AddIndex("group_quotas_primary_key", "group_id,type", true, "")
-
 }
 
 type GroupApprovalType struct {
