@@ -22,15 +22,16 @@ type User struct {
 	IsDeleted          bool    `json:"isDeleted" column:"is_deleted" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
 	IsEmailConfirmed   bool    `json:"isEmailConfirmed" column:"is_email_confirmed" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
 
-	PositionID     *int                             `json:"positionId" column:"position_id" sql:"BIGINT"`
-	DivisionID     int                              `json:"divisionId" column:"division_id" sql:"BIGINT"`
-	RfidCode       *string                          `json:"rfidCode" column:"rfid_code" sql:"VARCHAR NULL"`
-	ProfilePicture *string                          `json:"profilePicture" column:"profile_picture" sql:"VARCHAR NULL"`
-	EmployeeID     *string                          `json:"employeeId" column:"employee_id" sql:"VARCHAR NULL"`
-	Access         []fixed_asset_model.ModuleAccess `json:"access" column:"access" sql:"TEXT[]"`
-	ModifiedBy     int                              `json:"modifiedById" column:"modified_by_id" sql:"BIGINT REFERENCES users(id)"`
-	IsTemporary    bool                             `json:"isTemporary" column:"is_temporary" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
-	ExpiryDate     *time.Time                       `json:"expiryDate" column:"expiry_date" sql:"TIMESTAMPTZ NULL"`
+	PositionID      *int                             `json:"positionId" column:"position_id" sql:"BIGINT NULL"`
+	DivisionID      int                              `json:"divisionId" column:"division_id" sql:"BIGINT"`
+	RfidCode        *string                          `json:"rfidCode" column:"rfid_code" sql:"VARCHAR NULL"`
+	ProfilePicture  *string                          `json:"profilePicture" column:"profile_picture" sql:"VARCHAR NULL"`
+	EmployeeID      *string                          `json:"employeeId" column:"employee_id" sql:"VARCHAR NULL"`
+	Access          []fixed_asset_model.ModuleAccess `json:"access" column:"access" sql:"TEXT[]"`
+	ModifiedBy      int                              `json:"modifiedById" column:"modified_by_id" sql:"BIGINT REFERENCES users(id)"`
+	IsTemporary     bool                             `json:"isTemporary" column:"is_temporary" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
+	ExpiryDate      *time.Time                       `json:"expiryDate" column:"expiry_date" sql:"TIMESTAMPTZ NULL"`
+	HasModuleAccess bool                             `json:"hasModuleAccess" column:"has_module_access" sql:"BOOLEAN NOT NULL DEFAULT FALSE"` //For showing/hiding user that doesnt have fixed asset access from global settings
 
 	FCMToken string `json:"fcmToken"    column:"fcm_token" sql:"VARCHAR NULL"`
 
