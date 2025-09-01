@@ -9,6 +9,7 @@ import (
 // DisposalPrelist represents the disposal_prelists table in the database.
 type DisposalPrelist struct {
 	ID              int            `json:"id" column:"id" sql:"BIGINT PRIMARY KEY"`
+	OriginGroupID   int            `json:"originGroupId" column:"origin_group_id" sql:"BIGINT NOT NULL"`
 	DisposalGroupID int            `json:"disposalGroupId" column:"disposal_group_id" sql:"BIGINT"`
 	Method          DisposalMethod `json:"method" column:"method" sql:"disposal_method_enum"`
 	Organization    string         `json:"organization" column:"organization" sql:"VARCHAR"`
@@ -27,6 +28,14 @@ func (m *DisposalPrelist) Up(builder *migration.MigrationBuilder) {
 	builder.AddColumn(m)
 
 	// Add foreign key constraints as defined in the SQL migration file
+	builder.AddForeignKey(
+		"fk_disposal_prelists_origin_group_id",
+		"origin_group_id",
+		"groups",
+		"id",
+		"CASCADE",
+	)
+
 	builder.AddForeignKey(
 		"fk_disposal_prelists_disposal_group_id",
 		"disposal_group_id",
