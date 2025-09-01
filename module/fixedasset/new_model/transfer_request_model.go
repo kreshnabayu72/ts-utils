@@ -34,14 +34,14 @@ func (m *TransferRequest) Up(builder *migration.MigrationBuilder) {
 	// Add foreign key constraints as defined in the SQL migration file
 	builder.AddForeignKey(
 		"fk_transfer_request_asset",
-		"asset_id",
+		"asset",
 		"assets",
 		"id",
 		"",
 	)
 	builder.AddForeignKey(
 		"fk_transfer_request_transaction",
-		"transaction_id",
+		"transaction",
 		"transfer_transactions",
 		"id",
 		"",

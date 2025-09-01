@@ -43,4 +43,27 @@ func (m *BorrowingRequestHistory) TableName() string {
 
 func (m *BorrowingRequestHistory) Up(builder *migration.MigrationBuilder) {
 	builder.AddColumn(m)
+
+	// Add foreign key constraints as defined in the SQL migration file
+	builder.AddForeignKey(
+		"fk_borrowing_request_histories_asset",
+		"asset",
+		"assets",
+		"id",
+		"",
+	)
+	builder.AddForeignKey(
+		"fk_borrowing_request_histories_transaction",
+		"transaction",
+		"borrowing_transactions",
+		"id",
+		"",
+	)
+	builder.AddForeignKey(
+		"fk_borrowing_request_histories_parent",
+		"parent_id",
+		"borrowing_requests",
+		"id",
+		"",
+	)
 }
