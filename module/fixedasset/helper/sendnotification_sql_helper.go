@@ -34,6 +34,7 @@ type NotificationHelperSQL interface {
 		transactionType []util_fixedasset_new_model.TransactionRoleAttribute,
 		roleType []util_fixedasset_new_model.TransactionRoleType,
 		notificationDataWithoutUser util_fixedasset_new_model.Notification,
+		approvalLevel ...int,
 	) *entity.HttpError
 
 	SendNotificationToSystemRolesSQL(
@@ -111,20 +112,27 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationToTransactionRolesSQL(
 	transactionType []util_fixedasset_new_model.TransactionRoleAttribute,
 	roleType []util_fixedasset_new_model.TransactionRoleType,
 	notificationDataWithoutUser util_fixedasset_new_model.Notification,
+	approvalLevel ...int,
 ) *entity.HttpError {
 	userTransactionRoleService := serviceProvider.MakePostgreSqlService(
 		db.FixedAssetDBName.CompanyDBName(companyCode),
 	)
 
-	builder := sql_query.NewSQLSelectBuilder[any](db.UserTransactionRoleTableName, "utr")
-	builder.Select("utr.user_id")
-	builder.Join("groups g", "g.ancestor_id = utr.group_id")
-	builder.Where(map[string]sql_query.SQLCondition{
-		"is_active":      {Operator: sql_query.SQLOperatorEqual, Value: true},
-		"role_type":      {Operator: sql_query.SQLOperatorIn, Value: roleType},
-		"role_attribute": {Operator: sql_query.SQLOperatorIn, Value: transactionType},
-		"g.id":           groupIdFilter,
-	})
+	builder := sql_query.NewSQLSelectBuilder[any](db.UserTransactionRoleTableName, "utr").
+		Select("utr.user_id").
+		Join("groups g", "g.ancestor_id = utr.group_id").
+		Where(map[string]sql_query.SQLCondition{
+			"is_active":      {Operator: sql_query.SQLOperatorEqual, Value: true},
+			"role_type":      {Operator: sql_query.SQLOperatorIn, Value: roleType},
+			"role_attribute": {Operator: sql_query.SQLOperatorIn, Value: transactionType},
+			"g.id":           groupIdFilter,
+		})
+
+	if len(approvalLevel) > 0 && approvalLevel[0] != 0 {
+		builder.Where(map[string]sql_query.SQLCondition{
+			"approval_level": {Operator: sql_query.SQLOperatorEqual, Value: approvalLevel[0]},
+		})
+	}
 
 	query, args, _ := builder.Build()
 
