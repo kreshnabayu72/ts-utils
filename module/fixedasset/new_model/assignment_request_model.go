@@ -15,12 +15,14 @@ type AssignmentRequest struct {
 	// Foreign key to related transaction
 	Transaction int `json:"transaction" column:"transaction" sql:"BIGINT"`
 
-	ParentID   *int                    `json:"parentId" column:"parent_id" sql:"BIGINT"`
-	Status     AssignmentRequestStatus `json:"status" column:"status" sql:"assignment_request_status_enum"`
-	IsVerified bool                    `json:"isVerified" column:"is_verified" sql:"BOOLEAN"`
-	Notes      string                  `json:"notes" column:"notes" sql:"VARCHAR"`
-	CreatedAt  time.Time               `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt  time.Time               `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ParentID       *int                    `json:"parentId" column:"parent_id" sql:"BIGINT"`
+	Status         AssignmentRequestStatus `json:"status" column:"status" sql:"assignment_request_status_enum"`
+	PreviousStatus AssignmentRequestStatus `json:"previousStatus" column:"previous_status" sql:"assignment_request_status_enum"`
+
+	IsVerified bool      `json:"isVerified" column:"is_verified" sql:"BOOLEAN"`
+	Notes      string    `json:"notes" column:"notes" sql:"VARCHAR"`
+	CreatedAt  time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt  time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 // TableName returns the name of the database table for this model.
