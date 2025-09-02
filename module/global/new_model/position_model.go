@@ -8,10 +8,10 @@ import (
 )
 
 type Position struct {
-	ID        int       `json:"_id" column:"id" sql:"BIGINT PRIMARY KEY"`
-	Name      string    `json:"name" column:"name" sql:"VARCHAR NOT NULL"`
-	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ID        int       `json:"_id" column:"positions.id" sql:"BIGINT PRIMARY KEY"`
+	Name      string    `json:"name" column:"positions.name" sql:"VARCHAR NOT NULL"`
+	CreatedAt time.Time `json:"createdAt" column:"positions.created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt time.Time `json:"updatedAt" column:"positions.updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (m *Position) TableName() string {
