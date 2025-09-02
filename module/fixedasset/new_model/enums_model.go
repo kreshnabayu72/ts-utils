@@ -619,7 +619,7 @@ const (
 	BorrowingRequestStatusReportedDisposal          BorrowingRequestStatus = "Reported Disposal"
 	BorrowingRequestStatusOnDisposalProcess         BorrowingRequestStatus = "On Disposal Process"
 	BorrowingRequestStatusDisposed                  BorrowingRequestStatus = "Disposed"
-	BorrowRequestStatusTAGReported                  BorrowingRequestStatus = "TAG Reported"
+	BorrowingRequestStatusTAGReported                  BorrowingRequestStatus = "TAG Reported"
 )
 
 type ApprovalStatus string
