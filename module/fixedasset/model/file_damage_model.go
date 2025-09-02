@@ -23,17 +23,3 @@ type FileDamage struct {
 	CreatedAt  time.Time          `bson:"createdAt"        json:"createdAt"`
 	UpdatedAt  time.Time          `bson:"updatedAt"        json:"updatedAt"`
 }
-
-type AssetNameAttribute struct {
-	ID               primitive.ObjectID `bson:"_id,omitempty"    json:"_id,omitempty"`
-	Name             string             `bson:"name"             json:"name"`
-	NameWithSequence string             `bson:"nameWithSequence" json:"nameWithSequence"`
-	Sequence         int                `bson:"sequence"    json:"sequence"`
-	Key              int                `bson:"key,omitempty"    json:"key,omitempty"`
-}
-
-type GroupAttribute struct {
-	ID   primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
-	Name string             `bson:"name"          json:"name"`
-	Key  int                `bson:"key,omitempty" json:"key,omitempty"`
-}

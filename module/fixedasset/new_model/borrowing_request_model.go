@@ -18,6 +18,7 @@ type BorrowingRequest struct {
 
 	ParentID         *int                   `json:"parentId" column:"parent_id" sql:"BIGINT"`
 	Status           BorrowingRequestStatus `json:"status" column:"status" sql:"borrowing_request_status_enum"`
+	PreviousStatus   BorrowingRequestStatus `json:"previousStatus" column:"previous_status" sql:"borrowing_request_status_enum"`
 	IsVerified       bool                   `json:"isVerified" column:"is_verified" sql:"BOOLEAN"`
 	Notes            string                 `json:"notes" column:"notes" sql:"VARCHAR"`
 	ActualReturnDate *time.Time             `json:"actualReturnDate" column:"actual_return_date" sql:"TIMESTAMPTZ DEFAULT NULL"`

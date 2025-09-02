@@ -92,6 +92,7 @@ const (
 	PendingTagChangesTableName                = "pending_tag_changes"
 	PositionTableName                         = "positions"
 	QrTagTableName                            = "qrs"
+	QrRfidPairTableName                       = "qr_rfid_pairs"
 	ReaderAuthTableName                       = "reader_auths"
 	RepairApprovalTableName                   = "repair_approvals"
 	RepairTableName                           = "repairs"

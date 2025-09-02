@@ -586,6 +586,7 @@ const (
 	AssignmentRequestStatusReportedDisposal      AssignmentRequestStatus = "Reported Disposal"
 	AssignmentRequestStatusOnDisposalProcess     AssignmentRequestStatus = "On Disposal Process"
 	AssignmentRequestStatusDisposed              AssignmentRequestStatus = "Disposed"
+	AssignmentRequestStatusTAGReported           AssignmentRequestStatus = "TAG Reported"
 )
 
 type BorrowingTransactionStatus string
@@ -618,6 +619,7 @@ const (
 	BorrowingRequestStatusReportedDisposal          BorrowingRequestStatus = "Reported Disposal"
 	BorrowingRequestStatusOnDisposalProcess         BorrowingRequestStatus = "On Disposal Process"
 	BorrowingRequestStatusDisposed                  BorrowingRequestStatus = "Disposed"
+	BorrowRequestStatusTAGReported                  BorrowingRequestStatus = "TAG Reported"
 )
 
 type ApprovalStatus string
@@ -836,6 +838,7 @@ const (
 	TrackingStatusReportedDisposal             TrackingStatus = "Reported Disposal"
 	TrackingStatusOnDisposalProcess            TrackingStatus = "On Disposal Process"
 	TrackingStatusDisposed                     TrackingStatus = "Disposed"
+	TrackingStatusTAGReported                  TrackingStatus = "TAG Reported"
 )
 
 var TrackingStatusEnum = map[string]TrackingStatus{

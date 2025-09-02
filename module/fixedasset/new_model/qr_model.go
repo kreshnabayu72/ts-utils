@@ -14,8 +14,11 @@ type Qr struct {
 
 	Status TagStatus `json:"status" column:"status" sql:"tag_status_enum NOT NULL"`
 
-	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ReportedById *int `json:"reportedById" column:"reported_by_id" sql:"BIGINT"`
+
+	ReportedAt *time.Time `json:"reportedAt" column:"reported_at" sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
+	CreatedAt  time.Time  `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt  time.Time  `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (m *Qr) TableName() string {
