@@ -14,7 +14,8 @@ type Rfid struct {
 	Status          TagStatus   `json:"status" column:"status" sql:"tag_status_enum NOT NULL"`
 	LastAssetStatus AssetStatus `json:"lastAssetStatus" column:"asset_status" sql:"asset_status_enum NULL"`
 
-	HolderId *int `json:"holderId" column:"holder_id" sql:"BIGINT"`
+	HolderId     *int `json:"holderId" column:"holder_id" sql:"BIGINT"`
+	ReportedById *int `json:"reportedById" column:"reported_by_id" sql:"BIGINT"`
 
 	ToBeReturnedAt *time.Time `json:"toBeReturnedAt" column:"to_be_returned_at" sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
 	ReportedAt     *time.Time `json:"reportedAt" column:"reported_at" sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
