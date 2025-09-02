@@ -9,10 +9,10 @@ import (
 )
 
 type Division struct {
-	ID        int       `json:"_id" column:"id" sql:"BIGINT PRIMARY KEY"`
-	Name      string    `json:"name" column:"name" sql:"VARCHAR NOT NULL"`
-	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ID        int       `json:"_id" column:"divisions.id" sql:"BIGINT PRIMARY KEY"`
+	Name      string    `json:"name" column:"divisions.name" sql:"VARCHAR NOT NULL"`
+	CreatedAt time.Time `json:"createdAt" column:"divisions.created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt time.Time `json:"updatedAt" column:"divisions.updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (m *Division) TableName() string {
