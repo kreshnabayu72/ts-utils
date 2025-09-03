@@ -45,14 +45,6 @@ func (b *AuditSchedule) Up(builder *migration.MigrationBuilder) {
 	)
 
 	builder.AddForeignKey(
-		"fk_audit_schedules_modified_by",
-		"modified_by_id",
-		"users",
-		"id",
-		"",
-	)
-
-	builder.AddForeignKey(
 		"fk_audit_schedules_group",
 		"group_id",
 		"groups",
