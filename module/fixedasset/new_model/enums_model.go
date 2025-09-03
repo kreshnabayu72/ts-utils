@@ -47,6 +47,49 @@ const (
 	AssetLicenseTypeRepairTicketing AssetLicenseType = "Repair Ticketing"
 )
 
+type AuditType string
+
+const (
+	AuditTypeExistence AuditType = "Existence"
+	AuditTypeCondition AuditType = "Condition"
+)
+
+type AuditTaskAssetStatus string
+
+const (
+	AuditTaskAssetStatusExistence AuditTaskAssetStatus = "In Audit"
+	AuditTaskAssetStatusCondition AuditTaskAssetStatus = "Audited"
+)
+
+type AuditTaskAssetCondition string
+
+const (
+	AuditTaskAssetConditionNormal               AuditTaskAssetCondition = "Normal"
+	AuditTaskAssetConditionReportedDamaged      AuditTaskAssetCondition = "Reported Damaged"
+	AuditTaskAssetConditionReportedMissing      AuditTaskAssetCondition = "Reported Missing"
+	AuditTaskAssetConditionTAGFoundAssetMissing AuditTaskAssetCondition = "TAG Found Asset Missing"
+)
+
+type AuditTaskStatus string
+
+const (
+	AuditTaskStatusOnSchedule         AuditTaskStatus = "On Schedule"
+	AuditTaskStatusWaitingForApproval AuditTaskStatus = "Waiting for Approval"
+	AuditTaskStatusGracePeriod        AuditTaskStatus = "Grace Period"
+	AuditTaskStatusOverdue            AuditTaskStatus = "Overdue"
+	AuditTaskStatusCompleted          AuditTaskStatus = "Completed"
+	AuditTaskStatusCanceled           AuditTaskStatus = "Canceled"
+	AuditTaskStatusStopped            AuditTaskStatus = "Stopped"
+)
+
+type AuditOtherTransaction string
+
+const (
+	AuditOtherTransactionTransfer  AuditOtherTransaction = "Transfer"
+	AuditOtherTransactionDisposal  AuditOtherTransaction = "Disposal"
+	AuditOtherTransactionTAGChange AuditOtherTransaction = "TAG Change"
+)
+
 type CustomFieldType string
 
 const (
@@ -619,7 +662,7 @@ const (
 	BorrowingRequestStatusReportedDisposal          BorrowingRequestStatus = "Reported Disposal"
 	BorrowingRequestStatusOnDisposalProcess         BorrowingRequestStatus = "On Disposal Process"
 	BorrowingRequestStatusDisposed                  BorrowingRequestStatus = "Disposed"
-	BorrowingRequestStatusTAGReported                  BorrowingRequestStatus = "TAG Reported"
+	BorrowingRequestStatusTAGReported               BorrowingRequestStatus = "TAG Reported"
 )
 
 type ApprovalStatus string
@@ -752,6 +795,17 @@ const (
 	RoutineScheduleFrequencyMonthly  RoutineScheduleFrequency = "Monthly"
 	RoutineScheduleFrequencyAnnually RoutineScheduleFrequency = "Annually"
 	RoutineScheduleFrequencyCustom   RoutineScheduleFrequency = "Custom"
+)
+
+type Frequency string
+
+const (
+	FrequencyOnce     Frequency = "Once"
+	FrequencyDaily    Frequency = "Daily"
+	FrequencyWeekly   Frequency = "Weekly"
+	FrequencyMonthly  Frequency = "Monthly"
+	FrequencyAnnually Frequency = "Annually"
+	FrequencyCustom   Frequency = "Custom"
 )
 
 type IndicatorType string
