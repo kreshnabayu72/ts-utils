@@ -32,9 +32,9 @@ func (b *AuditScheduledAsset) Up(builder *migration.MigrationBuilder) {
 		"CASCADE",
 	)
 	builder.AddForeignKey(
-		"fk_audit_schedules_categories_category_id",
-		"category_id",
-		"categories",
+		"fk_audit_schedules_assets_asset_id",
+		"asset",
+		"assets",
 		"id",
 		"CASCADE",
 	)
