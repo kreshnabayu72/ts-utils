@@ -643,4 +643,39 @@ BEGIN
     END IF;
 END$$;
 
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'audit_type_enum') THEN
+        CREATE TYPE audit_type_enum AS ENUM (
+            'Existence',
+            'Condition'
+        );
+    END IF;
+END$$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'audit_task_status_enum') THEN
+        CREATE TYPE audit_task_status_enum AS ENUM (
+            'On Schedule',
+            'In Audit',
+            'Waiting for Approval',
+            'Grace Period',
+            'Overdue',
+            'Completed',
+            'Canceled',
+            'Stopped'
+        );
+    END IF;
+END$$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'audit_task_asset_status_enum') THEN
+        CREATE TYPE audit_task_asset_status_enum AS ENUM (
+            'In Audit',
+            'Audited'
+        );
+    END IF;
+END$$;
 `
