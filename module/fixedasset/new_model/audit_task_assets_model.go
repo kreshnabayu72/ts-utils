@@ -46,14 +46,14 @@ func (b *AuditTaskAssets) Up(builder *migration.MigrationBuilder) {
 	)
 	builder.AddForeignKey(
 		"fk_audit_tasks_assets_found_by_id",
-		"audit_found_by_id",
+		"found_by_id",
 		"users",
 		"id",
 		"",
 	)
 	builder.AddForeignKey(
 		"fk_audit_tasks_assets_found_group_id",
-		"audit_found_group_id",
+		"found_group_id",
 		"groups",
 		"id",
 		"",
