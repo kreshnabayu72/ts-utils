@@ -115,7 +115,7 @@ const (
 	SigninTokenTableName                      = "sign_in_tokens"
 	TagEventLogsTableName                     = "tag_event_logs"
 	TrackingApprovalTableName                 = "tracking_approvals"
-	TrackingTableName                         = "tracking"
+	TrackingTableName                         = "trackings"
 	TransactionLogTableName                   = "transaction_logs"
 	TransferApprovalTableName                 = "transfer_approvals"
 	TransferRequestTableName                  = "transfer_requests"
