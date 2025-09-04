@@ -21,7 +21,7 @@ type Asset struct {
 	FirstImage       *string           `json:"firstImage"         column:"first_image"        sql:"VARCHAR"`
 	SecondImage      *string           `json:"secondImage"        column:"second_image"       sql:"VARCHAR"`
 	SetDefault       AssetDefaultImage `json:"setDefault"         column:"set_default"        sql:"asset_default_image_enum"`
-	PreviousStatus   *string           `json:"previousStatus"     column:"previous_status"    sql:"asset_status_enum"`
+	PreviousStatus   *string           `json:"previousStatus"     column:"previous_status"    sql:"asset_status_enum NULL DEFAULT NULL"`
 
 	// ─────── References ───────
 	GroupID        int  `json:"groupId"             column:"group_id" sql:"BIGINT"`

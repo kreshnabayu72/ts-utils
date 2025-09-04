@@ -15,7 +15,7 @@ type MissingReport struct {
 	ReportedById int `json:"reportedById" column:"reported_by_id" sql:"BIGINT"`
 
 	Status         MissingReportStatus `json:"status" column:"status" sql:"missing_report_status_enum NOT NULL"`
-	PreviousStatus AssetStatus         `json:"previousStatus" column:"previous_status" sql:"asset_status_enum NOT NULL"`
+	PreviousStatus AssetStatus         `json:"previousStatus" column:"previous_status" sql:"asset_status_enum NULL DEFAULT NULL"`
 	ReportSource   AssetReportSource   `json:"reportSource" column:"report_source" sql:"asset_report_source_enum NOT NULL"`
 	Notes          string              `json:"notes" column:"notes" sql:"VARCHAR"`
 
