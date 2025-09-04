@@ -12,7 +12,7 @@ type DisposalRequest struct {
 	Asset                   int                   `json:"asset" column:"asset" sql:"BIGINT"`
 	Transaction             int                   `json:"transaction" column:"transaction" sql:"BIGINT"`
 	ReportID                *int                  `json:"reportId" column:"report_id" sql:"BIGINT"`
-	PreviousStatus          AssetStatus           `json:"previousStatus" column:"previous_status" sql:"asset_status_enum"`
+	PreviousStatus          AssetStatus           `json:"previousStatus" column:"previous_status" sql:"asset_status_enum NULL DEFAULT NULL"`
 	Status                  DisposalRequestStatus `json:"status" column:"status" sql:"disposal_request_status_enum"`
 	SalvageableParts        []string              `json:"salvageableParts" column:"salvageable_parts" sql:"TEXT[]"`
 	Notes                   string                `json:"notes" column:"notes" sql:"VARCHAR"`

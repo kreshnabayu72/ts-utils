@@ -11,7 +11,7 @@ type RepairTicketing struct {
 	AssetID                    int                     `json:"assetId" column:"asset_id" sql:"BIGINT NOT NULL"`
 	ReportedByID               int                     `json:"reportedById" column:"reported_by_id" sql:"BIGINT NOT NULL"`
 	DamageImage                string                  `json:"damageImage" column:"damage_image" sql:"VARCHAR"`
-	PreviousStatus             AssetStatus             `json:"previousStatus" column:"previous_status" sql:"asset_status_enum NOT NULL"`
+	PreviousStatus             AssetStatus             `json:"previousStatus" column:"previous_status" sql:"asset_status_enum NULL DEFAULT NULL"`
 	TransactionID              string                  `json:"transactionId" column:"transaction_id" sql:"VARCHAR NOT NULL"`
 	Status                     RepairTicketingStatus   `json:"status" column:"status" sql:"repair_ticketing_status_enum NOT NULL"`
 	PreviousMethod             []RepairTicketingMethod `json:"previousMethod" column:"previous_method" sql:"repair_ticketing_method_enum[] NOT NULL"`

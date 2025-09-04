@@ -11,7 +11,7 @@ type Tracking struct {
 	AssetID         int               `json:"assetId" column:"asset_id" sql:"BIGINT NOT NULL"`
 	ReportedByID    int               `json:"reportedById" column:"reported_by_id" sql:"BIGINT NOT NULL"`
 	DamageImage     string            `json:"damageImage" column:"damage_image" sql:"VARCHAR"`
-	PreviousStatus  AssetStatus       `json:"previousStatus" column:"previous_status" sql:"asset_status_enum NOT NULL"`
+	PreviousStatus  AssetStatus       `json:"previousStatus" column:"previous_status" sql:"asset_status_enum NULL DEFAULT NULL"`
 	TransactionID   string            `json:"transactionId" column:"transaction_id" sql:"VARCHAR NOT NULL"`
 	Status          TrackingStatus    `json:"status" column:"status" sql:"tracking_status_enum NOT NULL"`
 	Condition       TrackingCondition `json:"condition" column:"condition" sql:"tracking_condition_enum NOT NULL"`
