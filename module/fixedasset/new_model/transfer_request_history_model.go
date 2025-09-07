@@ -9,6 +9,8 @@ import (
 // TransferRequestHistory represents the transfer_request_histories table in the database.
 type TransferRequestHistory struct {
 	ID int `json:"id" column:"id" sql:"BIGINT PRIMARY KEY"`
+	// Foreign key to parent request history
+	ParentID *int `json:"parentId"            column:"parent_id"           sql:"BIGINT"`
 
 	// Foreign key to assets
 	Asset int `json:"asset"            column:"asset"           sql:"BIGINT"`
@@ -49,4 +51,12 @@ func (m *TransferRequestHistory) Up(builder *migration.MigrationBuilder) {
 
 	// Add the index for asset name with sequence
 	builder.AddIndex("transfer_transaction_histories_name_with_sequence", "name_with_sequence", false, "")
+
+	builder.AddForeignKey(
+		"fk_transfer_request_history_parent",
+		"parent_id",
+		"transfer_request_histories",
+		"id",
+		"",
+	)
 }
