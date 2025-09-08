@@ -7,12 +7,12 @@ import (
 )
 
 type RoutineScheduledAsset struct {
-	ID         int       `json:"_id" column:"id" sql:"BIGINT PRIMARY KEY"`
-	ScheduleID int       `json:"scheduleId" column:"schedule_id" sql:"BIGINT NOT NULL"`
-	AssetID    int       `json:"assetId" column:"asset_id" sql:"BIGINT NOT NULL"`
-	IsActive   bool      `json:"isActive" column:"is_active" sql:"BOOLEAN NOT NULL DEFAULT TRUE"`
-	CreatedAt  time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt  time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ID         int       `json:"_id"        column:"routine_scheduled_assets.id"          sql:"BIGINT PRIMARY KEY"`
+	ScheduleID int       `json:"scheduleId" column:"routine_scheduled_assets.schedule_id" sql:"BIGINT NOT NULL"`
+	AssetID    int       `json:"assetId"    column:"routine_scheduled_assets.asset_id"    sql:"BIGINT NOT NULL"`
+	IsActive   bool      `json:"isActive"   column:"routine_scheduled_assets.is_active"   sql:"BOOLEAN NOT NULL DEFAULT TRUE"`
+	CreatedAt  time.Time `json:"createdAt"  column:"routine_scheduled_assets.created_at"  sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt  time.Time `json:"updatedAt"  column:"routine_scheduled_assets.updated_at"  sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (m *RoutineScheduledAsset) TableName() string {

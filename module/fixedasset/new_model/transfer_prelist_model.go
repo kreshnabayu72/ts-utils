@@ -8,11 +8,11 @@ import (
 
 // TransferPrelist represents the transfer_prelists table in the database.
 type TransferPrelist struct {
-	ID                 int       `json:"id" column:"id" sql:"BIGINT PRIMARY KEY"`
-	OriginGroupID      int       `json:"originGroupId" column:"origin_group_id" sql:"BIGINT"`
-	DestinationGroupID int       `json:"destinationGroupId" column:"destination_group_id" sql:"BIGINT"`
-	CreatedAt          time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt          time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ID                 int       `json:"id"                 column:"transfer_prelists.id"                   sql:"BIGINT PRIMARY KEY"`
+	OriginGroupID      int       `json:"originGroupId"      column:"transfer_prelists.origin_group_id"      sql:"BIGINT"`
+	DestinationGroupID int       `json:"destinationGroupId" column:"transfer_prelists.destination_group_id" sql:"BIGINT"`
+	CreatedAt          time.Time `json:"createdAt"          column:"transfer_prelists.created_at"           sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt          time.Time `json:"updatedAt"          column:"transfer_prelists.updated_at"           sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 // TableName returns the name of the database table for this model.

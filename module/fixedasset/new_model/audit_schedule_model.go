@@ -7,26 +7,21 @@ import (
 )
 
 type AuditSchedule struct {
-	ID       int    `json:"_id" column:"id" sql:"BIGINT PRIMARY KEY"`
-	IsActive bool   `json:"isActive" column:"is_active" sql:"BOOLEAN DEFAULT TRUE"`
-	Name     string `json:"name" column:"name" sql:"VARCHAR"`
-
-	GroupID   int       `json:"groupId" column:"group_id" sql:"BIGINT"`
-	TagType   TagType   `json:"tagType" column:"tag_type" sql:"tag_type_enum"`
-	AuditType AuditType `json:"auditType" column:"audit_type" sql:"audit_type_enum"`
-
-	FrequencyLabel       Frequency `json:"frequencyLabel" column:"frequency_label" sql:"VARCHAR"`
-	FrequencyCustomValue *int      `json:"frequencyCustomValue" column:"frequency_custom_value" sql:"INTEGER NULL DEFAULT NULL"`
-
-	Duration     int `json:"duration" column:"duration" sql:"INTEGER NOT NULL"`
-	ModifiedById int `json:"modifiedById" column:"modified_by_id" sql:"BIGINT NOT NULL"`
-
-	IsDeleted bool `json:"isDeleted" column:"is_deleted" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
-
-	NextSchedule *time.Time `json:"nextSchedule" column:"next_schedule" sql:"TIMESTAMPTZ NULL"`
-	DeletedAt    *time.Time `json:"deletedAt" column:"deleted_at" sql:"TIMESTAMPTZ NULL"`
-	CreatedAt    time.Time  `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt    time.Time  `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ID                   int        `json:"_id"                  column:"audit_schedules.id"                     sql:"BIGINT PRIMARY KEY"`
+	IsActive             bool       `json:"isActive"             column:"audit_schedules.is_active"              sql:"BOOLEAN DEFAULT TRUE"`
+	Name                 string     `json:"name"                 column:"audit_schedules.name"                   sql:"VARCHAR"`
+	GroupID              int        `json:"groupId"              column:"audit_schedules.group_id"               sql:"BIGINT"`
+	TagType              TagType    `json:"tagType"              column:"audit_schedules.tag_type"               sql:"tag_type_enum"`
+	AuditType            AuditType  `json:"auditType"            column:"audit_schedules.audit_type"             sql:"audit_type_enum"`
+	FrequencyLabel       Frequency  `json:"frequencyLabel"       column:"audit_schedules.frequency_label"        sql:"VARCHAR"`
+	FrequencyCustomValue *int       `json:"frequencyCustomValue" column:"audit_schedules.frequency_custom_value" sql:"INTEGER NULL DEFAULT NULL"`
+	Duration             int        `json:"duration"             column:"audit_schedules.duration"               sql:"INTEGER NOT NULL"`
+	ModifiedById         int        `json:"modifiedById"         column:"audit_schedules.modified_by_id"         sql:"BIGINT NOT NULL"`
+	IsDeleted            bool       `json:"isDeleted"            column:"audit_schedules.is_deleted"             sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
+	NextSchedule         *time.Time `json:"nextSchedule"         column:"audit_schedules.next_schedule"          sql:"TIMESTAMPTZ NULL"`
+	DeletedAt            *time.Time `json:"deletedAt"            column:"audit_schedules.deleted_at"             sql:"TIMESTAMPTZ NULL"`
+	CreatedAt            time.Time  `json:"createdAt"            column:"audit_schedules.created_at"             sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt            time.Time  `json:"updatedAt"            column:"audit_schedules.updated_at"             sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (b *AuditSchedule) TableName() string {

@@ -7,20 +7,16 @@ import (
 )
 
 type AuditTaskAssets struct {
-	ID int `json:"_id" column:"id" sql:"BIGINT PRIMARY KEY"`
-
-	Asset       int  `json:"asset" column:"asset" sql:"BIGINT"`
-	AuditTaskId int  `json:"auditTaskId" column:"audit_task_id" sql:"BIGINT NOT NULL"`
-	FoundById   *int `json:"foundById" column:"found_by_id" sql:"BIGINT NULL"`
-
-	Status    AuditTaskAssetStatus    `json:"status" column:"status" sql:"VARCHAR"`
-	Condition AuditTaskAssetCondition `json:"condition" column:"condition" sql:"VARCHAR DEFAULT NULL"`
-	Notes     string                  `json:"notes" column:"notes" sql:"VARCHAR NOT NULL DEFAULT ''"`
-
-	FoundGroupId *int `json:"foundGroupId" column:"found_group_id" sql:"BIGINT NULL"`
-
-	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ID           int                     `json:"_id"          column:"audit_task_assets.id"             sql:"BIGINT PRIMARY KEY"`
+	Asset        int                     `json:"asset"        column:"audit_task_assets.asset"          sql:"BIGINT"`
+	AuditTaskId  int                     `json:"auditTaskId"  column:"audit_task_assets.audit_task_id"  sql:"BIGINT NOT NULL"`
+	FoundById    *int                    `json:"foundById"    column:"audit_task_assets.found_by_id"    sql:"BIGINT NULL"`
+	Status       AuditTaskAssetStatus    `json:"status"       column:"audit_task_assets.status"         sql:"VARCHAR"`
+	Condition    AuditTaskAssetCondition `json:"condition"    column:"audit_task_assets.condition"      sql:"VARCHAR DEFAULT NULL"`
+	Notes        string                  `json:"notes"        column:"audit_task_assets.notes"          sql:"VARCHAR NOT NULL DEFAULT ''"`
+	FoundGroupId *int                    `json:"foundGroupId" column:"audit_task_assets.found_group_id" sql:"BIGINT NULL"`
+	CreatedAt    time.Time               `json:"createdAt"    column:"audit_task_assets.created_at"     sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt    time.Time               `json:"updatedAt"    column:"audit_task_assets.updated_at"     sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (b *AuditTaskAssets) TableName() string {

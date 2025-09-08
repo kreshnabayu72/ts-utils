@@ -7,13 +7,11 @@ import (
 )
 
 type AuditScheduleCategories struct {
-	ID int `json:"_id" column:"id" sql:"BIGINT PRIMARY KEY"`
-
-	CategoryID      int `json:"categoryId" column:"category_id" sql:"BIGINT"`
-	AuditScheduleId int `json:"auditScheduleId" column:"audit_schedule_id" sql:"BIGINT NOT NULL"`
-
-	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ID              int       `json:"_id"             column:"audit_schedule_categories.id"               sql:"BIGINT PRIMARY KEY"`
+	CategoryID      int       `json:"categoryId"      column:"audit_schedule_categories.category_id"      sql:"BIGINT"`
+	AuditScheduleId int       `json:"auditScheduleId" column:"audit_schedule_categories.audit_schedule_id" sql:"BIGINT NOT NULL"`
+	CreatedAt       time.Time `json:"createdAt"       column:"audit_schedule_categories.created_at"        sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt       time.Time `json:"updatedAt"       column:"audit_schedule_categories.updated_at"        sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (b *AuditScheduleCategories) TableName() string {

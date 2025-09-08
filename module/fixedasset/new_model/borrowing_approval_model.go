@@ -8,18 +8,18 @@ import (
 )
 
 type BorrowingApproval struct {
-	ID            int            `json:"id" column:"id" sql:"BIGINT PRIMARY KEY"`
-	RequestID     int            `json:"requestId" column:"request_id" sql:"BIGINT"`
-	ApproverID    int            `json:"approverId" column:"approver_id" sql:"BIGINT"`
-	Level         int            `json:"level" column:"level" sql:"INTEGER"`
-	ApprovalRound int            `json:"approval_round" column:"approval_round" sql:"INTEGER DEFAULT 1"`
-	Status        ApprovalStatus `json:"status" column:"status" sql:"approval_status_enum"`
-	IsApproved    *bool          `json:"isApproved" column:"is_approved" sql:"BOOLEAN NULL DEFAULT NULL"`
-	Notes         *string        `json:"notes" column:"notes" sql:"VARCHAR"`
-	Type          ApprovalType   `json:"type" column:"type" sql:"approval_type_enum NOT NULL"`
-	ApprovedAt    *time.Time     `json:"approvedAt" column:"approved_at" sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
-	CreatedAt     time.Time      `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt     time.Time      `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ID            int            `json:"id"             column:"borrowing_approvals.id"             sql:"BIGINT PRIMARY KEY"`
+	RequestID     int            `json:"requestId"      column:"borrowing_approvals.request_id"     sql:"BIGINT"`
+	ApproverID    int            `json:"approverId"     column:"borrowing_approvals.approver_id"    sql:"BIGINT"`
+	Level         int            `json:"level"          column:"borrowing_approvals.level"          sql:"INTEGER"`
+	ApprovalRound int            `json:"approval_round" column:"borrowing_approvals.approval_round" sql:"INTEGER DEFAULT 1"`
+	Status        ApprovalStatus `json:"status"         column:"borrowing_approvals.status"         sql:"approval_status_enum"`
+	IsApproved    *bool          `json:"isApproved"     column:"borrowing_approvals.is_approved"    sql:"BOOLEAN NULL DEFAULT NULL"`
+	Notes         *string        `json:"notes"          column:"borrowing_approvals.notes"          sql:"VARCHAR"`
+	Type          ApprovalType   `json:"type"           column:"borrowing_approvals.type"           sql:"approval_type_enum NOT NULL"`
+	ApprovedAt    *time.Time     `json:"approvedAt"     column:"borrowing_approvals.approved_at"    sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
+	CreatedAt     time.Time      `json:"createdAt"      column:"borrowing_approvals.created_at"     sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt     time.Time      `json:"updatedAt"      column:"borrowing_approvals.updated_at"     sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (m *BorrowingApproval) TableName() string {

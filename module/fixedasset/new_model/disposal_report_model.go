@@ -8,14 +8,14 @@ import (
 
 // DisposalReport represents the disposal_reports table in the database.
 type DisposalReport struct {
-	ID            int                   `json:"id" column:"id" sql:"BIGINT PRIMARY KEY"`
-	AssetID       int                   `json:"assetId" column:"asset_id" sql:"BIGINT"`
-	ReportedByID  int                   `json:"reportedById" column:"reported_by_id" sql:"BIGINT"`
-	LastCondition DisposalLastCondition `json:"lastCondition" column:"last_condition" sql:"disposal_last_condition_enum"`
-	Note          string                `json:"note" column:"note" sql:"VARCHAR"`
-	IsDeleted     bool                  `json:"isDeleted" column:"is_deleted" sql:"BOOLEAN"`
-	CreatedAt     time.Time             `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt     time.Time             `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ID            int                   `json:"id"            column:"disposal_reports.id"             sql:"BIGINT PRIMARY KEY"`
+	AssetID       int                   `json:"assetId"       column:"disposal_reports.asset_id"       sql:"BIGINT"`
+	ReportedByID  int                   `json:"reportedById"  column:"disposal_reports.reported_by_id" sql:"BIGINT"`
+	LastCondition DisposalLastCondition `json:"lastCondition" column:"disposal_reports.last_condition" sql:"disposal_last_condition_enum"`
+	Note          string                `json:"note"          column:"disposal_reports.note"           sql:"VARCHAR"`
+	IsDeleted     bool                  `json:"isDeleted"     column:"disposal_reports.is_deleted"     sql:"BOOLEAN"`
+	CreatedAt     time.Time             `json:"createdAt"     column:"disposal_reports.created_at"     sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt     time.Time             `json:"updatedAt"     column:"disposal_reports.updated_at"     sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 // TableName returns the name of the database table for this model.

@@ -7,16 +7,16 @@ import (
 )
 
 type RoutineTask struct {
-	ID            int               `json:"_id" column:"id" sql:"BIGINT PRIMARY KEY"`
-	ScheduleID    int               `json:"scheduleId" column:"schedule_id" sql:"BIGINT NOT NULL"`
-	AssetID       int               `json:"assetId" column:"asset_id" sql:"BIGINT NOT NULL"`
-	Status        RoutineTaskStatus `json:"status" column:"status" sql:"routine_task_status_enum NOT NULL"`
-	Duration      int               `json:"duration" column:"duration" sql:"INT NOT NULL"`
-	ModifiedByID  int               `json:"modifiedById" column:"modified_by_id" sql:"BIGINT NOT NULL"`
-	ApprovalRound int               `json:"approvalRound" column:"approval_round" sql:"INT NOT NULL"`
-	StartAt       time.Time         `json:"startAt" column:"start_at" sql:"TIMESTAMPTZ NOT NULL"`
-	CreatedAt     time.Time         `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt     time.Time         `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ID            int               `json:"_id"           column:"routine_tasks.id"             sql:"BIGINT PRIMARY KEY"`
+	ScheduleID    int               `json:"scheduleId"    column:"routine_tasks.schedule_id"    sql:"BIGINT NOT NULL"`
+	AssetID       int               `json:"assetId"       column:"routine_tasks.asset_id"       sql:"BIGINT NOT NULL"`
+	Status        RoutineTaskStatus `json:"status"        column:"routine_tasks.status"         sql:"routine_task_status_enum NOT NULL"`
+	Duration      int               `json:"duration"      column:"routine_tasks.duration"       sql:"INT NOT NULL"`
+	ModifiedByID  int               `json:"modifiedById"  column:"routine_tasks.modified_by_id" sql:"BIGINT NOT NULL"`
+	ApprovalRound int               `json:"approvalRound" column:"routine_tasks.approval_round" sql:"INT NOT NULL"`
+	StartAt       time.Time         `json:"startAt"       column:"routine_tasks.start_at"       sql:"TIMESTAMPTZ NOT NULL"`
+	CreatedAt     time.Time         `json:"createdAt"     column:"routine_tasks.created_at"     sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt     time.Time         `json:"updatedAt"     column:"routine_tasks.updated_at"     sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (m *RoutineTask) TableName() string {

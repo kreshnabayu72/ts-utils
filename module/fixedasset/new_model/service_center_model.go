@@ -8,24 +8,23 @@ import (
 )
 
 type ServiceCenter struct {
-	ID int `json:"_id" column:"id" sql:"BIGINT PRIMARY KEY"`
-
-	IsActive       bool       `json:"isActive" column:"is_active" sql:"BOOLEAN NOT NULL DEFAULT TRUE"`
-	IsDefault      bool       `json:"isDefault" column:"is_default" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
-	Name           string     `json:"name" column:"name" sql:"VARCHAR NOT NULL CHECK (CHAR_LENGTH(name) > 0)"`
-	City           string     `json:"city" column:"city" sql:"VARCHAR"`
-	Country        string     `json:"country" column:"country" sql:"VARCHAR"`
-	State          string     `json:"state" column:"state" sql:"VARCHAR"`
-	ZipCode        string     `json:"zipCode" column:"zip_code" sql:"VARCHAR"`
-	Address        string     `json:"address" column:"address" sql:"VARCHAR"`
-	PhoneNumber    string     `json:"phoneNumber" column:"phone_number" sql:"VARCHAR"`
-	PicPhoneNumber string     `json:"picPhoneNumber" column:"pic_phone_number" sql:"VARCHAR"`
-	PicName        string     `json:"picName" column:"pic_name" sql:"VARCHAR"`
-	ModifiedById   *int       `json:"modifiedById" column:"modified_by_id" sql:"BIGINT"`
-	IsDeleted      bool       `json:"isDeleted" column:"is_deleted" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
-	DeletedAt      *time.Time `json:"deletedAt" column:"deleted_at" sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
-	CreatedAt      time.Time  `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt      time.Time  `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ID             int        `json:"_id"            column:"service_centers.id"               sql:"BIGINT PRIMARY KEY"`
+	IsActive       bool       `json:"isActive"       column:"service_centers.is_active"        sql:"BOOLEAN NOT NULL DEFAULT TRUE"`
+	IsDefault      bool       `json:"isDefault"      column:"service_centers.is_default"       sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
+	Name           string     `json:"name"           column:"service_centers.name"             sql:"VARCHAR NOT NULL CHECK (CHAR_LENGTH(name) > 0)"`
+	City           string     `json:"city"           column:"service_centers.city"             sql:"VARCHAR"`
+	Country        string     `json:"country"        column:"service_centers.country"          sql:"VARCHAR"`
+	State          string     `json:"state"          column:"service_centers.state"            sql:"VARCHAR"`
+	ZipCode        string     `json:"zipCode"        column:"service_centers.zip_code"         sql:"VARCHAR"`
+	Address        string     `json:"address"        column:"service_centers.address"          sql:"VARCHAR"`
+	PhoneNumber    string     `json:"phoneNumber"    column:"service_centers.phone_number"     sql:"VARCHAR"`
+	PicPhoneNumber string     `json:"picPhoneNumber" column:"service_centers.pic_phone_number" sql:"VARCHAR"`
+	PicName        string     `json:"picName"        column:"service_centers.pic_name"         sql:"VARCHAR"`
+	ModifiedById   *int       `json:"modifiedById"   column:"service_centers.modified_by_id"   sql:"BIGINT"`
+	IsDeleted      bool       `json:"isDeleted"      column:"service_centers.is_deleted"       sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
+	DeletedAt      *time.Time `json:"deletedAt"      column:"service_centers.deleted_at"       sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
+	CreatedAt      time.Time  `json:"createdAt"      column:"service_centers.created_at"       sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt      time.Time  `json:"updatedAt"      column:"service_centers.updated_at"       sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (m *ServiceCenter) TableName() string {

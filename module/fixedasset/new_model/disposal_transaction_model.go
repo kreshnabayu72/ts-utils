@@ -8,24 +8,24 @@ import (
 
 // DisposalTransaction represents the disposal_transactions table in the database.
 type DisposalTransaction struct {
-	ID                   int                       `json:"_id" column:"id" sql:"BIGINT PRIMARY KEY"`
-	TransactionID        string                    `json:"transactionId" column:"transaction_id" sql:"VARCHAR UNIQUE"`
-	ManagerID            int                       `json:"managerId" column:"manager_id" sql:"BIGINT"`
-	OriginGroupID        int                       `json:"originGroupId" column:"origin_group_id" sql:"BIGINT"`
-	DisposalGroupID      int                       `json:"disposalGroupId" column:"disposal_group_id" sql:"BIGINT"`
-	Status               DisposalTransactionStatus `json:"status" column:"status" sql:"disposal_transaction_status_enum"`
-	IsVerified           bool                      `json:"isVerified" column:"is_verified" sql:"BOOLEAN"`
-	Notes                string                    `json:"notes" column:"notes" sql:"VARCHAR"`
-	CompletionNotes      string                    `json:"completionNotes" column:"completion_notes" sql:"VARCHAR"`
-	LastCondition        DisposalLastCondition     `json:"lastCondition" column:"last_condition" sql:"disposal_last_condition_enum"`
-	Method               DisposalMethod            `json:"method" column:"method" sql:"disposal_method_enum"`
-	Organization         string                    `json:"organization" column:"organization" sql:"VARCHAR"`
-	DocumentationPhoto   string                    `json:"documentationPhoto" column:"documentation_photo" sql:"VARCHAR"`
-	CurrentApprovalType  DisposalGroupType         `json:"currentApprovalType" column:"current_approval_type" sql:"disposal_group_type_enum NOT NULL"`
-	CurrentApprovalLevel int                       `json:"currentApprovalLevel" column:"current_approval_level" sql:"INTEGER DEFAULT 1"`
-	CurrentApprovalRound int                       `json:"currentApprovalRound" column:"current_approval_round" sql:"INTEGER DEFAULT 1"`
-	CreatedAt            time.Time                 `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt            time.Time                 `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ID                   int                       `json:"_id"                  column:"disposal_transactions.id"                     sql:"BIGINT PRIMARY KEY"`
+	TransactionID        string                    `json:"transactionId"        column:"disposal_transactions.transaction_id"         sql:"VARCHAR UNIQUE"`
+	ManagerID            int                       `json:"managerId"            column:"disposal_transactions.manager_id"             sql:"BIGINT"`
+	OriginGroupID        int                       `json:"originGroupId"        column:"disposal_transactions.origin_group_id"        sql:"BIGINT"`
+	DisposalGroupID      int                       `json:"disposalGroupId"      column:"disposal_transactions.disposal_group_id"      sql:"BIGINT"`
+	Status               DisposalTransactionStatus `json:"status"               column:"disposal_transactions.status"                 sql:"disposal_transaction_status_enum"`
+	IsVerified           bool                      `json:"isVerified"           column:"disposal_transactions.is_verified"            sql:"BOOLEAN"`
+	Notes                string                    `json:"notes"                column:"disposal_transactions.notes"                  sql:"VARCHAR"`
+	CompletionNotes      string                    `json:"completionNotes"      column:"disposal_transactions.completion_notes"       sql:"VARCHAR"`
+	LastCondition        DisposalLastCondition     `json:"lastCondition"        column:"disposal_transactions.last_condition"         sql:"disposal_last_condition_enum"`
+	Method               DisposalMethod            `json:"method"               column:"disposal_transactions.method"                 sql:"disposal_method_enum"`
+	Organization         string                    `json:"organization"         column:"disposal_transactions.organization"           sql:"VARCHAR"`
+	DocumentationPhoto   string                    `json:"documentationPhoto"   column:"disposal_transactions.documentation_photo"    sql:"VARCHAR"`
+	CurrentApprovalType  DisposalGroupType         `json:"currentApprovalType"  column:"disposal_transactions.current_approval_type"  sql:"disposal_group_type_enum NOT NULL"`
+	CurrentApprovalLevel int                       `json:"currentApprovalLevel" column:"disposal_transactions.current_approval_level" sql:"INTEGER DEFAULT 1"`
+	CurrentApprovalRound int                       `json:"currentApprovalRound" column:"disposal_transactions.current_approval_round" sql:"INTEGER DEFAULT 1"`
+	CreatedAt            time.Time                 `json:"createdAt"            column:"disposal_transactions.created_at"             sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt            time.Time                 `json:"updatedAt"            column:"disposal_transactions.updated_at"             sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 // TableName returns the name of the database table for this model.

@@ -7,29 +7,24 @@ import (
 )
 
 type MissingReportHistory struct {
-	ID int `json:"_id" column:"id" sql:"BIGINT PRIMARY KEY"`
-
-	// Foreign key to assets
-	Asset int `json:"asset"            column:"asset"           sql:"BIGINT"`
-	// Asset ID based on alias code
-	AssetID          string   `json:"assetId"            column:"asset_id"           sql:"VARCHAR"`
-	TagType          *TagType `json:"tagType" column:"tag_type" sql:"tag_type_enum"`
-	Name             string   `json:"name"             column:"name"            sql:"VARCHAR"`
-	Brand            string   `json:"brand"             column:"brand"            sql:"VARCHAR"`
-	Model            string   `json:"model"             column:"model"            sql:"VARCHAR"`
-	NameWithSequence string   `json:"nameWithSequence"   column:"name_with_sequence" sql:"VARCHAR"`
-	SequenceNumber   int      `json:"sequenceNumber"     column:"sequence_number"    sql:"BIGINT"`
-	Image            *string  `json:"image"         column:"image"        sql:"VARCHAR"`
-	Group            string   `json:"group"   column:"group" sql:"VARCHAR"`
-	GroupID          int      `json:"groupId"   column:"group_id" sql:"BIGINT"`
-
-	ReportedBy int                 `json:"reportedBy" column:"reported_by" sql:"VARCHAR"`
-	Status     MissingReportStatus `json:"status" column:"status" sql:"missing_report_status_enum NOT NULL"`
-	Notes      string              `json:"notes" column:"notes" sql:"VARCHAR"`
-
-	FoundAt   time.Time `json:"foundAt" column:"created_at" sql:"TIMESTAMPTZ"`
-	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ID               int                 `json:"_id"              column:"missing_report_histories.id"                 sql:"BIGINT PRIMARY KEY"`
+	Asset            int                 `json:"asset"            column:"missing_report_histories.asset"              sql:"BIGINT"`
+	AssetID          string              `json:"assetId"          column:"missing_report_histories.asset_id"           sql:"VARCHAR"`
+	TagType          *TagType            `json:"tagType"          column:"missing_report_histories.tag_type"           sql:"tag_type_enum"`
+	Name             string              `json:"name"             column:"missing_report_histories.name"               sql:"VARCHAR"`
+	Brand            string              `json:"brand"            column:"missing_report_histories.brand"              sql:"VARCHAR"`
+	Model            string              `json:"model"            column:"missing_report_histories.model"              sql:"VARCHAR"`
+	NameWithSequence string              `json:"nameWithSequence" column:"missing_report_histories.name_with_sequence" sql:"VARCHAR"`
+	SequenceNumber   int                 `json:"sequenceNumber"   column:"missing_report_histories.sequence_number"    sql:"BIGINT"`
+	Image            *string             `json:"image"            column:"missing_report_histories.image"              sql:"VARCHAR"`
+	Group            string              `json:"group"            column:"missing_report_histories.group"              sql:"VARCHAR"`
+	GroupID          int                 `json:"groupId"          column:"missing_report_histories.group_id"           sql:"BIGINT"`
+	ReportedBy       int                 `json:"reportedBy"       column:"missing_report_histories.reported_by"        sql:"VARCHAR"`
+	Status           MissingReportStatus `json:"status"           column:"missing_report_histories.status"             sql:"missing_report_status_enum NOT NULL"`
+	Notes            string              `json:"notes"            column:"missing_report_histories.notes"              sql:"VARCHAR"`
+	FoundAt          time.Time           `json:"foundAt"          column:"missing_report_histories.created_at"         sql:"TIMESTAMPTZ"`
+	CreatedAt        time.Time           `json:"createdAt"        column:"missing_report_histories.created_at"         sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt        time.Time           `json:"updatedAt"        column:"missing_report_histories.updated_at"         sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (m *MissingReportHistory) TableName() string {

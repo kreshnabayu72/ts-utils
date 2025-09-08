@@ -7,14 +7,12 @@ import (
 )
 
 type AuditOtherTransactionAsset struct {
-	ID int `json:"_id" column:"id" sql:"BIGINT PRIMARY KEY"`
-
-	Asset       int                   `json:"asset" column:"asset" sql:"BIGINT"`
-	AudittaskId int                   `json:"auditTaskId" column:"audit_task_id" sql:"BIGINT NOT NULL"`
-	Type        AuditOtherTransaction `json:"type" column:"type" sql:"BOOLEAN NOT NULL DEFAULT TRUE"`
-
-	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ID          int                   `json:"_id"         column:"audit_other_transaction_assets.id"            sql:"BIGINT PRIMARY KEY"`
+	Asset       int                   `json:"asset"       column:"audit_other_transaction_assets.asset"         sql:"BIGINT"`
+	AuditTaskId int                   `json:"auditTaskId" column:"audit_other_transaction_assets.audit_task_id" sql:"BIGINT NOT NULL"`
+	Type        AuditOtherTransaction `json:"type"        column:"audit_other_transaction_assets.type"          sql:"BOOLEAN NOT NULL DEFAULT TRUE"`
+	CreatedAt   time.Time             `json:"createdAt"   column:"audit_other_transaction_assets.created_at"    sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt   time.Time             `json:"updatedAt"   column:"audit_other_transaction_assets.updated_at"    sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (b *AuditOtherTransactionAsset) TableName() string {

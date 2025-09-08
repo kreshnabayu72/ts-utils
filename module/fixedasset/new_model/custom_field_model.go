@@ -7,22 +7,18 @@ import (
 )
 
 type CustomField struct {
-	ID int `json:"_id" column:"id" sql:"BIGINT PRIMARY KEY"`
-
-	Name       string              `json:"name" column:"name" sql:"VARCHAR NOT NULL"`
-	Type       CustomFieldType     `json:"type" column:"type" sql:"custom_field_type_enum NOT NULL"`
-	DataType   CustomFieldDataType `json:"dataType" column:"data_type" sql:"custom_field_data_type_enum NOT NULL"`
-	IsRequired bool                `json:"isRequired" column:"is_required" sql:"BOOLEAN NOT NULL"`
-
-	OptionValue []string `json:"optionValue" column:"option_value" sql:"TEXT[] NULL"`
-
-	IsActive      bool `json:"isActive" column:"is_active" sql:"BOOLEAN DEFAULT TRUE"`
-	IsShowOnTable bool `json:"isShowOnTable" column:"is_show_on_table" sql:"BOOLEAN DEFAULT TRUE"`
-
-	IsDeleted bool       `json:"isDeleted" column:"is_deleted" sql:"BOOLEAN DEFAULT FALSE"`
-	DeletedAt *time.Time `json:"deletedAt" column:"deleted_at" sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
-	CreatedAt time.Time  `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt time.Time  `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ID            int                 `json:"_id"           column:"custom_fields.id"               sql:"BIGINT PRIMARY KEY"`
+	Name          string              `json:"name"          column:"custom_fields.name"             sql:"VARCHAR NOT NULL"`
+	Type          CustomFieldType     `json:"type"          column:"custom_fields.type"             sql:"custom_field_type_enum NOT NULL"`
+	DataType      CustomFieldDataType `json:"dataType"      column:"custom_fields.data_type"        sql:"custom_field_data_type_enum NOT NULL"`
+	IsRequired    bool                `json:"isRequired"    column:"custom_fields.is_required"      sql:"BOOLEAN NOT NULL"`
+	OptionValue   []string            `json:"optionValue"   column:"custom_fields.option_value"     sql:"TEXT[] NULL"`
+	IsActive      bool                `json:"isActive"      column:"custom_fields.is_active"        sql:"BOOLEAN DEFAULT TRUE"`
+	IsShowOnTable bool                `json:"isShowOnTable" column:"custom_fields.is_show_on_table" sql:"BOOLEAN DEFAULT TRUE"`
+	IsDeleted     bool                `json:"isDeleted"     column:"custom_fields.is_deleted"       sql:"BOOLEAN DEFAULT FALSE"`
+	DeletedAt     *time.Time          `json:"deletedAt"     column:"custom_fields.deleted_at"       sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
+	CreatedAt     time.Time           `json:"createdAt"     column:"custom_fields.created_at"       sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt     time.Time           `json:"updatedAt"     column:"custom_fields.updated_at"       sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (m *CustomField) TableName() string {

@@ -8,18 +8,18 @@ import (
 )
 
 type RepairApproval struct {
-	ID            int            `json:"id" column:"id" sql:"BIGINT PRIMARY KEY"`
-	RepairID      int            `json:"repairId" column:"repair_id" sql:"BIGINT NOT NULL"`
-	ApproverID    int            `json:"approverId" column:"approver_id" sql:"BIGINT"`
-	ApprovalRound int            `json:"approvalRound" column:"approval_round" sql:"INTEGER NOT NULL"`
-	Level         int            `json:"level" column:"level" sql:"INTEGER"`
-	Status        ApprovalStatus `json:"status" column:"status" sql:"approval_status_enum"`
-	IsApproved    *bool          `json:"isApproved" column:"is_approved" sql:"BOOLEAN NULL DEFAULT NULL"`
-	Notes         *string        `json:"notes" column:"notes" sql:"VARCHAR"`
-	Type          ApprovalType   `json:"type" column:"type" sql:"approval_type_enum NOT NULL"`
-	ApprovedAt    *time.Time     `json:"approvedAt" column:"approved_at" sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
-	CreatedAt     time.Time      `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt     time.Time      `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ID            int            `json:"id"            column:"repair_approvals.id"             sql:"BIGINT PRIMARY KEY"`
+	RepairID      int            `json:"repairId"      column:"repair_approvals.repair_id"      sql:"BIGINT NOT NULL"`
+	ApproverID    int            `json:"approverId"    column:"repair_approvals.approver_id"    sql:"BIGINT"`
+	ApprovalRound int            `json:"approvalRound" column:"repair_approvals.approval_round" sql:"INTEGER NOT NULL"`
+	Level         int            `json:"level"         column:"repair_approvals.level"          sql:"INTEGER"`
+	Status        ApprovalStatus `json:"status"        column:"repair_approvals.status"         sql:"approval_status_enum"`
+	IsApproved    *bool          `json:"isApproved"    column:"repair_approvals.is_approved"    sql:"BOOLEAN NULL DEFAULT NULL"`
+	Notes         *string        `json:"notes"         column:"repair_approvals.notes"          sql:"VARCHAR"`
+	Type          ApprovalType   `json:"type"          column:"repair_approvals.type"           sql:"approval_type_enum NOT NULL"`
+	ApprovedAt    *time.Time     `json:"approvedAt"    column:"repair_approvals.approved_at"    sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
+	CreatedAt     time.Time      `json:"createdAt"     column:"repair_approvals.created_at"     sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt     time.Time      `json:"updatedAt"     column:"repair_approvals.updated_at"     sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 // TableName returns the name of the database table for this model.
