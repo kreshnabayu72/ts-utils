@@ -21,7 +21,7 @@ type User struct {
 	IsDefault              bool       `json:"isDefault"              column:"users.is_default"                sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
 	IsEmailConfirmed       bool       `json:"isEmailConfirmed"       column:"users.is_email_confirmed"        sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
 	ExpiryDate             *time.Time `json:"expiryDate"             column:"users.expiry_date"               sql:"TIMESTAMPTZ NULL"`
-	IsExpired              *bool      `json:"isExpired"              column:"users.is_expired"                sql:"CASE WHEN expiry_date IS NULL THEN NULL ELSE expiry_date < NOW() END"`
+	IsExpired              *bool      `json:"isExpired"              column:"CASE WHEN expiry_date IS NULL THEN NULL ELSE expiry_date < NOW() END"`
 	Position               *string    `json:"position"               column:"users.position"                  sql:"VARCHAR NULL"`
 	Division               string     `json:"division"               column:"users.division"                  sql:"VARCHAR NOT NULL"`
 	RfidCode               *string    `json:"rfidCode"               column:"users.rfid_code"                 sql:"VARCHAR DEFAULT NULL"`
