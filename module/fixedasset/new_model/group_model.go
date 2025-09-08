@@ -15,7 +15,7 @@ type Group struct {
 	Level                              int        `json:"level"                              column:"groups.level"                                   sql:"BIGINT"`
 	IsDisposable                       bool       `json:"isDisposable"                       column:"groups.is_disposable"                           sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
 	AncestorID                         int        `json:"ancestorId"                         column:"groups.ancestor_id"                             sql:"BIGINT"`
-	ParentID                           int        `json:"parentId"                           column:"groups.parent_id"                               sql:"BIGINT"`
+	ParentID                           *int       `json:"parentId"                           column:"groups.parent_id"                               sql:"BIGINT"`
 	ParentQuotaSourceID                int        `json:"parentQuotaSourceId"                column:"groups.parent_quota_source_id"                  sql:"BIGINT"`
 	BorrowingRoleManagedByParent       bool       `json:"borrowingRoleManagedByParent"       column:"groups.borrowing_role_managed_by_parent"        sql:"BOOLEAN NOT NULL DEFAULT TRUE"`
 	TransferRoleManagedByParent        bool       `json:"transferRoleManagedByParent"        column:"groups.transfer_role_managed_by_parent"         sql:"BOOLEAN NOT NULL DEFAULT TRUE"`
