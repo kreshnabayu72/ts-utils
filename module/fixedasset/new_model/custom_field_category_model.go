@@ -8,8 +8,8 @@ import (
 
 type CustomFieldCategory struct {
 	ID            int       `json:"_id"           column:"custom_field_categories.id"              sql:"BIGINT PRIMARY KEY"`
-	CustomFieldId int       `json:"customFieldId" column:"custom_field_categories.custom_field_id" sql:"BIGINT UNIQUE"`
-	CategoryId    int       `json:"categoryId"    column:"custom_field_categories.category_id"     sql:"BIGINT UNIQUE"`
+	CustomFieldId int       `json:"customFieldId" column:"custom_field_categories.custom_field_id" sql:"BIGINT"`
+	CategoryId    int       `json:"categoryId"    column:"custom_field_categories.category_id"     sql:"BIGINT"`
 	CreatedAt     time.Time `json:"createdAt"     column:"custom_field_categories.created_at"      sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 	UpdatedAt     time.Time `json:"updatedAt"     column:"custom_field_categories.updated_at"      sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
@@ -35,6 +35,14 @@ func (c *CustomFieldCategory) Up(builder *migration.MigrationBuilder) {
 		"categories",
 		"id",
 		"SET NULL",
+	)
+
+	// Add the unique index for customfield id and category id
+	builder.AddIndex(
+		"unique_custom_field_category",
+		"custom_field_id,category_id",
+		true,
+		"",
 	)
 
 	builder.AddIndex("idx_cfc_custom_field_active", "custom_field_id", false, "")
