@@ -88,11 +88,6 @@ func ExtractFromType(typ reflect.Type) []FieldMeta {
 			meta.NestedFields = ExtractFromType(meta.Type)
 		}
 
-		if strings.Contains(meta.ColumnTag, ".") {
-			// Slice from the first character all the way to the "." character
-			meta.ColumnTag = meta.ColumnTag[strings.Index(meta.ColumnTag, ".")+1 : len(meta.ColumnTag)]
-		}
-
 		fields = append(fields, meta)
 	}
 

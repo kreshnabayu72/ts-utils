@@ -557,6 +557,10 @@ func (s *UpdateBuilder) extractUpdateFieldsStruct(v reflect.Value) ([]string, bo
 				col = CamelToSnake(field.Name)
 			}
 		}
+		// Slice from the first character all the way to the "." character
+		if strings.Contains(col, ".") {
+			col = col[strings.Index(col, ".")+1:]
+		}
 
 		// Recurse into nested structs (excluding time.Time)
 		if val.Kind() == reflect.Struct && field.Type != reflect.TypeOf(time.Time{}) && field.Type != reflect.TypeOf(UpdateRawSQL{}) {
