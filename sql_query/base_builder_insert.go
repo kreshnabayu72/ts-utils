@@ -194,7 +194,7 @@ func (s *InsertBuilder) cachedInsertSingle(v reflect.Value) SQLInsertChainBuilde
 			if meta.ColumnTag != "" {
 				if strings.Contains(meta.ColumnTag, ".") {
 					// Slice from the first character all the way to the "." character
-					setTag = meta.ColumnTag[strings.Index(meta.ColumnTag, ".")+1 : len(meta.ColumnTag)]
+					setTag = meta.ColumnTag[strings.Index(meta.ColumnTag, ".")+1:]
 				} else {
 					setTag = meta.ColumnTag
 				}
@@ -352,7 +352,7 @@ func (s *InsertBuilder) cachedInsertMany(slice reflect.Value) SQLInsertChainBuil
 			if meta.ColumnTag != "" {
 				if strings.Contains(meta.ColumnTag, ".") {
 					// Slice from the first character all the way to the "." character
-					setTag = meta.ColumnTag[strings.Index(meta.ColumnTag, ".")+1 : len(meta.ColumnTag)]
+					setTag = meta.ColumnTag[strings.Index(meta.ColumnTag, ".")+1:]
 				} else {
 					setTag = meta.ColumnTag
 				}
