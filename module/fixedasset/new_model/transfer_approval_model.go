@@ -9,18 +9,18 @@ import (
 
 // TransferApproval represents the transfer_approvals table in the database.
 type TransferApproval struct {
-	ID         int               `json:"id" column:"id" sql:"BIGINT PRIMARY KEY"`
-	RequestID  int               `json:"requestId" column:"request_id" sql:"BIGINT"`
-	ApproverID int               `json:"approverId" column:"approver_id" sql:"BIGINT"`
-	Level      int               `json:"level" column:"level" sql:"INTEGER"`
-	Status     ApprovalStatus    `json:"status" column:"status" sql:"approval_status_enum"`
-	IsApproved *bool             `json:"isApproved" column:"is_approved" sql:"BOOLEAN NULL DEFAULT NULL"`
-	Notes      *string           `json:"notes" column:"notes" sql:"VARCHAR"`
-	Type       ApprovalType      `json:"type" column:"type" sql:"approval_type_enum NOT NULL"`
-	GroupType  TransferGroupType `json:"groupType" column:"group_type" sql:"transfer_group_type_enum NOT NULL"`
-	ApprovedAt *time.Time        `json:"approvedAt" column:"approved_at" sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
-	CreatedAt  time.Time         `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt  time.Time         `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ID         int               `json:"id"         column:"transfer_approvals.id"          sql:"BIGINT PRIMARY KEY"`
+	RequestID  int               `json:"requestId"  column:"transfer_approvals.request_id"  sql:"BIGINT"`
+	ApproverID int               `json:"approverId" column:"transfer_approvals.approver_id" sql:"BIGINT"`
+	Level      int               `json:"level"      column:"transfer_approvals.level"       sql:"INTEGER"`
+	Status     ApprovalStatus    `json:"status"     column:"transfer_approvals.status"      sql:"approval_status_enum"`
+	IsApproved *bool             `json:"isApproved" column:"transfer_approvals.is_approved" sql:"BOOLEAN NULL DEFAULT NULL"`
+	Notes      *string           `json:"notes"      column:"transfer_approvals.notes"       sql:"VARCHAR"`
+	Type       ApprovalType      `json:"type"       column:"transfer_approvals.type"        sql:"approval_type_enum NOT NULL"`
+	GroupType  TransferGroupType `json:"groupType"  column:"transfer_approvals.group_type"  sql:"transfer_group_type_enum NOT NULL"`
+	ApprovedAt *time.Time        `json:"approvedAt" column:"transfer_approvals.approved_at" sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
+	CreatedAt  time.Time         `json:"createdAt"  column:"transfer_approvals.created_at"  sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt  time.Time         `json:"updatedAt"  column:"transfer_approvals.updated_at"  sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 // TableName returns the name of the database table for this model.

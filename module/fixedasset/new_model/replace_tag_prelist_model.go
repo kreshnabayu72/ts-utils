@@ -7,11 +7,10 @@ import (
 )
 
 type ReplaceTagPrelist struct {
-	ID      int `json:"_id" column:"id" sql:"BIGINT PRIMARY KEY"`
-	AssetId int `json:"assetId" column:"asset_id" sql:"BIGINT"`
-
-	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ID        int       `json:"_id"       column:"replace_tag_prelists.id"         sql:"BIGINT PRIMARY KEY"`
+	AssetId   int       `json:"assetId"   column:"replace_tag_prelists.asset_id"   sql:"BIGINT"`
+	CreatedAt time.Time `json:"createdAt" column:"replace_tag_prelists.created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt time.Time `json:"updatedAt" column:"replace_tag_prelists.updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (r *ReplaceTagPrelist) TableName() string {

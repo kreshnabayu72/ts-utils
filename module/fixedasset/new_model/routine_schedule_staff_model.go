@@ -7,11 +7,11 @@ import (
 )
 
 type RoutineScheduleStaff struct {
-	ID                int       `json:"_id" column:"id" sql:"BIGINT PRIMARY KEY"`
-	UserID            int       `json:"userId" column:"user_id" sql:"BIGINT NOT NULL"`
-	RoutineScheduleID int       `json:"routineScheduleId" column:"routine_schedule_id" sql:"BIGINT NOT NULL"`
-	CreatedAt         time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt         time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ID                int       `json:"_id"               column:"routine_schedule_staffs.id"                  sql:"BIGINT PRIMARY KEY"`
+	UserID            int       `json:"userId"            column:"routine_schedule_staffs.user_id"             sql:"BIGINT NOT NULL"`
+	RoutineScheduleID int       `json:"routineScheduleId" column:"routine_schedule_staffs.routine_schedule_id" sql:"BIGINT NOT NULL"`
+	CreatedAt         time.Time `json:"createdAt"         column:"routine_schedule_staffs.created_at"          sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt         time.Time `json:"updatedAt"         column:"routine_schedule_staffs.updated_at"          sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (m *RoutineScheduleStaff) TableName() string {

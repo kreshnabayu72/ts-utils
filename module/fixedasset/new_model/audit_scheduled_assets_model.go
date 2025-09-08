@@ -7,14 +7,12 @@ import (
 )
 
 type AuditScheduledAsset struct {
-	ID int `json:"_id" column:"id" sql:"BIGINT PRIMARY KEY"`
-
-	Asset           int  `json:"asset" column:"asset" sql:"BIGINT"`
-	AuditScheduleId int  `json:"auditScheduleId" column:"audit_schedule_id" sql:"BIGINT NOT NULL"`
-	IsActive        bool `json:"isActive" column:"is_active" sql:"BOOLEAN NOT NULL DEFAULT TRUE"`
-
-	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ID              int       `json:"_id"             column:"audit_scheduled_assets.id"                sql:"BIGINT PRIMARY KEY"`
+	Asset           int       `json:"asset"           column:"audit_scheduled_assets.asset"             sql:"BIGINT"`
+	AuditScheduleId int       `json:"auditScheduleId" column:"audit_scheduled_assets.audit_schedule_id" sql:"BIGINT NOT NULL"`
+	IsActive        bool      `json:"isActive"        column:"audit_scheduled_assets.is_active"         sql:"BOOLEAN NOT NULL DEFAULT TRUE"`
+	CreatedAt       time.Time `json:"createdAt"       column:"audit_scheduled_assets.created_at"        sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt       time.Time `json:"updatedAt"       column:"audit_scheduled_assets.updated_at"        sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (b *AuditScheduledAsset) TableName() string {

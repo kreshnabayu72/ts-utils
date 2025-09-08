@@ -8,12 +8,12 @@ import (
 
 // AssignmentPrelist represents the assignment_prelists table in the database.
 type AssignmentPrelist struct {
-	ID           int                   `json:"id" column:"id" sql:"BIGINT PRIMARY KEY"`
-	GroupID      int                   `json:"groupId" column:"group_id" sql:"BIGINT"`
-	AssignedToID int                   `json:"assignedToId" column:"assigned_to_id" sql:"BIGINT"`
-	Type         AssignmentPrelistType `json:"type" column:"type" sql:"assignment_prelist_type_enum"`
-	CreatedAt    time.Time             `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt    time.Time             `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ID           int                   `json:"id"           column:"assignment_prelists.id"             sql:"BIGINT PRIMARY KEY"`
+	GroupID      int                   `json:"groupId"      column:"assignment_prelists.group_id"       sql:"BIGINT"`
+	AssignedToID int                   `json:"assignedToId" column:"assignment_prelists.assigned_to_id" sql:"BIGINT"`
+	Type         AssignmentPrelistType `json:"type"         column:"assignment_prelists.type"           sql:"assignment_prelist_type_enum"`
+	CreatedAt    time.Time             `json:"createdAt"    column:"assignment_prelists.created_at"     sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt    time.Time             `json:"updatedAt"    column:"assignment_prelists.updated_at"     sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 // TableName returns the name of the database table for this model.

@@ -8,14 +8,14 @@ import (
 
 // DisposalPrelist represents the disposal_prelists table in the database.
 type DisposalPrelist struct {
-	ID              int                   `json:"id" column:"id" sql:"BIGINT PRIMARY KEY"`
-	OriginGroupID   int                   `json:"originGroupId" column:"origin_group_id" sql:"BIGINT NOT NULL"`
-	DisposalGroupID int                   `json:"disposalGroupId" column:"disposal_group_id" sql:"BIGINT"`
-	Method          DisposalMethod        `json:"method" column:"method" sql:"disposal_method_enum"`
-	LastCondition   DisposalLastCondition `json:"lastCondition" column:"last_condition" sql:"disposal_last_condition_enum"`
-	Organization    string                `json:"organization" column:"organization" sql:"VARCHAR"`
-	CreatedAt       time.Time             `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt       time.Time             `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ID              int                   `json:"id"              column:"disposal_prelists.id"                sql:"BIGINT PRIMARY KEY"`
+	OriginGroupID   int                   `json:"originGroupId"   column:"disposal_prelists.origin_group_id"   sql:"BIGINT NOT NULL"`
+	DisposalGroupID int                   `json:"disposalGroupId" column:"disposal_prelists.disposal_group_id" sql:"BIGINT"`
+	Method          DisposalMethod        `json:"method"          column:"disposal_prelists.method"            sql:"disposal_method_enum"`
+	LastCondition   DisposalLastCondition `json:"lastCondition"   column:"disposal_prelists.last_condition"    sql:"disposal_last_condition_enum"`
+	Organization    string                `json:"organization"    column:"disposal_prelists.organization"      sql:"VARCHAR"`
+	CreatedAt       time.Time             `json:"createdAt"       column:"disposal_prelists.created_at"        sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt       time.Time             `json:"updatedAt"       column:"disposal_prelists.updated_at"        sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 // TableName returns the name of the database table for this model.

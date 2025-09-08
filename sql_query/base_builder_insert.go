@@ -192,7 +192,12 @@ func (s *InsertBuilder) cachedInsertSingle(v reflect.Value) SQLInsertChainBuilde
 
 			setTag := CamelToSnake(meta.JSONTag)
 			if meta.ColumnTag != "" {
-				setTag = meta.ColumnTag
+				if strings.Contains(meta.ColumnTag, ".") {
+					// Slice from the first character all the way to the "." character
+					setTag = meta.ColumnTag[strings.Index(meta.ColumnTag, ".")+1:]
+				} else {
+					setTag = meta.ColumnTag
+				}
 			}
 
 			if ArrayIncludes([]string{"updated_at", "created_at"}, setTag) {
@@ -345,7 +350,12 @@ func (s *InsertBuilder) cachedInsertMany(slice reflect.Value) SQLInsertChainBuil
 
 			setTag := CamelToSnake(meta.JSONTag)
 			if meta.ColumnTag != "" {
-				setTag = meta.ColumnTag
+				if strings.Contains(meta.ColumnTag, ".") {
+					// Slice from the first character all the way to the "." character
+					setTag = meta.ColumnTag[strings.Index(meta.ColumnTag, ".")+1:]
+				} else {
+					setTag = meta.ColumnTag
+				}
 			}
 			if ArrayIncludes([]string{"updated_at", "created_at"}, setTag) {
 				continue

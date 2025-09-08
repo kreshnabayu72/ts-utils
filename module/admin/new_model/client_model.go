@@ -73,14 +73,14 @@ type Client struct {
 	Geolocation         bool   `json:"geolocation" column:"geolocation" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
 	TimeZone            string `json:"timeZone" column:"time_zone" sql:"VARCHAR default 'Asia/Jakarta'"`
 	PIN                 string `json:"pin" column:"pin" sql:"VARCHAR(6) DEFAULT '123456'"`
-	CurrencySymbol      string `json:"currencySymbol" column:"currency_symbol" sql:"VARCHAR DEFAULT 'IDR'"`
-	CurrencyCurrency    string `json:"currencyCurrency" column:"currency_currency" sql:"VARCHAR DEFAULT 'Rp'"`
+	CurrencySymbol      string `json:"currencySymbol" column:"currency_symbol" sql:"VARCHAR DEFAULT 'Rp'"`
+	CurrencyCurrency    string `json:"currencyCurrency" column:"currency_currency" sql:"VARCHAR DEFAULT 'IDR'"`
 	CurrencyLocale      string `json:"currencyLocale" column:"currency_locale" sql:"VARCHAR DEFAULT 'id-ID'"`
 	CurrencyLabel       string `json:"currencyLabel" column:"currency_label" sql:"VARCHAR DEFAULT 'Rp - Indonesian Rupiah'"`
 
 	// ─────── File Storage ───────
-	FileStorageTotalKB           float64 `json:"fileStorageTotalKB" column:"file_storage_total_kb" sql:"FLOAT DEFAULT 5242880"`         //5 gb
-	FileStorageAvailableKB       float64 `json:"fileStorageAvailableKB" column:"file_storage_available_kb" sql:"FLOAT DEFAULT 5242880"` //5gb
+	FileStorageTotalKB           float64 `json:"fileStorageTotalKB" column:"file_storage_total_kb" sql:"FLOAT DEFAULT 5242880"`         // 5 gb
+	FileStorageAvailableKB       float64 `json:"fileStorageAvailableKB" column:"file_storage_available_kb" sql:"FLOAT DEFAULT 5242880"` // 5gb
 	FileStorageUsedKB            float64 `json:"fileStorageUsedKB" column:"file_storage_used_kb" sql:"FLOAT DEFAULT 0"`
 	FileStorageAttachmentKB      float64 `json:"fileStorageAttachmentKB" column:"file_storage_attachment_kb" sql:"FLOAT DEFAULT 0"`
 	FileStorageDamagedKB         float64 `json:"fileStorageDamagedKB" column:"file_storage_damage_kb" sql:"FLOAT DEFAULT 0"`

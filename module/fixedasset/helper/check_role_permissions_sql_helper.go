@@ -21,6 +21,8 @@ import (
 // The function looks for an active system role entry that matches the user's ID, the specified
 // permission key (e.g., "view"), and the role attribute (e.g., "registerAssets").
 //
+// # For global role checking, just pass group filter with operator `is null` or empty operator
+//
 // If no matching permission is found, it returns an HTTP unauthorized error.
 func CheckSystemRolePermissionSQL(ctx *fiber.Ctx, permissionKey new_model.PermissionType, resourceTypes []new_model.SystemRoleAttribute, groupFilter sql_query.SQLCondition) *entity.HttpError {
 	// Get userId from Locals in Fiber context
@@ -56,11 +58,16 @@ func CheckSystemRolePermissionSQL(ctx *fiber.Ctx, permissionKey new_model.Permis
 				Operator: sql_query.SQLOperatorEqual,
 				Value:    true,
 			},
-			"group_id": groupFilter,
 			"is_active": {
 				Operator: sql_query.SQLOperatorEqual,
 				Value:    true,
 			},
+		}
+
+		// Apply group filter only if explicitly provided.
+		// Skip if operator is empty ("") or IS NULL, meaning no group restriction.
+		if groupFilter.Operator != sql_query.SQLOperatorIsNull && groupFilter.Operator != "" {
+			filter["group_id"] = groupFilter
 		}
 
 		// Check for matching documents where the resource type is in the given array
