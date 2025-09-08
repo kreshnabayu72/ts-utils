@@ -8,19 +8,15 @@ import (
 
 // AssignmentRequest represents the assignment_requests table in the database.
 type AssignmentRequest struct {
-	ID int `json:"id" column:"id" sql:"BIGINT PRIMARY KEY"`
-
-	// Foreign key to assets
-	Asset int `json:"asset" column:"asset" sql:"BIGINT"`
-	// Foreign key to related transaction
-	Transaction int `json:"transaction" column:"transaction" sql:"BIGINT"`
-
-	ParentID   *int                    `json:"parentId" column:"parent_id" sql:"BIGINT"`
-	Status     AssignmentRequestStatus `json:"status" column:"status" sql:"assignment_request_status_enum"`
-	IsVerified bool                    `json:"isVerified" column:"is_verified" sql:"BOOLEAN"`
-	Notes      string                  `json:"notes" column:"notes" sql:"VARCHAR"`
-	CreatedAt  time.Time               `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt  time.Time               `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ID          int                     `json:"id"          column:"assignment_requests.id"          sql:"BIGINT PRIMARY KEY"`
+	Asset       int                     `json:"asset"       column:"assignment_requests.asset"       sql:"BIGINT"`
+	Transaction int                     `json:"transaction" column:"assignment_requests.transaction" sql:"BIGINT"`
+	ParentID    *int                    `json:"parentId"    column:"assignment_requests.parent_id"   sql:"BIGINT"`
+	Status      AssignmentRequestStatus `json:"status"      column:"assignment_requests.status"      sql:"assignment_request_status_enum"`
+	IsVerified  bool                    `json:"isVerified"  column:"assignment_requests.is_verified" sql:"BOOLEAN"`
+	Notes       string                  `json:"notes"       column:"assignment_requests.notes"       sql:"VARCHAR"`
+	CreatedAt   time.Time               `json:"createdAt"   column:"assignment_requests.created_at"  sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt   time.Time               `json:"updatedAt"   column:"assignment_requests.updated_at"  sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 // TableName returns the name of the database table for this model.

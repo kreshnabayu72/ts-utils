@@ -7,14 +7,12 @@ import (
 )
 
 type AssetCustomField struct {
-	ID int `json:"_id" column:"id" sql:"BIGINT PRIMARY KEY"`
-
-	AssetId       int `json:"assetId" column:"asset_id" sql:"BIGINT"`
-	CustomFieldId int `json:"customFieldId" column:"custom_field_id" sql:"BIGINT"`
-	Value         any `json:"value" column:"value" sql:"VARCHAR DEFAULT NULL"`
-
-	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ID            int       `json:"_id"           column:"asset_custom_fields.id"              sql:"BIGINT PRIMARY KEY"`
+	AssetId       int       `json:"assetId"       column:"asset_custom_fields.asset_id"        sql:"BIGINT"`
+	CustomFieldId int       `json:"customFieldId" column:"asset_custom_fields.custom_field_id" sql:"BIGINT"`
+	Value         any       `json:"value"         column:"asset_custom_fields.value"           sql:"VARCHAR DEFAULT NULL"`
+	CreatedAt     time.Time `json:"createdAt"     column:"asset_custom_fields.created_at"      sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt     time.Time `json:"updatedAt"     column:"asset_custom_fields.updated_at"      sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (a *AssetCustomField) TableName() string {

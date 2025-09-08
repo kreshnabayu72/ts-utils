@@ -8,15 +8,15 @@ import (
 
 // AssignmentTransactionHistory represents the assignment_transaction_histories table in the database.
 type AssignmentTransactionHistory struct {
-	ID            int                         `json:"_id" column:"id" sql:"BIGINT PRIMARY KEY"`
-	TransactionID string                      `json:"transactionId" column:"transaction_id" sql:"VARCHAR UNIQUE"`
-	GroupID       int                         `json:"groupId" column:"group_id" sql:"BIGINT"`
-	AssignedTo    string                      `json:"assignedTo" column:"assigned_to" sql:"VARCHAR"`
-	Manager       string                      `json:"manager" column:"manager" sql:"VARCHAR"`
-	TotalAssets   int                         `json:"totalAssets" column:"total_assets" sql:"BIGINT"`
-	Status        AssignmentTransactionStatus `json:"status" column:"status" sql:"assignment_transaction_status_enum"`
-	CreatedAt     time.Time                   `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt     time.Time                   `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ID            int                         `json:"_id"           column:"assignment_transaction_histories.id"             sql:"BIGINT PRIMARY KEY"`
+	TransactionID string                      `json:"transactionId" column:"assignment_transaction_histories.transaction_id" sql:"VARCHAR UNIQUE"`
+	GroupID       int                         `json:"groupId"       column:"assignment_transaction_histories.group_id"       sql:"BIGINT"`
+	AssignedTo    string                      `json:"assignedTo"    column:"assignment_transaction_histories.assigned_to"    sql:"VARCHAR"`
+	Manager       string                      `json:"manager"       column:"assignment_transaction_histories.manager"        sql:"VARCHAR"`
+	TotalAssets   int                         `json:"totalAssets"   column:"assignment_transaction_histories.total_assets"   sql:"BIGINT"`
+	Status        AssignmentTransactionStatus `json:"status"        column:"assignment_transaction_histories.status"         sql:"assignment_transaction_status_enum"`
+	CreatedAt     time.Time                   `json:"createdAt"     column:"assignment_transaction_histories.created_at"     sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt     time.Time                   `json:"updatedAt"     column:"assignment_transaction_histories.updated_at"     sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 // TableName returns the name of the database table for this model.

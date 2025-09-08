@@ -8,17 +8,17 @@ import (
 
 // TransferRequest represents the transfer_requests table in the database.
 type TransferRequest struct {
-	ID             int                           `json:"id" column:"id" sql:"BIGINT PRIMARY KEY"`
-	Asset          int                           `json:"asset" column:"asset" sql:"BIGINT"`
-	Transaction    int                           `json:"transaction" column:"transaction" sql:"BIGINT"`
-	ParentID       *int                          `json:"parentId" column:"parent_id" sql:"BIGINT"`
-	Status         TransferRequestStatus         `json:"status" column:"status" sql:"transfer_request_status_enum"`
-	AssetTagStatus TransferRequestAssetTagStatus `json:"assetTagStatus" column:"asset_tag_status" sql:"transfer_request_asset_tag_status_enum"`
-	AssetStatus    *TransferRequestAssetStatus   `json:"assetStatus" column:"asset_status" sql:"transfer_request_asset_status_enum"`
-	IsVerified     bool                          `json:"isVerified" column:"is_verified" sql:"BOOLEAN"`
-	Notes          string                        `json:"notes" column:"notes" sql:"VARCHAR"`
-	CreatedAt      time.Time                     `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt      time.Time                     `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ID             int                           `json:"id"             column:"transfer_requests.id"               sql:"BIGINT PRIMARY KEY"`
+	Asset          int                           `json:"asset"          column:"transfer_requests.asset"            sql:"BIGINT"`
+	Transaction    int                           `json:"transaction"    column:"transfer_requests.transaction"      sql:"BIGINT"`
+	ParentID       *int                          `json:"parentId"       column:"transfer_requests.parent_id"        sql:"BIGINT"`
+	Status         TransferRequestStatus         `json:"status"         column:"transfer_requests.status"           sql:"transfer_request_status_enum"`
+	AssetTagStatus TransferRequestAssetTagStatus `json:"assetTagStatus" column:"transfer_requests.asset_tag_status" sql:"transfer_request_asset_tag_status_enum"`
+	AssetStatus    *TransferRequestAssetStatus   `json:"assetStatus"    column:"transfer_requests.asset_status"     sql:"transfer_request_asset_status_enum"`
+	IsVerified     bool                          `json:"isVerified"     column:"transfer_requests.is_verified"      sql:"BOOLEAN"`
+	Notes          string                        `json:"notes"          column:"transfer_requests.notes"            sql:"VARCHAR"`
+	CreatedAt      time.Time                     `json:"createdAt"      column:"transfer_requests.created_at"       sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt      time.Time                     `json:"updatedAt"      column:"transfer_requests.updated_at"       sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 // TableName returns the name of the database table for this model.

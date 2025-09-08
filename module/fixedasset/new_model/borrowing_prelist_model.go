@@ -7,11 +7,11 @@ import (
 )
 
 type BorrowingPrelist struct {
-	ID         int       `json:"id" column:"id" sql:"BIGINT PRIMARY KEY"`
-	GroupId    int       `json:"groupId" column:"group_id" sql:"BIGINT"`
-	BorrowerId int       `json:"borrowerId" column:"borrower_id" sql:"BIGINT"`
-	CreatedAt  time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt  time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ID         int       `json:"id"         column:"borrowing_prelists.id"          sql:"BIGINT PRIMARY KEY"`
+	GroupId    int       `json:"groupId"    column:"borrowing_prelists.group_id"    sql:"BIGINT"`
+	BorrowerId int       `json:"borrowerId" column:"borrowing_prelists.borrower_id" sql:"BIGINT"`
+	CreatedAt  time.Time `json:"createdAt"  column:"borrowing_prelists.created_at"  sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt  time.Time `json:"updatedAt"  column:"borrowing_prelists.updated_at"  sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (m *BorrowingPrelist) TableName() string {

@@ -5,11 +5,11 @@ import (
 )
 
 type IotReaderPort struct {
-	ID          int  `json:"_id" column:"id" sql:"BIGINT PRIMARY KEY"`
-	IotReaderID int  `json:"iotReaderId" column:"iot_reader_id" sql:"BIGINT NOT NULL"`
-	Power       int  `json:"power" column:"power" sql:"INTEGER"`
-	GroupID     *int `json:"groupId" column:"group_id" sql:"BIGINT"`
-	IsActive    bool `json:"isActive" column:"is_active" sql:"BOOLEAN"`
+	ID          int  `json:"_id"         column:"iot_reader_ports.id"            sql:"BIGINT PRIMARY KEY"`
+	IotReaderID int  `json:"iotReaderId" column:"iot_reader_ports.iot_reader_id" sql:"BIGINT NOT NULL"`
+	Power       int  `json:"power"       column:"iot_reader_ports.power"         sql:"INTEGER"`
+	GroupID     *int `json:"groupId"     column:"iot_reader_ports.group_id"      sql:"BIGINT"`
+	IsActive    bool `json:"isActive"    column:"iot_reader_ports.is_active"     sql:"BOOLEAN"`
 }
 
 func (p *IotReaderPort) TableName() string {

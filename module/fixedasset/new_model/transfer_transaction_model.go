@@ -8,18 +8,18 @@ import (
 
 // TransferTransaction represents the transfer_transactions table in the database.
 type TransferTransaction struct {
-	ID                   int                       `json:"_id" column:"id" sql:"BIGINT PRIMARY KEY"`
-	TransactionID        string                    `json:"transactionId" column:"transaction_id" sql:"VARCHAR UNIQUE"`
-	ManagerID            int                       `json:"managerId" column:"manager_id" sql:"BIGINT"`
-	OriginGroupID        int                       `json:"originGroupId" column:"origin_group_id" sql:"BIGINT"`
-	DestinationGroupID   int                       `json:"destinationGroupId" column:"destination_group_id" sql:"BIGINT"`
-	Status               TransferTransactionStatus `json:"status" column:"status" sql:"transfer_transaction_status_enum"`
-	IsVerified           bool                      `json:"isVerified" column:"is_verified" sql:"BOOLEAN"`
-	CurrentApprovalType  TransferGroupType         `json:"currentApprovalType" column:"current_approval_type" sql:"transfer_group_type_enum NOT NULL"`
-	CurrentApprovalLevel int                       `json:"currentApprovalLevel" column:"current_approval_level" sql:"INTEGER DEFAULT 1"`
-	CurrentApprovalRound int                       `json:"currentApprovalRound" column:"current_approval_round" sql:"INTEGER DEFAULT 1"`
-	CreatedAt            time.Time                 `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt            time.Time                 `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ID                   int                       `json:"_id"                  column:"transfer_transactions.id"                     sql:"BIGINT PRIMARY KEY"`
+	TransactionID        string                    `json:"transactionId"        column:"transfer_transactions.transaction_id"         sql:"VARCHAR UNIQUE"`
+	ManagerID            int                       `json:"managerId"            column:"transfer_transactions.manager_id"             sql:"BIGINT"`
+	OriginGroupID        int                       `json:"originGroupId"        column:"transfer_transactions.origin_group_id"        sql:"BIGINT"`
+	DestinationGroupID   int                       `json:"destinationGroupId"   column:"transfer_transactions.destination_group_id"   sql:"BIGINT"`
+	Status               TransferTransactionStatus `json:"status"               column:"transfer_transactions.status"                 sql:"transfer_transaction_status_enum"`
+	IsVerified           bool                      `json:"isVerified"           column:"transfer_transactions.is_verified"            sql:"BOOLEAN"`
+	CurrentApprovalType  TransferGroupType         `json:"currentApprovalType"  column:"transfer_transactions.current_approval_type"  sql:"transfer_group_type_enum NOT NULL"`
+	CurrentApprovalLevel int                       `json:"currentApprovalLevel" column:"transfer_transactions.current_approval_level" sql:"INTEGER DEFAULT 1"`
+	CurrentApprovalRound int                       `json:"currentApprovalRound" column:"transfer_transactions.current_approval_round" sql:"INTEGER DEFAULT 1"`
+	CreatedAt            time.Time                 `json:"createdAt"            column:"transfer_transactions.created_at"             sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt            time.Time                 `json:"updatedAt"            column:"transfer_transactions.updated_at"             sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 // TableName returns the name of the database table for this model.

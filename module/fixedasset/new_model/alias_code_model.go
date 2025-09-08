@@ -7,14 +7,14 @@ import (
 )
 
 type AliasCodeData struct {
-	ID          int       `column:"acd.id" json:"_id,omitempty" sql:"BIGINT PRIMARY KEY"`
-	AliasCodeID int       `column:"acd.alias_code_id" json:"aliasCodeId" sql:"BIGINT NOT NULL"`
-	Name        string    `json:"name" column:"acd.name" sql:"VARCHAR NOT NULL CHECK (char_length(name) > 0)"`
-	IsChecked   bool      `json:"isChecked" column:"acd.is_checked" sql:"BOOLEAN NOT NULL DEFAULT FALSE CHECK (is_checked IN (TRUE, FALSE))"`
-	Value       string    `json:"value" column:"acd.value" sql:"VARCHAR NOT NULL"`
-	Order       *int      `json:"order" column:"acd.order" sql:"INTEGER NULL UNIQUE"`
-	CreatedAt   time.Time `column:"acd.created_at" json:"createdAt" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt   time.Time `column:"acd.updated_at" json:"updatedAt" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ID          int       `json:"_id,omitempty" column:"acd.id"            sql:"BIGINT PRIMARY KEY"`
+	AliasCodeID int       `json:"aliasCodeId"   column:"acd.alias_code_id" sql:"BIGINT NOT NULL"`
+	Name        string    `json:"name"          column:"acd.name"          sql:"VARCHAR NOT NULL CHECK (char_length(name) > 0)"`
+	IsChecked   bool      `json:"isChecked"     column:"acd.is_checked"    sql:"BOOLEAN NOT NULL DEFAULT FALSE CHECK (is_checked IN (TRUE, FALSE))"`
+	Value       string    `json:"value"         column:"acd.value"         sql:"VARCHAR NOT NULL"`
+	Order       *int      `json:"order"         column:"acd.order"         sql:"INTEGER NULL UNIQUE"`
+	CreatedAt   time.Time `json:"createdAt"     column:"acd.created_at"    sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt   time.Time `json:"updatedAt"     column:"acd.updated_at"    sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (m *AliasCodeData) TableName() string {

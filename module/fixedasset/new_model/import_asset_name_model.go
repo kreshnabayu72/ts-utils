@@ -7,17 +7,15 @@ import (
 )
 
 type ImportAssetName struct {
-	ID  int `json:"_id" column:"id" sql:"BIGINT PRIMARY KEY"`
-	Key int `json:"key" column:"key" sql:"INTEGER NOT NULL"`
-
-	Name         string `json:"name" column:"name" sql:"VARCHAR NOT NULL"`
-	Code         string `json:"code" column:"code" sql:"VARCHAR NOT NULL"`
-	Category     string `json:"category" column:"category" sql:"VARCHAR NOT NULL"`
-	CategoryCode string `json:"categoryCode" column:"category_code" sql:"VARCHAR NOT NULL"`
-	Measurement  string `json:"measurement" column:"measurement" sql:"VARCHAR NOT NULL"`
-
-	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ID           int       `json:"_id"          column:"import_asset_names.id"            sql:"BIGINT PRIMARY KEY"`
+	Key          int       `json:"key"          column:"import_asset_names.key"           sql:"INTEGER NOT NULL"`
+	Name         string    `json:"name"         column:"import_asset_names.name"          sql:"VARCHAR NOT NULL"`
+	Code         string    `json:"code"         column:"import_asset_names.code"          sql:"VARCHAR NOT NULL"`
+	Category     string    `json:"category"     column:"import_asset_names.category"      sql:"VARCHAR NOT NULL"`
+	CategoryCode string    `json:"categoryCode" column:"import_asset_names.category_code" sql:"VARCHAR NOT NULL"`
+	Measurement  string    `json:"measurement"  column:"import_asset_names.measurement"   sql:"VARCHAR NOT NULL"`
+	CreatedAt    time.Time `json:"createdAt"    column:"import_asset_names.created_at"    sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt    time.Time `json:"updatedAt"    column:"import_asset_names.updated_at"    sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (a *ImportAssetName) TableName() string {

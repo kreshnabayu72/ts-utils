@@ -8,23 +8,23 @@ import (
 
 // DisposalTransactionHistory represents the disposal_transaction_histories table in the database.
 type DisposalTransactionHistory struct {
-	ID                 int                       `json:"_id" column:"id" sql:"BIGINT PRIMARY KEY"`
-	TransactionID      string                    `json:"transactionId" column:"transaction_id" sql:"VARCHAR UNIQUE"`
-	Manager            int                       `json:"managerId" column:"manager_id" sql:"BIGINT"`
-	OriginGroupID      int                       `json:"originGroupId" column:"origin_group_id" sql:"BIGINT"`
-	DisposalGroupID    int                       `json:"disposalGroupId" column:"disposal_group_id" sql:"BIGINT"`
-	OriginGroup        string                    `json:"originGroup" column:"origin_group" sql:"VARCHAR"`
-	DisposalGroup      string                    `json:"disposalGroup" column:"disposal_group" sql:"VARCHAR"`
-	Status             DisposalTransactionStatus `json:"status" column:"status" sql:"disposal_transaction_status_enum"`
-	Notes              string                    `json:"notes" column:"notes" sql:"VARCHAR"`
-	CompletionNotes    string                    `json:"completionNotes" column:"completion_notes" sql:"VARCHAR"`
-	LastCondition      DisposalLastCondition     `json:"lastCondition" column:"last_condition" sql:"disposal_last_condition_enum"`
-	Method             DisposalMethod            `json:"method" column:"method" sql:"disposal_method_enum"`
-	Organization       string                    `json:"organization" column:"organization" sql:"VARCHAR"`
-	DocumentationPhoto string                    `json:"documentationPhoto" column:"documentation_photo" sql:"VARCHAR"`
-	TotalAssets        int                       `json:"totalAssets" column:"total_assets" sql:"BIGINT"`
-	CreatedAt          time.Time                 `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt          time.Time                 `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ID                 int                       `json:"_id"                column:"disposal_transaction_histories.id"                  sql:"BIGINT PRIMARY KEY"`
+	TransactionID      string                    `json:"transactionId"      column:"disposal_transaction_histories.transaction_id"      sql:"VARCHAR UNIQUE"`
+	Manager            int                       `json:"managerId"          column:"disposal_transaction_histories.manager_id"          sql:"BIGINT"`
+	OriginGroupID      int                       `json:"originGroupId"      column:"disposal_transaction_histories.origin_group_id"     sql:"BIGINT"`
+	DisposalGroupID    int                       `json:"disposalGroupId"    column:"disposal_transaction_histories.disposal_group_id"   sql:"BIGINT"`
+	OriginGroup        string                    `json:"originGroup"        column:"disposal_transaction_histories.origin_group"        sql:"VARCHAR"`
+	DisposalGroup      string                    `json:"disposalGroup"      column:"disposal_transaction_histories.disposal_group"      sql:"VARCHAR"`
+	Status             DisposalTransactionStatus `json:"status"             column:"disposal_transaction_histories.status"              sql:"disposal_transaction_status_enum"`
+	Notes              string                    `json:"notes"              column:"disposal_transaction_histories.notes"               sql:"VARCHAR"`
+	CompletionNotes    string                    `json:"completionNotes"    column:"disposal_transaction_histories.completion_notes"    sql:"VARCHAR"`
+	LastCondition      DisposalLastCondition     `json:"lastCondition"      column:"disposal_transaction_histories.last_condition"      sql:"disposal_last_condition_enum"`
+	Method             DisposalMethod            `json:"method"             column:"disposal_transaction_histories.method"              sql:"disposal_method_enum"`
+	Organization       string                    `json:"organization"       column:"disposal_transaction_histories.organization"        sql:"VARCHAR"`
+	DocumentationPhoto string                    `json:"documentationPhoto" column:"disposal_transaction_histories.documentation_photo" sql:"VARCHAR"`
+	TotalAssets        int                       `json:"totalAssets"        column:"disposal_transaction_histories.total_assets"        sql:"BIGINT"`
+	CreatedAt          time.Time                 `json:"createdAt"          column:"disposal_transaction_histories.created_at"          sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt          time.Time                 `json:"updatedAt"          column:"disposal_transaction_histories.updated_at"          sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 // TableName returns the name of the database table for this model.

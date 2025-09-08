@@ -8,36 +8,30 @@ import (
 
 // DisposalRequDisposalRequestHistoryest represents the disposal_request_histories table in the database.
 type DisposalRequestHistory struct {
-	ID int `json:"id" column:"id" sql:"BIGINT PRIMARY KEY"`
-
-	// Foreign key to assets
-	Asset int `json:"asset"            column:"asset"           sql:"BIGINT"`
-	// Asset ID based on alias code
-	AssetID          string   `json:"assetId"            column:"asset_id"           sql:"VARCHAR"`
-	TagType          *TagType `json:"tagType" column:"tag_type" sql:"tag_type_enum"`
-	Name             string   `json:"name"             column:"name"            sql:"VARCHAR"`
-	Brand            string   `json:"brand"             column:"brand"            sql:"VARCHAR"`
-	Model            string   `json:"model"             column:"model"            sql:"VARCHAR"`
-	NameWithSequence string   `json:"nameWithSequence"   column:"name_with_sequence" sql:"VARCHAR"`
-	SequenceNumber   int      `json:"sequenceNumber"     column:"sequence_number"    sql:"BIGINT"`
-	Image            *string  `json:"image"         column:"image"        sql:"VARCHAR"`
-
-	OriginGroup     string `json:"originGroup"   column:"origin_group" sql:"VARCHAR"`
-	OriginGroupID   int    `json:"originGroupId"   column:"origin_group_id" sql:"BIGINT"`
-	DisposalGroup   string `json:"disposalGroup"   column:"disposal_group" sql:"VARCHAR"`
-	DisposalGroupID int    `json:"disposalGroupId"   column:"disposal_group_id" sql:"BIGINT"`
-
-	Transaction      int                   `json:"transaction" column:"transaction" sql:"BIGINT"`
-	Status           DisposalRequestStatus `json:"status" column:"status" sql:"disposal_request_status_enum"`
-	SalvageableParts []string              `json:"salvageableParts" column:"salvageable_parts" sql:"TEXT[]"`
-	SalePrice        string                `json:"salePrice" column:"sale_price" sql:"VARCHAR"`
-	LastCondition    DisposalLastCondition `json:"lastCondition" column:"last_condition" sql:"disposal_last_condition_enum"`
-	Method           DisposalMethod        `json:"method" column:"method" sql:"disposal_method_enum"`
-	Notes            string                `json:"notes" column:"notes" sql:"VARCHAR"`
-	Manager          string                `json:"manager"   column:"manager" sql:"VARCHAR"`
-
-	CreatedAt time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	ID               int                   `json:"id"                 column:"disposal_request_histories.id"                 sql:"BIGINT PRIMARY KEY"`
+	Asset            int                   `json:"asset"              column:"disposal_request_histories.asset"              sql:"BIGINT"`
+	AssetID          string                `json:"assetId"            column:"disposal_request_histories.asset_id"           sql:"VARCHAR"`
+	TagType          *TagType              `json:"tagType"            column:"disposal_request_histories.tag_type"           sql:"tag_type_enum"`
+	Name             string                `json:"name"               column:"disposal_request_histories.name"               sql:"VARCHAR"`
+	Brand            string                `json:"brand"              column:"disposal_request_histories.brand"              sql:"VARCHAR"`
+	Model            string                `json:"model"              column:"disposal_request_histories.model"              sql:"VARCHAR"`
+	NameWithSequence string                `json:"nameWithSequence"   column:"disposal_request_histories.name_with_sequence" sql:"VARCHAR"`
+	SequenceNumber   int                   `json:"sequenceNumber"     column:"disposal_request_histories.sequence_number"    sql:"BIGINT"`
+	Image            *string               `json:"image"              column:"disposal_request_histories.image"              sql:"VARCHAR"`
+	OriginGroup      string                `json:"originGroup"        column:"disposal_request_histories.origin_group"       sql:"VARCHAR"`
+	OriginGroupID    int                   `json:"originGroupId"      column:"disposal_request_histories.origin_group_id"    sql:"BIGINT"`
+	DisposalGroup    string                `json:"disposalGroup"      column:"disposal_request_histories.disposal_group"     sql:"VARCHAR"`
+	DisposalGroupID  int                   `json:"disposalGroupId"    column:"disposal_request_histories.disposal_group_id"  sql:"BIGINT"`
+	Transaction      int                   `json:"transaction"        column:"disposal_request_histories.transaction"        sql:"BIGINT"`
+	Status           DisposalRequestStatus `json:"status"             column:"disposal_request_histories.status"             sql:"disposal_request_status_enum"`
+	SalvageableParts []string              `json:"salvageableParts"   column:"disposal_request_histories.salvageable_parts"  sql:"TEXT[]"`
+	SalePrice        string                `json:"salePrice"          column:"disposal_request_histories.sale_price"         sql:"VARCHAR"`
+	LastCondition    DisposalLastCondition `json:"lastCondition"      column:"disposal_request_histories.last_condition"     sql:"disposal_last_condition_enum"`
+	Method           DisposalMethod        `json:"method"             column:"disposal_request_histories.method"             sql:"disposal_method_enum"`
+	Notes            string                `json:"notes"              column:"disposal_request_histories.notes"              sql:"VARCHAR"`
+	Manager          string                `json:"manager"            column:"disposal_request_histories.manager"            sql:"VARCHAR"`
+	CreatedAt        time.Time             `json:"createdAt"          column:"disposal_request_histories.created_at"         sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt        time.Time             `json:"updatedAt"          column:"disposal_request_histories.updated_at"         sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 // TableName returns the name of the database table for this model.
