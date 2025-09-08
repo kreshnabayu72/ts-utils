@@ -233,7 +233,7 @@ END$$;
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'module_access_enum') THEN
-        CREATE TYPE module_access_enum AS ENUM ('Fixed Asset', 'Settings Portal','Admin Console','Supply Asset');
+        CREATE TYPE module_access_enum AS ENUM ('Fixed Asset', 'Global Settings','Admin Console','Supply Asset');
     END IF;
 END$$;
 
@@ -643,4 +643,39 @@ BEGIN
     END IF;
 END$$;
 
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'audit_type_enum') THEN
+        CREATE TYPE audit_type_enum AS ENUM (
+            'Existence',
+            'Condition'
+        );
+    END IF;
+END$$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'audit_task_status_enum') THEN
+        CREATE TYPE audit_task_status_enum AS ENUM (
+            'On Schedule',
+            'In Audit',
+            'Waiting for Approval',
+            'Grace Period',
+            'Overdue',
+            'Completed',
+            'Canceled',
+            'Stopped'
+        );
+    END IF;
+END$$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'audit_task_asset_status_enum') THEN
+        CREATE TYPE audit_task_asset_status_enum AS ENUM (
+            'In Audit',
+            'Audited'
+        );
+    END IF;
+END$$;
 `

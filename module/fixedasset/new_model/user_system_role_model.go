@@ -48,7 +48,7 @@ func (u *UserSystemRole) Up(builder *migration.MigrationBuilder) {
 
 	builder.AddIndex(
 		"user_system_roles_unique_index",
-		"group_id,user_id,role_type",
+		"group_id,user_id,role_attribute",
 		true,
 		"",
 	)

@@ -14,6 +14,8 @@ type Rfid struct {
 	LastAssetStatus AssetStatus `json:"lastAssetStatus" column:"rfids.asset_status"      sql:"asset_status_enum NULL"`
 	HolderId        *int        `json:"holderId"        column:"rfids.holder_id"         sql:"BIGINT"`
 	ToBeReturnedAt  *time.Time  `json:"toBeReturnedAt"  column:"rfids.to_be_returned_at" sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
+	ReportedById    *int        `json:"reportedById"    column:"rfids.reported_by_id"    sql:"BIGINT"`
+	ReportedAt      *time.Time  `json:"reportedAt"      column:"rfids.reported_at"       sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
 	CreatedAt       time.Time   `json:"createdAt"       column:"rfids.created_at"        sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 	UpdatedAt       time.Time   `json:"updatedAt"       column:"rfids.updated_at"        sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }

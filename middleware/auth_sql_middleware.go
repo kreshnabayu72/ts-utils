@@ -41,11 +41,11 @@ func ValidateJWTSQL() fiber.Handler {
 
 			companyCode := claims["companyCode"].(string)
 			userId, _ := claims["id"].(string)
-			session, _ := claims["session"].(float64)
+			session, _ := claims["session"].(string)
 			company, _ := claims["company"].(string)
 
 			ctx.Locals(UserKey, userId)
-			ctx.Locals(SessionKey, int(session))
+			ctx.Locals(SessionKey, session)
 			ctx.Locals(CompanyCodeKey, companyCode)
 			ctx.Locals(Company, company)
 

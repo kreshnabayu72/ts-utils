@@ -19,15 +19,30 @@ func (m *MockNotificationSQLHelper) SendNotificationToTransactionRolesSQL(
 	transactionType []util_fixedasset_new_model.TransactionRoleAttribute,
 	roleType []util_fixedasset_new_model.TransactionRoleType,
 	notificationDataWithoutUser util_fixedasset_new_model.Notification,
+	approvalLevel ...int,
 ) *entity.HttpError {
-	args := m.Mock.Called(
-		serviceProvider,
-		companyCode,
-		groupIdFilter,
-		transactionType,
-		roleType,
-		notificationDataWithoutUser,
-	)
+	var args mock.Arguments
+
+	if len(approvalLevel) > 0 {
+		args = m.Mock.Called(
+			serviceProvider,
+			companyCode,
+			groupIdFilter,
+			transactionType,
+			roleType,
+			notificationDataWithoutUser,
+			approvalLevel,
+		)
+	} else {
+		args = m.Mock.Called(
+			serviceProvider,
+			companyCode,
+			groupIdFilter,
+			transactionType,
+			roleType,
+			notificationDataWithoutUser,
+		)
+	}
 	return args.Get(0).(*entity.HttpError)
 }
 

@@ -43,4 +43,20 @@ func (m *DisposalRequestHistory) TableName() string {
 func (m *DisposalRequestHistory) Up(builder *migration.MigrationBuilder) {
 	// Add all columns from the struct
 	builder.AddColumn(m)
+
+	// Add foreign key constraints as defined in the SQL migration file
+	builder.AddForeignKey(
+		"fk_disposal_request_asset",
+		"asset",
+		"assets",
+		"id",
+		"",
+	)
+	builder.AddForeignKey(
+		"fk_disposal_request_transaction",
+		"transaction_id",
+		"disposal_transactions",
+		"id",
+		"",
+	)
 }

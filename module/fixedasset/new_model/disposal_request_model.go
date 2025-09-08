@@ -35,14 +35,14 @@ func (m *DisposalRequest) Up(builder *migration.MigrationBuilder) {
 	// Add foreign key constraints as defined in the SQL migration file
 	builder.AddForeignKey(
 		"fk_disposal_request_asset",
-		"asset_id",
+		"asset",
 		"assets",
 		"id",
 		"",
 	)
 	builder.AddForeignKey(
 		"fk_disposal_request_transaction",
-		"transaction_id",
+		"transaction",
 		"disposal_transactions",
 		"id",
 		"",

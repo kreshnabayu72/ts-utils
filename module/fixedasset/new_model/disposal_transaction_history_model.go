@@ -36,4 +36,30 @@ func (m *DisposalTransactionHistory) TableName() string {
 func (m *DisposalTransactionHistory) Up(builder *migration.MigrationBuilder) {
 	// Add all columns from the struct
 	builder.AddColumn(m)
+
+	// Add foreign key constraints as defined in the SQL migration file
+	builder.AddForeignKey(
+		"fk_disposal_transaction_manager",
+		"manager_id",
+		"users",
+		"id",
+		"",
+	)
+	builder.AddForeignKey(
+		"fk_disposal_transaction_origin_group",
+		"origin_group_id",
+		"groups",
+		"id",
+		"",
+	)
+	builder.AddForeignKey(
+		"fk_disposal_transaction_destination_group",
+		"destination_group_id",
+		"groups",
+		"id",
+		"",
+	)
+
+	// Add the unique index for transaction_id
+	builder.AddIndex("disposal_transactions_transaction_id", "transaction_id", true, "")
 }

@@ -38,6 +38,7 @@ type User struct {
 	ModifiedByFirstName    string     `json:"modifiedByFirstName"    column:"users.modified_by_first_name"    sql:"VARCHAR NOT NULL"`
 	ModifiedByLastName     string     `json:"modifiedByLastName"     column:"users.modified_by_last_name"     sql:"VARCHAR NOT NULL"`
 	ModifiedByFullName     string     `json:"modifiedByFullName"     column:"users.modified_by_full_name"     sql:"VARCHAR NOT NULL GENERATED ALWAYS AS (modified_by_first_name || ' ' || modified_by_last_name) STORED"`
+	HasModuleAccess        bool       `json:"hasModuleAccess"        column:"users.has_module_access"         sql:"BOOLEAN NOT NULL DEFAULT FALSE"` //For showing/hiding user that doesnt have fixed asset access from global settings
 	IsDeleted              bool       `json:"isDeleted"              column:"users.is_deleted"                sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
 	DeleteFromDatabaseAt   *time.Time `json:"deleteFromDatabaseAt"   column:"users.deleted_at"                sql:"TIMESTAMPTZ NULL"`
 	CreatedAt              time.Time  `json:"createdAt"              column:"users.created_at"                sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`

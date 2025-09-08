@@ -70,7 +70,6 @@ func (m *GroupQuota) Up(builder *migration.MigrationBuilder) {
 	builder.AddColumn(m)
 
 	builder.AddIndex("group_quotas_primary_key", "group_id,type", true, "")
-
 }
 
 type GroupApprovalType struct {

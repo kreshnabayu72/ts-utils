@@ -92,3 +92,29 @@ type Company struct {
 	CreatedAt                 time.Time          `json:"createdAt"                 bson:"createdAt"`
 	UpdatedAt                 time.Time          `json:"updatedAt"                 bson:"updatedAt"`
 }
+
+type AssetNameAttribute struct {
+	ID               primitive.ObjectID `bson:"_id,omitempty"    json:"_id,omitempty"`
+	Name             string             `bson:"name"             json:"name"`
+	NameWithSequence string             `bson:"nameWithSequence" json:"nameWithSequence"`
+	Sequence         int                `bson:"sequence"    json:"sequence"`
+	Key              int                `bson:"key,omitempty"    json:"key,omitempty"`
+}
+
+type GroupAttribute struct {
+	ID   primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
+	Name string             `bson:"name"          json:"name"`
+	Key  int                `bson:"key,omitempty" json:"key,omitempty"`
+}
+
+type AssetNameAttributeSql struct {
+	ID               string `bson:"_id,omitempty"    json:"_id,omitempty"`
+	Name             string `bson:"name"             json:"name"`
+	NameWithSequence string `bson:"nameWithSequence" json:"nameWithSequence"`
+	Sequence         int    `bson:"sequence"    json:"sequence"`
+}
+
+type GroupAttributeSql struct {
+	ID   primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
+	Name string             `bson:"name"          json:"name"`
+}

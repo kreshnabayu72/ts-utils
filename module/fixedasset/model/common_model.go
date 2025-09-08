@@ -149,6 +149,15 @@ const (
 	TagTypeRFIDQR TagType = "RFID & QR"
 )
 
+type TagTransactionHistoryType string
+
+const (
+	TagTransactionHistoryTypePairTAG    = PlanTypes("Pair TAG")
+	TagTransactionHistoryTypeReplaceTAG = PlanTypes("Replace TAG")
+	TagTransactionHistoryTypeChangeTAG  = PlanTypes("Change TAG")
+	TagTransactionHistoryTypeReportTAG  = PlanTypes("Report TAG")
+)
+
 // TransactionManageType represents the transaction role's manage type
 type TransactionManageType string
 

@@ -80,6 +80,7 @@ const (
 	SessionLogModelName                       = "session_logs"
 	SigninTokenModelName                      = "signin_tokens"
 	TagEventLogsModelName                     = "tag_event_logs"
+	TagTransactionHistoryModelName            = "tag_transaction_history"
 	TrackingApprovalModelName                 = "tracking_approvals"
 	TrackingModelName                         = "tracking"
 	TransactionLogModelName                   = "transaction_logs"

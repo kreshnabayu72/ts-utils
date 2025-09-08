@@ -33,4 +33,14 @@ func (m *MissingReportHistory) TableName() string {
 
 func (m *MissingReportHistory) Up(builder *migration.MigrationBuilder) {
 	builder.AddColumn(m)
+
+	// Add foreign key constraints as defined in the SQL migration file
+	builder.AddForeignKey(
+		"fk_missing_history_asset",
+		"asset",
+		"assets",
+		"id",
+		"",
+	)
+
 }

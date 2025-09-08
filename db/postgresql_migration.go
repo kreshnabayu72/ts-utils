@@ -171,6 +171,7 @@ func migrateFixedAssetDB(dbName string, migrator *migration.Migrator) error {
 		&fixedasset_model.AssignmentPrelist{},
 		&fixedasset_model.AssignmentPrelistRequest{},
 
+		&fixedasset_model.DisposalReport{},
 		&fixedasset_model.DisposalTransaction{},
 		&fixedasset_model.DisposalRequest{},
 		&fixedasset_model.DisposalApproval{},
@@ -192,6 +193,15 @@ func migrateFixedAssetDB(dbName string, migrator *migration.Migrator) error {
 		&fixedasset_model.RoutineTaskStaff{},
 		&fixedasset_model.RoutineTaskIndicator{},
 		&fixedasset_model.RoutineApproval{},
+
+		&fixedasset_model.AuditSchedule{},
+		&fixedasset_model.AuditScheduleCategories{},
+		&fixedasset_model.AuditTask{},
+		&fixedasset_model.AuditTaskAssets{},
+		&fixedasset_model.AuditTaskCategories{},
+		&fixedasset_model.AuditApproval{},
+		&fixedasset_model.AuditScheduledAsset{},
+		&fixedasset_model.AuditOtherTransactionAsset{},
 
 		&fixedasset_model.RepairTicketing{},
 		&fixedasset_model.RepairApproval{},

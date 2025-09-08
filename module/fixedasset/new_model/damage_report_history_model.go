@@ -33,4 +33,13 @@ func (d *DamageReportHistory) TableName() string {
 
 func (d *DamageReportHistory) Up(builder *migration.MigrationBuilder) {
 	builder.AddColumn(d)
+
+	// Add foreign key constraints as defined in the SQL migration file
+	builder.AddForeignKey(
+		"fk_damage_history_asset",
+		"asset",
+		"assets",
+		"id",
+		"",
+	)
 }

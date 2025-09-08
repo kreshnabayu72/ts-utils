@@ -11,6 +11,7 @@ type DisposalPrelistRequest struct {
 	ID        int       `json:"id"        column:"disposal_prelist_requests.id"         sql:"BIGINT PRIMARY KEY"`
 	AssetID   int       `json:"assetId"   column:"disposal_prelist_requests.asset_id"   sql:"BIGINT"`
 	PrelistID int       `json:"prelistId" column:"disposal_prelist_requests.prelist_id" sql:"BIGINT"`
+	Note      string    `json:"note"      column:"disposal_prelist_requests.note"       sql:"VARCHAR"`
 	CreatedAt time.Time `json:"createdAt" column:"disposal_prelist_requests.created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 	UpdatedAt time.Time `json:"updatedAt" column:"disposal_prelist_requests.updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }

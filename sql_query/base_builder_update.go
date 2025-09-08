@@ -9,6 +9,11 @@ import (
 	"time"
 )
 
+type UpdateRawSQL struct {
+	Expr string
+	Args []interface{}
+}
+
 // type string struct {
 // 	Key       string
 // 	Operator  SQLOperators // e.g., '=', '>', '<=', 'LIKE', 'IN', 'IS NULL'
@@ -49,8 +54,39 @@ type UpdateCases interface {
 // To ensure SQLUpdateBuilder has its own initial methods
 // e.g. UpdateBuilder(...).Update()...Rest
 type SQLUpdateInitBuilder interface {
-	// Update builds an UPDATE query for a single struct using reflection.
-	// Automatically sets updated_at = NOW() if not provided.
+	// Update builds an UPDATE query for a single struct or map using reflection.
+	//
+	// It supports two value types:
+	//   • Normal values (int, string, time.Time, etc.): converted into positional parameters ($1, $2, …).
+	//   • Raw SQL expressions: allows embedding expressions with placeholders ("?")
+	//     which will be replaced with proper PostgreSQL-style parameters ($1, $2, …).
+	//
+	// Example using struct:
+	//
+	//     type GroupQuota struct {
+	//         Used int `column:"used"`
+	//         Available sql_query.UpdateRawSQL `column:"available"`
+	//     }
+	//
+	//     builder.Update(GroupQuota{
+	//         Used: 5,
+	//         Available: sql_query.UpdateRawSQL{
+	//             Expr: "CASE WHEN available IS NULL THEN NULL ELSE available - ? END",
+	//             Args: []any{5},
+	//         },
+	//     })
+	//
+	// Example using map:
+	//
+	//     builder.Update(map[string]any{
+	//         "used": 5,
+	//         "available": sql_query.UpdateRawSQL{
+	//             Expr: "CASE WHEN available IS NULL THEN NULL ELSE available - ? END",
+	//             Args: []any{5},
+	//         },
+	//     })
+	//
+	// By default, it will automatically add `updated_at = NOW()` if not explicitly provided.
 	Update(values interface{}) SQLUpdateChainBuilder
 	// UpdateEach updates multiple rows at once using VALUES() with a slice of structs.
 	// Matches rows using the given rowIdentifier (e.g., "id").
@@ -424,7 +460,7 @@ func (s *SQLEloquentQuery) buildUpdateQuery() (string, []interface{}, error) {
 	if len(s.Columns) > 0 {
 		query += " RETURNING " + strings.Join(s.Columns, ",")
 	} else {
-		query += " RETURNING id::text"
+		query += " RETURNING id"
 	}
 
 	return query, s.Args, nil
@@ -523,7 +559,7 @@ func (s *UpdateBuilder) extractUpdateFieldsStruct(v reflect.Value) ([]string, bo
 		}
 
 		// Recurse into nested structs (excluding time.Time)
-		if val.Kind() == reflect.Struct && field.Type != reflect.TypeOf(time.Time{}) {
+		if val.Kind() == reflect.Struct && field.Type != reflect.TypeOf(time.Time{}) && field.Type != reflect.TypeOf(UpdateRawSQL{}) {
 			childClauses, childHasUpdated := s.extractUpdateFieldsStruct(val)
 			setClauses = append(setClauses, childClauses...)
 			if childHasUpdated {
@@ -544,8 +580,21 @@ func (s *UpdateBuilder) extractUpdateFieldsStruct(v reflect.Value) ([]string, bo
 			continue
 		}
 
-		setClauses = append(setClauses, fmt.Sprintf(`"%s" = $%d`, col, len(s.Args)+1))
-		s.Args = append(s.Args, val.Interface())
+		fieldVal := val.Interface()
+
+		switch v := fieldVal.(type) {
+		case UpdateRawSQL:
+			expr := v.Expr
+			for _, arg := range v.Args {
+				expr = strings.Replace(expr, "?", fmt.Sprintf("$%d", len(s.Args)+1), 1)
+				s.Args = append(s.Args, arg)
+			}
+			setClauses = append(setClauses, fmt.Sprintf(`"%s" = %s`, col, expr))
+
+		default:
+			setClauses = append(setClauses, fmt.Sprintf(`"%s" = $%d`, col, len(s.Args)+1))
+			s.Args = append(s.Args, fieldVal)
+		}
 
 		if col == "updated_at" {
 			hasUpdatedAt = true
@@ -567,7 +616,7 @@ func (s *UpdateBuilder) extractUpdateFieldsMap(v map[string]any) ([]string, bool
 
 		v := reflect.ValueOf(value)
 		// if value is a struct, recurse into it
-		if v.Kind() == reflect.Struct && v.Type() != reflect.TypeOf(time.Time{}) {
+		if v.Kind() == reflect.Struct && v.Type() != reflect.TypeOf(time.Time{}) && v.Type() != reflect.TypeOf(UpdateRawSQL{}) {
 			childClauses, childHasUpdated := s.extractUpdateFieldsStruct(v)
 			setClauses = append(setClauses, childClauses...)
 			if childHasUpdated {
@@ -591,8 +640,22 @@ func (s *UpdateBuilder) extractUpdateFieldsMap(v map[string]any) ([]string, bool
 		if col == "updated_at" {
 			hasUpdatedAt = true
 		}
-		setClauses = append(setClauses, fmt.Sprintf(`"%s" = $%d`, col, len(s.Args)+1))
-		s.Args = append(s.Args, value)
+
+		switch v := value.(type) {
+		case UpdateRawSQL:
+			fmt.Println("v := value.(type) UpdateRawSQL", v)
+			expr := v.Expr
+
+			// replace ? with correct $n placeholders
+			for _, arg := range v.Args {
+				expr = strings.Replace(expr, "?", fmt.Sprintf("$%d", len(s.Args)+1), 1)
+				s.Args = append(s.Args, arg)
+			}
+			setClauses = append(setClauses, fmt.Sprintf(`"%s" = %s`, col, expr))
+		default:
+			setClauses = append(setClauses, fmt.Sprintf(`"%s" = $%d`, col, len(s.Args)+1))
+			s.Args = append(s.Args, v)
+		}
 	}
 
 	return setClauses, hasUpdatedAt

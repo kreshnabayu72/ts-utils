@@ -29,7 +29,7 @@ func (d *DamageReport) Up(builder *migration.MigrationBuilder) {
 
 	builder.AddForeignKey(
 		"fk_damage_reports_asset_id",
-		"asset_id",
+		"asset",
 		"assets",
 		"id",
 		"CASCADE",

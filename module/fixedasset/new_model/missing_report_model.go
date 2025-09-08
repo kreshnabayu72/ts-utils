@@ -28,7 +28,7 @@ func (m *MissingReport) Up(builder *migration.MigrationBuilder) {
 
 	builder.AddForeignKey(
 		"fk_missing_reports_asset_id",
-		"asset_id",
+		"asset",
 		"assets",
 		"id",
 		"CASCADE",

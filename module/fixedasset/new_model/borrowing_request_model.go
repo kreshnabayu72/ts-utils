@@ -13,6 +13,7 @@ type BorrowingRequest struct {
 	ApprovalRound    int                    `json:"approval_round"   column:"borrowing_requests.approval_round"     sql:"INTEGER DEFAULT 1"`
 	ParentID         *int                   `json:"parentId"         column:"borrowing_requests.parent_id"          sql:"BIGINT"`
 	Status           BorrowingRequestStatus `json:"status"           column:"borrowing_requests.status"             sql:"borrowing_request_status_enum"`
+	PreviousStatus   BorrowingRequestStatus `json:"previousStatus"   column:"borrowing_requests.previous_status"    sql:"borrowing_request_status_enum NULL DEFAULT NULL"`
 	IsVerified       bool                   `json:"isVerified"       column:"borrowing_requests.is_verified"        sql:"BOOLEAN"`
 	Notes            string                 `json:"notes"            column:"borrowing_requests.notes"              sql:"VARCHAR"`
 	ActualReturnDate *time.Time             `json:"actualReturnDate" column:"borrowing_requests.actual_return_date" sql:"TIMESTAMPTZ DEFAULT NULL"`
@@ -30,7 +31,7 @@ func (m *BorrowingRequest) Up(builder *migration.MigrationBuilder) {
 
 	builder.AddForeignKey(
 		"fk_borrowing_request_asset",
-		"asset_id",
+		"asset",
 		"assets",
 		"id",
 		"",
@@ -38,7 +39,7 @@ func (m *BorrowingRequest) Up(builder *migration.MigrationBuilder) {
 
 	builder.AddForeignKey(
 		"fk_borrowing_request_transaction",
-		"transaction_id",
+		"transaction",
 		"borrowing_transactions",
 		"id",
 		"",
