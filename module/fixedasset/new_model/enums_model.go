@@ -615,19 +615,20 @@ const (
 type AssignmentRequestStatus string
 
 const (
-	AssignmentRequestStatusWaitingForApproval AssignmentRequestStatus = "Waiting for Approval"
-	AssignmentRequestStatusWaitingForHandover AssignmentRequestStatus = "Waiting for Handover"
-	AssignmentRequestStatusAssigned           AssignmentRequestStatus = "Assigned"
-	AssignmentRequestStatusCanceled           AssignmentRequestStatus = "Canceled"
-	AssignmentRequestStatusUnassigned         AssignmentRequestStatus = "Unassigned"
-	AssignmentRequestStatusApproved           AssignmentRequestStatus = "Approved"
-	AssignmentRequestStatusRejected           AssignmentRequestStatus = "Rejected"
-	AssignmentRequestStatusDamaged            AssignmentRequestStatus = "Reported Damaged"
-	AssignmentRequestStatusMissing            AssignmentRequestStatus = "Reported Missing"
-	AssignmentRequestStatusReportedDisposal   AssignmentRequestStatus = "Reported Disposal"
-	AssignmentRequestStatusOnDisposalProcess  AssignmentRequestStatus = "On Disposal Process"
-	AssignmentRequestStatusDisposed           AssignmentRequestStatus = "Disposed"
-	AssignmentRequestStatusTAGReported        AssignmentRequestStatus = "TAG Reported"
+	AssignmentRequestStatusWaitingForApproval     AssignmentRequestStatus = "Waiting for Approval"
+	AssignmentRequestStatusWaitingForHandover     AssignmentRequestStatus = "Waiting for Handover"
+	AssignmentRequestStatusWaitingForConfirmation AssignmentRequestStatus = "Waiting for Confirmation"
+	AssignmentRequestStatusAssigned               AssignmentRequestStatus = "Assigned"
+	AssignmentRequestStatusCanceled               AssignmentRequestStatus = "Canceled"
+	AssignmentRequestStatusUnassigned             AssignmentRequestStatus = "Unassigned"
+	AssignmentRequestStatusApproved               AssignmentRequestStatus = "Approved"
+	AssignmentRequestStatusRejected               AssignmentRequestStatus = "Rejected"
+	AssignmentRequestStatusDamaged                AssignmentRequestStatus = "Reported Damaged"
+	AssignmentRequestStatusMissing                AssignmentRequestStatus = "Reported Missing"
+	AssignmentRequestStatusReportedDisposal       AssignmentRequestStatus = "Reported Disposal"
+	AssignmentRequestStatusOnDisposalProcess      AssignmentRequestStatus = "On Disposal Process"
+	AssignmentRequestStatusDisposed               AssignmentRequestStatus = "Disposed"
+	AssignmentRequestStatusTAGReported            AssignmentRequestStatus = "TAG Reported"
 )
 
 type BorrowingTransactionStatus string
@@ -646,19 +647,20 @@ const (
 type BorrowingRequestStatus string
 
 const (
-	BorrowingRequestStatusWaitingForApproval BorrowingRequestStatus = "Waiting for Approval"
-	BorrowingRequestStatusWaitingForHandover BorrowingRequestStatus = "Waiting for Handover"
-	BorrowingRequestStatusBorrowed           BorrowingRequestStatus = "Borrowed"
-	BorrowingRequestStatusCanceled           BorrowingRequestStatus = "Canceled"
-	BorrowingRequestStatusReturned           BorrowingRequestStatus = "Returned"
-	BorrowingRequestStatusApproved           BorrowingRequestStatus = "Approved"
-	BorrowingRequestStatusRejected           BorrowingRequestStatus = "Rejected"
-	BorrowingRequestStatusDamaged            BorrowingRequestStatus = "Reported Damaged"
-	BorrowingRequestStatusMissing            BorrowingRequestStatus = "Reported Missing"
-	BorrowingRequestStatusReportedDisposal   BorrowingRequestStatus = "Reported Disposal"
-	BorrowingRequestStatusOnDisposalProcess  BorrowingRequestStatus = "On Disposal Process"
-	BorrowingRequestStatusDisposed           BorrowingRequestStatus = "Disposed"
-	BorrowingRequestStatusTAGReported        BorrowingRequestStatus = "TAG Reported"
+	BorrowingRequestStatusWaitingForApproval     BorrowingRequestStatus = "Waiting for Approval"
+	BorrowingRequestStatusWaitingForHandover     BorrowingRequestStatus = "Waiting for Handover"
+	BorrowingRequestStatusWaitingForConfirmation BorrowingRequestStatus = "Waiting for Confirmation"
+	BorrowingRequestStatusBorrowed               BorrowingRequestStatus = "Borrowed"
+	BorrowingRequestStatusCanceled               BorrowingRequestStatus = "Canceled"
+	BorrowingRequestStatusReturned               BorrowingRequestStatus = "Returned"
+	BorrowingRequestStatusApproved               BorrowingRequestStatus = "Approved"
+	BorrowingRequestStatusRejected               BorrowingRequestStatus = "Rejected"
+	BorrowingRequestStatusDamaged                BorrowingRequestStatus = "Reported Damaged"
+	BorrowingRequestStatusMissing                BorrowingRequestStatus = "Reported Missing"
+	BorrowingRequestStatusReportedDisposal       BorrowingRequestStatus = "Reported Disposal"
+	BorrowingRequestStatusOnDisposalProcess      BorrowingRequestStatus = "On Disposal Process"
+	BorrowingRequestStatusDisposed               BorrowingRequestStatus = "Disposed"
+	BorrowingRequestStatusTAGReported            BorrowingRequestStatus = "TAG Reported"
 )
 
 type ApprovalStatus string
