@@ -120,7 +120,7 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationToTransactionRolesSQL(
 
 	builder := sql_query.NewSQLSelectBuilder[any](db.UserTransactionRoleTableName, "utr").
 		Select("utr.user_id").
-		Join("groups g", "g.ancestor_id = utr.group_id").
+		Join("groups g", "g.ancestor_id = utr.group_id OR g.id = utr.group_id").
 		Where(map[string]sql_query.SQLCondition{
 			"is_active":      {Operator: sql_query.SQLOperatorEqual, Value: true},
 			"role_type":      {Operator: sql_query.SQLOperatorIn, Value: roleType},
