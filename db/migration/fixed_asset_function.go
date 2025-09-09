@@ -66,12 +66,13 @@ BEGIN
 
     IF parent_id IS NOT DISTINCT FROM parent THEN
       current_id := (node ->> '_id')::text;
-      children   := build_group_tree_with_role(current_id, nodes);
+      children   := build_group_tree(current_id, nodes);
 
       result := result || jsonb_build_object(
         '_id',                      current_id,
         'name',                     node ->> 'name',
         'key',                      node -> 'key',
+        'code',                     node -> 'code',
         'children',                 children,
         'is_deleted',               (node -> 'is_deleted')::boolean,
         'hasSystemRoles',           node -> 'hasSystemRoles',
