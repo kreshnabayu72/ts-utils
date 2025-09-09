@@ -37,4 +37,5 @@ func (m *BrandCategory) Up(builder *migration.MigrationBuilder) {
 		"id",
 		"CASCADE",
 	)
+
 }

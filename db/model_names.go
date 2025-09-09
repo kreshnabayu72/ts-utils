@@ -12,7 +12,7 @@ const (
 	AttachmentModelName                       = "attachments"
 	AuditAssetModelName                       = "audit_asset"
 	AuditScheduleModelName                    = "audit_schedule"
-	AuditScheduledAssetModelName              = "audit_scheduled_asset"
+	AuditScheduledAssetModelName              = "audit_scheduled_assets"
 	AuditTaskModelName                        = "audit_tasks"
 	BatchNumberModelName                      = "batch_numbers"
 	BrandModelName                            = "brands"
