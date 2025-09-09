@@ -340,7 +340,6 @@ func (s *BasePostgreSqlService) CountWithFilter(
 	filter map[string]sql_query.SQLCondition,
 ) (int, error) {
 	queryString, args := common_builders.CountBuilder(tableName, filter)
-	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	return s.Count(ctx, queryString, args...)
 }
@@ -447,7 +446,6 @@ func (s *BasePostgreSqlService) InsertOneWithData(
 		returnColumn = append(returnColumn, returnOption[0].Column...)
 	}
 	queryString, args := common_builders.InsertBuilder(tableName, body, returnColumn...)
-	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	if len(returnOption) > 0 && returnOption[0].Destination != nil {
 		return nil, s.SelectOne(returnOption[0].Destination, ctx, queryString, args...)
@@ -490,7 +488,6 @@ func (s *BasePostgreSqlService) InsertManyWithData(
 		returnColumn = append(returnColumn, returnOption[0].Column...)
 	}
 	queryString, args := common_builders.InsertBuilder(tableName, body, returnColumn...)
-	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	if len(returnOption) > 0 && returnOption[0].Destination != nil {
 		err := s.SelectMany(returnOption[0].Destination, ctx, queryString, args...)
@@ -600,7 +597,6 @@ func (s *BasePostgreSqlService) UpdateOneWithData(
 		body,
 		returnColumn...,
 	)
-	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	if len(returnOption) > 0 && returnOption[0].Destination != nil {
 		return nil, s.SelectOne(returnOption[0].Destination, ctx, queryString, args...)
@@ -648,7 +644,6 @@ func (s *BasePostgreSqlService) UpdateManyWithData(
 		body,
 		returnColumn...,
 	)
-	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	if len(returnOption) > 0 && returnOption[0].Destination != nil {
 		err := s.SelectMany(returnOption[0].Destination, ctx, queryString, args...)
@@ -671,7 +666,6 @@ func (s *BasePostgreSqlService) UpdateEachWithData(
 		query,
 		body,
 	)
-	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	return s.UpdateMany(ctx, queryString, args...)
 }
@@ -758,7 +752,6 @@ func (s *BasePostgreSqlService) DeleteOneWithFilter(
 	filter map[string]sql_query.SQLCondition,
 ) (interface{}, error) {
 	queryString, args := common_builders.DeleteBuilder(tableName, filter)
-	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	return s.DeleteOne(ctx, queryString, args...)
 }
@@ -792,7 +785,6 @@ func (s *BasePostgreSqlService) DeleteManyWithFilter(
 	filter map[string]sql_query.SQLCondition,
 ) (int64, error) {
 	queryString, args := common_builders.DeleteBuilder(tableName, filter)
-	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	return s.DeleteMany(ctx, queryString, args...)
 }
