@@ -3,21 +3,29 @@ package sql_query
 import (
 	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
 func InterpolateQuery(query string, args ...any) string {
-	// Regex to find $1, $2, ...
-	re := regexp.MustCompile(`\$\d+`)
+	re := regexp.MustCompile(`\$(\d+)`)
 
-	i := 0
-	result := re.ReplaceAllStringFunc(query, func(_ string) string {
-		if i >= len(args) {
+	result := re.ReplaceAllStringFunc(query, func(match string) string {
+		// Extract the number from the matched placeholder
+		indexStr := re.FindStringSubmatch(match)[1]
+		index, err := strconv.Atoi(indexStr)
+		if err != nil {
+			// Handle error if placeholder isn't a valid number
+			return "NULL"
+		}
+
+		// Adjust for 0-based index
+		i := index - 1
+		if i < 0 || i >= len(args) {
 			return "NULL" // safety fallback
 		}
-		arg := args[i]
-		i++
 
+		arg := args[i]
 		switch v := arg.(type) {
 		case string:
 			// wrap strings in quotes, escape single quotes
