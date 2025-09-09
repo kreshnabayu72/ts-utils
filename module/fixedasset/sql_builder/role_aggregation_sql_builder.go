@@ -285,7 +285,7 @@ func TransactionRolePermissionAggregation(
 	builder.Join("groups gp", "gp.id = "+groupColumn)
 	joinCteKeyword(
 		"user_transaction_roles_cte utr",
-		"utr.group_id = gp.ancestor_id",
+		"utr.group_id = gp.ancestor_id OR utr.group_id = gp.id",
 	)
 }
 
@@ -937,7 +937,7 @@ func RolePermissionAggregation(
 	builder.Join("groups gp", "gp.id = "+groupColumn)
 	builder.LeftJoin(
 		"user_transaction_roles_cte utr",
-		"utr.group_id = gp.ancestor_id",
+		"utr.group_id = gp.ancestor_id OR utr.group_id = gp.id",
 	)
 
 	systemRolesBuilder := systemRoleCTEBuilder(loggedInUserId)
@@ -1053,7 +1053,7 @@ func FindUserTransactionRoles[T any](
 	var err error
 
 	transactionRoleBuilder := sql_query.NewSQLSelectBuilder[T]("user_transaction_roles", "utr")
-	transactionRoleBuilder.LeftJoin("groups gp", "gp.ancestor_id = utr.group_id")
+	transactionRoleBuilder.LeftJoin("groups gp", "gp.ancestor_id = utr.group_id OR gp.id = utr.group_id")
 
 	filter := map[string]sql_query.SQLCondition{
 		"utr.user_id": {
@@ -1150,7 +1150,8 @@ func TransactionRoleMultipleGroupAggregation(
 		if len(hideField) > 0 && !hideField[0] {
 			builder.SelectBoolOr(
 				fmt.Sprintf(
-					"utr.group_id = gp%d.ancestor_id AND utr.role_type = $%d",
+					"(utr.group_id = gp%d.ancestor_id OR utr.group_id = gp%d.id) AND utr.role_type = $%d",
+					idx,
 					idx,
 					builder.GetCurrentArgIndex()+1,
 				),
@@ -1159,7 +1160,8 @@ func TransactionRoleMultipleGroupAggregation(
 			)
 			builder.SelectBoolOr(
 				fmt.Sprintf(
-					"utr.group_id = gp%d.ancestor_id AND utr.role_type = $%d",
+					"(utr.group_id = gp%d.ancestor_id OR utr.group_id = gp%d.id) AND utr.role_type = $%d",
+					idx,
 					idx,
 					builder.GetCurrentArgIndex()+1,
 				),
@@ -1168,7 +1170,8 @@ func TransactionRoleMultipleGroupAggregation(
 			)
 			builder.SelectBoolOr(
 				fmt.Sprintf(
-					"utr.group_id = gp%d.ancestor_id AND utr.role_type = $%d",
+					"(utr.group_id = gp%d.ancestor_id OR utr.group_id = gp%d.id) AND utr.role_type = $%d",
+					idx,
 					idx,
 					builder.GetCurrentArgIndex()+1,
 				),
@@ -1309,7 +1312,7 @@ func TransactionRoleMultiPermissionAggregation(
 	builder.Join("groups gp", "gp.id = "+groupColumn)
 	builder.LeftJoin(
 		"user_transaction_roles_cte utr",
-		"utr.group_id = gp.ancestor_id",
+		"utr.group_id = gp.ancestor_id OR utr.group_id = gp.id",
 	)
 }
 

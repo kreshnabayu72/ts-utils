@@ -256,7 +256,7 @@ func CheckTransactionRoleMultiGroupPermissionsSQL(
 	query, args, _ := builder.
 		Select(tableName+".id", "utr.id as \"userTransactionRoleId\"").
 		Join("groups g", "g.id = "+groupIdField).
-		LeftJoin(fmt.Sprintf("%s as utr", db.UserTransactionRoleTableName), "g.ancestor_id = utr.group_id", filter).
+		LeftJoin(fmt.Sprintf("%s as utr", db.UserTransactionRoleTableName), "g.ancestor_id = utr.group_id OR g.id = utr.group_id", filter).
 		Where(dataFilter).
 		Build()
 
@@ -330,7 +330,7 @@ func CheckTransactionRolePermissionSQL(
 	}
 
 	query, args, _ := sql_query.NewSQLCountBuilder(db.UserTransactionRoleTableName).
-		Join("groups g", "group_id = g.ancestor_id").
+		Join("groups g", "group_id = g.ancestor_id or group_id = g.id").
 		Where(filter).
 		Build()
 
@@ -421,7 +421,7 @@ func GetTopLevelTransactionRoles[T any](
 	roleType new_model.TransactionRoleType,
 ) (*[]T, error) {
 	query, args, _ := sql_query.NewSQLSelectBuilder[T](db.UserTransactionRoleTableName, "utr").
-		Join(db.GroupTableName+" g", "utr.group_id = g.ancestor_id").
+		Join(db.GroupTableName+" g", "utr.group_id = g.ancestor_id OR utr.group_id = g.id").
 		Where(map[string]sql_query.SQLCondition{
 			"utr.role_type":      {Operator: sql_query.SQLOperatorEqual, Value: roleType},
 			"utr.role_attribute": {Operator: sql_query.SQLOperatorEqual, Value: roleAttribute},
