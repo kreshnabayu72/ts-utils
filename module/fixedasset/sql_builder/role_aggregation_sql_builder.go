@@ -1184,7 +1184,7 @@ func TransactionRoleMultipleGroupAggregation(
 
 // transactionRoleMultiPermissionAggregationCTE builds a Common Table Expression (CTE)
 // that aggregates all relevant transaction permissions for a given user across multiple
-// transaction types (Borrowing, Transfer, Disposal).
+// transaction types (Borrowing, Transfer, Disposal, Audit, Maintenance, Repair).
 //
 // This internal helper creates a subquery that selects the user's active 'Manager' and
 // 'Monitoring' roles, then uses `BOOL_OR` to produce boolean columns for each role-transaction
@@ -1216,6 +1216,9 @@ func transactionRoleMultiPermissionAggregationCTE(
 					fixedasset_new_model.TransactionRoleAttributeBorrowing,
 					fixedasset_new_model.TransactionRoleAttributeTransfer,
 					fixedasset_new_model.TransactionRoleAttributeDisposal,
+					fixedasset_new_model.TransactionRoleAttributeAudit,
+					fixedasset_new_model.TransactionRoleAttributeMaintenance,
+					fixedasset_new_model.TransactionRoleAttributeRepair,
 				},
 			},
 		})
@@ -1238,34 +1241,79 @@ func transactionRoleMultiPermissionAggregationCTE(
 			builder.GetCurrentArgIndex()+6,
 		),
 		fmt.Sprintf(
-			`BOOL_OR(utr.role_type = $%d AND utr.role_attribute = $%d) AS "monitoring_borrowing"`,
+			`BOOL_OR(utr.role_type = $%d AND utr.role_attribute = $%d) AS "manager_audit"`,
 			builder.GetCurrentArgIndex()+7,
 			builder.GetCurrentArgIndex()+8,
 		),
 		fmt.Sprintf(
-			`BOOL_OR(utr.role_type = $%d AND utr.role_attribute = $%d) AS "monitoring_transfer"`,
+			`BOOL_OR(utr.role_type = $%d AND utr.role_attribute = $%d) AS "manager_maintenance"`,
 			builder.GetCurrentArgIndex()+9,
 			builder.GetCurrentArgIndex()+10,
 		),
 		fmt.Sprintf(
-			`BOOL_OR(utr.role_type = $%d AND utr.role_attribute = $%d) AS "monitoring_disposal"`,
+			`BOOL_OR(utr.role_type = $%d AND utr.role_attribute = $%d) AS "manager_repair"`,
 			builder.GetCurrentArgIndex()+11,
 			builder.GetCurrentArgIndex()+12,
 		),
 		fmt.Sprintf(
-			`BOOL_OR(utr.role_type = $%d AND utr.role_attribute = $%d) AS "approval_borrowing"`,
+			`BOOL_OR(utr.role_type = $%d AND utr.role_attribute = $%d) AS "monitoring_borrowing"`,
 			builder.GetCurrentArgIndex()+13,
 			builder.GetCurrentArgIndex()+14,
 		),
 		fmt.Sprintf(
-			`BOOL_OR(utr.role_type = $%d AND utr.role_attribute = $%d) AS "approval_transfer"`,
+			`BOOL_OR(utr.role_type = $%d AND utr.role_attribute = $%d) AS "monitoring_transfer"`,
 			builder.GetCurrentArgIndex()+15,
 			builder.GetCurrentArgIndex()+16,
 		),
 		fmt.Sprintf(
-			`BOOL_OR(utr.role_type = $%d AND utr.role_attribute = $%d) AS "approval_disposal"`,
+			`BOOL_OR(utr.role_type = $%d AND utr.role_attribute = $%d) AS "monitoring_disposal"`,
 			builder.GetCurrentArgIndex()+17,
 			builder.GetCurrentArgIndex()+18,
+		),
+		fmt.Sprintf(
+			`BOOL_OR(utr.role_type = $%d AND utr.role_attribute = $%d) AS "monitoring_audit"`,
+			builder.GetCurrentArgIndex()+19,
+			builder.GetCurrentArgIndex()+20,
+		),
+		fmt.Sprintf(
+			`BOOL_OR(utr.role_type = $%d AND utr.role_attribute = $%d) AS "monitoring_maintenance"`,
+			builder.GetCurrentArgIndex()+21,
+			builder.GetCurrentArgIndex()+22,
+		),
+		fmt.Sprintf(
+			`BOOL_OR(utr.role_type = $%d AND utr.role_attribute = $%d) AS "monitoring_repair"`,
+			builder.GetCurrentArgIndex()+23,
+			builder.GetCurrentArgIndex()+24,
+		),
+		fmt.Sprintf(
+			`BOOL_OR(utr.role_type = $%d AND utr.role_attribute = $%d) AS "approval_borrowing"`,
+			builder.GetCurrentArgIndex()+25,
+			builder.GetCurrentArgIndex()+26,
+		),
+		fmt.Sprintf(
+			`BOOL_OR(utr.role_type = $%d AND utr.role_attribute = $%d) AS "approval_transfer"`,
+			builder.GetCurrentArgIndex()+27,
+			builder.GetCurrentArgIndex()+28,
+		),
+		fmt.Sprintf(
+			`BOOL_OR(utr.role_type = $%d AND utr.role_attribute = $%d) AS "approval_disposal"`,
+			builder.GetCurrentArgIndex()+29,
+			builder.GetCurrentArgIndex()+30,
+		),
+		fmt.Sprintf(
+			`BOOL_OR(utr.role_type = $%d AND utr.role_attribute = $%d) AS "approval_audit"`,
+			builder.GetCurrentArgIndex()+31,
+			builder.GetCurrentArgIndex()+32,
+		),
+		fmt.Sprintf(
+			`BOOL_OR(utr.role_type = $%d AND utr.role_attribute = $%d) AS "approval_maintenance"`,
+			builder.GetCurrentArgIndex()+33,
+			builder.GetCurrentArgIndex()+34,
+		),
+		fmt.Sprintf(
+			`BOOL_OR(utr.role_type = $%d AND utr.role_attribute = $%d) AS "approval_repair"`,
+			builder.GetCurrentArgIndex()+35,
+			builder.GetCurrentArgIndex()+36,
 		),
 	)
 
@@ -1276,18 +1324,38 @@ func transactionRoleMultiPermissionAggregationCTE(
 		fixedasset_new_model.TransactionRoleAttributeTransfer,
 		fixedasset_new_model.TransactionRoleTypeManager,
 		fixedasset_new_model.TransactionRoleAttributeDisposal,
+		fixedasset_new_model.TransactionRoleTypeManager,
+		fixedasset_new_model.TransactionRoleAttributeAudit,
+		fixedasset_new_model.TransactionRoleTypeManager,
+		fixedasset_new_model.TransactionRoleAttributeMaintenance,
+		fixedasset_new_model.TransactionRoleTypeManager,
+		fixedasset_new_model.TransactionRoleAttributeRepair,
+
 		fixedasset_new_model.TransactionRoleTypeMonitoring,
 		fixedasset_new_model.TransactionRoleAttributeBorrowing,
 		fixedasset_new_model.TransactionRoleTypeMonitoring,
 		fixedasset_new_model.TransactionRoleAttributeTransfer,
 		fixedasset_new_model.TransactionRoleTypeMonitoring,
 		fixedasset_new_model.TransactionRoleAttributeDisposal,
+		fixedasset_new_model.TransactionRoleTypeMonitoring,
+		fixedasset_new_model.TransactionRoleAttributeAudit,
+		fixedasset_new_model.TransactionRoleTypeMonitoring,
+		fixedasset_new_model.TransactionRoleAttributeMaintenance,
+		fixedasset_new_model.TransactionRoleTypeMonitoring,
+		fixedasset_new_model.TransactionRoleAttributeRepair,
+
 		fixedasset_new_model.TransactionRoleTypeApproval,
 		fixedasset_new_model.TransactionRoleAttributeBorrowing,
 		fixedasset_new_model.TransactionRoleTypeApproval,
 		fixedasset_new_model.TransactionRoleAttributeTransfer,
 		fixedasset_new_model.TransactionRoleTypeApproval,
 		fixedasset_new_model.TransactionRoleAttributeDisposal,
+		fixedasset_new_model.TransactionRoleTypeApproval,
+		fixedasset_new_model.TransactionRoleAttributeAudit,
+		fixedasset_new_model.TransactionRoleTypeApproval,
+		fixedasset_new_model.TransactionRoleAttributeMaintenance,
+		fixedasset_new_model.TransactionRoleTypeApproval,
+		fixedasset_new_model.TransactionRoleAttributeRepair,
 	)
 
 	return builder.GroupBy("utr.group_id")
