@@ -19,10 +19,6 @@ func GenerateCTEOption(
 		labelValue = escapeQuoteColumns(labelValue)
 		snakeAliasName := CamelToSnake(aliasName)
 
-		orderString := fmt.Sprintf(`%s ASC`, labelKey)
-		if len(customSort) > 0 {
-			orderString = fmt.Sprintf(`%s %s`, customSort[0].SortBy, "ASC")
-		}
 		cteBuilder := sourceBuilder.
 			ClearSelects().
 			Distinct(
@@ -39,6 +35,11 @@ func GenerateCTEOption(
 			snakeAliasName,
 			fmt.Sprintf(`"%s"."id" = "%s"."id"`, snakeAliasName, refTable),
 		)
+
+		orderString := fmt.Sprintf(`"%s"."key" ASC`, snakeAliasName)
+		if len(customSort) > 0 {
+			orderString = fmt.Sprintf(`%s %s`, customSort[0].SortBy, "ASC")
+		}
 
 		mainBuilder.Select(
 			fmt.Sprintf(
