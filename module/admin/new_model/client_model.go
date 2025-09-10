@@ -46,8 +46,9 @@ type Client struct {
 	PlanProcurementAsset fixedasset_model.PlanTypes `json:"planProcurementAsset" column:"plan_procurement_asset" sql:"license_plan_enum DEFAULT 'Basic'"`
 
 	// ─────── Deprec Method ───────
-	DepreciationMethod        CompanyDepreciationMethod  `json:"depreciationMethod" column:"depreciation_method" sql:"depreciation_method_enum NOT NULL DEFAULT 'Straight-Line'"`
-	PendingDepreciationMethod *CompanyDepreciationMethod `json:"pendingDepreciationMethod" column:"pending_depreciation_method" sql:"depreciation_method_enum NULL DEFAULT NULL"`
+	DepreciationMethod          CompanyDepreciationMethod  `json:"depreciationMethod" column:"depreciation_method" sql:"depreciation_method_enum NOT NULL DEFAULT 'Straight-Line'"`
+	PendingDepreciationMethod   *CompanyDepreciationMethod `json:"pendingDepreciationMethod" column:"pending_depreciation_method" sql:"depreciation_method_enum NULL DEFAULT NULL"`
+	DepreciationMethodUpdatedAt *time.Time                 `json:"depreciationMethodUpdatedAt" column:"depreciation_method_updated_at" sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
 
 	// ─────── Add On Status ───────
 	AddOnRepairTicketing bool `json:"addOnRepairTicketing" column:"addon_repair_ticketing" sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
