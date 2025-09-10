@@ -100,6 +100,7 @@ const (
 	RepairTableName                           = "repairs"
 	RepairTicketingTableName                  = "repair_ticketings"
 	ReportTableName                           = "reports"
+	ReplaceTagPrelistTableName                = "replace_tag_prelists"
 	RfIdTagTableName                          = "rfids"
 	RoleTableName                             = "roles"
 	RoutineApprovalTableName                  = "routine_approvals"
