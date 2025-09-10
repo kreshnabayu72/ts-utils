@@ -124,6 +124,7 @@ func migrateFixedAssetDB(dbName string, migrator *migration.Migrator) error {
 		&fixedasset_model.GroupQuota{},
 		&fixedasset_model.Category{},
 		&fixedasset_model.Asset{},
+		&fixedasset_model.AssetLicense{},
 		&fixedasset_model.AssetName{},
 		&fixedasset_model.BrandCategory{},
 		&fixedasset_model.Brand{},
