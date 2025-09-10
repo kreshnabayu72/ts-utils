@@ -8,7 +8,7 @@ import (
 
 type FileInStorage struct {
 	ID                   int       `json:"_id"                  column:"file_in_storage.id"             sql:"BIGINT PRIMARY KEY"`
-	AttachmentID         *int      `json:"attachmentId"         column:"file_in_storage.attachment_id"` // not used in SQL, kept for app logic
+	AttachmentID         *int      `json:"attachmentId"         column:"file_in_storage.attachment_id" sql:"BIGINT"` // not used in SQL, kept for app logic - UPDATE(kreshna): used for delete attachment API so it can delete file_in_storage & update storage kb
 	AssetID              int       `json:"assetId"              column:"file_in_storage.asset_id"       sql:"BIGINT"`
 	ModifiedByID         int       `json:"modifiedById"         column:"file_in_storage.modified_by_id" sql:"BIGINT"`
 	TransactionID        *string   `json:"transactionId"        column:"file_in_storage.transaction_id" sql:"VARCHAR"`
