@@ -27,7 +27,7 @@ func GetAssetsWithFamilies(service service.PostgreSqlService, ctx context.Contex
 	for i := range assetIds {
 		assetId := assetIds[i]
 
-		queryAsset, argsAsset, _ := sql_builder.CommonGetAssetListBuilder("category", "depreciationGroup").
+		queryAsset, argsAsset, _ := sql_builder.CommonGetAssetListBuilder("depreciationGroup").
 			Where(
 				map[string]sql_query.SQLCondition{
 					"a.id": {Operator: sql_query.SQLOperatorEqual, Value: assetId},
@@ -39,7 +39,7 @@ func GetAssetsWithFamilies(service service.PostgreSqlService, ctx context.Contex
 			return nil, err
 		}
 
-		queryFamily, argsFamily, _ := sql_builder.CommonGetAssetListBuilder("category", "depreciationGroup").
+		queryFamily, argsFamily, _ := sql_builder.CommonGetAssetListBuilder("depreciationGroup").
 			WhereOr(
 				map[string]sql_query.SQLCondition{
 					"a.id": {Operator: sql_query.SQLOperatorEqual, Value: assetId},
