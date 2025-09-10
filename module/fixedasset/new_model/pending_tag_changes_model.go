@@ -3,31 +3,30 @@ package new_model
 
 import (
 	"time"
+
+	"gitea.qwertysystem.net/BETS/ts-utils/migration"
 )
 
-type PendingTagTypeGroup struct {
-	ID   int    `json:"_id"  column:"id"`
-	Name string `json:"name" column:"name"`
-}
-
-type PendingTagTypeAssetName struct {
-	ID               int    `json:"_id"              column:"id"`
-	Name             string `json:"name"             column:"name"`
-	NameWithSequence string `json:"nameWithSequence" column:"name_with_sequence"`
-}
-
 type PendingTagChange struct {
-	ID                     int                     `json:"_id,omitempty"          column:"id"`
-	Type                   string                  `json:"type"                   column:"type"`
-	TagType                string                  `json:"tagType"                column:"tag_type"`
-	RFID                   string                  `json:"rfid"                   column:"rfid"`
-	QR                     string                  `json:"qr"                     column:"qr"`
-	AssetStatus            string                  `json:"assetStatus"            column:"asset_status"`
-	AssetMaintenanceStatus string                  `json:"assetMaintenanceStatus" column:"asset_maintenance_status"`
-	AssetAuditStatus       string                  `json:"assetAuditStatus"       column:"asset_audit_status"`
-	Group                  PendingTagTypeGroup     `json:"group"                  column:"group"`
-	AssetName              PendingTagTypeAssetName `json:"assetName"              column:"asset_name"`
-	Asset                  int                     `json:"asset"                  column:"asset"`
-	CreatedAt              time.Time               `json:"createdAt"              column:"created_at"`
-	UpdatedAt              time.Time               `json:"updatedAt"              column:"updated_at"`
+	ID        int       `json:"_id,omitempty"          column:"id" sql:"BIGINT PRIMARY KEY"`
+	Type      string    `json:"type"                   column:"type" sql:"VARCHAR"`
+	Asset     int       `json:"asset"                  column:"asset" sql:"BIGINT"`
+	CreatedAt time.Time `json:"createdAt"              column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt time.Time `json:"updatedAt"              column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+}
+
+func (m *PendingTagChange) TableName() string {
+	return "pending_tag_changes"
+}
+
+func (m *PendingTagChange) Up(builder *migration.MigrationBuilder) {
+	builder.AddColumn(m)
+
+	builder.AddForeignKey(
+		"fk_pending_tag_changes_asset",
+		"asset",
+		"assets",
+		"id",
+		"CASCADE",
+	)
 }
