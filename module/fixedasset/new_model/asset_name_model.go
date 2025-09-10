@@ -9,7 +9,7 @@ import (
 type AssetName struct {
 	ID                      int        `json:"_id"                     column:"asset_names.id"                        sql:"BIGINT PRIMARY KEY"`
 	Name                    string     `json:"name"                    column:"asset_names.name"                      sql:"VARCHAR NOT NULL CHECK (CHAR_LENGTH(name) > 0)"`
-	Code                    string     `json:"code"                    column:"asset_names.code"                      sql:"VARCHAR NULL DEFAULT NULL"`
+	Code                    *string    `json:"code"                    column:"asset_names.code"                      sql:"VARCHAR NULL DEFAULT NULL"`
 	AddOnRepairTicketing    bool       `json:"addonRepairTicketing"    column:"asset_names.addon_repair_ticketing"    sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
 	AddOnMaintenance        bool       `json:"addonMaintenance"        column:"asset_names.addon_maintenance"         sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
 	AddOnTracking           bool       `json:"addonTracking"           column:"asset_names.addon_tracking"            sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
