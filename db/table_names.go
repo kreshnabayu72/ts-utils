@@ -58,7 +58,7 @@ const (
 	DisposalTransactionTableName              = "disposal_transactions"
 	DisposalRequestHistoryTableName           = "disposal_request_histories"
 	DisposalTransactionHistoryTableName       = "disposal_transaction_histories"
-	FilesInStorageTableName                   = "files_in_storage"
+	FilesInStorageTableName                   = "file_in_storage"
 	FileAttachmentTableName                   = "file_attachments"
 	FileDamageTableName                       = "file_damages"
 	FileDisposalDocumentTableName             = "file_disposal_documents"
