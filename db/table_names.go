@@ -7,6 +7,7 @@ const (
 	AssetControlRequestTableName              = "asset_control_request"
 	AssetControlTransactionTableName          = "asset_control_transaction"
 	AssetTableName                            = "assets"
+	AssetLicenseTableName                     = "asset_licenses"
 	AssetCustomFieldTableName                 = "asset_custom_fields"
 	AssetNameTableName                        = "asset_names"
 	AssignmentApprovalTableName               = "assignment_approvals"
