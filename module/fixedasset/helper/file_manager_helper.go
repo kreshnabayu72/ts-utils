@@ -43,7 +43,7 @@ func (f *FileManagerHelperImpl) CreateFileManagerSQL(
 	clientService := serviceFactory.MakePostgreSqlService(adminDb)
 
 	// Check if the company exists
-	queryStr, args, _ := sql_query.NewSQLSelectBuilder[int](db.ClientTableName).
+	queryStr, args, _ := sql_query.NewSQLSelectBuilder[admin_model.Client](db.ClientTableName).
 		Where(map[string]sql_query.SQLCondition{
 			"client_id": {
 				Operator: sql_query.SQLOperatorEqual,
