@@ -41,15 +41,19 @@ func GenerateCTEOption(
 			orderString = fmt.Sprintf(`%s %s`, customSort[0].SortBy, "ASC")
 		}
 
+		// Wrap the original jsonb_agg with COALESCE
 		mainBuilder.Select(
 			fmt.Sprintf(
-				`jsonb_agg(
-					jsonb_build_object(
-						'label', "%s"."key",
-						'value', "%s"."value"
-					)
-					ORDER BY %s
-				) FILTER (WHERE "%s"."value" IS NOT NULL) AS "%s"`,
+				`COALESCE(
+					jsonb_agg(
+						jsonb_build_object(
+							'label', "%s"."key",
+							'value', "%s"."value"
+						)
+						ORDER BY %s
+					) FILTER (WHERE "%s"."value" IS NOT NULL),
+					'[]'::jsonb
+				) AS "%s"`, // The default value '[]'::jsonb is added
 				snakeAliasName,
 				snakeAliasName,
 				orderString,
