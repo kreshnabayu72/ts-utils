@@ -120,7 +120,7 @@ func ChangeFixedAssetQuota(
 //   - licenseType: quota type to filter by
 func UpdateGroupQuota(service service.PostgreSqlService, ctx context.Context, setValue map[string]any, groupId int, licenseType new_model.GroupQuotaType) error {
 	queryQuota, argsQuota, _ := sql_query.NewSQLUpdateBuilder(
-		db.GroupQuotaModelName,
+		db.GroupQuotaTableName,
 	).
 		Update(setValue).
 		Where(map[string]sql_query.SQLCondition{
@@ -162,7 +162,7 @@ func GetGroupWithQuota(
 	if err := service.SelectOne(&groupData, ctx, queryGroup, argsGroup...); err != nil {
 		return new_model.Group{}, new_model.GroupQuota{}, errors.New("group not found")
 	}
-	queryQuota, argsQuota, _ := sql_query.NewSQLSelectBuilder[new_model.GroupQuota](db.GroupQuotaModelName).
+	queryQuota, argsQuota, _ := sql_query.NewSQLSelectBuilder[new_model.GroupQuota](db.GroupQuotaTableName).
 		Where(map[string]sql_query.SQLCondition{
 			"group_id": {Operator: sql_query.SQLOperatorEqual, Value: groupId},
 			"type":     {Operator: sql_query.SQLOperatorEqual, Value: quotaType},
