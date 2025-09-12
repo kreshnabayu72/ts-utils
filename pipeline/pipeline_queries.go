@@ -210,8 +210,8 @@ func GenerateFacetOption(
 	return NewPipelineBuilder().
 		Match(bson.M{
 			"$and": bson.A{
-				bson.M{"fieldName": bson.M{"$ne": nil}},
-				bson.M{"fieldName": bson.M{"$ne": ""}},
+				bson.M{fieldName: bson.M{"$ne": nil}},
+				bson.M{fieldName: bson.M{"$ne": ""}},
 			},
 			"$expr": bson.M{"$eq": bson.A{optionsQuery, true}}}).
 		Group(bson.D{
@@ -247,8 +247,8 @@ func GenerateFacetOptionWithUnwind(
 	return NewPipelineBuilder().
 		Match(bson.M{
 			"$and": bson.A{
-				bson.M{"fieldName": bson.M{"$ne": nil}},
-				bson.M{"fieldName": bson.M{"$ne": ""}},
+				bson.M{fieldName: bson.M{"$ne": nil}},
+				bson.M{fieldName: bson.M{"$ne": ""}},
 			},
 			"$expr": bson.M{"$eq": bson.A{optionsQuery, true}}}).
 		Unwind(bson.M{
