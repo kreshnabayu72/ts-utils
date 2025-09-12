@@ -182,7 +182,7 @@ type ReplaceTagPrelistType string
 const (
 	ReplaceTagPrelistTypeRFID   = TagType("Replace RFID TAG")
 	ReplaceTagPrelistTypeQR     = TagType("Replace QR TAG")
-	ReplaceTagPrelistTypeRFIDQR = TagType("Replace RFID & QR TAGR")
+	ReplaceTagPrelistTypeRFIDQR = TagType("Replace RFID & QR TAG")
 )
 
 type Permission struct {
