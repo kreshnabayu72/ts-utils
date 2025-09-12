@@ -4,6 +4,7 @@ package middleware
 type ContextKey string
 
 const (
+	ErrorLog           = ContextKey("errorLog")
 	UserKey            = ContextKey("user")
 	CompanyCodeKey     = ContextKey("companyCode")
 	SessionKey         = ContextKey("session")
