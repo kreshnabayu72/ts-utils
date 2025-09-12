@@ -22,6 +22,7 @@ type TagEventLog struct {
 	Action     string             `json:"action"          bson:"action"`
 	TotalItems int                `json:"totalItems"          bson:"totalItems"`
 	Holder     UserAttribute      `json:"holder"          bson:"holder"`
+	ReportedBy UserAttribute      `json:"reportedBy"          bson:"reportedBy"`
 	ReportedAt *time.Time         `json:"reportedAt"       bson:"reportedAt"`
 	FinishedAt *time.Time         `json:"finishedAt"       bson:"finishedAt"`
 	CreatedAt  time.Time          `json:"createdAt"       bson:"createdAt"`
