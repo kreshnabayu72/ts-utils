@@ -16,6 +16,8 @@ type TagTransactionHistory struct {
 	Qr           string                    `json:"qr" bson:"qr"`
 	AssetName    AssetNameAttributeSql     `json:"assetName" bson:"assetName"`
 	UserFullName string                    `json:"userFullName" bson:"userFullName"`
+	ReportedBy   string                    `json:"reportedBy" bson:"reportedBy"`
+	ReportedAt   *time.Time                `json:"reportedAt" bson:"reportedAt"`
 	CreatedAt    time.Time                 `json:"createdAt" bson:"createdAt"`
 	UpdatedAt    time.Time                 `json:"updatedAt" bson:"updatedAt"`
 }
