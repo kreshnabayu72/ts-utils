@@ -177,6 +177,7 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 			if clause != "" {
 				s.Filters = append(s.Filters, clause)
 			}
+			continue
 		}
 
 		// Needed for filtering with subquery, e.g: WHERE category_id IN (SELECT id FROM category_recursive)
