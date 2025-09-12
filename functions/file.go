@@ -1,6 +1,7 @@
 package functions
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"errors"
@@ -235,4 +236,33 @@ func DeleteSplittedFile(fileMediumPath string) error {
 	os.Remove(filepath.Join(currentDir, "..", "..", "..", "tsv2-files", small))
 
 	return nil
+}
+
+func ReadFile(filePath string) (string, error) {
+	// Open the file
+	file, err := os.Open(filePath)
+	if err != nil {
+		return "", fmt.Errorf("failed to open file: %v", err)
+	}
+	defer file.Close()
+
+	// Use a buffered reader for efficiency
+	var sb strings.Builder
+	scanner := bufio.NewScanner(file)
+
+	// Optionally increase buffer size for large lines
+	const maxCapacity = 16 * 1024 * 1024 // 16 MB
+	buf := make([]byte, 0, 64*1024)
+	scanner.Buffer(buf, maxCapacity)
+
+	for scanner.Scan() {
+		sb.WriteString(scanner.Text())
+		sb.WriteByte('\n')
+	}
+
+	if err := scanner.Err(); err != nil {
+		return "", fmt.Errorf("failed to read file: %v", err)
+	}
+
+	return sb.String(), nil
 }
