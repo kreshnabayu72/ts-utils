@@ -211,7 +211,8 @@ func GenerateFacetOption(
 		Match(bson.M{
 			"$and": bson.A{
 				bson.M{fieldName: bson.M{"$ne": nil}},
-				bson.M{fieldName: bson.M{"$ne": ""}},
+				bson.M{labelKey: bson.M{"$ne": ""}},
+				bson.M{valueKey: bson.M{"$ne": ""}},
 			},
 			"$expr": bson.M{"$eq": bson.A{optionsQuery, true}}}).
 		Group(bson.D{
@@ -248,7 +249,8 @@ func GenerateFacetOptionWithUnwind(
 		Match(bson.M{
 			"$and": bson.A{
 				bson.M{fieldName: bson.M{"$ne": nil}},
-				bson.M{fieldName: bson.M{"$ne": ""}},
+				bson.M{labelKey: bson.M{"$ne": ""}},
+				bson.M{valueKey: bson.M{"$ne": ""}},
 			},
 			"$expr": bson.M{"$eq": bson.A{optionsQuery, true}}}).
 		Unwind(bson.M{
