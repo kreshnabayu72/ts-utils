@@ -51,12 +51,14 @@ func GenerateCTEOption(
 							'value', "%s"."value"
 						)
 						ORDER BY %s
-					) FILTER (WHERE "%s"."value" IS NOT NULL),
+					) FILTER (WHERE "%s"."value" IS NOT NULL AND "%s"."value" != '' AND "%s"."label" != ''),
 					'[]'::jsonb
 				) AS "%s"`, // The default value '[]'::jsonb is added
 				snakeAliasName,
 				snakeAliasName,
 				orderString,
+				snakeAliasName,
+				snakeAliasName,
 				snakeAliasName,
 				aliasName,
 			),
