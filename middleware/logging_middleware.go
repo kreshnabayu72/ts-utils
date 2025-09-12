@@ -18,6 +18,7 @@ import (
 //
 // Notes:
 //   - You need to pass ctxWithTimeout to usecase param as pointer.
+//   - You need to set needed env to send error log.
 //   - Errors are logged in a goroutine to avoid slowing down the response.
 //   - If ctx.Locals(ErrorLog) is not set, nothing is logged.
 //   - If you return an error directly from the handler (instead of setting ctx.Locals),

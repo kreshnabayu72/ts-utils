@@ -10,6 +10,7 @@ import (
 	"strings"
 )
 
+// You need to set needed env to send error log
 func SendErrorLog(errMessage string) error {
 	slackWebhook := os.Getenv("SLACK_WEBHOOK_URL")
 	if slackWebhook == "" {
