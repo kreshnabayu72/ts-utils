@@ -209,8 +209,11 @@ func GenerateFacetOption(
 
 	return NewPipelineBuilder().
 		Match(bson.M{
-			fieldName: bson.M{"$ne": nil},
-			"$expr":   bson.M{"$eq": bson.A{optionsQuery, true}}}).
+			"$and": bson.A{
+				bson.M{"fieldName": bson.M{"$ne": nil}},
+				bson.M{"fieldName": bson.M{"$ne": ""}},
+			},
+			"$expr": bson.M{"$eq": bson.A{optionsQuery, true}}}).
 		Group(bson.D{
 			{Key: "_id", Value: bson.M{"label": lk, "value": vk}},
 		}).
@@ -243,8 +246,11 @@ func GenerateFacetOptionWithUnwind(
 
 	return NewPipelineBuilder().
 		Match(bson.M{
-			fieldName: bson.M{"$ne": nil},
-			"$expr":   bson.M{"$eq": bson.A{optionsQuery, true}}}).
+			"$and": bson.A{
+				bson.M{"fieldName": bson.M{"$ne": nil}},
+				bson.M{"fieldName": bson.M{"$ne": ""}},
+			},
+			"$expr": bson.M{"$eq": bson.A{optionsQuery, true}}}).
 		Unwind(bson.M{
 			"path": unwindPath,
 		}).
