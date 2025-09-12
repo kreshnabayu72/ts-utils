@@ -177,6 +177,14 @@ const (
 	TagTypeNonTAG = TagType("Non TAG")
 )
 
+type ReplaceTagPrelistType string
+
+const (
+	ReplaceTagPrelistTypeRFID   = TagType("Replace RFID TAG")
+	ReplaceTagPrelistTypeQR     = TagType("Replace QR TAG")
+	ReplaceTagPrelistTypeRFIDQR = TagType("Replace RFID & QR TAGR")
+)
+
 type Permission struct {
 	Create bool
 	View   bool
