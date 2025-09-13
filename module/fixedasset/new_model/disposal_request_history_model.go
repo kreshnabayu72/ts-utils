@@ -9,7 +9,6 @@ import (
 // DisposalRequDisposalRequestHistoryest represents the disposal_request_histories table in the database.
 type DisposalRequestHistory struct {
 	ID               int                   `json:"id"                 column:"disposal_request_histories.id"                 sql:"BIGINT PRIMARY KEY"`
-	Asset            int                   `json:"asset"              column:"disposal_request_histories.asset"              sql:"BIGINT"`
 	AssetID          string                `json:"assetId"            column:"disposal_request_histories.asset_id"           sql:"VARCHAR"`
 	TagType          *TagType              `json:"tagType"            column:"disposal_request_histories.tag_type"           sql:"tag_type_enum"`
 	Name             string                `json:"name"               column:"disposal_request_histories.name"               sql:"VARCHAR"`
@@ -43,20 +42,4 @@ func (m *DisposalRequestHistory) TableName() string {
 func (m *DisposalRequestHistory) Up(builder *migration.MigrationBuilder) {
 	// Add all columns from the struct
 	builder.AddColumn(m)
-
-	// Add foreign key constraints as defined in the SQL migration file
-	builder.AddForeignKey(
-		"fk_disposal_request_asset",
-		"asset",
-		"assets",
-		"id",
-		"",
-	)
-	builder.AddForeignKey(
-		"fk_disposal_request_transaction",
-		"transaction_id",
-		"disposal_transactions",
-		"id",
-		"",
-	)
 }

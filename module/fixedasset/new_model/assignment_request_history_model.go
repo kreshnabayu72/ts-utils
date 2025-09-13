@@ -9,7 +9,6 @@ import (
 // AssignmentRequestHistory represents the assignment_request_histories table in the database.
 type AssignmentRequestHistory struct {
 	ID               int                     `json:"id"               column:"assignment_request_histories.id"                 sql:"BIGINT PRIMARY KEY"`
-	Asset            int                     `json:"asset"            column:"assignment_request_histories.asset"              sql:"BIGINT"`
 	ParentID         *int                    `json:"parentId"         column:"assignment_request_histories.parent_id"           sql:"BIGINT"`
 	AssetID          string                  `json:"assetId"          column:"assignment_request_histories.asset_id"           sql:"VARCHAR"`
 	Name             string                  `json:"name"             column:"assignment_request_histories.name"               sql:"VARCHAR"`
@@ -38,12 +37,4 @@ func (m *AssignmentRequestHistory) TableName() string {
 func (m *AssignmentRequestHistory) Up(builder *migration.MigrationBuilder) {
 	// Add all columns from the struct
 	builder.AddColumn(m)
-
-	builder.AddForeignKey(
-		"fk_assignment_request_history_parent",
-		"parent_id",
-		"assignment_request_histories",
-		"id",
-		"",
-	)
 }

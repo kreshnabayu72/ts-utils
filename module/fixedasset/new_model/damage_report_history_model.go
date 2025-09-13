@@ -8,7 +8,6 @@ import (
 
 type DamageReportHistory struct {
 	ID               int                `json:"_id"                column:"damage_report_histories.id"                 sql:"BIGINT PRIMARY KEY"`
-	Asset            int                `json:"asset"              column:"damage_report_histories.asset"              sql:"BIGINT"`
 	AssetID          string             `json:"assetId"            column:"damage_report_histories.asset_id"           sql:"VARCHAR"`
 	TagType          *TagType           `json:"tagType"            column:"damage_report_histories.tag_type"           sql:"tag_type_enum"`
 	Name             string             `json:"name"               column:"damage_report_histories.name"               sql:"VARCHAR"`
@@ -33,13 +32,4 @@ func (d *DamageReportHistory) TableName() string {
 
 func (d *DamageReportHistory) Up(builder *migration.MigrationBuilder) {
 	builder.AddColumn(d)
-
-	// Add foreign key constraints as defined in the SQL migration file
-	builder.AddForeignKey(
-		"fk_damage_history_asset",
-		"asset",
-		"assets",
-		"id",
-		"",
-	)
 }
