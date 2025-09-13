@@ -9,6 +9,7 @@ import (
 type BorrowingRequestHistory struct {
 	ID               int                    `json:"id"               column:"borrowing_request_histories.id"                 sql:"BIGINT PRIMARY KEY"`
 	ParentID         *int                   `json:"parentId"         column:"borrowing_request_histories.parent_id"          sql:"BIGINT"`
+	Asset            int                    `json:"asset"              column:"borrowing_request_histories.asset"              sql:"BIGINT"`
 	AssetID          string                 `json:"assetId"          column:"borrowing_request_histories.asset_id"           sql:"VARCHAR"`
 	Name             string                 `json:"name"             column:"borrowing_request_histories.name"               sql:"VARCHAR"`
 	Brand            string                 `json:"brand"            column:"borrowing_request_histories.brand"              sql:"VARCHAR"`

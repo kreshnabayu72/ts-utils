@@ -9,6 +9,7 @@ import (
 // DisposalRequDisposalRequestHistoryest represents the disposal_request_histories table in the database.
 type DisposalRequestHistory struct {
 	ID               int                   `json:"id"                 column:"disposal_request_histories.id"                 sql:"BIGINT PRIMARY KEY"`
+	Asset            int                   `json:"asset"              column:"disposal_request_histories.asset"              sql:"BIGINT"`
 	AssetID          string                `json:"assetId"            column:"disposal_request_histories.asset_id"           sql:"VARCHAR"`
 	TagType          *TagType              `json:"tagType"            column:"disposal_request_histories.tag_type"           sql:"tag_type_enum"`
 	Name             string                `json:"name"               column:"disposal_request_histories.name"               sql:"VARCHAR"`

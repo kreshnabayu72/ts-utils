@@ -10,6 +10,7 @@ import (
 type TransferRequestHistory struct {
 	ID                 int                            `json:"id"                 column:"transfer_request_histories.id"                   sql:"BIGINT PRIMARY KEY"`
 	ParentID           *int                           `json:"parentId"           column:"transfer_request_histories.parent_id"            sql:"BIGINT"`
+	Asset              int                            `json:"asset"              column:"transfer_request_histories.asset"              sql:"BIGINT"`
 	AssetID            string                         `json:"assetId"            column:"transfer_request_histories.asset_id"             sql:"VARCHAR"`
 	AssetStatus        TransferRequestAssetStatus     `json:"assetStatus"        column:"transfer_request_histories.asset_status"         sql:"transfer_request_asset_status_enum"`
 	Name               string                         `json:"name"               column:"transfer_request_histories.name"                 sql:"VARCHAR"`

@@ -8,6 +8,7 @@ import (
 
 type DamageReportHistory struct {
 	ID               int                `json:"_id"                column:"damage_report_histories.id"                 sql:"BIGINT PRIMARY KEY"`
+	Asset            int                `json:"asset"              column:"damage_report_histories.asset"              sql:"BIGINT"`
 	AssetID          string             `json:"assetId"            column:"damage_report_histories.asset_id"           sql:"VARCHAR"`
 	TagType          *TagType           `json:"tagType"            column:"damage_report_histories.tag_type"           sql:"tag_type_enum"`
 	Name             string             `json:"name"               column:"damage_report_histories.name"               sql:"VARCHAR"`
