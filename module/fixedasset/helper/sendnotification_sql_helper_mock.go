@@ -1,6 +1,8 @@
 package helper
 
 import (
+	"context"
+
 	"gitea.qwertysystem.net/BETS/ts-utils/entity"
 	util_fixedasset_new_model "gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
 	"gitea.qwertysystem.net/BETS/ts-utils/provider"
@@ -108,10 +110,11 @@ func (m *MockNotificationSQLHelper) EmitLoggedOutByAdminSseSQL(userIds []string)
 }
 
 func (m *MockNotificationSQLHelper) RefreshNotificationSseWithFilter(
+	ctx context.Context,
 	serviceProvider provider.ServiceProvider,
 	companyCode string,
 	filter any,
 ) error {
-	args := m.Mock.Called(serviceProvider, companyCode, filter)
+	args := m.Mock.Called(ctx, serviceProvider, companyCode, filter)
 	return args.Error(0)
 }
