@@ -21,6 +21,7 @@ import (
 	"gitea.qwertysystem.net/BETS/ts-utils/provider"
 	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/oauth2/jwt"
 	"google.golang.org/api/option"
@@ -533,9 +534,8 @@ func (r *SendNotificationSQLHelperImpl) RefreshNotificationSseWithFilter(
 	_, err = notificationService.UpdateMany(
 		ctx,
 		filter,
-		map[string]any{
-			"isRead":    true,
-			"updatedAt": time.Now(),
+		bson.M{
+			"$set": bson.M{"is_read": true, "updated_at": time.Now()},
 		},
 	)
 	if err != nil {
