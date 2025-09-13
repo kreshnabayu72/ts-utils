@@ -106,3 +106,12 @@ func (m *MockNotificationSQLHelper) EmitLoggedOutByAdminSseSQL(userIds []string)
 	args := m.Mock.Called(userIds)
 	return args.Get(0).(*entity.HttpError)
 }
+
+func (m *MockNotificationSQLHelper) RefreshNotificationSseWithFilter(
+	serviceProvider provider.ServiceProvider,
+	companyCode string,
+	filter any,
+) error {
+	args := m.Mock.Called(serviceProvider, companyCode, filter)
+	return args.Error(0)
+}
