@@ -137,7 +137,7 @@ func GetAssetIDFromAliasCodeBuilder(builder *sql_query.SelectBuilder, localAsset
 	replaced := false
 	for i, c := range builder.Columns {
 		// normalize for case/spacing (since some drivers format `AS`)
-		if strings.HasSuffix(strings.ToLower(c), "as assetid") {
+		if strings.HasSuffix(strings.ToLower(c), `as "assetid"`) {
 			builder.Columns[i] = col
 			replaced = true
 			break
