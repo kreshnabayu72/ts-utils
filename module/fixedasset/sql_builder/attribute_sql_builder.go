@@ -131,7 +131,23 @@ func GetAssetIDFromAliasCodeBuilder(builder *sql_query.SelectBuilder, localAsset
 		log.Println(err)
 	}
 
-	builder.Columns = append(builder.Columns, fmt.Sprintf("(%s) AS assetId", res))
+	col := fmt.Sprintf(`(%s) AS "assetId"`, res)
+
+	// replace if already exists
+	replaced := false
+	for i, c := range builder.Columns {
+		// normalize for case/spacing (since some drivers format `AS`)
+		if strings.HasSuffix(strings.ToLower(c), "as assetid") {
+			builder.Columns[i] = col
+			replaced = true
+			break
+		}
+	}
+
+	if !replaced {
+		builder.Columns = append(builder.Columns, col)
+	}
+
 	builder.Args = append(builder.Args, args...)
 
 	// res, args, err := sql_query.NewSQLSelectBuilder[AliasCode](db.AliasCodeTableName, "ac").
