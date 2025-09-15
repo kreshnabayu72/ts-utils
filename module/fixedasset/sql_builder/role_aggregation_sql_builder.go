@@ -171,8 +171,6 @@ func generateUserTransactionRolesBuilder(
 func SystemRolePermissionAggregation(
 	builder *sql_query.SelectBuilder,
 	loggedInUserId int,
-	groupColumn string,
-	mainTable string,
 	aliasTable string,
 	roleAttributes []fixedasset_new_model.SystemRoleAttribute,
 ) {
