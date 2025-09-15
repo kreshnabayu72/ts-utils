@@ -22,6 +22,7 @@ type AssignmentTransaction struct {
 	ConfirmationEmailToken       string                      `json:"confirmationEmailToken"       column:"assignment_transactions.confirmation_email_token"        sql:"VARCHAR"`
 	ConfirmationEmailConfirmedAt time.Time                   `json:"confirmationEmailConfirmedAt" column:"assignment_transactions.confirmation_email_confirmed_at" sql:"TIMESTAMPTZ"`
 	CurrentApprovalLevel         int                         `json:"currentApprovalLevel"         column:"assignment_transactions.current_approval_level"          sql:"INTEGER DEFAULT 1"`
+	AssignDate                   time.Time                   `json:"assignDate" column:"assignment_transactions.assign_date" sql:"TIMESTAMPTZ"`
 	CreatedAt                    time.Time                   `json:"createdAt"                    column:"assignment_transactions.created_at"                      sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 	UpdatedAt                    time.Time                   `json:"updatedAt"                    column:"assignment_transactions.updated_at"                      sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }

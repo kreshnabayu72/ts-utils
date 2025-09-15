@@ -21,6 +21,7 @@ import (
 	"gitea.qwertysystem.net/BETS/ts-utils/provider"
 	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/oauth2/jwt"
 	"google.golang.org/api/option"
@@ -57,6 +58,13 @@ type NotificationHelperSQL interface {
 		companyCode string,
 		notifications []util_fixedasset_new_model.Notification,
 	) *entity.HttpError
+
+	RefreshNotificationSseWithFilter(
+		ctx context.Context,
+		serviceProvider provider.ServiceProvider,
+		companyCode string,
+		filter any,
+	) error
 
 	RefreshNotificationSseSQL(userIds []string) *entity.HttpError
 	EmitApprovalSseSQL(userIds []string) *entity.HttpError
@@ -179,7 +187,9 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationToSystemRolesSQL(
 		db.FixedAssetDBName.CompanyDBName(companyCode),
 	)
 
-	query, args, _ := sql_query.NewSQLSelectBuilder[util_fixedasset_new_model.UserSystemRole](db.UserSystemRoleTableName).
+	query, args, _ := sql_query.NewSQLSelectBuilder[util_fixedasset_new_model.UserSystemRole](
+		db.UserSystemRoleTableName,
+	).
 		Where(map[string]sql_query.SQLCondition{
 			"is_active":      {Operator: sql_query.SQLOperatorEqual, Value: true},
 			"role_attribute": {Operator: sql_query.SQLOperatorIn, Value: roleAttribute},
@@ -232,7 +242,9 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationToUsersSQL(
 		db.FixedAssetDBName.CompanyDBName(companyCode),
 	)
 
-	query, args, _ := sql_query.NewSQLSelectBuilder[util_fixedasset_new_model.User](db.UserTableName).
+	query, args, _ := sql_query.NewSQLSelectBuilder[util_fixedasset_new_model.User](
+		db.UserTableName,
+	).
 		Where(map[string]sql_query.SQLCondition{
 			"id": {Operator: sql_query.SQLOperatorIn, Value: userIds},
 		}).
@@ -339,7 +351,10 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationSQL(
 	return nil
 }
 
-func (r *SendNotificationSQLHelperImpl) SendMobileNotificationSQL(data util_fixedasset_new_model.Notification, tokens []string) *entity.HttpError {
+func (r *SendNotificationSQLHelperImpl) SendMobileNotificationSQL(
+	data util_fixedasset_new_model.Notification,
+	tokens []string,
+) *entity.HttpError {
 	// ─────── credentials ───────
 	cred := os.Getenv("MOBILE_CREDENTIAL_JSON")
 	opt := option.WithCredentialsJSON([]byte(cred))
@@ -491,4 +506,51 @@ func (r *SendNotificationSQLHelperImpl) EmitLoggedOutByAdminSseSQL(
 	userIds []string,
 ) *entity.HttpError {
 	return emitRefreshSse(userIds, "user:logout", "LOGGED_OUT_BY_ADMINISTRATOR")
+}
+
+func (r *SendNotificationSQLHelperImpl) RefreshNotificationSseWithFilter(
+	ctx context.Context,
+	serviceProvider provider.ServiceProvider,
+	companyCode string,
+	filter any,
+) error {
+	notificationService := serviceProvider.MakeService(
+		db.FixedAssetDBName.CompanyDBName(companyCode),
+		db.NotificationModelName,
+	)
+
+	// Find notifications based on the provided filter
+	var notifications []util_fixedasset_new_model.Notification
+	err := notificationService.Find(
+		&notifications,
+		ctx,
+		filter,
+	)
+	if err != nil {
+		return err
+	}
+
+	// Update the IsRead field to true for each notification
+	_, err = notificationService.UpdateMany(
+		ctx,
+		filter,
+		bson.M{
+			"$set": bson.M{"is_read": true, "updated_at": time.Now()},
+		},
+	)
+	if err != nil {
+		return err
+	}
+
+	var userIds []string
+	for _, notif := range notifications {
+		userIds = append(userIds, notif.UserKey)
+	}
+
+	emitErr := r.RefreshNotificationSseSQL(userIds)
+	if emitErr != nil {
+		return emitErr
+	}
+
+	return nil
 }

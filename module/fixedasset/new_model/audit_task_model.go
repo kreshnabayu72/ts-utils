@@ -14,7 +14,7 @@ type AuditTask struct {
 	AuditType     AuditType       `json:"auditType"      column:"audit_tasks.audit_type"      sql:"audit_type_enum"`
 	Status        AuditTaskStatus `json:"status"         column:"audit_tasks.status"          sql:"audit_task_status_enum"`
 	Duration      int             `json:"duration"       column:"audit_tasks.duration"        sql:"INTEGER NOT NULL"`
-	ModifiedById  int             `json:"modifiedById"   column:"audit_tasks.modified_by_id"  sql:"BIGINT NOT NULL"`
+	ModifiedById  int             `json:"modifiedById"   column:"audit_tasks.modified_by_id"  sql:"BIGINT"`
 	ApprovalRound int             `json:"approvalRound"  column:"audit_tasks.approval_round"  sql:"INTEGER DEFAULT 1"`
 	StartedAt     *time.Time      `json:"startedAt"      column:"audit_tasks.started_at"      sql:"TIMESTAMPTZ NULL"`
 	GracePeriodAt *time.Time      `json:"gracePeriodAt"  column:"audit_tasks.grace_period_at" sql:"TIMESTAMPTZ NULL"`
