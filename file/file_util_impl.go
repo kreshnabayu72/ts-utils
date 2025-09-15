@@ -7,6 +7,8 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 type FileUtilImpl struct {
@@ -25,6 +27,7 @@ type saveFileResponse struct {
 }
 
 func (f *FileUtilImpl) SaveFile(
+	ctx *fiber.Ctx,
 	folderName string,
 	filePrefix string,
 	files []*multipart.FileHeader,
@@ -72,6 +75,11 @@ func (f *FileUtilImpl) SaveFile(
 		return nil, fmt.Errorf("create request: %w", err)
 	}
 	req.Header.Set("Content-Type", writer.FormDataContentType())
+
+	// Forward authorization header if present
+	if auth := ctx.Get("Authorization"); auth != "" {
+		req.Header.Set("Authorization", auth)
+	}
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
