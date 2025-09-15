@@ -11,10 +11,10 @@ import (
 // How it works:
 //  1. The request enters the middleware.
 //  2. The middleware calls ctx.Next() to let the route handler and other middleware run.
-//  3. Inside your controller, you set ctx.Locals(ErrorLog, err) when you want
+//  3. Inside your controller, you set ctx.Locals(ErrorLog, err.Error()) when you want
 //     the error to be logged. This avoids scattering log.SendErrorLog calls everywhere.
 //  4. After the handler finishes, LoggingMiddleware checks ctx.Locals(ErrorLog).
-//  5. If an error is found, it sends the error message asynchronously to the remote log service.
+//  5. If an error message is found, it sends the error message asynchronously to the remote log service.
 //
 // Notes:
 //   - You need to pass ctxWithTimeout to usecase param as pointer.
@@ -36,7 +36,7 @@ import (
 //
 //	    if err != nil {
 //	        // store the error in context for logging
-//	        *param.Ctx = context.WithValue(*param.Ctx, "usecaseErr", err)
+//	        *param.Ctx = context.WithValue(*param.Ctx, "usecaseErr", err.Error()) // Or custom formatting error message with line or function name
 //	        return ...
 //	    }
 //	    return ...
@@ -47,8 +47,8 @@ import (
 //	    transaction, err := usecase.FindTransactionUsecase(param)
 //	    if err != nil {
 //	        // catch the error from ctxWithTimeout
-//	        if usecaseErr, ok := ctxWithTimeout.Value("usecaseErr").(error); ok {
-//	        	ctx.Locals(util_middleware.ErrorLog, usecaseErr)
+//	        if usecaseErr, ok := ctxWithTimeout.Value("usecaseErr").(string); ok {
+//	        	ctx.Locals(util_middleware.ErrorLog, usecaseErr) // Or custom formatting error message with endpoint
 //	        }
 //	        return ...
 //	    }
@@ -67,10 +67,10 @@ func LoggingMiddleware() fiber.Handler {
 		// Run the next handler first
 		err := ctx.Next()
 
-		// Now check error stored in locals after handler finishes
-		errorLog, _ := ctx.Locals(ErrorLog).(error)
-		if errorLog != nil {
-			go log.SendErrorLog(errorLog.Error())
+		// Now check error message stored in locals after handler finishes
+		errorLog, _ := ctx.Locals(ErrorLog).(string)
+		if errorLog != "" {
+			go log.SendErrorLog(errorLog)
 		}
 
 		return err
