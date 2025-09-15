@@ -689,8 +689,8 @@ const (
 type AssignmentPrelistType string
 
 const (
-	AssignmentPrelistTypeOr  AssignmentPrelistType = "Assign"
-	AssignmentPrelistTypeAnd AssignmentPrelistType = "Unassign"
+	AssignmentPrelistTypeAssign   AssignmentPrelistType = "Assign"
+	AssignmentPrelistTypeUnassign AssignmentPrelistType = "Unassign"
 )
 
 type TransferTransactionStatus string
