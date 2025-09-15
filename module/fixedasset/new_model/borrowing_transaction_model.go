@@ -16,10 +16,10 @@ type BorrowingTransaction struct {
 	IsVerified                   bool                       `json:"isVerified"                   column:"borrowing_transactions.is_verified"                     sql:"BOOLEAN"`
 	ConfirmationEmail            string                     `json:"confirmationEmail"            column:"borrowing_transactions.confirmation_email"              sql:"VARCHAR"`
 	ConfirmationEmailConfirmed   bool                       `json:"confirmationEmailConfirmed"   column:"borrowing_transactions.confirmation_email_confirmed"    sql:"BOOLEAN"`
-	ConfirmationEmailSentAt      time.Time                  `json:"confirmationEmailSentAt"      column:"borrowing_transactions.confirmation_email_sent_at"      sql:"TIMESTAMPTZ"`
-	ConfirmationEmailExpiredAt   time.Time                  `json:"confirmationEmailExpiredAt"   column:"borrowing_transactions.confirmation_email_expired_at"   sql:"TIMESTAMPTZ"`
+	ConfirmationEmailSentAt      *time.Time                 `json:"confirmationEmailSentAt"      column:"borrowing_transactions.confirmation_email_sent_at"      sql:"TIMESTAMPTZ"`
+	ConfirmationEmailExpiredAt   *time.Time                 `json:"confirmationEmailExpiredAt"   column:"borrowing_transactions.confirmation_email_expired_at"   sql:"TIMESTAMPTZ"`
 	ConfirmationEmailToken       string                     `json:"confirmationEmailToken"       column:"borrowing_transactions.confirmation_email_token"        sql:"VARCHAR"`
-	ConfirmationEmailConfirmedAt time.Time                  `json:"confirmationEmailConfirmedAt" column:"borrowing_transactions.confirmation_email_confirmed_at" sql:"TIMESTAMPTZ"`
+	ConfirmationEmailConfirmedAt *time.Time                 `json:"confirmationEmailConfirmedAt" column:"borrowing_transactions.confirmation_email_confirmed_at" sql:"TIMESTAMPTZ"`
 	CurrentApprovalLevel         int                        `json:"currentApprovalLevel"         column:"borrowing_transactions.current_approval_level"          sql:"INTEGER DEFAULT 1"`
 	CreatedAt                    time.Time                  `json:"createdAt"                    column:"borrowing_transactions.created_at"                      sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 	UpdatedAt                    time.Time                  `json:"updatedAt"                    column:"borrowing_transactions.updated_at"                      sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
