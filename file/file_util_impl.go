@@ -45,7 +45,10 @@ func (f *FileUtilImpl) SaveFile(
 			return nil, fmt.Errorf("open file %s: %w", fh.Filename, err)
 		}
 
-		part, err := writer.CreateFormFile("files", filePrefix+fh.Filename)
+		// Add the fileName field to the request body
+		_ = writer.WriteField("fileName", fh.Filename)
+
+		part, err := writer.CreateFormFile("files", fh.Filename)
 		if err != nil {
 			src.Close()
 			return nil, fmt.Errorf("create form file: %w", err)
