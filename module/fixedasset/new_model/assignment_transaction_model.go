@@ -17,10 +17,10 @@ type AssignmentTransaction struct {
 	IsVerified                   bool                        `json:"isVerified"                   column:"assignment_transactions.is_verified"                     sql:"BOOLEAN"`
 	ConfirmationEmail            string                      `json:"confirmationEmail"            column:"assignment_transactions.confirmation_email"              sql:"VARCHAR"`
 	ConfirmationEmailConfirmed   bool                        `json:"confirmationEmailConfirmed"   column:"assignment_transactions.confirmation_email_confirmed"    sql:"BOOLEAN"`
-	ConfirmationEmailSentAt      time.Time                   `json:"confirmationEmailSentAt"      column:"assignment_transactions.confirmation_email_sent_at"      sql:"TIMESTAMPTZ"`
-	ConfirmationEmailExpiredAt   time.Time                   `json:"confirmationEmailExpiredAt"   column:"assignment_transactions.confirmation_email_expired_at"   sql:"TIMESTAMPTZ"`
+	ConfirmationEmailSentAt      *time.Time                  `json:"confirmationEmailSentAt"      column:"assignment_transactions.confirmation_email_sent_at"      sql:"TIMESTAMPTZ"`
+	ConfirmationEmailExpiredAt   *time.Time                  `json:"confirmationEmailExpiredAt"   column:"assignment_transactions.confirmation_email_expired_at"   sql:"TIMESTAMPTZ"`
 	ConfirmationEmailToken       string                      `json:"confirmationEmailToken"       column:"assignment_transactions.confirmation_email_token"        sql:"VARCHAR"`
-	ConfirmationEmailConfirmedAt time.Time                   `json:"confirmationEmailConfirmedAt" column:"assignment_transactions.confirmation_email_confirmed_at" sql:"TIMESTAMPTZ"`
+	ConfirmationEmailConfirmedAt *time.Time                  `json:"confirmationEmailConfirmedAt" column:"assignment_transactions.confirmation_email_confirmed_at" sql:"TIMESTAMPTZ"`
 	CurrentApprovalLevel         int                         `json:"currentApprovalLevel"         column:"assignment_transactions.current_approval_level"          sql:"INTEGER DEFAULT 1"`
 	AssignDate                   time.Time                   `json:"assignDate" column:"assignment_transactions.assign_date" sql:"TIMESTAMPTZ"`
 	CreatedAt                    time.Time                   `json:"createdAt"                    column:"assignment_transactions.created_at"                      sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
