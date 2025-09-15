@@ -33,7 +33,7 @@ func MakeFileManagerHelperSQLImpl() *FileManagerHelperSQLImpl {
 	return &FileManagerHelperSQLImpl{}
 }
 
-func (f *FileManagerHelperImpl) CreateFileManagerSQL(
+func (f *FileManagerHelperSQLImpl) CreateFileManagerSQL(
 	serviceFactory utilprovider.ServiceProvider,
 	companyCode string,
 	data new_model.FileInStorage,
@@ -121,7 +121,7 @@ func (f *FileManagerHelperImpl) CreateFileManagerSQL(
 	return nil
 }
 
-func (f *FileManagerHelperImpl) DeleteFileManagerSQL(
+func (f *FileManagerHelperSQLImpl) DeleteFileManagerSQL(
 	serviceFactory utilprovider.ServiceProvider,
 	companyCode string,
 	filter map[string]sql_query.SQLCondition,
