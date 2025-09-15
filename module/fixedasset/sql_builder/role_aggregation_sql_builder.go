@@ -1145,7 +1145,7 @@ func TransactionRoleMultipleGroupAggregation(
 
 	for idx, groupField := range groupFieldsAndAttribute {
 		builder.Join(fmt.Sprintf("groups gp%d", idx), fmt.Sprintf("gp%d.id = %s", idx, groupField.Field))
-		if len(hideField) > 0 && !hideField[0] {
+		if len(hideField) == 0 || len(hideField) > 0 && !hideField[0] {
 			builder.SelectBoolOr(
 				fmt.Sprintf(
 					"(utr.group_id = gp%d.ancestor_id OR utr.group_id = gp%d.id) AND utr.role_type = $%d",
