@@ -779,6 +779,7 @@ const (
 	DisposalRequestStatusWaitingForApproval     DisposalRequestStatus = "Waiting for Approval"
 	DisposalRequestStatusWaitingForVerification DisposalRequestStatus = "Waiting for Verification"
 	DisposalRequestStatusOnProgress             DisposalRequestStatus = "On Progress"
+	DisposalRequestStatusCommpletionApproval    DisposalRequestStatus = "Completion Approval"
 	DisposalRequestStatusCompleted              DisposalRequestStatus = "Completed"
 	DisposalRequestStatusCanceled               DisposalRequestStatus = "Canceled"
 	DisposalRequestStatusApproved               DisposalRequestStatus = "Approved"
