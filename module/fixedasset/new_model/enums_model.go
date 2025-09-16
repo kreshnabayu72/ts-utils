@@ -642,22 +642,25 @@ const (
 type BorrowingTransactionStatus string
 
 const (
-	BorrowingTransactionStatusWaitingForApproval BorrowingTransactionStatus = "Waiting for Approval"
-	BorrowingTransactionStatusWaitingForHandover BorrowingTransactionStatus = "Waiting for Handover"
-	BorrowingTransactionStatusBorrowed           BorrowingTransactionStatus = "Borrowed"
-	BorrowingTransactionStatusCanceled           BorrowingTransactionStatus = "Canceled"
-	BorrowingTransactionStatusReturned           BorrowingTransactionStatus = "Returned"
-	BorrowingTransactionStatusExtendApproval     BorrowingTransactionStatus = "Extend Approval"
-	BorrowingTransactionStatusRequestExtension   BorrowingTransactionStatus = "Request Extension"
-	BorrowingTransactionStatusRejected           BorrowingTransactionStatus = "Rejected"
+	BorrowingTransactionStatusWaitingForApproval     BorrowingTransactionStatus = "Waiting for Approval"
+	BorrowingTransactionStatusWaitingForVerification BorrowingTransactionStatus = "Waiting for Verification"
+	BorrowingTransactionStatusWaitingForConfirmation BorrowingTransactionStatus = "Waiting for Confirmation"
+	BorrowingTransactionStatusWaitingForHandover     BorrowingTransactionStatus = "Waiting for Handover"
+	BorrowingTransactionStatusBorrowed               BorrowingTransactionStatus = "Borrowed"
+	BorrowingTransactionStatusCanceled               BorrowingTransactionStatus = "Canceled"
+	BorrowingTransactionStatusReturned               BorrowingTransactionStatus = "Returned"
+	BorrowingTransactionStatusExtendApproval         BorrowingTransactionStatus = "Extend Approval"
+	BorrowingTransactionStatusRequestExtension       BorrowingTransactionStatus = "Request Extension"
+	BorrowingTransactionStatusRejected               BorrowingTransactionStatus = "Rejected"
 )
 
 type BorrowingRequestStatus string
 
 const (
 	BorrowingRequestStatusWaitingForApproval     BorrowingRequestStatus = "Waiting for Approval"
-	BorrowingRequestStatusWaitingForHandover     BorrowingRequestStatus = "Waiting for Handover"
+	BorrowingRequestStatusWaitingForVerification BorrowingRequestStatus = "Waiting for Verification"
 	BorrowingRequestStatusWaitingForConfirmation BorrowingRequestStatus = "Waiting for Confirmation"
+	BorrowingRequestStatusWaitingForHandover     BorrowingRequestStatus = "Waiting for Handover"
 	BorrowingRequestStatusBorrowed               BorrowingRequestStatus = "Borrowed"
 	BorrowingRequestStatusCanceled               BorrowingRequestStatus = "Canceled"
 	BorrowingRequestStatusReturned               BorrowingRequestStatus = "Returned"
