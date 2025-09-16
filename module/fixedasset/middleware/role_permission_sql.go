@@ -9,6 +9,28 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+func CombineOrRestriction(middlewares ...fiber.Handler) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		var lastErr error
+
+		for _, mw := range middlewares {
+			// Run each middleware
+			err := mw(c)
+			if err == nil {
+				// At least one middleware passed then authorized
+				return c.Next()
+			}
+			lastErr = err
+		}
+
+		// All middlewares fails
+		if lastErr != nil {
+			return lastErr
+		}
+		return response.SendResponse(c, fiber.StatusUnauthorized, nil, "Unauthorized")
+	}
+}
+
 // PermittedUserRestrictionSQL creates a middleware that restricts access based on a user's
 // given access (either "Assigned" or "Borrower" based on given param value).
 func PermittedUserRestrictionSQL(typeUser helper.PermittedUser) fiber.Handler {
