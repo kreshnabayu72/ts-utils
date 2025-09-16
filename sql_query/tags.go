@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"sync"
 )
+
+var mu = &sync.Mutex{}
 
 // ExtractJSONTags returns columns with near-zero cost on warm cache.
 // To avoid complexity in usage, it's better to ignore params and just passing dto.SomeStruct to generic
@@ -30,6 +33,8 @@ func ExtractJSONTags[T any](optType ...reflect.Type) []string {
 		return *cols
 	}
 
+	mu.Lock()
+	defer mu.Unlock()
 	// If columns not cached, fallback to process below
 	fieldMeta, ok := fieldMetaCache[typeName]
 	if !ok {
@@ -42,6 +47,7 @@ func ExtractJSONTags[T any](optType ...reflect.Type) []string {
 	// Build final columns (only once per type)
 	// This generated columns will be saved in memory cache for next call
 	cols := buildColumnsFromMeta(*fieldMeta)
+
 	columnsCache[typeName] = cols
 
 	return *cols
@@ -125,6 +131,8 @@ func MakeMapJSONTags[T any]() map[string]string {
 	// Get package path followed by struct name to give strict uniqueness to map's key
 	typeName := typ.PkgPath() + "." + typ.Name()
 
+	mu.Lock()
+	defer mu.Unlock()
 	// If columns not cached, fallback to process below
 	fieldMeta, ok := fieldMetaCache[typeName]
 	if !ok {
@@ -147,6 +155,8 @@ func MakeMapJSONTagsFromValue(dto any) map[string]string {
 	typeName := typ.PkgPath() + "." + typ.Name()
 
 	// If columns not cached, fallback to process below
+	mu.Lock()
+	defer mu.Unlock()
 	fieldMeta, ok := fieldMetaCache[typeName]
 	if !ok {
 		// Build metadata if not cached (only once per type)
