@@ -393,6 +393,56 @@ func CheckTotalControlPermissionSQL(ctx *fiber.Ctx) *entity.HttpError {
 	return nil
 }
 
+// CheckPermittedUserPermissionSQL confirms if a user has "assigned" or "borrower" access based on given param.
+func CheckPermittedUserPermissionSQL(
+	ctx *fiber.Ctx,
+	typeUser PermittedUser,
+) *entity.HttpError {
+	// Get userId from Locals in Fiber context
+	userId, ok := ctx.Locals(middleware.UserKey).(string)
+	if !ok {
+		return entity.Unauthorized("User not authenticated")
+	}
+
+	companyCode := ctx.Locals(middleware.CompanyCodeKey).(string)
+
+	fixedAssetDbName := db.FixedAssetDBName.CompanyDBName(companyCode)
+	service := service.MakePostgreSqlService(fixedAssetDbName)
+
+	filter := map[string]sql_query.SQLCondition{
+		"status": {
+			Operator: sql_query.SQLOperatorAny,
+			Value:    []string{"Waiting for Handover", "Waiting for Approval", "Waiting for Confirmation"},
+		},
+	}
+
+	var dbName string
+	if typeUser == PermittedUserAssigned {
+		dbName = db.AssignmentTransactionTableName
+		filter["assigned_to_id"] = sql_query.SQLCondition{
+			Operator: sql_query.SQLOperatorEqual,
+			Value:    userId,
+		}
+	} else {
+		dbName = db.BorrowingTransactionTableName
+		filter["borrower_id"] = sql_query.SQLCondition{
+			Operator: sql_query.SQLOperatorEqual,
+			Value:    userId,
+		}
+	}
+
+	count, err := service.CountWithFilter(ctx.Context(), dbName, filter)
+	if err != nil {
+		return entity.InternalServerError(err.Error())
+	}
+
+	if count < 1 {
+		return entity.Unauthorized("You do not have the required permissions")
+	}
+
+	return nil
+}
+
 // GetTopLevelTransactionRoles finds all transaction roles for a specific role attribute and
 // type that are assigned to the top-level ancestor of a given group.
 //
