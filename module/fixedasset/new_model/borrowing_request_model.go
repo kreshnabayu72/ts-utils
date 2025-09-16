@@ -16,6 +16,7 @@ type BorrowingRequest struct {
 	PreviousStatus   BorrowingRequestStatus `json:"previousStatus"   column:"borrowing_requests.previous_status"    sql:"borrowing_request_status_enum NULL DEFAULT NULL"`
 	IsVerified       bool                   `json:"isVerified"       column:"borrowing_requests.is_verified"        sql:"BOOLEAN"`
 	Notes            string                 `json:"notes"            column:"borrowing_requests.notes"              sql:"VARCHAR"`
+	Duration         int                    `json:"duration"         column:"borrowing_requests.duration"           sql:"BIGINT"`
 	ActualReturnDate *time.Time             `json:"actualReturnDate" column:"borrowing_requests.actual_return_date" sql:"TIMESTAMPTZ DEFAULT NULL"`
 	DueReturnDate    time.Time              `json:"dueReturnDate"    column:"borrowing_requests.due_return_date"    sql:"TIMESTAMPTZ NOT NULL"`
 	CreatedAt        time.Time              `json:"createdAt"        column:"borrowing_requests.created_at"         sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
