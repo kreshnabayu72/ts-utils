@@ -79,3 +79,8 @@ func (m *MockRolePermissionSQLHelper) CheckTotalControlPermissionSQL(ctx *fiber.
 	args := m.Mock.Called(ctx)
 	return args.Get(0).(*entity.HttpError)
 }
+
+func (m *MockRolePermissionSQLHelper) CheckPermittedUserPermissionSQL(ctx *fiber.Ctx, typeUser PermittedUser) *entity.HttpError {
+	args := m.Mock.Called(ctx, typeUser)
+	return args.Get(0).(*entity.HttpError)
+}
