@@ -425,8 +425,8 @@ func CheckUserAccessSQL(
 ) error {
 	filter := map[string]sql_query.SQLCondition{
 		"status": {
-			Operator: sql_query.SQLOperatorAny,
-			Value:    []string{"Waiting for Handover", "Waiting for Approval", "Waiting for Confirmation"},
+			Operator: sql_query.SQLOperatorNotIn,
+			Value:    []string{"Canceled", "Rejected"},
 		},
 	}
 
