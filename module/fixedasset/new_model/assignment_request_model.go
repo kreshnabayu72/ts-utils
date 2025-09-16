@@ -16,7 +16,7 @@ type AssignmentRequest struct {
 	PreviousStatus AssignmentRequestStatus `json:"previousStatus" column:"assignment_requests.previous_status" sql:"assignment_request_status_enum NULL DEFAULT NULL"`
 	IsVerified     bool                    `json:"isVerified"     column:"assignment_requests.is_verified"     sql:"BOOLEAN"`
 	Notes          string                  `json:"notes"          column:"assignment_requests.notes"           sql:"VARCHAR"`
-	SerialNumber   *string                 `json:"serialNumber"          column:"assignment_requests.serial_number"           sql:"VARCHAR"`
+	SerialNumber   *string                 `json:"serialNumber"   column:"assignment_requests.serial_number"   sql:"VARCHAR"`
 	CreatedAt      time.Time               `json:"createdAt"      column:"assignment_requests.created_at"      sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 	UpdatedAt      time.Time               `json:"updatedAt"      column:"assignment_requests.updated_at"      sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
