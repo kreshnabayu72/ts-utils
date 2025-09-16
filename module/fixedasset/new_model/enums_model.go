@@ -612,12 +612,14 @@ const (
 type AssignmentTransactionStatus string
 
 const (
-	AssignmentTransactionStatusWaitingForApproval AssignmentTransactionStatus = "Waiting for Approval"
-	AssignmentTransactionStatusWaitingForHandover AssignmentTransactionStatus = "Waiting for Handover"
-	AssignmentTransactionStatusAssigned           AssignmentTransactionStatus = "Assigned"
-	AssignmentTransactionStatusCanceled           AssignmentTransactionStatus = "Canceled"
-	AssignmentTransactionStatusUnassigned         AssignmentTransactionStatus = "Unassigned"
-	AssignmentTransactionStatusRejected           AssignmentTransactionStatus = "Rejected"
+	AssignmentTransactionStatusWaitingForApproval     AssignmentTransactionStatus = "Waiting for Approval"
+	AssignmentTransactionStatusWaitingForHandover     AssignmentTransactionStatus = "Waiting for Handover"
+	AssignmentTransactionStatusWaitingForConfirmation AssignmentTransactionStatus = "Waiting for Confirmation"
+	AssignmentTransactionStatusWaitingForVerification AssignmentTransactionStatus = "Waiting for Verification"
+	AssignmentTransactionStatusAssigned               AssignmentTransactionStatus = "Assigned"
+	AssignmentTransactionStatusCanceled               AssignmentTransactionStatus = "Canceled"
+	AssignmentTransactionStatusUnassigned             AssignmentTransactionStatus = "Unassigned"
+	AssignmentTransactionStatusRejected               AssignmentTransactionStatus = "Rejected"
 )
 
 type AssignmentRequestStatus string
@@ -626,6 +628,7 @@ const (
 	AssignmentRequestStatusWaitingForApproval     AssignmentRequestStatus = "Waiting for Approval"
 	AssignmentRequestStatusWaitingForHandover     AssignmentRequestStatus = "Waiting for Handover"
 	AssignmentRequestStatusWaitingForConfirmation AssignmentRequestStatus = "Waiting for Confirmation"
+	AssignmentRequestStatusWaitingForVerification AssignmentRequestStatus = "Waiting for Verification"
 	AssignmentRequestStatusAssigned               AssignmentRequestStatus = "Assigned"
 	AssignmentRequestStatusCanceled               AssignmentRequestStatus = "Canceled"
 	AssignmentRequestStatusUnassigned             AssignmentRequestStatus = "Unassigned"
