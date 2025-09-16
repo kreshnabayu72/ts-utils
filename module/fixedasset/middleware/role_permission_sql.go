@@ -18,7 +18,7 @@ func CombineOrRestriction(middlewares ...fiber.Handler) fiber.Handler {
 			err := mw(c)
 			if err == nil {
 				// At least one middleware passed then authorized
-				return c.Next()
+				return nil
 			}
 			lastErr = err
 		}
