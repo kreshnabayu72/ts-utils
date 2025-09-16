@@ -409,6 +409,24 @@ func CheckPermittedUserPermissionSQL(
 	fixedAssetDbName := db.FixedAssetDBName.CompanyDBName(companyCode)
 	service := service.MakePostgreSqlService(fixedAssetDbName)
 
+	count, err := CheckUserAccessSQL(service, ctx.Context(), typeUser, userId)
+	if err != nil {
+		return entity.InternalServerError(err.Error())
+	}
+
+	if count < 1 {
+		return entity.Unauthorized("You do not have the required permissions")
+	}
+
+	return nil
+}
+
+func CheckUserAccessSQL(
+	service service.PostgreSqlService,
+	ctx context.Context,
+	typeUser PermittedUser,
+	userId string,
+) (int, error) {
 	filter := map[string]sql_query.SQLCondition{
 		"status": {
 			Operator: sql_query.SQLOperatorAny,
@@ -431,16 +449,7 @@ func CheckPermittedUserPermissionSQL(
 		}
 	}
 
-	count, err := service.CountWithFilter(ctx.Context(), dbName, filter)
-	if err != nil {
-		return entity.InternalServerError(err.Error())
-	}
-
-	if count < 1 {
-		return entity.Unauthorized("You do not have the required permissions")
-	}
-
-	return nil
+	return service.CountWithFilter(ctx, dbName, filter)
 }
 
 // GetTopLevelTransactionRoles finds all transaction roles for a specific role attribute and
