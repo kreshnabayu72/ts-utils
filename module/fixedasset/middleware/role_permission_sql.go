@@ -9,6 +9,26 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// PermittedUserRestrictionSQL creates a middleware that restricts access based on a user's
+// given access (either "Assigned" or "Borrower" based on given param value).
+func PermittedUserRestrictionSQL(typeUser helper.PermittedUser) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		isTest := c.Locals(middleware.IsTest)
+		if isTest != nil {
+			return c.Next()
+		}
+
+		// Check permissions based on the provided permissionKey and resourceTypes
+		err := helper.CheckPermittedUserPermissionSQL(c, typeUser)
+		if err != nil {
+			return response.SendResponse(c, fiber.StatusUnauthorized, nil, "Unauthorized: "+err.Message)
+		}
+
+		// Continue to the next handler if permission is granted
+		return c.Next()
+	}
+}
+
 // GlobalSystemRoleRestrictionSQL creates a middleware that restricts access based on a user's
 // system role permissions, regardless of which group they belong to (which means global system role).
 //
