@@ -13,6 +13,7 @@ type BorrowingTransaction struct {
 	ManagerID                    int                        `json:"managerId"                    column:"borrowing_transactions.manager_id"                      sql:"BIGINT"`
 	GroupID                      int                        `json:"groupId"                      column:"borrowing_transactions.group_id"                        sql:"BIGINT"`
 	Status                       BorrowingTransactionStatus `json:"status"                       column:"borrowing_transactions.status"                          sql:"borrowing_transaction_status_enum"`
+	IsSelfService                bool                       `json:"isSelfService"                column:"borrowing_transactions.is_self_service"                 sql:"BOOLEAN"`
 	IsVerified                   bool                       `json:"isVerified"                   column:"borrowing_transactions.is_verified"                     sql:"BOOLEAN"`
 	ConfirmationEmail            string                     `json:"confirmationEmail"            column:"borrowing_transactions.confirmation_email"              sql:"VARCHAR"`
 	ConfirmationEmailConfirmed   bool                       `json:"confirmationEmailConfirmed"   column:"borrowing_transactions.confirmation_email_confirmed"    sql:"BOOLEAN"`
