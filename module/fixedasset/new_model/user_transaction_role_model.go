@@ -16,7 +16,7 @@ type UserTransactionRole struct {
 	RoleType      TransactionRoleType      `json:"roleType"      column:"user_transaction_roles.role_type"      sql:"transaction_role_type_enum NOT NULL"`
 	GroupID       int                      `json:"groupId"       column:"user_transaction_roles.group_id"       sql:"BIGINT NOT NULL"`
 	ApprovalLevel *int                     `json:"approvalLevel" column:"user_transaction_roles.approval_level" sql:"INTEGER"`
-	ApprovalType  string                   `json:"approvalType"  column:"user_transaction_roles.approval_type"  sql:"approval_type_enum NOT NULL"`
+	ApprovalType  ApprovalType             `json:"approvalType"  column:"user_transaction_roles.approval_type"  sql:"approval_type_enum NOT NULL"`
 	CreatedAt     *time.Time               `json:"createdAt"     column:"user_transaction_roles.created_at"     sql:"TIMESTAMPTZ NULL"`
 	UpdatedAt     *time.Time               `json:"updatedAt"     column:"user_transaction_roles.updated_at"     sql:"TIMESTAMPTZ NULL"`
 }
