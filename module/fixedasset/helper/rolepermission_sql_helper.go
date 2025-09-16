@@ -8,6 +8,13 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+type PermittedUser string
+
+const (
+	PermittedUserAssigned = "Assigned"
+	PermittedUserBorrower = "Borrower"
+)
+
 type RolePermissionHelperSQL interface {
 	CheckSystemRolePermissionSQL(
 		ctx *fiber.Ctx,
@@ -44,6 +51,11 @@ type RolePermissionHelperSQL interface {
 	) error
 
 	CheckTotalControlPermissionSQL(ctx *fiber.Ctx) *entity.HttpError
+
+	CheckPermittedUserPermissionSQL(
+		ctx *fiber.Ctx,
+		typeUser PermittedUser,
+	) *entity.HttpError
 }
 
 type RolePermissionSQLHelperImpl struct{}
@@ -112,4 +124,11 @@ func (r *RolePermissionSQLHelperImpl) CheckTransactionRolePermissionSQL(
 
 func (r *RolePermissionSQLHelperImpl) CheckTotalControlPermissionSQL(ctx *fiber.Ctx) *entity.HttpError {
 	return CheckTotalControlPermissionSQL(ctx)
+}
+
+func (r *RolePermissionSQLHelperImpl) CheckPermittedUserPermissionSQL(
+	ctx *fiber.Ctx,
+	typeUser PermittedUser,
+) *entity.HttpError {
+	return CheckPermittedUserPermissionSQL(ctx, typeUser)
 }
