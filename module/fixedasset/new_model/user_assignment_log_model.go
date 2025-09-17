@@ -12,7 +12,7 @@ type UserAssignmentLog struct {
 	AssetName             string             `json:"assetName"             bson:"assetName"`
 	AssetNameWithSequence string             `json:"assetNameWithSequence" bson:"assetNameWithSequence"`
 	Action                string             `json:"action"                bson:"action"`
-	UserID                int                `json:"userId"                bson:"userId"`
+	UserID                string             `json:"userId"                bson:"userId"`
 	UserFullName          string             `json:"userFullName"          bson:"userFullName"`
 	CreatedAt             time.Time          `json:"createdAt"             bson:"createdAt"`
 	UpdatedAt             time.Time          `json:"updatedAt"             bson:"updatedAt"`
