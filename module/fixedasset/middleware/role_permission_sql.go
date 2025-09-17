@@ -9,6 +9,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// Currently only support for assigned/borrower with transaction roles
+// Add support to other middleware by adding variadic param `shouldPropagateError`
 func CombineOrRestriction(middlewares ...fiber.Handler) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var lastErr error
@@ -33,7 +35,7 @@ func CombineOrRestriction(middlewares ...fiber.Handler) fiber.Handler {
 
 // PermittedUserRestrictionSQL creates a middleware that restricts access based on a user's
 // given access (either "Assigned" or "Borrower" based on given param value).
-func PermittedUserRestrictionSQL(typeUser helper.PermittedUser) fiber.Handler {
+func PermittedUserRestrictionSQL(typeUser helper.PermittedUser, shouldPropagateError ...bool) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		isTest := c.Locals(middleware.IsTest)
 		if isTest != nil {
@@ -43,6 +45,9 @@ func PermittedUserRestrictionSQL(typeUser helper.PermittedUser) fiber.Handler {
 		// Check permissions based on the provided permissionKey and resourceTypes
 		err := helper.CheckPermittedUserPermissionSQL(c, typeUser)
 		if err != nil {
+			if len(shouldPropagateError) > 0 && shouldPropagateError[0] {
+				return err
+			}
 			return response.SendResponse(c, fiber.StatusUnauthorized, nil, "Unauthorized: "+err.Message)
 		}
 
@@ -118,7 +123,7 @@ func TotalControlRoleRestrictionSQL() fiber.Handler {
 // transaction role is found that matches the provided types and attributes.
 //
 // This helper assumes that the action itself is not group-specific.
-func TransactionRoleRestrictionSQL(roleTypes []new_model.TransactionRoleType, transactionAttributes []new_model.TransactionRoleAttribute) fiber.Handler {
+func TransactionRoleRestrictionSQL(roleTypes []new_model.TransactionRoleType, transactionAttributes []new_model.TransactionRoleAttribute, shouldPropagateError ...bool) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		isTest := c.Locals(middleware.IsTest)
 		if isTest != nil {
@@ -130,6 +135,9 @@ func TransactionRoleRestrictionSQL(roleTypes []new_model.TransactionRoleType, tr
 			Operator: sql_query.SQLOperatorIsNotNull,
 		}, transactionAttributes, roleTypes)
 		if err != nil {
+			if len(shouldPropagateError) > 0 && shouldPropagateError[0] {
+				return err
+			}
 			return response.SendResponse(c, fiber.StatusUnauthorized, nil, "Unauthorized: "+err.Error())
 		}
 

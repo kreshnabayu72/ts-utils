@@ -725,8 +725,11 @@ func (s *SelectBuilder) WithRecursiveCTEBuilder(cteName string, cteBuilder *SQLE
 	// Shift the placeholders in the CTE query
 	shiftedCTEQuery := shiftSQLPlaceholders(cteQuery, offset)
 
-	s.WithRecursiveClauses = append(s.WithRecursiveClauses, fmt.Sprintf("%s AS (%s)", cteName, shiftedCTEQuery))
+	s.WithClauses = append(s.WithClauses, fmt.Sprintf("%s AS (%s)", cteName, shiftedCTEQuery))
 	s.Args = append(s.Args, cteArgs...)
+	s.Args = append(s.Args, cteArgs...)
+
+	s.useWithRecursive = true
 
 	return s
 }
@@ -840,20 +843,15 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 	// WITH
 	if len(s.WithClauses) > 0 {
 		withSb.WriteByte('\n')
-		withSb.WriteString("WITH ")
-		for i, c := range s.WithClauses {
-			if i > 0 {
-				withSb.WriteString(", ")
-			}
-			withSb.WriteString(c)
-		}
-	}
 
-	// WITH RECURSIVE
-	if len(s.WithRecursiveClauses) > 0 {
-		withSb.WriteByte('\n')
-		withSb.WriteString("WITH RECURSIVE ")
-		for i, c := range s.WithRecursiveClauses {
+		// if one of WITH are recursive, add 'RECURSIVE' string
+		if s.useWithRecursive {
+			withSb.WriteString("WITH RECURSIVE ")
+		} else {
+			withSb.WriteString("WITH ")
+		}
+
+		for i, c := range s.WithClauses {
 			if i > 0 {
 				withSb.WriteString(", ")
 			}
