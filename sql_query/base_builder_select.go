@@ -727,7 +727,6 @@ func (s *SelectBuilder) WithRecursiveCTEBuilder(cteName string, cteBuilder *SQLE
 
 	s.WithClauses = append(s.WithClauses, fmt.Sprintf("%s AS (%s)", cteName, shiftedCTEQuery))
 	s.Args = append(s.Args, cteArgs...)
-	s.Args = append(s.Args, cteArgs...)
 
 	s.useWithRecursive = true
 
