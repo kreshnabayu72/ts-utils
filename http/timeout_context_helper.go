@@ -69,7 +69,7 @@ func RunWithTimeout[T any](
 	case <-ctxWithTimeout.Done():
 		return response.SendResponse(ctx, fiber.StatusRequestTimeout, nil, "Timeout")
 	case err := <-errorChan:
-		return response.SendResponse(ctx, err.Code, nil, err.Message)
+		return response.SendResponse(ctx, err.Code, err.Data, err.Message)
 	case res := <-resultChan:
 		return response.SendResponse(ctx, successCode, res, successMessage)
 	}
