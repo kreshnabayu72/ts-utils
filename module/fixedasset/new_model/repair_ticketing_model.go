@@ -8,7 +8,7 @@ import (
 
 type RepairTicketing struct {
 	ID                         int                     `json:"_id"                        column:"repair_ticketings.id"                            sql:"BIGINT PRIMARY KEY"`
-	AssetID                    int                     `json:"assetId"                    column:"repair_ticketings.asset_id"                      sql:"BIGINT NOT NULL"`
+	Asset                      int                     `json:"asset"                    column:"repair_ticketings.asset"                      sql:"BIGINT NOT NULL"`
 	ReportedByID               int                     `json:"reportedById"               column:"repair_ticketings.reported_by_id"                sql:"BIGINT NOT NULL"`
 	DamageImage                string                  `json:"damageImage"                column:"repair_ticketings.damage_image"                  sql:"VARCHAR"`
 	PreviousStatus             AssetStatus             `json:"previousStatus"             column:"repair_ticketings.previous_status"               sql:"asset_status_enum NOT NULL"`
@@ -41,8 +41,8 @@ func (m *RepairTicketing) Up(builder *migration.MigrationBuilder) {
 	builder.AddColumn(m)
 
 	builder.AddForeignKey(
-		"fk_repair_ticketing_asset_id",
-		"asset_id",
+		"fk_repair_ticketing_asset",
+		"asset",
 		"assets",
 		"id",
 		"CASCADE",
