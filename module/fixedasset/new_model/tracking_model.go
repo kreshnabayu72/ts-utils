@@ -8,7 +8,7 @@ import (
 
 type Tracking struct {
 	ID              int               `json:"_id"             column:"trackings.id"                sql:"BIGINT PRIMARY KEY"`
-	AssetID         int               `json:"assetId"         column:"trackings.asset_id"          sql:"BIGINT NOT NULL"`
+	Asset           int               `json:"asset"         column:"trackings.asset"          sql:"BIGINT NOT NULL"`
 	ReportedByID    int               `json:"reportedById"    column:"trackings.reported_by_id"    sql:"BIGINT NOT NULL"`
 	DamageImage     string            `json:"damageImage"     column:"trackings.damage_image"      sql:"VARCHAR"`
 	PreviousStatus  AssetStatus       `json:"previousStatus"  column:"trackings.previous_status"   sql:"asset_status_enum NOT NULL"`
@@ -52,8 +52,8 @@ func (m *Tracking) Up(builder *migration.MigrationBuilder) {
 		"CASCADE",
 	)
 	builder.AddForeignKey(
-		"fk_tracking_asset_id",
-		"asset_id",
+		"fk_tracking_asset",
+		"asset",
 		"assets",
 		"id",
 		"CASCADE",
