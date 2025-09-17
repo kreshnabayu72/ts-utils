@@ -23,8 +23,8 @@ type Tracking struct {
 	ApprovalRound   int               `json:"approvalRound"   column:"trackings.approval_round"    sql:"INTEGER NOT NULL DEFAULT 0"`
 
 	FoundAt    time.Time `json:"foundAt" column:"trackings.found_at"`
-	FoundBy    time.Time `json:"foundBy" column:"trackings.found_by_id"`
-	FoundGroup time.Time `json:"found_group" column:"trackings.found_group_id"`
+	FoundBy    int       `json:"foundBy" column:"trackings.found_by_id"`
+	FoundGroup int       `json:"found_group" column:"trackings.found_group_id"`
 
 	CreatedAt time.Time `json:"createdAt"       column:"trackings.created_at"        sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 	UpdatedAt time.Time `json:"updatedAt"       column:"trackings.updated_at"        sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
