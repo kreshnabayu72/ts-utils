@@ -21,8 +21,13 @@ type Tracking struct {
 	DownTimeSeconds float64           `json:"downTimeSeconds" column:"trackings.down_time_seconds" sql:"FLOAT"`
 	ReportSource    AssetReportSource `json:"reportSource"    column:"trackings.report_source"     sql:"asset_report_source_enum NOT NULL"`
 	ApprovalRound   int               `json:"approvalRound"   column:"trackings.approval_round"    sql:"INTEGER NOT NULL DEFAULT 0"`
-	CreatedAt       time.Time         `json:"createdAt"       column:"trackings.created_at"        sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt       time.Time         `json:"updatedAt"       column:"trackings.updated_at"        sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+
+	FoundAt    time.Time `json:"foundAt" column:"trackings.found_at"`
+	FoundBy    int       `json:"foundBy" column:"trackings.found_by_id"`
+	FoundGroup int       `json:"found_group" column:"trackings.found_group_id"`
+
+	CreatedAt time.Time `json:"createdAt"       column:"trackings.created_at"        sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
+	UpdatedAt time.Time `json:"updatedAt"       column:"trackings.updated_at"        sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
 
 func (m *Tracking) TableName() string {
@@ -32,6 +37,20 @@ func (m *Tracking) TableName() string {
 func (m *Tracking) Up(builder *migration.MigrationBuilder) {
 	builder.AddColumn(m)
 
+	builder.AddForeignKey(
+		"fk_tracking_found_group_id",
+		"found_group_id",
+		"groups",
+		"id",
+		"CASCADE",
+	)
+	builder.AddForeignKey(
+		"fk_tracking_found_by_id",
+		"found_by_id",
+		"users",
+		"id",
+		"CASCADE",
+	)
 	builder.AddForeignKey(
 		"fk_tracking_asset_id",
 		"asset_id",
