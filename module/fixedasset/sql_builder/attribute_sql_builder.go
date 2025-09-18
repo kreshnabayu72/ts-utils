@@ -31,7 +31,6 @@ type Brand struct {
 type Category struct {
 	ID   string `column:"categories.id::text" json:"_id,omitempty"`
 	Name string `column:"categories.name" json:"name"`
-	Key  int    `column:"categories.key" json:"key"`
 }
 
 type BrandCategory struct {
