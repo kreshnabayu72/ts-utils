@@ -1122,17 +1122,6 @@ func TransactionRoleMultipleGroupAggregation(
 	roleTypes []fixedasset_new_model.TransactionRoleType,
 	hideField ...bool,
 ) {
-	builder.
-		LeftJoin(
-			"user_transaction_roles utr",
-			fmt.Sprintf(
-				"utr.user_id = $%d AND utr.is_active = true AND utr.role_attribute = $%d",
-				builder.GetCurrentArgIndex()+1,
-				builder.GetCurrentArgIndex()+2,
-			),
-		)
-	builder.AddArgs(loggedInUserId, transactionGroupAttribute)
-
 	if len(roleTypes) > 0 {
 		builder.Where(map[string]sql_query.SQLCondition{
 			"utr.role_type": {
@@ -1143,7 +1132,9 @@ func TransactionRoleMultipleGroupAggregation(
 		})
 	}
 
+	groupsMatching := []string{}
 	for idx, groupField := range groupFieldsAndAttribute {
+		groupsMatching = append(groupsMatching, fmt.Sprintf("utr.group_id = gp%d.ancestor_id", idx))
 		builder.Join(fmt.Sprintf("groups gp%d", idx), fmt.Sprintf("gp%d.id = %s", idx, groupField.Field))
 		if len(hideField) == 0 || (len(hideField) > 0 && !hideField[0]) {
 			builder.SelectBoolOr(
@@ -1175,6 +1166,18 @@ func TransactionRoleMultipleGroupAggregation(
 			)
 		}
 	}
+
+	builder.
+		LeftJoin(
+			"user_transaction_roles utr",
+			fmt.Sprintf(
+				"utr.user_id = $%d AND utr.is_active = true AND utr.role_attribute = $%d AND (%s)",
+				builder.GetCurrentArgIndex()+1,
+				builder.GetCurrentArgIndex()+2,
+				strings.Join(groupsMatching, " OR "),
+			),
+		)
+	builder.AddArgs(loggedInUserId, transactionGroupAttribute)
 }
 
 // transactionRoleMultiPermissionAggregationCTE builds a Common Table Expression (CTE)
