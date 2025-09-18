@@ -25,7 +25,7 @@ type RepairTicketingHistory struct {
 	PreviousMethod             []RepairTicketingMethod `json:"previousMethod"             column:"repair_ticketing_histories.previous_method"               sql:"repair_ticketing_method_enum[] NOT NULL"`
 	ReportNotes                string                  `json:"reportNotes"                column:"repair_ticketing_histories.report_notes"                  sql:"VARCHAR"`
 	RepairNotes                string                  `json:"repairNotes"                column:"repair_ticketing_histories.repair_notes"                  sql:"VARCHAR"`
-	IsRepairSuccess            bool                    `json:"isRepairSuccess"            column:"repair_ticketing_histories.is_repair_success"             sql:"BOOLEAN"`
+	IsRepairSuccess            *bool                   `json:"isRepairSuccess"            column:"repair_ticketing_histories.is_repair_success"             sql:"BOOLEAN"`
 	DownTimeSeconds            float64                 `json:"downTimeSeconds"            column:"repair_ticketing_histories.down_time_seconds"             sql:"FLOAT"`
 	ReportSource               AssetReportSource       `json:"reportSource"               column:"repair_ticketing_histories.report_source"                 sql:"asset_report_source_enum NOT NULL"`
 	Details                    string                  `json:"details"                    column:"repair_ticketing_histories.details"                       sql:"VARCHAR"`
