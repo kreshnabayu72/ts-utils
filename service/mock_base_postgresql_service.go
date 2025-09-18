@@ -22,8 +22,23 @@ func (m *MockBasePostgreSqlService) GetPool() PgxPoolInterface {
 	return arg.Get(0).(PgxPoolInterface)
 }
 
+func (m *MockBasePostgreSqlService) GetTransaction() pgx.Tx {
+	arg := m.Called()
+	return arg.Get(0).(pgx.Tx)
+}
+
 func (m *MockBasePostgreSqlService) SetTransaction(tx pgx.Tx) {
 	m.Called(tx)
+}
+
+func (m *MockBasePostgreSqlService) CommitTransaction(ctx context.Context) error {
+	arg := m.Called(ctx)
+	return arg.Error(0)
+}
+
+func (m *MockBasePostgreSqlService) RollbackTransaction(ctx context.Context) error {
+	arg := m.Called(ctx)
+	return arg.Error(0)
 }
 
 func (m *MockBasePostgreSqlService) Count(
