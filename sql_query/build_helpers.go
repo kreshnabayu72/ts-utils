@@ -125,7 +125,7 @@ func (s *SQLEloquentQuery) sharedWhereJsonArray(column string, each SQLCondition
 		}
 
 		// Common operator, products.user.id = $1 (literal value with args)=
-		clause = fmt.Sprintf(`value ->> "%s" %s $%d`, each.Key, each.Operator, len(s.Args)+1)
+		clause = fmt.Sprintf(`value ->> '%s' %s $%d`, each.Key, each.Operator, len(s.Args)+1)
 		s.Args = append(s.Args, each.Value)
 	}
 
