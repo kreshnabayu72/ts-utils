@@ -30,9 +30,11 @@ type TrackingHistory struct {
 	ReportSource    AssetReportSource `json:"reportSource"    column:"tracking_histories.report_source"     sql:"asset_report_source_enum NOT NULL"`
 	ApprovalRound   int               `json:"approvalRound"   column:"tracking_histories.approval_round"    sql:"INTEGER NOT NULL DEFAULT 0"`
 
-	FoundAt    time.Time `json:"foundAt" column:"tracking_histories.found_at"`
-	FoundBy    int       `json:"foundBy" column:"tracking_histories.found_by_id"`
-	FoundGroup int       `json:"found_group" column:"tracking_histories.found_group_id"`
+	FoundAt         time.Time `json:"foundAt" column:"tracking_histories.found_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NULL"`
+	FoundById       int       `json:"foundBy" column:"tracking_histories.found_by_id" sql:"BIGINT"`
+	FoundByFullName string    `json:"foundByFullName" column:"tracking_histories.found_by_full_name" sql:"VARCHAR"`
+	FoundGroupId    int       `json:"foundGroupId" column:"tracking_histories.found_group_id" sql:"BIGINT"`
+	FoundGroupName  string    `json:"foundGroupName" column:"tracking_histories.found_group_name" sql:"VARCHAR"`
 
 	CreatedAt time.Time `json:"createdAt"       column:"tracking_histories.created_at"        sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 	UpdatedAt time.Time `json:"updatedAt"       column:"tracking_histories.updated_at"        sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
