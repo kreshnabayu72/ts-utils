@@ -38,9 +38,14 @@ type PostgreSqlService interface {
 	// GetPool returns the underlying connection pool (PgxPoolInterface)
 	// used by this service.
 	GetPool() PgxPoolInterface
+	// GetTransaction returns the underlying connection transaction (pgx.Tx)
+	// used by this service.
+	GetTransaction() pgx.Tx
 	// SetTransaction assigns an active transaction (pgx.Tx) to the service.
 	// If a transaction is set, all queries will be executed within it.
 	SetTransaction(tx pgx.Tx)
+	CommitTransaction(ctx context.Context) error
+	RollbackTransaction(ctx context.Context) error
 
 	// Count executes a SELECT COUNT(*) query and returns the number of rows.
 	Count(ctx context.Context, queryString string, args ...any) (int, error)
@@ -283,8 +288,34 @@ func (s *BasePostgreSqlService) GetPool() PgxPoolInterface {
 	return s.Pool
 }
 
+func (s *BasePostgreSqlService) GetTransaction() pgx.Tx {
+	return s.Transaction
+}
+
 func (s *BasePostgreSqlService) SetTransaction(tx pgx.Tx) {
 	s.Transaction = tx
+}
+
+func (s *BasePostgreSqlService) CommitTransaction(ctx context.Context) error {
+	if s.Transaction == nil {
+		return errors.New("no active transaction to commit")
+	}
+
+	if err := s.Transaction.Commit(ctx); err != nil {
+		_ = s.Transaction.Rollback(ctx)
+		return err
+	}
+
+	return nil
+}
+
+func (s *BasePostgreSqlService) RollbackTransaction(ctx context.Context) error {
+	if s.Transaction == nil {
+		return errors.New("no active transaction to rollback")
+	}
+
+	_ = s.Transaction.Rollback(ctx)
+	return nil
 }
 
 func (s *BasePostgreSqlService) Count(
@@ -793,10 +824,22 @@ func (s *BasePostgreSqlService) DeleteManyWithFilter(
 // If fn returns an error, the transaction is rolled back.
 // If fn succeeds, the transaction is committed.
 // The returned value is whatever fn returns, or an error if commit/rollback fails.
+//
+// ⚠️ WARNING about holdCommit mode:
+// When holdCommit is true, this function will NOT commit or rollback.
+// Instead, the caller is fully responsible for calling tx.Rollback or tx.Commit.
+// Forgetting to do so will:
+//   - Leave the connection "dirty" and unusable for other queries
+//   - Hold locks and temporary resources open in PostgreSQL
+//   - Eventually cause connection pool exhaustion under load
+//
+// Although pgx will automatically rollback when the connection is returned
+// to the pool, you must NOT rely on this. Always explicitly close the tx.
 func UseTransactions[T any](
 	ctx context.Context,
 	pool PgxPoolInterface,
 	fn func(tx pgx.Tx) (T, error),
+	holdCommit ...bool,
 ) (result T, err error) {
 	tx, err := pool.Begin(ctx)
 	if err != nil {
@@ -805,13 +848,26 @@ func UseTransactions[T any](
 		return
 	}
 
+	// When holdCommit is true, caller is responsible for calling Rollback or Commit. Transaction is returned unclosed.
+	if len(holdCommit) > 0 && holdCommit[0] {
+		defer func() {
+			if r := recover(); r != nil {
+				log.Printf("transaction panicked: %v\n%s", r, debug.Stack())
+				err = errors.New("something went wrong")
+			}
+		}()
+
+		result, err = fn(tx)
+		return result, err
+	}
+
 	defer func() {
 		if r := recover(); r != nil {
 			log.Printf("transaction panicked: %v\n%s", r, debug.Stack())
-			tx.Rollback(ctx)
+			_ = tx.Rollback(ctx)
 			err = errors.New("something went wrong")
 		} else {
-			tx.Rollback(ctx)
+			_ = tx.Rollback(ctx)
 		}
 	}()
 

@@ -27,7 +27,7 @@ type RepairTicketing struct {
 	AdditionalCostCurrency     string                  `json:"additionalCostCurrency"     column:"repair_ticketings.additional_cost_currency"      sql:"VARCHAR"`
 	AdditionalCostPaymentProof string                  `json:"additionalCostPaymentProof" column:"repair_ticketings.additional_cost_payment_proof" sql:"VARCHAR"`
 	StaffID                    *int                    `json:"staffId"                    column:"repair_ticketings.staff_id"                      sql:"BIGINT NULL DEFAULT NULL"`
-	IsDeleted                  bool                    `json:"isDeleted"                  column:"repair_ticketings.is_deleted"                    sql:"BOOLEAN NOT NULL DEFAULT FALSE"`
+	ServiceCenterId            *int                    `json:"serviceCenterId"            column:"repair_ticketings.service_center_id"             sql:"BIGINT NULL DEFAULT NULL"`
 	RepairStartAt              *time.Time              `json:"repairStartAt"              column:"repair_ticketings.repair_start_at"               sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
 	CreatedAt                  time.Time               `json:"createdAt"                  column:"repair_ticketings.created_at"                    sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 	UpdatedAt                  time.Time               `json:"updatedAt"                  column:"repair_ticketings.updated_at"                    sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
