@@ -15,6 +15,8 @@ type AuditTaskAssets struct {
 	Condition    AuditTaskAssetCondition `json:"condition"    column:"audit_task_assets.condition"      sql:"VARCHAR DEFAULT NULL"`
 	Notes        string                  `json:"notes"        column:"audit_task_assets.notes"          sql:"VARCHAR NOT NULL DEFAULT ''"`
 	FoundGroupId *int                    `json:"foundGroupId" column:"audit_task_assets.found_group_id" sql:"BIGINT NULL"`
+	Address      string                  `json:"address"         column:"audit_task_assets.address"           sql:"VARCHAR NULL DEFAULT NULL"`
+	Coordinate   string                  `json:"coordinate"      column:"audit_task_assets.coordinate"        sql:"VARCHAR NULL DEFAULT NULL"`
 	CreatedAt    time.Time               `json:"createdAt"    column:"audit_task_assets.created_at"     sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 	UpdatedAt    time.Time               `json:"updatedAt"    column:"audit_task_assets.updated_at"     sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }

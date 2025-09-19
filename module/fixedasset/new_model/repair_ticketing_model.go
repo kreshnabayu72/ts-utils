@@ -27,6 +27,8 @@ type RepairTicketing struct {
 	AdditionalCostCurrency     string                  `json:"additionalCostCurrency"     column:"repair_ticketings.additional_cost_currency"      sql:"VARCHAR"`
 	AdditionalCostPaymentProof string                  `json:"additionalCostPaymentProof" column:"repair_ticketings.additional_cost_payment_proof" sql:"VARCHAR"`
 	StaffID                    *int                    `json:"staffId"                    column:"repair_ticketings.staff_id"                      sql:"BIGINT NULL DEFAULT NULL"`
+	Address                    string                  `json:"address"         column:"repair_ticketings.address"           sql:"VARCHAR NULL DEFAULT NULL"`
+	Coordinate                 string                  `json:"coordinate"      column:"repair_ticketings.coordinate"        sql:"VARCHAR NULL DEFAULT NULL"`
 	ServiceCenterId            *int                    `json:"serviceCenterId"            column:"repair_ticketings.service_center_id"             sql:"BIGINT NULL DEFAULT NULL"`
 	RepairStartAt              *time.Time              `json:"repairStartAt"              column:"repair_ticketings.repair_start_at"               sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
 	CreatedAt                  time.Time               `json:"createdAt"                  column:"repair_ticketings.created_at"                    sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`

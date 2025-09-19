@@ -24,8 +24,8 @@ type TrackingHistory struct {
 	Status          TrackingStatus    `json:"status"          column:"tracking_histories.status"            sql:"tracking_status_enum NOT NULL"`
 	Condition       TrackingCondition `json:"condition"       column:"tracking_histories.condition"         sql:"tracking_condition_enum NOT NULL"`
 	Notes           string            `json:"notes"           column:"tracking_histories.notes"             sql:"VARCHAR"`
-	Address         string            `json:"address"         column:"tracking_histories.address"           sql:"VARCHAR"`
-	Coordinate      string            `json:"coordinate"      column:"tracking_histories.coordinate"        sql:"VARCHAR"`
+	Address         string            `json:"address"         column:"tracking_histories.address"           sql:"VARCHAR NULL DEFAULT NULL"`
+	Coordinate      string            `json:"coordinate"      column:"tracking_histories.coordinate"        sql:"VARCHAR NULL DEFAULT NULL"`
 	DownTimeSeconds float64           `json:"downTimeSeconds" column:"tracking_histories.down_time_seconds" sql:"FLOAT"`
 	ReportSource    AssetReportSource `json:"reportSource"    column:"tracking_histories.report_source"     sql:"asset_report_source_enum NOT NULL"`
 	ApprovalRound   int               `json:"approvalRound"   column:"tracking_histories.approval_round"    sql:"INTEGER NOT NULL DEFAULT 0"`
