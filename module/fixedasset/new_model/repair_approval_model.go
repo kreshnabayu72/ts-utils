@@ -18,10 +18,10 @@ type RepairApproval struct {
 	Notes         *string        `json:"notes"         column:"repair_approvals.notes"          sql:"VARCHAR"`
 	Type          ApprovalType   `json:"type"          column:"repair_approvals.type"           sql:"approval_type_enum NOT NULL"`
 
-	HandledBy       RepairTicketingMethod `json:"handledBy"                  column:"repair_ticketings.handled_by"                    sql:"repair_ticketing_method_enum"`
-	ServiceCenterId *int                  `json:"serviceCenterId"            column:"repair_ticketings.service_center_id"             sql:"BIGINT NULL DEFAULT NULL"`
-	Address         string                `json:"address"         column:"repair_ticketings.address"           sql:"VARCHAR NULL DEFAULT NULL"`
-	Coordinate      string                `json:"coordinate"      column:"repair_ticketings.coordinate"        sql:"VARCHAR NULL DEFAULT NULL"`
+	HandledBy       RepairTicketingMethod `json:"handledBy"                  column:"repair_approvals.handled_by"                    sql:"repair_ticketing_method_enum"`
+	ServiceCenterId *int                  `json:"serviceCenterId"            column:"repair_approvals.service_center_id"             sql:"BIGINT NULL DEFAULT NULL"`
+	Address         string                `json:"address"         column:"repair_approvals.address"           sql:"VARCHAR NULL DEFAULT NULL"`
+	Coordinate      string                `json:"coordinate"      column:"repair_approvals.coordinate"        sql:"VARCHAR NULL DEFAULT NULL"`
 
 	ApprovedAt *time.Time `json:"approvedAt"    column:"repair_approvals.approved_at"    sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
 	CreatedAt  time.Time  `json:"createdAt"     column:"repair_approvals.created_at"     sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
