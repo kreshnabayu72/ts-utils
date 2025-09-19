@@ -17,6 +17,8 @@ type AuditApproval struct {
 	IsApproved    *bool          `json:"isApproved"    column:"audit_approvals.is_approved"    sql:"BOOLEAN NULL DEFAULT NULL"`
 	Notes         *string        `json:"notes"         column:"audit_approvals.notes"          sql:"VARCHAR"`
 	Type          ApprovalType   `json:"type"          column:"audit_approvals.type"           sql:"approval_type_enum NOT NULL"`
+	Address       string         `json:"address"         column:"audit_approvals.address"           sql:"VARCHAR"`
+	Coordinate    string         `json:"coordinate"      column:"audit_approvals.coordinate"        sql:"VARCHAR"`
 	ApprovedAt    *time.Time     `json:"approvedAt"    column:"audit_approvals.approved_at"    sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
 	CreatedAt     time.Time      `json:"createdAt"     column:"audit_approvals.created_at"     sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 	UpdatedAt     time.Time      `json:"updatedAt"     column:"audit_approvals.updated_at"     sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`

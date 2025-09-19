@@ -34,6 +34,8 @@ type RepairTicketingHistory struct {
 	AdditionalCostTotalPrice   float32                 `json:"additionalCostTotalPrice"   column:"repair_ticketing_histories.additional_cost_total_price"   sql:"FLOAT DEFAULT 0"`
 	AdditionalCostCurrency     string                  `json:"additionalCostCurrency"     column:"repair_ticketing_histories.additional_cost_currency"      sql:"VARCHAR"`
 	AdditionalCostPaymentProof string                  `json:"additionalCostPaymentProof" column:"repair_ticketing_histories.additional_cost_payment_proof" sql:"VARCHAR"`
+	Address                    string                  `json:"address"         column:"repair_ticketing_histories.address"           sql:"VARCHAR"`
+	Coordinate                 string                  `json:"coordinate"      column:"repair_ticketing_histories.coordinate"        sql:"VARCHAR"`
 	StaffFullName              string                  `json:"staffFullName"                    column:"repair_ticketing_histories.staff_full_name"                      sql:"VARCHAR"`
 	ServiceCenterName          *string                 `json:"serviceCenterName"            column:"repair_ticketing_histories.service_center_name"             sql:"VARCHAR NULL"`
 	RepairStartAt              *time.Time              `json:"repairStartAt"              column:"repair_ticketing_histories.repair_start_at"               sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
