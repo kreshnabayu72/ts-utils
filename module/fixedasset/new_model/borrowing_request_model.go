@@ -19,6 +19,7 @@ type BorrowingRequest struct {
 	Duration         int                    `json:"duration"         column:"borrowing_requests.duration"           sql:"BIGINT"`
 	ActualReturnDate *time.Time             `json:"actualReturnDate" column:"borrowing_requests.actual_return_date" sql:"TIMESTAMPTZ DEFAULT NULL"`
 	DueReturnDate    time.Time              `json:"dueReturnDate"    column:"borrowing_requests.due_return_date"    sql:"TIMESTAMPTZ NOT NULL"`
+	SerialNumber     *string                `json:"serialNumber"     column:"borrowing_requests.serial_number"`
 	CreatedAt        time.Time              `json:"createdAt"        column:"borrowing_requests.created_at"         sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 	UpdatedAt        time.Time              `json:"updatedAt"        column:"borrowing_requests.updated_at"         sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
