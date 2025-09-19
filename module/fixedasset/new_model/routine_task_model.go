@@ -14,8 +14,8 @@ type RoutineTask struct {
 	Duration      int               `json:"duration"      column:"routine_tasks.duration"       sql:"INT NOT NULL"`
 	ModifiedByID  int               `json:"modifiedById"  column:"routine_tasks.modified_by_id" sql:"BIGINT NOT NULL"`
 	ApprovalRound int               `json:"approvalRound" column:"routine_tasks.approval_round" sql:"INT NOT NULL"`
-	Address       string            `json:"address"         column:"routine_tasks.address"           sql:"VARCHAR"`
-	Coordinate    string            `json:"coordinate"      column:"routine_tasks.coordinate"        sql:"VARCHAR"`
+	Address       string            `json:"address"         column:"routine_tasks.address"           sql:"VARCHAR NULL DEFAULT NULL"`
+	Coordinate    string            `json:"coordinate"      column:"routine_tasks.coordinate"        sql:"VARCHAR NULL DEFAULT NULL"`
 	StartAt       time.Time         `json:"startAt"       column:"routine_tasks.start_at"       sql:"TIMESTAMPTZ NOT NULL"`
 	CreatedAt     time.Time         `json:"createdAt"     column:"routine_tasks.created_at"     sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 	UpdatedAt     time.Time         `json:"updatedAt"     column:"routine_tasks.updated_at"     sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`

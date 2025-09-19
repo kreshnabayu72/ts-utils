@@ -20,8 +20,8 @@ type RepairApproval struct {
 
 	HandledBy       RepairTicketingMethod `json:"handledBy"                  column:"repair_ticketings.handled_by"                    sql:"repair_ticketing_method_enum"`
 	ServiceCenterId *int                  `json:"serviceCenterId"            column:"repair_ticketings.service_center_id"             sql:"BIGINT NULL DEFAULT NULL"`
-	Address         string                `json:"address"         column:"repair_ticketings.address"           sql:"VARCHAR"`
-	Coordinate      string                `json:"coordinate"      column:"repair_ticketings.coordinate"        sql:"VARCHAR"`
+	Address         string                `json:"address"         column:"repair_ticketings.address"           sql:"VARCHAR NULL DEFAULT NULL"`
+	Coordinate      string                `json:"coordinate"      column:"repair_ticketings.coordinate"        sql:"VARCHAR NULL DEFAULT NULL"`
 
 	ApprovedAt *time.Time `json:"approvedAt"    column:"repair_approvals.approved_at"    sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
 	CreatedAt  time.Time  `json:"createdAt"     column:"repair_approvals.created_at"     sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
