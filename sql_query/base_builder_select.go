@@ -631,7 +631,12 @@ func (s *SelectBuilder) OrderBy(sortBy []string, asc bool) SQLSelectChainBuilder
 		direction = "DESC"
 	}
 
-	sortingRule := fmt.Sprintf("%s %s", strings.Join(sortBy, ", "), direction)
+	escapedColumns := []string{}
+	for i := range sortBy {
+		escapedColumns = append(escapedColumns, escapeQuoteColumns(sortBy[i]))
+	}
+
+	sortingRule := fmt.Sprintf("%s %s", strings.Join(escapedColumns, ", "), direction)
 	s.SortBy = append(s.SortBy, sortingRule)
 	return s
 }
