@@ -319,7 +319,7 @@ func (s *InsertBuilder) cachedInsertMany(slice reflect.Value) SQLInsertChainBuil
 	db.InitSnowflake()
 	firstElem := slice.Index(0)
 	t := firstElem.Type()
-	typeName := t.PkgPath() + "." + t.Name()
+	typeName := t.PkgPath() + ".[]" + t.Name()
 
 	log.Println("TEMPORARY LOG FOR CACHE: Used typeName = " + typeName)
 	// Get field meta from cache
