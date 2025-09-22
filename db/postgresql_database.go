@@ -4,12 +4,15 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net"
 	"os"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/bwmarrin/snowflake"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"golang.org/x/crypto/ssh"
 )
 
 var (
@@ -40,6 +43,7 @@ func ConnectPostgres(dbName DBName) *pgxpool.Pool {
 	}
 
 	postgresHost := os.Getenv("POSTGRES_HOST")
+	postgresPort := os.Getenv("POSTGRES_PORT")
 	postgresUsername := os.Getenv("POSTGRES_USERNAME")
 	postgresPassword := os.Getenv("POSTGRES_PASSWORD")
 	postgresSslMode := os.Getenv("POSTGRES_SSLMODE")
@@ -49,19 +53,21 @@ func ConnectPostgres(dbName DBName) *pgxpool.Pool {
 	}
 
 	if postgresHost == "" {
-		postgresHost = "localhost:5432"
+		postgresHost = "localhost"
+		postgresPort = "5432"
 	}
 
 	postgresUri := fmt.Sprintf(
-		"postgres://%s:%s@%s/%s?sslmode=%s",
+		"postgres://%s:%s@%s:%s/%s?sslmode=%s",
 		postgresUsername,
 		postgresPassword,
 		postgresHost,
+		postgresPort,
 		dbName,
 		postgresSslMode,
 	)
 
-	config, err := pgxpool.ParseConfig(postgresUri)
+	config, err := pgxpool.ParseConfig(postgresUri) //or (dsn)
 	if err != nil {
 		log.Fatalf("Unable to parse PostgreSQL URI: %v", err)
 	}
@@ -69,6 +75,43 @@ func ConnectPostgres(dbName DBName) *pgxpool.Pool {
 	pool, err := pgxpool.NewWithConfig(context.Background(), config)
 	if err != nil {
 		log.Fatalf("Unable to connect to PostgreSQL: %v", err)
+	}
+
+	// ===== SSH Tunnel Configuration =====
+	sshHost := os.Getenv("SSH_HOST")
+	sshPort := "22"
+	sshUser := os.Getenv("SSH_USER")
+	sshPassword := os.Getenv("SSH_PASSWORD")
+
+	if sshHost != "" {
+		// SSH client configuration using password authentication
+		sshConfig := &ssh.ClientConfig{
+			User: sshUser,
+			Auth: []ssh.AuthMethod{
+				ssh.Password(sshPassword),
+			},
+			// IMPORTANT: In production, use a proper HostKeyCallback.
+			// ssh.InsecureIgnoreHostKey() is convenient for development but insecure.
+			HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+			Timeout:         5 * time.Second,
+		}
+
+		// Establish the SSH connection
+		sshClient, err := ssh.Dial("tcp", net.JoinHostPort(sshHost, sshPort), sshConfig)
+		if err != nil {
+			log.Fatalf("Failed to dial SSH server: %v", err)
+		}
+		defer sshClient.Close()
+		fmt.Println("✅ SSH connection established successfully!")
+		// This dialer function will be used by pgx to establish connections
+		// through the SSH tunnel.
+		dialer := func(ctx context.Context, network, addr string) (net.Conn, error) {
+			// The addr is ignored because we are tunneling to the dbHost and dbPort defined above.
+			return sshClient.Dial("tcp", net.JoinHostPort(postgresHost, postgresPort))
+		}
+
+		// Set the custom dialer
+		config.ConnConfig.DialFunc = dialer
 	}
 
 	err = pool.Ping(context.Background())
