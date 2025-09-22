@@ -54,7 +54,6 @@ func ConnectPostgres(dbName DBName) *pgxpool.Pool {
 
 	// 2. Gather all configuration details first.
 	postgresHost := os.Getenv("POSTGRES_HOST")
-	postgresPort := os.Getenv("POSTGRES_PORT")
 	postgresUsername := os.Getenv("POSTGRES_USERNAME")
 	postgresPassword := os.Getenv("POSTGRES_PASSWORD")
 	postgresSslMode := os.Getenv("POSTGRES_SSLMODE")
@@ -63,13 +62,12 @@ func ConnectPostgres(dbName DBName) *pgxpool.Pool {
 		postgresSslMode = "disable"
 	}
 	if postgresHost == "" {
-		postgresHost = "localhost"
-		postgresPort = "5432"
+		postgresHost = "localhost:5432"
 	}
 
 	postgresUri := fmt.Sprintf(
-		"postgres://%s:%s@%s:%s/%s?sslmode=%s",
-		postgresUsername, postgresPassword, postgresHost, postgresPort, dbName, postgresSslMode,
+		"postgres://%s:%s@%s/%s?sslmode=%s",
+		postgresUsername, postgresPassword, postgresHost, dbName, postgresSslMode,
 	)
 
 	config, err := pgxpool.ParseConfig(postgresUri)
@@ -93,7 +91,8 @@ func ConnectPostgres(dbName DBName) *pgxpool.Pool {
 			Timeout:         5 * time.Second,
 		}
 
-		sshClient, err = ssh.Dial("tcp", net.JoinHostPort(sshHost, sshPort), sshConfig)
+		splittedHost := strings.Split(postgresHost, ":")
+		sshClient, err = ssh.Dial("tcp", net.JoinHostPort(splittedHost[0], sshPort), sshConfig)
 		if err != nil {
 			log.Fatalf("Failed to dial SSH server: %v", err)
 		}
@@ -101,7 +100,7 @@ func ConnectPostgres(dbName DBName) *pgxpool.Pool {
 		fmt.Println("✅ SSH connection established successfully!")
 
 		dialer := func(ctx context.Context, network, addr string) (net.Conn, error) {
-			return sshClient.Dial("tcp", net.JoinHostPort(postgresHost, postgresPort))
+			return sshClient.Dial("tcp", net.JoinHostPort(splittedHost[0], splittedHost[1]))
 		}
 		config.ConnConfig.DialFunc = dialer
 	}
