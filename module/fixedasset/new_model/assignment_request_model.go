@@ -12,6 +12,7 @@ type AssignmentRequest struct {
 	Asset          int                     `json:"asset"          column:"assignment_requests.asset"           sql:"BIGINT"`
 	Transaction    int                     `json:"transaction"    column:"assignment_requests.transaction"     sql:"BIGINT"`
 	ParentID       *int                    `json:"parentId"       column:"assignment_requests.parent_id"       sql:"BIGINT"`
+	RepairID       *int                    `json:"repairId"       column:"assignment_requests.repair_id"       sql:"BIGINT"`
 	Status         AssignmentRequestStatus `json:"status"         column:"assignment_requests.status"          sql:"assignment_request_status_enum"`
 	PreviousStatus AssignmentRequestStatus `json:"previousStatus" column:"assignment_requests.previous_status" sql:"assignment_request_status_enum NULL DEFAULT NULL"`
 	IsVerified     bool                    `json:"isVerified"     column:"assignment_requests.is_verified"     sql:"BOOLEAN"`

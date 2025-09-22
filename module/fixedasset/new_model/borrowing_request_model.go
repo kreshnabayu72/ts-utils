@@ -12,6 +12,7 @@ type BorrowingRequest struct {
 	Transaction      int                    `json:"transaction"      column:"borrowing_requests.transaction"        sql:"BIGINT"`
 	ApprovalRound    int                    `json:"approval_round"   column:"borrowing_requests.approval_round"     sql:"INTEGER DEFAULT 1"`
 	ParentID         *int                   `json:"parentId"         column:"borrowing_requests.parent_id"          sql:"BIGINT"`
+	RepairID         *int                   `json:"repairId"       column:"borrowing_requests.repair_id"       sql:"BIGINT"`
 	Status           BorrowingRequestStatus `json:"status"           column:"borrowing_requests.status"             sql:"borrowing_request_status_enum"`
 	PreviousStatus   BorrowingRequestStatus `json:"previousStatus"   column:"borrowing_requests.previous_status"    sql:"borrowing_request_status_enum NULL DEFAULT NULL"`
 	IsVerified       bool                   `json:"isVerified"       column:"borrowing_requests.is_verified"        sql:"BOOLEAN"`
