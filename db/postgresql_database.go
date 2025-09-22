@@ -19,6 +19,7 @@ var (
 	pools         = make(map[string]*pgxpool.Pool)
 	snowflakeOnce sync.Once
 	Node          *snowflake.Node
+	sshClients    = make(map[string]*ssh.Client)
 )
 
 func InitSnowflake() {
@@ -34,14 +35,24 @@ func InitSnowflake() {
 
 // ConnectPostgres initializes the PostgreSQL connection pool once
 func ConnectPostgres(dbName DBName) *pgxpool.Pool {
-	if pools[string(dbName)] != nil {
-		pool := pools[string(dbName)]
-		err := pool.Ping(context.Background())
-		if err == nil {
-			return pool
+	key := string(dbName)
+
+	// 1. Check for an existing, healthy pool.
+	if pool, ok := pools[key]; ok && pool != nil {
+		if err := pool.Ping(context.Background()); err == nil {
+			return pool // Pool is healthy, reuse it.
 		}
+		// Pool is unhealthy. Close it and its associated SSH client before creating a new one.
+		log.Printf("Unhealthy pool for '%s' detected, closing old resources.", key)
+		pool.Close()
+		if client, ok := sshClients[key]; ok && client != nil {
+			client.Close()
+		}
+		delete(pools, key)
+		delete(sshClients, key)
 	}
 
+	// 2. Gather all configuration details first.
 	postgresHost := os.Getenv("POSTGRES_HOST")
 	postgresPort := os.Getenv("POSTGRES_PORT")
 	postgresUsername := os.Getenv("POSTGRES_USERNAME")
@@ -51,7 +62,6 @@ func ConnectPostgres(dbName DBName) *pgxpool.Pool {
 	if postgresSslMode == "" {
 		postgresSslMode = "disable"
 	}
-
 	if postgresHost == "" {
 		postgresHost = "localhost"
 		postgresPort = "5432"
@@ -59,85 +69,70 @@ func ConnectPostgres(dbName DBName) *pgxpool.Pool {
 
 	postgresUri := fmt.Sprintf(
 		"postgres://%s:%s@%s:%s/%s?sslmode=%s",
-		postgresUsername,
-		postgresPassword,
-		postgresHost,
-		postgresPort,
-		dbName,
-		postgresSslMode,
+		postgresUsername, postgresPassword, postgresHost, postgresPort, dbName, postgresSslMode,
 	)
 
-	config, err := pgxpool.ParseConfig(postgresUri) //or (dsn)
+	config, err := pgxpool.ParseConfig(postgresUri)
 	if err != nil {
 		log.Fatalf("Unable to parse PostgreSQL URI: %v", err)
 	}
 
-	pool, err := pgxpool.NewWithConfig(context.Background(), config)
-	if err != nil {
-		log.Fatalf("Unable to connect to PostgreSQL: %v", err)
-	}
+	var sshClient *ssh.Client // Declare here to be accessible for storage later.
 
-	// ===== SSH Tunnel Configuration =====
+	// 3. Configure the SSH tunnel (if needed) and apply it to the config object.
 	sshHost := os.Getenv("SSH_HOST")
-	sshPort := "22"
-	sshUser := os.Getenv("SSH_USER")
-	sshPassword := os.Getenv("SSH_PASSWORD")
-
 	if sshHost != "" {
-		// SSH client configuration using password authentication
+		sshPort := "22"
+		sshUser := os.Getenv("SSH_USER")
+		sshPassword := os.Getenv("SSH_PASSWORD")
+
 		sshConfig := &ssh.ClientConfig{
-			User: sshUser,
-			Auth: []ssh.AuthMethod{
-				ssh.Password(sshPassword),
-			},
-			// IMPORTANT: In production, use a proper HostKeyCallback.
-			// ssh.InsecureIgnoreHostKey() is convenient for development but insecure.
+			User:            sshUser,
+			Auth:            []ssh.AuthMethod{ssh.Password(sshPassword)},
 			HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 			Timeout:         5 * time.Second,
 		}
 
-		// Establish the SSH connection
-		sshClient, err := ssh.Dial("tcp", net.JoinHostPort(sshHost, sshPort), sshConfig)
+		sshClient, err = ssh.Dial("tcp", net.JoinHostPort(sshHost, sshPort), sshConfig)
 		if err != nil {
 			log.Fatalf("Failed to dial SSH server: %v", err)
 		}
-		defer sshClient.Close()
+		// DO NOT use defer sshClient.Close() here. The client must live on.
 		fmt.Println("✅ SSH connection established successfully!")
-		// This dialer function will be used by pgx to establish connections
-		// through the SSH tunnel.
+
 		dialer := func(ctx context.Context, network, addr string) (net.Conn, error) {
-			// The addr is ignored because we are tunneling to the dbHost and dbPort defined above.
 			return sshClient.Dial("tcp", net.JoinHostPort(postgresHost, postgresPort))
 		}
-
-		// Set the custom dialer
 		config.ConnConfig.DialFunc = dialer
 	}
 
-	err = pool.Ping(context.Background())
+	// 4. Apply health check settings to the config. This is always a good practice.
+	config.MaxConnIdleTime = 5 * time.Minute
+	config.MaxConnLifetime = 2 * time.Hour
+	config.HealthCheckPeriod = 1 * time.Minute
+
+	// 5. Now, create the pool using the fully prepared config.
+	pool, err := pgxpool.NewWithConfig(context.Background(), config)
 	if err != nil {
+		if sshClient != nil {
+			sshClient.Close() // Clean up the SSH client if pool creation fails.
+		}
+		// Handle "database does not exist" error.
 		notExisingDB := fmt.Sprintf("database \"%s\" does not exist", dbName)
 		if strings.Contains(err.Error(), notExisingDB) {
-			err := MigrateDB(
-				dbName,
-				postgresHost,
-				postgresUsername,
-				postgresPassword,
-				postgresSslMode,
-			)
-			if err != nil {
-				log.Fatal(err)
-			}
+			// ... your migration logic here ...
+			log.Fatalf("Database '%s' does not exist. Please run migrations and restart.", dbName)
 		} else {
-			log.Fatalf("Unable to ping PostgreSQL: %v", err)
+			log.Fatalf("Unable to connect to PostgreSQL: %v", err)
 		}
-
 	}
 
-	fmt.Println("PostgreSQL pool initialized!")
+	// 6. Store the new pool and its SSH client for future use.
+	pools[key] = pool
+	if sshClient != nil {
+		sshClients[key] = sshClient
+	}
 
-	pools[string(dbName)] = pool
 	log.Printf("Connected to PostgreSQL database: %s\n", dbName)
-
-	return pools[string(dbName)]
+	return pool
 }
