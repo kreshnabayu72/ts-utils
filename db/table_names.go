@@ -114,6 +114,7 @@ const (
 	RoutineTaskTableName                      = "routine_tasks"
 	RoutineTaskStaffTableName                 = "routine_task_staffs"
 	RoutineTaskIndicatorTableName             = "routine_task_indicators"
+	ServiceActivityTableName                  = "service_activities"
 	ServiceCenterTableName                    = "service_centers"
 	ServiceCenterBrandTableName               = "service_center_brands"
 	SessionLogTableName                       = "session_logs"

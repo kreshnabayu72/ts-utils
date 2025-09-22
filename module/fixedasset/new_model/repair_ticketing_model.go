@@ -10,8 +10,6 @@ type RepairTicketing struct {
 	ID                         int                     `json:"_id"                        column:"repair_ticketings.id"                            sql:"BIGINT PRIMARY KEY"`
 	Asset                      int                     `json:"asset"                    column:"repair_ticketings.asset"                      sql:"BIGINT NOT NULL"`
 	ReportedByID               int                     `json:"reportedById"               column:"repair_ticketings.reported_by_id"                sql:"BIGINT NOT NULL"`
-	BorrowingRequestId         int                     `json:"borrowingRequestId"               column:"repair_ticketings.borrowing_request_id"                sql:"BIGINT NULL"`
-	AssignmentRequestId        int                     `json:"assignmentRequestId"               column:"repair_ticketings.assignment_request_id"                sql:"BIGINT NULL"`
 	DamageImage                string                  `json:"damageImage"                column:"repair_ticketings.damage_image"                  sql:"VARCHAR"`
 	RepairImage                string                  `json:"repairImage"                column:"repair_ticketings.repair_image"                  sql:"VARCHAR"`
 	ConfirmAction              string                  `json:"confirmAction"                column:"repair_ticketings.confirm_action"                  sql:"VARCHAR"`
