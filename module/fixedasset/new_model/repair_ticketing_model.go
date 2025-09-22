@@ -10,7 +10,11 @@ type RepairTicketing struct {
 	ID                         int                     `json:"_id"                        column:"repair_ticketings.id"                            sql:"BIGINT PRIMARY KEY"`
 	Asset                      int                     `json:"asset"                    column:"repair_ticketings.asset"                      sql:"BIGINT NOT NULL"`
 	ReportedByID               int                     `json:"reportedById"               column:"repair_ticketings.reported_by_id"                sql:"BIGINT NOT NULL"`
+	BorrowingRequestId         int                     `json:"borrowingRequestId"               column:"repair_ticketings.borrowing_request_id"                sql:"BIGINT NULL"`
+	AssignmentRequestId        int                     `json:"assignmentRequestId"               column:"repair_ticketings.assignment_request_id"                sql:"BIGINT NULL"`
 	DamageImage                string                  `json:"damageImage"                column:"repair_ticketings.damage_image"                  sql:"VARCHAR"`
+	RepairImage                string                  `json:"repairImage"                column:"repair_ticketings.repair_image"                  sql:"VARCHAR"`
+	ConfirmAction              string                  `json:"confirmAction"                column:"repair_ticketings.confirm_action"                  sql:"VARCHAR"`
 	PreviousStatus             AssetStatus             `json:"previousStatus"             column:"repair_ticketings.previous_status"               sql:"asset_status_enum NOT NULL"`
 	TransactionID              string                  `json:"transactionId"              column:"repair_ticketings.transaction_id"                sql:"VARCHAR NOT NULL"`
 	Status                     RepairTicketingStatus   `json:"status"                     column:"repair_ticketings.status"                        sql:"repair_ticketing_status_enum NOT NULL"`
@@ -31,6 +35,9 @@ type RepairTicketing struct {
 	Coordinate                 string                  `json:"coordinate"      column:"repair_ticketings.coordinate"        sql:"VARCHAR NULL DEFAULT NULL"`
 	ServiceCenterId            *int                    `json:"serviceCenterId"            column:"repair_ticketings.service_center_id"             sql:"BIGINT NULL DEFAULT NULL"`
 	RepairStartAt              *time.Time              `json:"repairStartAt"              column:"repair_ticketings.repair_start_at"               sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
+	RepairFinishedAt           *time.Time              `json:"repairFinishedAt"              column:"repair_ticketings.repair_finished_at"               sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
+	RepairConfirmedAt          *time.Time              `json:"repairConfirmedAt"              column:"repair_ticketings.repair_confirmed_at"               sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
+	RepairApprovedAt           *time.Time              `json:"repairApprovedAt"              column:"repair_ticketings.repair_approved_at"               sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
 	CreatedAt                  time.Time               `json:"createdAt"                  column:"repair_ticketings.created_at"                    sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 	UpdatedAt                  time.Time               `json:"updatedAt"                  column:"repair_ticketings.updated_at"                    sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
