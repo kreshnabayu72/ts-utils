@@ -92,7 +92,7 @@ func ConnectPostgres(dbName DBName) *pgxpool.Pool {
 		}
 
 		splittedHost := strings.Split(postgresHost, ":")
-		sshClient, err = ssh.Dial("tcp", net.JoinHostPort(splittedHost[0], sshPort), sshConfig)
+		sshClient, err = ssh.Dial("tcp", net.JoinHostPort(sshHost, sshPort), sshConfig)
 		if err != nil {
 			log.Fatalf("Failed to dial SSH server: %v", err)
 		}
