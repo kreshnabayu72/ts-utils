@@ -7,9 +7,10 @@ import (
 )
 
 type TrackingHistory struct {
-	ID                 int    `json:"_id"             column:"tracking_histories.id"                sql:"BIGINT PRIMARY KEY"`
-	Asset              int    `json:"asset"         column:"tracking_histories.asset"          sql:"BIGINT NOT NULL"`
-	ReportedByFullName string `json:"reportedByFullName"               column:"tracking_histories.reported_by_full_name"                sql:"VARCHAR"`
+	ID                 int     `json:"_id"             column:"tracking_histories.id"                sql:"BIGINT PRIMARY KEY"`
+	Asset              int     `json:"asset"         column:"tracking_histories.asset"          sql:"BIGINT NOT NULL"`
+	TagType            TagType `json:"tagType"                 column:"tracking_histories.tag_type"                  sql:"VARCHAR NOT NULL"`
+	ReportedByFullName string  `json:"reportedByFullName"               column:"tracking_histories.reported_by_full_name"                sql:"VARCHAR"`
 
 	AssetNameWithSequence string `json:"assetNameWithSequence"                column:"tracking_histories.asset_name_with_sequence"                  sql:"VARCHAR"`
 	AssetAliasCode        string `json:"assetAliasCode"                column:"tracking_histories.asset_alias_code"                  sql:"VARCHAR"`
