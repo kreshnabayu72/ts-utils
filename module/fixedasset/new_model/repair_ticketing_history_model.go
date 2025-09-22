@@ -7,9 +7,10 @@ import (
 )
 
 type RepairTicketingHistory struct {
-	ID                 int    `json:"_id"                        column:"repair_ticketing_histories.id"                            sql:"BIGINT PRIMARY KEY"`
-	Asset              int    `json:"asset"                    column:"repair_ticketing_histories.asset"                      sql:"BIGINT NOT NULL"`
-	ReportedByFullName string `json:"reportedByFullName"               column:"repair_ticketing_histories.reported_by_full_name"                sql:"VARCHAR"`
+	ID                 int     `json:"_id"                        column:"repair_ticketing_histories.id"                            sql:"BIGINT PRIMARY KEY"`
+	Asset              int     `json:"asset"                    column:"repair_ticketing_histories.asset"                      sql:"BIGINT NOT NULL"`
+	ReportedByFullName string  `json:"reportedByFullName"               column:"repair_ticketing_histories.reported_by_full_name"                sql:"VARCHAR"`
+	TagType            TagType `json:"tagType"                 column:"repair_ticketing_histories.tag_type"                  sql:"VARCHAR NOT NULL"`
 
 	AssetNameWithSequence string `json:"assetNameWithSequence"                column:"repair_ticketing_histories.asset_name_with_sequence"                  sql:"VARCHAR"`
 	AssetAliasCode        string `json:"assetAliasCode"                column:"repair_ticketing_histories.asset_alias_code"                  sql:"VARCHAR"`

@@ -10,6 +10,7 @@ import (
 type AssignmentRequestHistory struct {
 	ID               int                     `json:"id"               column:"assignment_request_histories.id"                 sql:"BIGINT PRIMARY KEY"`
 	ParentID         *int                    `json:"parentId"         column:"assignment_request_histories.parent_id"           sql:"BIGINT"`
+	TagType          TagType                 `json:"tagType"                 column:"assignment_request_histories.tag_type"                  sql:"VARCHAR NOT NULL"`
 	Asset            int                     `json:"asset"              column:"assignment_request_histories.asset"              sql:"BIGINT"`
 	AssetID          string                  `json:"assetId"          column:"assignment_request_histories.asset_id"           sql:"VARCHAR"`
 	Name             string                  `json:"name"             column:"assignment_request_histories.name"               sql:"VARCHAR"`
