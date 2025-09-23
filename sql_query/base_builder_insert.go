@@ -344,6 +344,11 @@ func (s *InsertBuilder) cachedInsertMany(slice reflect.Value) SQLInsertChainBuil
 		FieldIndexes = append(FieldIndexes, []int{0})
 
 		for _, meta := range *fieldMeta {
+			// Skip generated column.
+			if meta.IsGenerated {
+				continue
+			}
+
 			if ArrayIncludes([]string{"_id", "id"}, meta.JSONTag) || meta.ColumnTag == "id" {
 				continue
 			}

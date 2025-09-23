@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"gitea.qwertysystem.net/BETS/ts-utils/functions"
 )
 
 type UpdateRawSQL struct {
@@ -542,9 +544,13 @@ func (s *UpdateBuilder) extractUpdateFieldsStruct(v reflect.Value) ([]string, bo
 			continue
 		}
 
-		// Handle ignored fields
 		jsonTag := field.Tag.Get("json")
-		if jsonTag == "-" {
+
+		specialTag := field.Tag.Get("special")
+		specials := strings.Split(specialTag, ",")
+
+		// Handle ignored fields
+		if jsonTag == "-" || functions.Contains(specials, "generated") {
 			continue
 		}
 
