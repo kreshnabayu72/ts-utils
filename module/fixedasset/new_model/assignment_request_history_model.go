@@ -24,7 +24,7 @@ type AssignmentRequestHistory struct {
 	Transaction      int                     `json:"transaction"      column:"assignment_request_histories.transaction"        sql:"BIGINT"`
 	Status           AssignmentRequestStatus `json:"status"           column:"assignment_request_histories.status"             sql:"assignment_request_status_enum"`
 	Notes            string                  `json:"notes"            column:"assignment_request_histories.notes"              sql:"VARCHAR"`
-	User             string                  `json:"user"             column:"assignment_request_histories.user"               sql:"VARCHAR"`
+	AssignedTo       string                  `json:"assignedTo"             column:"assignment_request_histories.assignedTo"               sql:"VARCHAR"`
 	Manager          string                  `json:"manager"          column:"assignment_request_histories.manager"            sql:"VARCHAR"`
 	CreatedAt        time.Time               `json:"createdAt"        column:"assignment_request_histories.created_at"         sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 	UpdatedAt        time.Time               `json:"updatedAt"        column:"assignment_request_histories.updated_at"         sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
