@@ -2,6 +2,7 @@ package helper
 
 import (
 	"context"
+	"log"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/db"
 	utildb "gitea.qwertysystem.net/BETS/ts-utils/db"
@@ -70,7 +71,7 @@ func (f *FileManagerHelperSQLImpl) CreateFileManagerSQL(
 	case new_model.FileTypeAttachment:
 		storageFieldName = "file_storage_attachment_kb"
 	case new_model.FileTypeDamage:
-		storageFieldName = "file_storage_damaged_kb"
+		storageFieldName = "file_storage_damage_kb"
 	case new_model.FileTypeDisposal:
 		storageFieldName = "file_storage_disposal_kb"
 	case new_model.FileTypeRepairTicketing:
@@ -100,6 +101,7 @@ func (f *FileManagerHelperSQLImpl) CreateFileManagerSQL(
 		args...,
 	)
 	if err != nil {
+		log.Printf("Error file storage: %v\n", err)
 		return &entity.HttpError{Message: "Failed to update file storage"}
 	}
 
