@@ -6,7 +6,6 @@ import (
 	"sync"
 	"time"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/functions"
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
@@ -70,7 +69,6 @@ func ExtractFromType(typ reflect.Type) []FieldMeta {
 		}
 
 		specialTag := f.Tag.Get("special")
-		specials := strings.Split(specialTag, ",")
 
 		var isSlice bool
 		fType := f.Type
@@ -86,7 +84,7 @@ func ExtractFromType(typ reflect.Type) []FieldMeta {
 			IsStruct:    fType.Kind() == reflect.Struct && fType != timeType,
 			IsSlice:     isSlice,
 			IsTime:      fType == timeType,
-			IsGenerated: functions.Contains(specials, "generated"),
+			IsGenerated: strings.Contains(specialTag, "generated"),
 		}
 
 		// No longer need to check for .Elem() since variable `meta` already normalized to single struct
