@@ -18,9 +18,10 @@ type FieldMeta struct {
 	FieldIndex   []int
 	NestedFields []FieldMeta
 
-	IsStruct bool
-	IsSlice  bool
-	IsTime   bool
+	IsStruct    bool
+	IsSlice     bool
+	IsTime      bool
+	IsGenerated bool
 }
 
 type InsertTemplate struct {
@@ -67,20 +68,23 @@ func ExtractFromType(typ reflect.Type) []FieldMeta {
 			continue
 		}
 
+		specialTag := f.Tag.Get("special")
+
 		var isSlice bool
 		fType := f.Type
 		fType, isSlice = normalizeType(fType)
 		timeType := reflect.TypeOf(time.Time{})
 
 		meta := FieldMeta{
-			Name:       f.Name,
-			Type:       fType,
-			JSONTag:    strings.TrimSuffix(f.Tag.Get("json"), ",omitempty"),
-			ColumnTag:  f.Tag.Get("column"),
-			FieldIndex: f.Index,
-			IsStruct:   fType.Kind() == reflect.Struct && fType != timeType,
-			IsSlice:    isSlice,
-			IsTime:     fType == timeType,
+			Name:        f.Name,
+			Type:        fType,
+			JSONTag:     strings.TrimSuffix(f.Tag.Get("json"), ",omitempty"),
+			ColumnTag:   f.Tag.Get("column"),
+			FieldIndex:  f.Index,
+			IsStruct:    fType.Kind() == reflect.Struct && fType != timeType,
+			IsSlice:     isSlice,
+			IsTime:      fType == timeType,
+			IsGenerated: strings.Contains(specialTag, "generated"),
 		}
 
 		// No longer need to check for .Elem() since variable `meta` already normalized to single struct

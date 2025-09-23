@@ -542,9 +542,12 @@ func (s *UpdateBuilder) extractUpdateFieldsStruct(v reflect.Value) ([]string, bo
 			continue
 		}
 
-		// Handle ignored fields
 		jsonTag := field.Tag.Get("json")
-		if jsonTag == "-" {
+
+		specialTag := field.Tag.Get("special")
+
+		// Handle ignored fields
+		if jsonTag == "-" || strings.Contains(specialTag, "generated") {
 			continue
 		}
 
