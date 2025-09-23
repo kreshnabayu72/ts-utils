@@ -114,7 +114,6 @@ func migrateGlobalDB(dbName string, migrator *migration.Migrator) error {
 func migrateFixedAssetDB(dbName string, migrator *migration.Migrator) error {
 	models := []migration.Model{
 		&fixedasset_model.Measurement{},
-		&fixedasset_model.User{},
 		&fixedasset_model.AliasCode{},
 		&fixedasset_model.AliasCodeData{},
 		&fixedasset_model.AccountCode{},
