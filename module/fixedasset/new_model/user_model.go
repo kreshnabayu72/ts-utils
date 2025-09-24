@@ -29,8 +29,10 @@ type User struct {
 	ParentId               *int       `json:"parentId"               column:"users.parent_id"`
 	ReadOnlyIsActive       bool       `json:"readOnlyIsActive"       column:"users.read_only_is_active"`
 	ReadOnlyIsAssigned     bool       `json:"readOnlyIsAssigned"     column:"users.read_only_is_assigned"`
+	IsReadOnly             bool       `json:"isReadOnly"             column:"users.is_read_only"                                                   special:"generated"`
 	TotalControlIsActive   bool       `json:"totalControlIsActive"   column:"users.total_control_is_active"`
 	TotalControlIsAssigned bool       `json:"totalControlIsAssigned" column:"users.total_control_is_assigned"`
+	IsTotalControl         bool       `json:"isTotalControl"         column:"users.is_total_control"                                               special:"generated"`
 	ModifiedById           int        `json:"modifiedById"           column:"users.modified_by_id"`
 	ModifiedByFirstName    string     `json:"modifiedByFirstName"    column:"users.modified_by_first_name"`
 	ModifiedByLastName     string     `json:"modifiedByLastName"     column:"users.modified_by_last_name"`
