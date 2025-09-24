@@ -20,6 +20,7 @@ type DisposalTransactionHistory struct {
 	CompletionNotes    string                    `json:"completionNotes"    column:"disposal_transaction_histories.completion_notes"    sql:"VARCHAR"`
 	LastCondition      DisposalLastCondition     `json:"lastCondition"      column:"disposal_transaction_histories.last_condition"      sql:"disposal_last_condition_enum"`
 	Method             DisposalMethod            `json:"method"             column:"disposal_transaction_histories.method"              sql:"disposal_method_enum"`
+	CustomMethod       string                    `json:"customMethod"       column:"disposal_transaction_histories.custom_method"       sql:"VARCHAR"`
 	Organization       string                    `json:"organization"       column:"disposal_transaction_histories.organization"        sql:"VARCHAR"`
 	DocumentationPhoto string                    `json:"documentationPhoto" column:"disposal_transaction_histories.documentation_photo" sql:"VARCHAR"`
 	TotalAssets        int                       `json:"totalAssets"        column:"disposal_transaction_histories.total_assets"        sql:"BIGINT"`
