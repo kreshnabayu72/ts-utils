@@ -858,6 +858,11 @@ func UseTransactions[T any](
 		}()
 
 		result, err = fn(tx)
+
+		if err != nil {
+			log.Printf("Error %v\n", err.Error())
+		}
+
 		return result, err
 	}
 
@@ -873,6 +878,7 @@ func UseTransactions[T any](
 
 	result, err = fn(tx)
 	if err != nil {
+		log.Printf("Error %v\n", err.Error())
 		return
 	}
 
