@@ -19,6 +19,7 @@ type DisposalTransaction struct {
 	CompletionNotes      string                    `json:"completionNotes"      column:"disposal_transactions.completion_notes"       sql:"VARCHAR"`
 	LastCondition        DisposalLastCondition     `json:"lastCondition"        column:"disposal_transactions.last_condition"         sql:"disposal_last_condition_enum"`
 	Method               DisposalMethod            `json:"method"               column:"disposal_transactions.method"                 sql:"disposal_method_enum"`
+	CustomMethod         string                    `json:"customMethod"         column:"disposal_transactions.custom_method"          sql:"VARCHAR"`
 	Organization         string                    `json:"organization"         column:"disposal_transactions.organization"           sql:"VARCHAR"`
 	DocumentationPhoto   string                    `json:"documentationPhoto"   column:"disposal_transactions.documentation_photo"    sql:"VARCHAR"`
 	CurrentApprovalType  DisposalGroupType         `json:"currentApprovalType"  column:"disposal_transactions.current_approval_type"  sql:"disposal_group_type_enum NOT NULL"`

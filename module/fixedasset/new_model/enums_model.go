@@ -765,6 +765,7 @@ const (
 	DisposalMethodSell      DisposalMethod = "Sell"
 	DisposalMethodDestroy   DisposalMethod = "Destroy"
 	DisposalMethodClearance DisposalMethod = "Clearance"
+	DisposalMethodOther     DisposalMethod = "Other"
 )
 
 type DisposalTransactionStatus string
