@@ -88,6 +88,7 @@ const (
 	HandheldReaderTableName                   = "handheld_readers"
 	MeasurementTableName                      = "measurements"
 	MissingReportTableName                    = "missing_reports"
+	MissingReportHistoryTableName             = "missing_report_histories"
 	ModelTableName                            = "models"
 	NfcTableName                              = "nfcs"
 	QrTableName                               = "qrs"
