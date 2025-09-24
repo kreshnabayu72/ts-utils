@@ -7,20 +7,20 @@ import (
 )
 
 type Tracking struct {
-	ID              int               `json:"_id"             column:"trackings.id"                sql:"BIGINT PRIMARY KEY"`
-	Asset           int               `json:"asset"         column:"trackings.asset"          sql:"BIGINT NOT NULL"`
-	ReportedByID    int               `json:"reportedById"    column:"trackings.reported_by_id"    sql:"BIGINT NOT NULL"`
-	DamageImage     string            `json:"damageImage"     column:"trackings.damage_image"      sql:"VARCHAR"`
-	PreviousStatus  AssetStatus       `json:"previousStatus"  column:"trackings.previous_status"   sql:"asset_status_enum NOT NULL"`
-	TransactionID   string            `json:"transactionId"   column:"trackings.transaction_id"    sql:"VARCHAR NOT NULL"`
-	Status          TrackingStatus    `json:"status"          column:"trackings.status"            sql:"tracking_status_enum NOT NULL"`
-	Condition       TrackingCondition `json:"condition"       column:"trackings.condition"         sql:"tracking_condition_enum NOT NULL"`
-	Notes           string            `json:"notes"           column:"trackings.notes"             sql:"VARCHAR"`
-	Address         string            `json:"address"         column:"trackings.address"           sql:"VARCHAR NULL DEFAULT NULL"`
-	Coordinate      string            `json:"coordinate"      column:"trackings.coordinate"        sql:"VARCHAR NULL DEFAULT NULL"`
-	DownTimeSeconds float64           `json:"downTimeSeconds" column:"trackings.down_time_seconds" sql:"FLOAT"`
-	ReportSource    AssetReportSource `json:"reportSource"    column:"trackings.report_source"     sql:"asset_report_source_enum NOT NULL"`
-	ApprovalRound   int               `json:"approvalRound"   column:"trackings.approval_round"    sql:"INTEGER NOT NULL DEFAULT 0"`
+	ID              int                `json:"_id"             column:"trackings.id"                sql:"BIGINT PRIMARY KEY"`
+	Asset           int                `json:"asset"         column:"trackings.asset"          sql:"BIGINT NOT NULL"`
+	ReportedByID    int                `json:"reportedById"    column:"trackings.reported_by_id"    sql:"BIGINT NOT NULL"`
+	DamageImage     string             `json:"damageImage"     column:"trackings.damage_image"      sql:"VARCHAR"`
+	PreviousStatus  AssetStatus        `json:"previousStatus"  column:"trackings.previous_status"   sql:"asset_status_enum NOT NULL"`
+	TransactionID   string             `json:"transactionId"   column:"trackings.transaction_id"    sql:"VARCHAR NOT NULL"`
+	Status          TrackingStatus     `json:"status"          column:"trackings.status"            sql:"tracking_status_enum NOT NULL"`
+	Condition       *TrackingCondition `json:"condition"       column:"trackings.condition"         sql:"VARCHAR NULL"`
+	Notes           string             `json:"notes"           column:"trackings.notes"             sql:"VARCHAR"`
+	Address         string             `json:"address"         column:"trackings.address"           sql:"VARCHAR NULL DEFAULT NULL"`
+	Coordinate      string             `json:"coordinate"      column:"trackings.coordinate"        sql:"VARCHAR NULL DEFAULT NULL"`
+	DownTimeSeconds float64            `json:"downTimeSeconds" column:"trackings.down_time_seconds" sql:"FLOAT"`
+	ReportSource    AssetReportSource  `json:"reportSource"    column:"trackings.report_source"     sql:"asset_report_source_enum NOT NULL"`
+	ApprovalRound   int                `json:"approvalRound"   column:"trackings.approval_round"    sql:"INTEGER NOT NULL DEFAULT 0"`
 
 	FoundAt    time.Time `json:"foundAt" column:"trackings.found_at"`
 	FoundBy    int       `json:"foundBy" column:"trackings.found_by_id"`
