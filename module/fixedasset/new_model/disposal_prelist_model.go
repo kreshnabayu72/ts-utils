@@ -12,6 +12,7 @@ type DisposalPrelist struct {
 	OriginGroupID   int                   `json:"originGroupId"   column:"disposal_prelists.origin_group_id"   sql:"BIGINT NOT NULL"`
 	DisposalGroupID int                   `json:"disposalGroupId" column:"disposal_prelists.disposal_group_id" sql:"BIGINT"`
 	Method          DisposalMethod        `json:"method"          column:"disposal_prelists.method"            sql:"disposal_method_enum"`
+	CustomMethod    string                `json:"customMethod"    column:"disposal_prelists.custom_method"     sql:"VARCHAR"`
 	LastCondition   DisposalLastCondition `json:"lastCondition"   column:"disposal_prelists.last_condition"    sql:"disposal_last_condition_enum"`
 	Organization    string                `json:"organization"    column:"disposal_prelists.organization"      sql:"VARCHAR"`
 	CreatedAt       time.Time             `json:"createdAt"       column:"disposal_prelists.created_at"        sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
