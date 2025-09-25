@@ -19,7 +19,7 @@ type MissingReportHistory struct {
 	Image            *string             `json:"image"            column:"missing_report_histories.image"              sql:"VARCHAR"`
 	Group            string              `json:"group"            column:"missing_report_histories.group"              sql:"VARCHAR"`
 	GroupID          int                 `json:"groupId"          column:"missing_report_histories.group_id"           sql:"BIGINT"`
-	ReportedBy       int                 `json:"reportedBy"       column:"missing_report_histories.reported_by"        sql:"VARCHAR"`
+	ReportedBy       string              `json:"reportedBy"       column:"missing_report_histories.reported_by"        sql:"VARCHAR"`
 	Status           MissingReportStatus `json:"status"           column:"missing_report_histories.status"             sql:"missing_report_status_enum NOT NULL"`
 	Notes            string              `json:"notes"            column:"missing_report_histories.notes"              sql:"VARCHAR"`
 	FoundAt          time.Time           `json:"foundAt"          column:"missing_report_histories.created_at"         sql:"TIMESTAMPTZ"`
