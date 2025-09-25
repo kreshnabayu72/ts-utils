@@ -25,6 +25,7 @@ type Asset struct {
 	FirstImage             *string           `json:"firstImage"               column:"assets.first_image"                sql:"VARCHAR"`
 	SecondImage            *string           `json:"secondImage"              column:"assets.second_image"               sql:"VARCHAR"`
 	SetDefault             AssetDefaultImage `json:"setDefault"               column:"assets.set_default"                sql:"asset_default_image_enum"`
+	AssetImage             *string           `json:"assetImage"               column:"assets.asset_image"                special:"generated"`
 	PreviousStatus         *string           `json:"previousStatus"           column:"assets.previous_status"            sql:"asset_status_enum"`
 	TagType                TagType           `json:"tagType"                  column:"assets.tag_type"                   special:"generated"`
 	GroupID                int               `json:"groupId"                  column:"assets.group_id"                   sql:"BIGINT"`
