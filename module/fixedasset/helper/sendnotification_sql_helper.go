@@ -125,6 +125,7 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationToTransactionRolesSQL(
 	userTransactionRoleService := serviceProvider.MakePostgreSqlService(
 		db.FixedAssetDBName.CompanyDBName(companyCode),
 	)
+	userTransactionRoleService.Debug(3)
 
 	builder := sql_query.NewSQLSelectBuilder[any](db.UserTransactionRoleTableName, "utr").
 		Select("utr.user_id").
@@ -152,6 +153,7 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationToTransactionRolesSQL(
 		args...,
 	)
 	if err != nil {
+		log.Printf("Error: %v\n", err.Error())
 		return entity.InternalServerError(err.Error())
 	}
 
@@ -241,7 +243,7 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationToUsersSQL(
 	userService := serviceProvider.MakePostgreSqlService(
 		db.FixedAssetDBName.CompanyDBName(companyCode),
 	)
-
+	userService.Debug(3)
 	query, args, _ := sql_query.NewSQLSelectBuilder[util_fixedasset_new_model.User](
 		db.UserTableName,
 	).
@@ -258,6 +260,8 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationToUsersSQL(
 		args...,
 	)
 	if err != nil {
+		log.Printf("Error: %v\n", err.Error())
+
 		return entity.InternalServerError(err.Error())
 	}
 
@@ -294,13 +298,15 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationToUsersSQL(
 	sendNotifErr := r.SendNotificationSQL(serviceProvider, companyCode, pendingNotifications)
 
 	if sendNotifErr != nil {
+		log.Printf("Error: %v\n", sendNotifErr.Error())
+
 		return entity.ToHttpError(sendNotifErr)
 	}
 
 	mobileNotifErr := r.SendMobileNotificationSQL(notificationDataWithoutUser, fcmTokens)
 
 	if mobileNotifErr != nil {
-		fmt.Println("MOBILE NOTIFICATION ERROR: " + mobileNotifErr.Error())
+		log.Println("MOBILE NOTIFICATION ERROR: " + mobileNotifErr.Error())
 	}
 
 	return nil
@@ -334,7 +340,7 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationSQL(
 		)
 		// Dont throw error, if notif is down, let transaction continue
 		if err != nil {
-			fmt.Println("NOTIFICATION ERROR: " + err.Error())
+			log.Println("NOTIFICATION ERROR: " + err.Error())
 			continue
 		}
 
@@ -345,6 +351,8 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationSQL(
 
 	_, err := notificationService.InsertMany(context.Background(), notificationsInterface)
 	if err != nil {
+		log.Printf("Error: %v\n", err.Error())
+
 		return entity.InternalServerError(err.Error())
 	}
 
@@ -368,11 +376,11 @@ func (r *SendNotificationSQLHelperImpl) SendMobileNotificationSQL(
 
 	app, err := firebase.NewApp(ctx, config, opt)
 	if err != nil {
-		fmt.Printf("error initializing app: %v\n", err)
+		log.Printf("error initializing app: %v\n", err)
 	}
 	client, err := app.Messaging(ctx)
 	if err != nil {
-		fmt.Printf("error getting Messaging client: %v\n", err)
+		log.Printf("error getting Messaging client: %v\n", err)
 	}
 
 	if client == nil {
@@ -466,7 +474,7 @@ func emitRefreshSse(userIds []string, message string, reason ...string) *entity.
 		resp, err := http.Get(path)
 		// Don't throw error, if notif is down, let transaction continue
 		if err != nil {
-			fmt.Println("RefreshNotificationSseSQL: " + err.Error())
+			log.Println("RefreshNotificationSseSQL: " + err.Error())
 			continue
 		}
 
