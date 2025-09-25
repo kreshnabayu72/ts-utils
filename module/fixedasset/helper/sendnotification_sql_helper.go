@@ -152,6 +152,7 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationToTransactionRolesSQL(
 		args...,
 	)
 	if err != nil {
+		log.Printf("Error: %v\n", err.Error())
 		return entity.InternalServerError(err.Error())
 	}
 
@@ -258,6 +259,8 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationToUsersSQL(
 		args...,
 	)
 	if err != nil {
+		log.Printf("Error: %v\n", err.Error())
+
 		return entity.InternalServerError(err.Error())
 	}
 
@@ -294,6 +297,8 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationToUsersSQL(
 	sendNotifErr := r.SendNotificationSQL(serviceProvider, companyCode, pendingNotifications)
 
 	if sendNotifErr != nil {
+		log.Printf("Error: %v\n", sendNotifErr.Error())
+
 		return entity.ToHttpError(sendNotifErr)
 	}
 
@@ -345,6 +350,8 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationSQL(
 
 	_, err := notificationService.InsertMany(context.Background(), notificationsInterface)
 	if err != nil {
+		log.Printf("Error: %v\n", err.Error())
+
 		return entity.InternalServerError(err.Error())
 	}
 
