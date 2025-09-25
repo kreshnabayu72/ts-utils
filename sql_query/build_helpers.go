@@ -197,8 +197,9 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 			}
 			clause = raw
 			// If exists, ExtraArgs will be appended into main Args
-			if len(each.ExtraArgs) > 0 {
-				s.Args = append(s.Args, each.ExtraArgs...)
+			for _, arg := range each.ExtraArgs {
+				clause = strings.Replace(clause, "?", fmt.Sprintf("$%d", len(s.Args)+1), 1)
+				s.Args = append(s.Args, arg)
 			}
 
 		/* ───────────── IS NULL / IS NOT NULL ──────────── */
