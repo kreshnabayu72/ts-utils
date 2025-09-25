@@ -19,6 +19,7 @@ type BorrowingRequest struct {
 	IsVerified       bool                   `json:"isVerified"       column:"borrowing_requests.is_verified"        sql:"BOOLEAN"`
 	Notes            string                 `json:"notes"            column:"borrowing_requests.notes"              sql:"VARCHAR"`
 	Duration         int                    `json:"duration"         column:"borrowing_requests.duration"           sql:"BIGINT"`
+	PreviousDuration int                    `json:"previousDuration" column:"borrowing_requests.previous_duration"`
 	ActualReturnDate *time.Time             `json:"actualReturnDate" column:"borrowing_requests.actual_return_date" sql:"TIMESTAMPTZ DEFAULT NULL"`
 	DueReturnDate    time.Time              `json:"dueReturnDate"    column:"borrowing_requests.due_return_date"    sql:"TIMESTAMPTZ NOT NULL"`
 	SerialNumber     *string                `json:"serialNumber"     column:"borrowing_requests.serial_number"`
