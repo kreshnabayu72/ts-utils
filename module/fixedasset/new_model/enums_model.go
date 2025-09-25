@@ -676,6 +676,7 @@ const (
 	BorrowingRequestStatusDisposed               BorrowingRequestStatus = "Disposed"
 	BorrowingRequestStatusTAGReported            BorrowingRequestStatus = "TAG Reported"
 	BorrowingRequestStatusRequestExtension       BorrowingRequestStatus = "Request Extension"
+	BorrowingRequestStatusExtendApproval         BorrowingRequestStatus = "Extend Approval"
 )
 
 type ApprovalStatus string
