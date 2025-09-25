@@ -148,7 +148,6 @@ func migrateFixedAssetDB(dbName string, migrator *migration.Migrator) error {
 
 		&fixedasset_model.BorrowingTransaction{},
 		&fixedasset_model.BorrowingRequest{},
-		&fixedasset_model.BorrowingApproval{},
 		&fixedasset_model.BorrowingPrelist{},
 		&fixedasset_model.BorrowingPrelistRequest{},
 
