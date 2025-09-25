@@ -80,7 +80,7 @@ const (
 
 	// ─────────────── Raw SQL ───────────────
 
-	// Usage: {"": {Operator: SQLOperatorRaw, Value: `"age" > $1 OR "status" = 'active'`, ExtraArgs: []any{30}}}
-	// →  age > $1 OR status = 'active'
+	// Usage: {"": {Operator: SQLOperatorRaw, Value: `"age" > ? OR "status" = 'active'`, ExtraArgs: []any{30}}}
+	// →  age > ? OR status = 'active'
 	SQLOperatorRaw SQLOperators = "__RAW__"
 )
