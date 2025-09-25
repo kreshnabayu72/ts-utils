@@ -22,7 +22,7 @@ type MissingReportHistory struct {
 	ReportedBy       string              `json:"reportedBy"       column:"missing_report_histories.reported_by"        sql:"VARCHAR"`
 	Status           MissingReportStatus `json:"status"           column:"missing_report_histories.status"             sql:"missing_report_status_enum NOT NULL"`
 	Notes            string              `json:"notes"            column:"missing_report_histories.notes"              sql:"VARCHAR"`
-	FoundAt          time.Time           `json:"foundAt"          column:"missing_report_histories.created_at"         sql:"TIMESTAMPTZ"`
+	FoundAt          time.Time           `json:"foundAt"          column:"missing_report_histories.found_at"         sql:"TIMESTAMPTZ"`
 	CreatedAt        time.Time           `json:"createdAt"        column:"missing_report_histories.created_at"         sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 	UpdatedAt        time.Time           `json:"updatedAt"        column:"missing_report_histories.updated_at"         sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
 }
