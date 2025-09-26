@@ -526,29 +526,75 @@ func (s *SQLEloquentQuery) buildUpdateQuery() (string, []interface{}, error) {
 		return "", nil, errors.New("invalid update query: CustomQuery not set")
 	}
 
-	var query string
+	var initSb strings.Builder
+	var withSb strings.Builder
+	var whereSb strings.Builder
+	var joinSb strings.Builder
+	var fromSb strings.Builder
+	var returningSb strings.Builder
+
+	initSb.Grow(256)      // preallocate ~256 bytes
+	withSb.Grow(256)      // preallocate ~256 bytes
+	whereSb.Grow(256)     // preallocate ~256 bytes
+	joinSb.Grow(256)      // preallocate ~256 bytes
+	fromSb.Grow(256)      // preallocate ~256 bytes
+	returningSb.Grow(256) // preallocate ~256 bytes
+
+	initSb.WriteByte('\n')
 	if len(s.UpdateCaseClauses) > 0 {
-		query = buildUpdateCase(s.UpdateCaseClauses, s.Table)
+		initSb.WriteString(buildUpdateCase(s.UpdateCaseClauses, s.Table))
 	} else {
-		query = s.CustomQuery
+		initSb.WriteString(s.CustomQuery)
+	}
+
+	// WITH
+	if len(s.WithClauses) > 0 {
+		withSb.WriteByte('\n')
+
+		// if one of WITH are recursive, add 'RECURSIVE' string
+		if s.useWithRecursive {
+			withSb.WriteString("WITH RECURSIVE ")
+		} else {
+			withSb.WriteString("WITH ")
+		}
+
+		for i, c := range s.WithClauses {
+			if i > 0 {
+				withSb.WriteString(", ")
+			}
+			withSb.WriteString(c)
+		}
 	}
 
 	if len(s.OtherTables) > 0 {
-		fromClause := strings.Join(s.OtherTables, " ")
-		query += " " + fromClause
+		fromSb.WriteByte('\n')
+		fromSb.WriteString(strings.Join(s.OtherTables, " "))
 	}
 
 	if len(s.Filters) < 1 {
 		return "", nil, errors.New("unsafe query: DELETE/UPDATE must have WHERE clause")
 	}
 
-	query += " " + fmt.Sprintf("WHERE %s", strings.Join(s.Filters, " AND "))
+	// WHERE
+	whereSb.WriteByte('\n')
+	whereSb.WriteString("WHERE ")
+	for i, f := range s.Filters {
+		if i > 0 {
+			whereSb.WriteString(" AND ")
+		}
+		whereSb.WriteString(f)
+	}
+	whereSb.WriteByte('\n')
 
 	if len(s.Columns) > 0 {
-		query += " RETURNING " + strings.Join(s.Columns, ",")
+		returningSb.WriteByte('\n')
+		returningSb.WriteString(" RETURNING " + strings.Join(s.Columns, ","))
 	} else {
-		query += " RETURNING id"
+		returningSb.WriteByte('\n')
+		returningSb.WriteString(" RETURNING id")
 	}
+
+	query := withSb.String() + initSb.String() + fromSb.String() + whereSb.String() + returningSb.String()
 
 	return query, s.Args, nil
 }
