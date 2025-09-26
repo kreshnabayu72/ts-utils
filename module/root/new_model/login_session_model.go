@@ -2,26 +2,14 @@ package new_model
 
 import (
 	"time"
-
-	"gitea.qwertysystem.net/BETS/ts-utils/migration"
 )
 
 type LoginSession struct {
-	ID          int        `json:"_id,omitempty" column:"id" sql:"BIGINT PRIMARY KEY"`
-	CompanyCode string     `json:"companyCode" column:"company_code" sql:"VARCHAR NOT NULL"`
-	Email       string     `json:"email" column:"email" sql:"VARCHAR NOT NULL"`
-	DeletedAt   *time.Time `json:"deletedAt" column:"deleted_at" sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
-	SessionType string     `json:"sessionType" column:"session_type" sql:"session_type_enum NULL"` // Possible Values: "mobile", "web"
-	CreatedAt   *time.Time `json:"createdAt" column:"created_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt   *time.Time `json:"updatedAt" column:"updated_at" sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-}
-
-func (m *LoginSession) TableName() string {
-	return "login_sessions"
-}
-
-func (m *LoginSession) Up(builder *migration.MigrationBuilder) {
-	builder.AddColumn(m)
-
-	builder.AddEnum("session_type_enum", []string{"Mobile", "Web"})
+	ID          int        `json:"_id,omitempty" column:"login_sessions.id"`
+	CompanyCode string     `json:"companyCode"   column:"login_sessions.company_code"`
+	Email       string     `json:"email"         column:"login_sessions.email"`
+	DeletedAt   *time.Time `json:"deletedAt"     column:"login_sessions.deleted_at"`
+	SessionType string     `json:"sessionType"   column:"login_sessions.session_type"` // Possible Values: "mobile", "web"
+	CreatedAt   *time.Time `json:"createdAt"     column:"login_sessions.created_at"`
+	UpdatedAt   *time.Time `json:"updatedAt"     column:"login_sessions.updated_at"`
 }
