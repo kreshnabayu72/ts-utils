@@ -2,53 +2,19 @@ package new_model
 
 import (
 	"time"
-
-	"gitea.qwertysystem.net/BETS/ts-utils/migration"
-	fixed_asset_migration "gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model/migration"
 )
 
 type RoutineApproval struct {
-	ID            int            `json:"id"            column:"routine_approvals.id"             sql:"BIGINT PRIMARY KEY"`
-	TaskID        int            `json:"taskId"        column:"routine_approvals.task_id"        sql:"BIGINT NOT NULL"`
-	ApproverID    int            `json:"approverId"    column:"routine_approvals.approver_id"    sql:"BIGINT"`
-	ApprovalRound int            `json:"approvalRound" column:"routine_approvals.approval_round" sql:"INTEGER NOT NULL"`
-	Level         int            `json:"level"         column:"routine_approvals.level"          sql:"INTEGER"`
-	Status        ApprovalStatus `json:"status"        column:"routine_approvals.status"         sql:"approval_status_enum"`
-	IsApproved    *bool          `json:"isApproved"    column:"routine_approvals.is_approved"    sql:"BOOLEAN NULL DEFAULT NULL"`
-	Notes         *string        `json:"notes"         column:"routine_approvals.notes"          sql:"VARCHAR"`
-	Type          ApprovalType   `json:"type"          column:"routine_approvals.type"           sql:"approval_type_enum NOT NULL"`
-	ApprovedAt    *time.Time     `json:"approvedAt"    column:"routine_approvals.approved_at"    sql:"TIMESTAMPTZ NULL DEFAULT NULL"`
-	CreatedAt     time.Time      `json:"createdAt"     column:"routine_approvals.created_at"     sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt     time.Time      `json:"updatedAt"     column:"routine_approvals.updated_at"     sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-}
-
-// TableName returns the name of the database table for this model.
-func (m *RoutineApproval) TableName() string {
-	return "routine_approvals"
-}
-
-// Up defines the migration logic to create the table and its constraints.
-func (m *RoutineApproval) Up(builder *migration.MigrationBuilder) {
-	// Add all columns from the struct
-	builder.AddColumn(m)
-
-	// Add foreign key constraints as defined in the SQL migration file
-	builder.AddForeignKey(
-		"fk_routine_approval_task_id",
-		"task_id",
-		"routine_tasks",
-		"id",
-		"CASCADE",
-	)
-	builder.AddForeignKey(
-		"fk_routine_approval_approver_id",
-		"approver_id",
-		"users",
-		"id",
-		"CASCADE",
-	)
-
-	// ─────── Insert default data ───────
-	// NOTE: reading from sql file has been tried and doesnt work in server, so use string instead
-	builder.SetPostQuery(fixed_asset_migration.RoutineApprovalPostQuery)
+	ID            int            `json:"id"            column:"routine_approvals.id"`
+	TaskID        int            `json:"taskId"        column:"routine_approvals.task_id"`
+	ApproverID    int            `json:"approverId"    column:"routine_approvals.approver_id"`
+	ApprovalRound int            `json:"approvalRound" column:"routine_approvals.approval_round"`
+	Level         int            `json:"level"         column:"routine_approvals.level"`
+	Status        ApprovalStatus `json:"status"        column:"routine_approvals.status"`
+	IsApproved    *bool          `json:"isApproved"    column:"routine_approvals.is_approved"`
+	Notes         *string        `json:"notes"         column:"routine_approvals.notes"`
+	Type          ApprovalType   `json:"type"          column:"routine_approvals.type"`
+	ApprovedAt    *time.Time     `json:"approvedAt"    column:"routine_approvals.approved_at"`
+	CreatedAt     time.Time      `json:"createdAt"     column:"routine_approvals.created_at"`
+	UpdatedAt     time.Time      `json:"updatedAt"     column:"routine_approvals.updated_at"`
 }

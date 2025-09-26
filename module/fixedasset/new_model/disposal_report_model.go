@@ -2,45 +2,16 @@ package new_model
 
 import (
 	"time"
-
-	"gitea.qwertysystem.net/BETS/ts-utils/migration"
 )
 
 // DisposalReport represents the disposal_reports table in the database.
 type DisposalReport struct {
-	ID            int                   `json:"id"            column:"disposal_reports.id"             sql:"BIGINT PRIMARY KEY"`
-	AssetID       int                   `json:"assetId"       column:"disposal_reports.asset_id"       sql:"BIGINT"`
-	ReportedByID  int                   `json:"reportedById"  column:"disposal_reports.reported_by_id" sql:"BIGINT"`
-	LastCondition DisposalLastCondition `json:"lastCondition" column:"disposal_reports.last_condition" sql:"disposal_last_condition_enum"`
-	Note          string                `json:"note"          column:"disposal_reports.note"           sql:"VARCHAR"`
-	IsDeleted     bool                  `json:"isDeleted"     column:"disposal_reports.is_deleted"     sql:"BOOLEAN"`
-	CreatedAt     time.Time             `json:"createdAt"     column:"disposal_reports.created_at"     sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-	UpdatedAt     time.Time             `json:"updatedAt"     column:"disposal_reports.updated_at"     sql:"TIMESTAMPTZ NOT NULL DEFAULT NOW()"`
-}
-
-// TableName returns the name of the database table for this model.
-func (m *DisposalReport) TableName() string {
-	return "disposal_reports"
-}
-
-// Up defines the migration logic to create the table and its constraints.
-func (m *DisposalReport) Up(builder *migration.MigrationBuilder) {
-	// Add all columns from the struct
-	builder.AddColumn(m)
-
-	// Add foreign key constraints as defined in the SQL migration file
-	builder.AddForeignKey(
-		"fk_disposal_reports_asset",
-		"asset_id",
-		"assets",
-		"id",
-		"",
-	)
-	builder.AddForeignKey(
-		"fk_disposal_reports_prelist",
-		"reported_by_id",
-		"users",
-		"id",
-		"",
-	)
+	ID            int                   `json:"id"            column:"disposal_reports.id"`
+	AssetID       int                   `json:"assetId"       column:"disposal_reports.asset_id"`
+	ReportedByID  int                   `json:"reportedById"  column:"disposal_reports.reported_by_id"`
+	LastCondition DisposalLastCondition `json:"lastCondition" column:"disposal_reports.last_condition"`
+	Note          string                `json:"note"          column:"disposal_reports.note"`
+	IsDeleted     bool                  `json:"isDeleted"     column:"disposal_reports.is_deleted"`
+	CreatedAt     time.Time             `json:"createdAt"     column:"disposal_reports.created_at"`
+	UpdatedAt     time.Time             `json:"updatedAt"     column:"disposal_reports.updated_at"`
 }
