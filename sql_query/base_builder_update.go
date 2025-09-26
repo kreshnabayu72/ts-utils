@@ -201,6 +201,34 @@ type SQLUpdateChainBuilder interface {
 	Where(filters map[string]SQLCondition) SQLUpdateChainBuilder
 	// WhereOr implements SQLUpdateChainBuilder. (Accumulates previous value if called again)
 	WhereOr(filters ...map[string]SQLCondition) SQLUpdateChainBuilder
+
+	// Join adds an INNER JOIN clause with the specified ON condition.
+	//
+	// Example:
+	//
+	//	builder.Join("roles r", "r.id = u.role_id")
+	Join(table string, onCondition string, additionalConditions ...map[string]SQLCondition) SQLUpdateChainBuilder
+	// LeftJoin adds a LEFT JOIN clause with the specified ON condition.
+	//
+	// Example:
+	//
+	//	builder.LeftJoin("roles r", "r.id = u.role_id")
+	LeftJoin(table string, onCondition string, additionalConditions ...map[string]SQLCondition) SQLUpdateChainBuilder
+
+	// WithCTEBuilder adds a Common Table Expression (CTE) to the query.
+	// It adjusts argument placeholders to avoid conflicts.
+	// This function just add the defined CTE to the top of query.
+	// You need to JOIN/LEFT JOIN the CTE builder to let main expression know that it should use CTE.
+	//
+	// Example:
+	//
+	//	builder.WithCTEBuilder("recent_orders", cte.(*sql_query.SelectBuilder).SQLEloquentQuery)
+	//
+	// Generates:
+	//
+	//	WITH recent_orders AS (SELECT id, user_id FROM orders) ...
+	WithCTEBuilder(cteName string, cteBuilder *SQLEloquentQuery) SQLUpdateChainBuilder
+
 	// Return implements SQLUpdateChainBuilder. (Only able to be called once, overrides previous values if re-called).
 	// Return sets the columns to return after the update.
 	// Defaults to RETURNING id if no column is provided.
@@ -232,6 +260,65 @@ func (s *UpdateBuilder) Where(filters map[string]SQLCondition) SQLUpdateChainBui
 
 func (s *UpdateBuilder) WhereOr(filters ...map[string]SQLCondition) SQLUpdateChainBuilder {
 	s.SQLEloquentQuery.sharedWhereOrQuery(filters...)
+	return s
+}
+
+func (s *UpdateBuilder) Join(table string, onCondition string, additionalConditions ...map[string]SQLCondition) SQLUpdateChainBuilder {
+	if table == "" {
+		return s
+	}
+
+	var filterSb strings.Builder
+	if len(additionalConditions) > 0 {
+		var filters []string
+		s.sharedWhereAndQuery(additionalConditions[0], &filters)
+
+		for i := range filters {
+			filterSb.WriteString(" AND ")
+			filterSb.WriteString(filters[i])
+		}
+	}
+
+	s.OtherTables = append(s.OtherTables, fmt.Sprintf("JOIN %s ON %s%s", table, onCondition, filterSb.String()))
+	return s
+}
+
+func (s *UpdateBuilder) LeftJoin(table string, mainCondition string, additionalConditions ...map[string]SQLCondition) SQLUpdateChainBuilder {
+	if table == "" {
+		return s
+	}
+
+	var filterSb strings.Builder
+	if len(additionalConditions) > 0 {
+		var filters []string
+		s.sharedWhereAndQuery(additionalConditions[0], &filters)
+
+		for i := range filters {
+			filterSb.WriteString(" AND ")
+			filterSb.WriteString(filters[i])
+		}
+	}
+
+	s.OtherTables = append(s.OtherTables, fmt.Sprintf("LEFT JOIN %s ON %s%s", table, mainCondition, filterSb.String()))
+	return s
+}
+
+func (s *UpdateBuilder) WithCTEBuilder(cteName string, cteBuilder *SQLEloquentQuery) SQLUpdateChainBuilder {
+	cteQuery, cteArgs, err := cteBuilder.Build()
+	if err != nil {
+		s.LastError = err
+		return s
+	}
+
+	// Calculate the current argument offset
+	offset := len(s.Args)
+
+	// Shift the placeholders in the CTE query
+	shiftedCTEQuery := shiftSQLPlaceholders(cteQuery, offset)
+
+	s.WithClauses = append(s.WithClauses, fmt.Sprintf("%s AS (%s)", cteName, shiftedCTEQuery))
+	s.Args = append(s.Args, cteArgs...)
+
 	return s
 }
 
