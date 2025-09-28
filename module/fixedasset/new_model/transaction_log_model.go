@@ -20,6 +20,7 @@ type TransactionLog struct {
 	Detail                    map[string]interface{} `json:"detail"                    bson:"detail"`
 	OriginGroup               *string                `json:"originGroup"               bson:"originGroup"`
 	DestinationGroup          *string                `json:"destinationGroup"          bson:"destinationGroup"`
+	FoundGroup                *string                `json:"foundGroup"          bson:"foundGroup"`
 	TransactionId             string                 `json:"transactionId"             bson:"transactionId"`
 	ReaderId                  *string                `json:"readerId"                  bson:"readerId"`
 	ReaderName                *string                `json:"readerName"                bson:"readerName"`

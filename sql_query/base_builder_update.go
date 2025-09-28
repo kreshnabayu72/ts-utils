@@ -201,6 +201,34 @@ type SQLUpdateChainBuilder interface {
 	Where(filters map[string]SQLCondition) SQLUpdateChainBuilder
 	// WhereOr implements SQLUpdateChainBuilder. (Accumulates previous value if called again)
 	WhereOr(filters ...map[string]SQLCondition) SQLUpdateChainBuilder
+
+	// Join adds an INNER JOIN clause with the specified ON condition.
+	//
+	// Example:
+	//
+	//	builder.Join("roles r", "r.id = u.role_id")
+	Join(table string, onCondition string, additionalConditions ...map[string]SQLCondition) SQLUpdateChainBuilder
+	// LeftJoin adds a LEFT JOIN clause with the specified ON condition.
+	//
+	// Example:
+	//
+	//	builder.LeftJoin("roles r", "r.id = u.role_id")
+	LeftJoin(table string, onCondition string, additionalConditions ...map[string]SQLCondition) SQLUpdateChainBuilder
+
+	// WithCTEBuilder adds a Common Table Expression (CTE) to the query.
+	// It adjusts argument placeholders to avoid conflicts.
+	// This function just add the defined CTE to the top of query.
+	// You need to JOIN/LEFT JOIN the CTE builder to let main expression know that it should use CTE.
+	//
+	// Example:
+	//
+	//	builder.WithCTEBuilder("recent_orders", cte.(*sql_query.SelectBuilder).SQLEloquentQuery)
+	//
+	// Generates:
+	//
+	//	WITH recent_orders AS (SELECT id, user_id FROM orders) ...
+	WithCTEBuilder(cteName string, cteBuilder *SQLEloquentQuery) SQLUpdateChainBuilder
+
 	// Return implements SQLUpdateChainBuilder. (Only able to be called once, overrides previous values if re-called).
 	// Return sets the columns to return after the update.
 	// Defaults to RETURNING id if no column is provided.
@@ -232,6 +260,65 @@ func (s *UpdateBuilder) Where(filters map[string]SQLCondition) SQLUpdateChainBui
 
 func (s *UpdateBuilder) WhereOr(filters ...map[string]SQLCondition) SQLUpdateChainBuilder {
 	s.SQLEloquentQuery.sharedWhereOrQuery(filters...)
+	return s
+}
+
+func (s *UpdateBuilder) Join(table string, onCondition string, additionalConditions ...map[string]SQLCondition) SQLUpdateChainBuilder {
+	if table == "" {
+		return s
+	}
+
+	var filterSb strings.Builder
+	if len(additionalConditions) > 0 {
+		var filters []string
+		s.sharedWhereAndQuery(additionalConditions[0], &filters)
+
+		for i := range filters {
+			filterSb.WriteString(" AND ")
+			filterSb.WriteString(filters[i])
+		}
+	}
+
+	s.OtherTables = append(s.OtherTables, fmt.Sprintf("JOIN %s ON %s%s", table, onCondition, filterSb.String()))
+	return s
+}
+
+func (s *UpdateBuilder) LeftJoin(table string, mainCondition string, additionalConditions ...map[string]SQLCondition) SQLUpdateChainBuilder {
+	if table == "" {
+		return s
+	}
+
+	var filterSb strings.Builder
+	if len(additionalConditions) > 0 {
+		var filters []string
+		s.sharedWhereAndQuery(additionalConditions[0], &filters)
+
+		for i := range filters {
+			filterSb.WriteString(" AND ")
+			filterSb.WriteString(filters[i])
+		}
+	}
+
+	s.OtherTables = append(s.OtherTables, fmt.Sprintf("LEFT JOIN %s ON %s%s", table, mainCondition, filterSb.String()))
+	return s
+}
+
+func (s *UpdateBuilder) WithCTEBuilder(cteName string, cteBuilder *SQLEloquentQuery) SQLUpdateChainBuilder {
+	cteQuery, cteArgs, err := cteBuilder.Build()
+	if err != nil {
+		s.LastError = err
+		return s
+	}
+
+	// Calculate the current argument offset
+	offset := len(s.Args)
+
+	// Shift the placeholders in the CTE query
+	shiftedCTEQuery := shiftSQLPlaceholders(cteQuery, offset)
+
+	s.WithClauses = append(s.WithClauses, fmt.Sprintf("%s AS (%s)", cteName, shiftedCTEQuery))
+	s.Args = append(s.Args, cteArgs...)
+
 	return s
 }
 
@@ -439,29 +526,75 @@ func (s *SQLEloquentQuery) buildUpdateQuery() (string, []interface{}, error) {
 		return "", nil, errors.New("invalid update query: CustomQuery not set")
 	}
 
-	var query string
+	var initSb strings.Builder
+	var withSb strings.Builder
+	var whereSb strings.Builder
+	var joinSb strings.Builder
+	var fromSb strings.Builder
+	var returningSb strings.Builder
+
+	initSb.Grow(256)      // preallocate ~256 bytes
+	withSb.Grow(256)      // preallocate ~256 bytes
+	whereSb.Grow(256)     // preallocate ~256 bytes
+	joinSb.Grow(256)      // preallocate ~256 bytes
+	fromSb.Grow(256)      // preallocate ~256 bytes
+	returningSb.Grow(256) // preallocate ~256 bytes
+
+	initSb.WriteByte('\n')
 	if len(s.UpdateCaseClauses) > 0 {
-		query = buildUpdateCase(s.UpdateCaseClauses, s.Table)
+		initSb.WriteString(buildUpdateCase(s.UpdateCaseClauses, s.Table))
 	} else {
-		query = s.CustomQuery
+		initSb.WriteString(s.CustomQuery)
+	}
+
+	// WITH
+	if len(s.WithClauses) > 0 {
+		withSb.WriteByte('\n')
+
+		// if one of WITH are recursive, add 'RECURSIVE' string
+		if s.useWithRecursive {
+			withSb.WriteString("WITH RECURSIVE ")
+		} else {
+			withSb.WriteString("WITH ")
+		}
+
+		for i, c := range s.WithClauses {
+			if i > 0 {
+				withSb.WriteString(", ")
+			}
+			withSb.WriteString(c)
+		}
 	}
 
 	if len(s.OtherTables) > 0 {
-		fromClause := strings.Join(s.OtherTables, " ")
-		query += " " + fromClause
+		fromSb.WriteByte('\n')
+		fromSb.WriteString(strings.Join(s.OtherTables, " "))
 	}
 
 	if len(s.Filters) < 1 {
 		return "", nil, errors.New("unsafe query: DELETE/UPDATE must have WHERE clause")
 	}
 
-	query += " " + fmt.Sprintf("WHERE %s", strings.Join(s.Filters, " AND "))
+	// WHERE
+	whereSb.WriteByte('\n')
+	whereSb.WriteString("WHERE ")
+	for i, f := range s.Filters {
+		if i > 0 {
+			whereSb.WriteString(" AND ")
+		}
+		whereSb.WriteString(f)
+	}
+	whereSb.WriteByte('\n')
 
 	if len(s.Columns) > 0 {
-		query += " RETURNING " + strings.Join(s.Columns, ",")
+		returningSb.WriteByte('\n')
+		returningSb.WriteString(" RETURNING " + strings.Join(s.Columns, ","))
 	} else {
-		query += " RETURNING id"
+		returningSb.WriteByte('\n')
+		returningSb.WriteString(" RETURNING id")
 	}
+
+	query := withSb.String() + initSb.String() + fromSb.String() + whereSb.String() + returningSb.String()
 
 	return query, s.Args, nil
 }
