@@ -69,6 +69,7 @@ type NotificationHelperSQL interface {
 	RefreshNotificationSseSQL(userIds []string) *entity.HttpError
 	EmitApprovalSseSQL(userIds []string) *entity.HttpError
 	EmitLoggedOutSseSQL(userIds []string) *entity.HttpError
+	EmitHandoverSseSQL(userIds []string) *entity.HttpError
 	UpdateUserSseSQL(userIds []string) *entity.HttpError
 	EmitLoggedOutByAdminSseSQL(userIds []string) *entity.HttpError
 }
@@ -508,6 +509,12 @@ func (r *SendNotificationSQLHelperImpl) UpdateUserSseSQL(
 	userIds []string,
 ) *entity.HttpError {
 	return emitRefreshSse(userIds, "user:update")
+}
+
+func (r *SendNotificationSQLHelperImpl) EmitHandoverSseSQL(
+	userIds []string,
+) *entity.HttpError {
+	return emitRefreshSse(userIds, "user:handover")
 }
 
 func (r *SendNotificationSQLHelperImpl) EmitLoggedOutByAdminSseSQL(

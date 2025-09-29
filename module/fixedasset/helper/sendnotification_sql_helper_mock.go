@@ -99,6 +99,11 @@ func (m *MockNotificationSQLHelper) EmitLoggedOutSseSQL(userIds []string) *entit
 	return args.Get(0).(*entity.HttpError)
 }
 
+func (m *MockNotificationSQLHelper) EmitHandoverSseSQL(userIds []string) *entity.HttpError {
+	args := m.Mock.Called(userIds)
+	return args.Get(0).(*entity.HttpError)
+}
+
 func (m *MockNotificationSQLHelper) UpdateUserSseSQL(userIds []string) *entity.HttpError {
 	args := m.Mock.Called(userIds)
 	return args.Get(0).(*entity.HttpError)
