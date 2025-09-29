@@ -57,8 +57,8 @@ const (
 type AuditTaskAssetStatus string
 
 const (
-	AuditTaskAssetStatusExistence AuditTaskAssetStatus = "In Audit"
-	AuditTaskAssetStatusCondition AuditTaskAssetStatus = "Audited"
+	AuditTaskAssetStatusInAudit AuditTaskAssetStatus = "In Audit"
+	AuditTaskAssetStatusAudited AuditTaskAssetStatus = "Audited"
 )
 
 type AuditTaskAssetCondition string
