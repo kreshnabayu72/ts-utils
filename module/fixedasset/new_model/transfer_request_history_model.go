@@ -11,6 +11,7 @@ type TransferRequestHistory struct {
 	TagType            TagType                        `json:"tagType"            column:"transfer_request_histories.tag_type"`
 	Asset              int                            `json:"asset"              column:"transfer_request_histories.asset"`
 	AssetID            string                         `json:"assetId"            column:"transfer_request_histories.asset_id"`
+	AliasCode          *string                        `json:"aliasCode"                column:"transfer_request_histories.alias_code"`
 	AssetStatus        *TransferRequestAssetStatus    `json:"assetStatus"        column:"transfer_request_histories.asset_status"`
 	Name               string                         `json:"name"               column:"transfer_request_histories.name"`
 	Brand              string                         `json:"brand"              column:"transfer_request_histories.brand"`

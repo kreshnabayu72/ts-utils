@@ -11,6 +11,7 @@ type AssignmentRequestHistory struct {
 	TagType          TagType                 `json:"tagType"          column:"assignment_request_histories.tag_type"`
 	Asset            int                     `json:"asset"            column:"assignment_request_histories.asset"`
 	AssetID          string                  `json:"assetId"          column:"assignment_request_histories.asset_id"`
+	AliasCode        *string                 `json:"aliasCode"                column:"assignment_request_histories.alias_code"`
 	Name             string                  `json:"name"             column:"assignment_request_histories.name"`
 	Brand            string                  `json:"brand"            column:"assignment_request_histories.brand"`
 	Model            string                  `json:"model"            column:"assignment_request_histories.model"`

@@ -10,6 +10,7 @@ type BorrowingRequestHistory struct {
 	TagType          TagType                `json:"tagType"          column:"borrowing_request_histories.tag_type"`
 	Asset            int                    `json:"asset"            column:"borrowing_request_histories.asset"`
 	AssetID          string                 `json:"assetId"          column:"borrowing_request_histories.asset_id"`
+	AliasCode        *string                `json:"aliasCode"                column:"borrowing_request_histories.alias_code"`
 	Name             string                 `json:"name"             column:"borrowing_request_histories.name"`
 	Brand            string                 `json:"brand"            column:"borrowing_request_histories.brand"`
 	Model            string                 `json:"model"            column:"borrowing_request_histories.model"`

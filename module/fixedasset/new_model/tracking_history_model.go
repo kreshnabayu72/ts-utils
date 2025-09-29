@@ -10,7 +10,8 @@ type TrackingHistory struct {
 	TagType               TagType           `json:"tagType"               column:"tracking_histories.tag_type"`
 	ReportedByFullName    string            `json:"reportedByFullName"    column:"tracking_histories.reported_by_full_name"`
 	AssetNameWithSequence string            `json:"assetNameWithSequence" column:"tracking_histories.asset_name_with_sequence"`
-	AssetAliasCode        string            `json:"assetAliasCode"        column:"tracking_histories.asset_alias_code"`
+	AssetID               string            `json:"assetId"             column:"tracking_histories.asset_id"`
+	AssetAliasCode        *string           `json:"assetAliasCode"        column:"tracking_histories.asset_alias_code"`
 	AssetBrand            string            `json:"assetBrand"            column:"tracking_histories.asset_brand"`
 	AssetModel            string            `json:"assetModel"            column:"tracking_histories.asset_model"`
 	AssetGroupName        string            `json:"assetGroup"            column:"tracking_histories.asset_group_name"`

@@ -10,7 +10,8 @@ type RepairTicketingHistory struct {
 	ReportedByFullName         string                  `json:"reportedByFullName"         column:"repair_ticketing_histories.reported_by_full_name"`
 	TagType                    TagType                 `json:"tagType"                    column:"repair_ticketing_histories.tag_type"`
 	AssetNameWithSequence      string                  `json:"assetNameWithSequence"      column:"repair_ticketing_histories.asset_name_with_sequence"`
-	AssetAliasCode             string                  `json:"assetAliasCode"             column:"repair_ticketing_histories.asset_alias_code"`
+	AssetID                    string                  `json:"assetId"             column:"repair_ticketing_histories.asset_id"`
+	AssetAliasCode             *string                 `json:"assetAliasCode"             column:"repair_ticketing_histories.asset_alias_code"`
 	AssetBrand                 string                  `json:"assetBrand"                 column:"repair_ticketing_histories.asset_brand"`
 	AssetModel                 string                  `json:"assetModel"                 column:"repair_ticketing_histories.asset_model"`
 	AssetGroupName             string                  `json:"assetGroup"                 column:"repair_ticketing_histories.asset_group_name"`
