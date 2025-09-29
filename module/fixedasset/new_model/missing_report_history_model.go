@@ -8,6 +8,7 @@ type MissingReportHistory struct {
 	ID               int                 `json:"_id"              column:"missing_report_histories.id"`
 	Asset            int                 `json:"asset"            column:"missing_report_histories.asset"`
 	AssetID          string              `json:"assetId"          column:"missing_report_histories.asset_id"`
+	AliasCode        *string             `json:"aliasCode"                column:"missing_report_histories.alias_code"`
 	TagType          *TagType            `json:"tagType"          column:"missing_report_histories.tag_type"`
 	Name             string              `json:"name"             column:"missing_report_histories.name"`
 	Brand            string              `json:"brand"            column:"missing_report_histories.brand"`
