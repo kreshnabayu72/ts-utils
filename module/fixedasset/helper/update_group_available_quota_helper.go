@@ -21,7 +21,7 @@ import (
 //     - Increase `used`.
 //  2. If the current group still has available quota left, stop here.
 //  3. Otherwise, walk up the parent chain:
-//     - Increment `allocated_to_subgroups` for each parent.
+//     - Increment `allocated_to_sub_groups` for each parent.
 //     - Stop once a parent with `available > 0` is found.
 //  4. Deduct from that parent's `available` and increment its `used`.
 //
@@ -74,7 +74,7 @@ func ChangeFixedAssetQuota(
 	for parentId != nil {
 		// Add to allocatedToSubGroups
 		setParent := map[string]any{
-			"allocated_to_subgroups": sql_query.UpdateRawSQL{Expr: "allocated_to_subgroups + ?", Args: []interface{}{amount}},
+			"allocated_to_sub_groups": sql_query.UpdateRawSQL{Expr: "allocated_to_sub_groups + ?", Args: []interface{}{amount}},
 		}
 		if err := UpdateGroupQuota(service, ctx, setParent, *parentId, quotaType); err != nil {
 			return err
