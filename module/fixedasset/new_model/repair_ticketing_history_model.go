@@ -37,6 +37,7 @@ type RepairTicketingHistory struct {
 	StaffFullName              string                  `json:"staffFullName"              column:"repair_ticketing_histories.staff_full_name"`
 	ServiceCenterName          *string                 `json:"serviceCenterName"          column:"repair_ticketing_histories.service_center_name"`
 	RepairStartAt              *time.Time              `json:"repairStartAt"              column:"repair_ticketing_histories.repair_start_at"`
+	RepairFinishedAt           *time.Time              `json:"repairFinishedAt"              column:"repair_ticketing_histories.repair_finished_at"`
 	CreatedAt                  time.Time               `json:"createdAt"                  column:"repair_ticketing_histories.created_at"`
 	UpdatedAt                  time.Time               `json:"updatedAt"                  column:"repair_ticketing_histories.updated_at"`
 }
