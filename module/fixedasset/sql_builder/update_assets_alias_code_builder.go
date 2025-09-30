@@ -13,12 +13,16 @@ func UpdateAssetAliasCodeBuilder() (string, []interface{}, error) {
 
 	type editAssetAliasCode struct {
 		AliasCode sql_query.UpdateRawSQL `json:"aliasCode" column:"alias_code"`
+		UpdatedAt sql_query.UpdateRawSQL `json:"updatedAt" column:"updated_at"`
 	}
 
 	return util_sql_query.NewSQLUpdateBuilder(db.AssetTableName).
 		Update(editAssetAliasCode{
 			AliasCode: sql_query.UpdateRawSQL{
 				Expr: `gc.dynamic_code`,
+			},
+			UpdatedAt: sql_query.UpdateRawSQL{
+				Expr: `assets.updated_at`,
 			},
 		}).
 		WithCTEBuilder("generated_codes", generatedCodeBuilder.(*util_sql_query.SelectBuilder).SQLEloquentQuery).
