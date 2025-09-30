@@ -30,15 +30,12 @@ func (helper *AssetsAliasCodeHelperImpl) UpdateAssetsAliasCode(
 	ctx context.Context,
 	serviceFactory utilprovider.ServiceProvider,
 	companyCode string,
-	filter map[string]sql_query.SQLCondition,
 ) *entity.HttpError {
 	adminDb := utildb.FixedAssetDBName.CompanyDBName(companyCode)
 
 	fixedAssetService := serviceFactory.MakePostgreSqlService(adminDb)
 
-	querystring, args, err := sql_builder.UpdateAssetAliasCodeBuilder(
-		filter,
-	)
+	querystring, args, err := sql_builder.UpdateAssetAliasCodeBuilder()
 
 	_, err = fixedAssetService.UpdateMany(ctx, querystring, args...)
 	if err != nil {
