@@ -20,6 +20,7 @@ type BorrowingRequest struct {
 	PreviousDuration int                    `json:"previousDuration" column:"borrowing_requests.previous_duration"`
 	ActualReturnDate *time.Time             `json:"actualReturnDate" column:"borrowing_requests.actual_return_date"`
 	DueReturnDate    time.Time              `json:"dueReturnDate"    column:"borrowing_requests.due_return_date"`
+	IsOverdue        bool                   `json:"isOverdue"        column:"borrowing_requests.is_overdue"`
 	SerialNumber     *string                `json:"serialNumber"     column:"borrowing_requests.serial_number"`
 	CreatedAt        time.Time              `json:"createdAt"        column:"borrowing_requests.created_at"`
 	UpdatedAt        time.Time              `json:"updatedAt"        column:"borrowing_requests.updated_at"`
