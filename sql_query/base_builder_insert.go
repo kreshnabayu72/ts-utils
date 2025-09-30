@@ -3,7 +3,6 @@ package sql_query
 import (
 	"errors"
 	"fmt"
-	"log"
 	"reflect"
 	"strconv"
 	"strings"
@@ -164,8 +163,6 @@ func (s *InsertBuilder) cachedInsertSingle(v reflect.Value) SQLInsertChainBuilde
 	t := v.Type()
 	typeName := t.PkgPath() + "." + t.Name()
 
-	log.Println("TEMPORARY LOG FOR CACHE: Used typeName = " + typeName)
-
 	// Get field meta from cache
 	fieldMeta, ok := fieldMetaCache[typeName]
 	if !ok {
@@ -185,6 +182,11 @@ func (s *InsertBuilder) cachedInsertSingle(v reflect.Value) SQLInsertChainBuilde
 		FieldIndexes := [][]int{{0}}
 
 		for _, meta := range *fieldMeta {
+			// Skip generated column.
+			if meta.IsGenerated {
+				continue
+			}
+
 			if ArrayIncludes([]string{"_id", "id"}, meta.JSONTag) || meta.ColumnTag == "id" {
 				continue
 			}
@@ -321,7 +323,6 @@ func (s *InsertBuilder) cachedInsertMany(slice reflect.Value) SQLInsertChainBuil
 	t := firstElem.Type()
 	typeName := t.PkgPath() + ".[]" + t.Name()
 
-	log.Println("TEMPORARY LOG FOR CACHE: Used typeName = " + typeName)
 	// Get field meta from cache
 	fieldMeta, ok := fieldMetaCache[typeName]
 	if !ok {
