@@ -9,7 +9,6 @@ type RepairTicketing struct {
 	Asset                      int                     `json:"asset"                      column:"repair_ticketings.asset"`
 	ReportedByID               int                     `json:"reportedById"               column:"repair_ticketings.reported_by_id"`
 	RepairImage                string                  `json:"repairImage"                column:"repair_ticketings.repair_image"`
-	ConfirmAction              string                  `json:"confirmAction"              column:"repair_ticketings.confirm_action"`
 	PreviousStatus             AssetStatus             `json:"previousStatus"             column:"repair_ticketings.previous_status"`
 	TransactionID              string                  `json:"transactionId"              column:"repair_ticketings.transaction_id"`
 	Status                     RepairTicketingStatus   `json:"status"                     column:"repair_ticketings.status"`
@@ -31,8 +30,6 @@ type RepairTicketing struct {
 	ServiceCenterId            *int                    `json:"serviceCenterId"            column:"repair_ticketings.service_center_id"`
 	RepairStartAt              *time.Time              `json:"repairStartAt"              column:"repair_ticketings.repair_start_at"`
 	RepairFinishedAt           *time.Time              `json:"repairFinishedAt"           column:"repair_ticketings.repair_finished_at"`
-	RepairConfirmedAt          *time.Time              `json:"repairConfirmedAt"          column:"repair_ticketings.repair_confirmed_at"`
-	RepairApprovedAt           *time.Time              `json:"repairApprovedAt"           column:"repair_ticketings.repair_approved_at"`
 	CreatedAt                  time.Time               `json:"createdAt"                  column:"repair_ticketings.created_at"`
 	UpdatedAt                  time.Time               `json:"updatedAt"                  column:"repair_ticketings.updated_at"`
 }
