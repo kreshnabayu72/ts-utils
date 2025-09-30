@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strings"
 
@@ -16,6 +17,7 @@ func ValidateJWTSQL() fiber.Handler {
 		jwtKey := []byte(os.Getenv("JWT_KEY"))
 		tokenStr := ctx.Get("Authorization", "NOT_FOUND")
 		if tokenStr == "NOT_FOUND" {
+			log.Println("Error: no auth header")
 			return response.SendResponse(ctx, fiber.StatusBadRequest, nil, "Unauthorized")
 		}
 
@@ -31,6 +33,7 @@ func ValidateJWTSQL() fiber.Handler {
 			return jwtKey, nil
 		})
 		if err != nil {
+			log.Printf("Error parsing token: %v\n", err.Error())
 			return response.SendResponse(ctx, fiber.StatusBadRequest, nil, "Unauthorized")
 		}
 
@@ -50,6 +53,7 @@ func ValidateJWTSQL() fiber.Handler {
 			ctx.Locals(Company, company)
 
 		} else {
+			log.Println("invalid token")
 			return response.SendResponse(ctx, fiber.StatusBadRequest, nil, "Unauthorized")
 		}
 
