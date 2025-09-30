@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -392,7 +393,13 @@ func (r *SendNotificationSQLHelperImpl) SendMobileNotificationSQL(
 	dataPayload := make(map[string]string)
 
 	for k, v := range data.Data {
-		dataPayload[k] = v.(string)
+		if strVal, ok := v.(string); ok {
+			// The value 'v' was a string, so we can safely add it.
+			dataPayload[k] = strVal
+			continue
+		}
+
+		log.Printf("Notification data attribute isnt string: %v (type=%v)\n", v, reflect.TypeOf(v))
 	}
 
 	// Tambahkan field lain sebagai string
