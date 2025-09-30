@@ -8,7 +8,6 @@ type RepairTicketing struct {
 	ID                         int                     `json:"_id"                        column:"repair_ticketings.id"`
 	Asset                      int                     `json:"asset"                      column:"repair_ticketings.asset"`
 	ReportedByID               int                     `json:"reportedById"               column:"repair_ticketings.reported_by_id"`
-	DamageImage                string                  `json:"damageImage"                column:"repair_ticketings.damage_image"`
 	RepairImage                string                  `json:"repairImage"                column:"repair_ticketings.repair_image"`
 	ConfirmAction              string                  `json:"confirmAction"              column:"repair_ticketings.confirm_action"`
 	PreviousStatus             AssetStatus             `json:"previousStatus"             column:"repair_ticketings.previous_status"`
