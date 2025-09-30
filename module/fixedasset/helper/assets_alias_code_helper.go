@@ -8,7 +8,6 @@ import (
 	"gitea.qwertysystem.net/BETS/ts-utils/entity"
 	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/sql_builder"
 	utilprovider "gitea.qwertysystem.net/BETS/ts-utils/provider"
-	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
 )
 
 type AssetsAliasCodeHelper interface {
@@ -16,7 +15,6 @@ type AssetsAliasCodeHelper interface {
 		ctx context.Context,
 		serviceFactory utilprovider.ServiceProvider,
 		companyCode string,
-		filter map[string]sql_query.SQLCondition,
 	) *entity.HttpError
 }
 
