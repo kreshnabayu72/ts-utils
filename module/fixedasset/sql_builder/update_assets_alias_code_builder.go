@@ -8,7 +8,7 @@ import (
 	util_sql_query "gitea.qwertysystem.net/BETS/ts-utils/sql_query"
 )
 
-func UpdateAssetAliasCodeBuilder(filter map[string]sql_query.SQLCondition) (string, []interface{}, error) {
+func UpdateAssetAliasCodeBuilder() (string, []interface{}, error) {
 	generatedCodeBuilder := generatedCodesCte()
 
 	type editAssetAliasCode struct {
@@ -24,7 +24,6 @@ func UpdateAssetAliasCodeBuilder(filter map[string]sql_query.SQLCondition) (stri
 		WithCTEBuilder("generated_codes", generatedCodeBuilder.(*util_sql_query.SelectBuilder).SQLEloquentQuery).
 		From([]string{"generated_codes gc"}).
 		Return("assets.id").
-		Where(filter).
 		Where(map[string]util_sql_query.SQLCondition{
 			"": {
 				Operator: sql_query.SQLOperatorRaw,
