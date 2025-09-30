@@ -28,7 +28,7 @@ type RepairTicketingHistory struct {
 	ReportSource               AssetReportSource       `json:"reportSource"               column:"repair_ticketing_histories.report_source"`
 	Details                    string                  `json:"details"                    column:"repair_ticketing_histories.details"`
 	HandledBy                  RepairTicketingMethod   `json:"handledBy"                  column:"repair_ticketing_histories.handled_by"`
-	ApprovalRound              int                     `json:"approvalRound"              column:"repair_ticketings.approval_round"`
+	ApprovalRound              int                     `json:"approvalRound"              column:"repair_ticketing_histories.approval_round"`
 	AdditionalCostTotalPrice   float32                 `json:"additionalCostTotalPrice"   column:"repair_ticketing_histories.additional_cost_total_price"`
 	AdditionalCostCurrency     string                  `json:"additionalCostCurrency"     column:"repair_ticketing_histories.additional_cost_currency"`
 	AdditionalCostPaymentProof string                  `json:"additionalCostPaymentProof" column:"repair_ticketing_histories.additional_cost_payment_proof"`
