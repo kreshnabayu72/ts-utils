@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/entity"
-	utilprovider "gitea.qwertysystem.net/BETS/ts-utils/provider"
+	"gitea.qwertysystem.net/BETS/ts-utils/service"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -14,9 +14,9 @@ type MockAssetsAliasCodeHelperImpl struct {
 
 func (m *MockAssetsAliasCodeHelperImpl) UpdateAssetsAliasCode(
 	ctx context.Context,
-	serviceFactory utilprovider.ServiceProvider,
+	fixedAssetService service.PostgreSqlService,
 	companyCode string,
 ) *entity.HttpError {
-	args := m.Called(ctx, serviceFactory, companyCode)
+	args := m.Called(ctx, fixedAssetService, companyCode)
 	return args.Get(0).(*entity.HttpError)
 }
