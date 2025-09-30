@@ -8,6 +8,7 @@ type DamageReportHistory struct {
 	ID               int                `json:"_id"                column:"damage_report_histories.id"`
 	Asset            int                `json:"asset"              column:"damage_report_histories.asset"`
 	AssetID          string             `json:"assetId"            column:"damage_report_histories.asset_id"`
+	AliasCode        *string            `json:"aliasCode"                column:"damage_report_histories.alias_code"`
 	TagType          *TagType           `json:"tagType"            column:"damage_report_histories.tag_type"`
 	Name             string             `json:"name"               column:"damage_report_histories.name"`
 	Brand            string             `json:"brand"              column:"damage_report_histories.brand"`

@@ -38,6 +38,7 @@ type User struct {
 	ModifiedByLastName     string     `json:"modifiedByLastName"     column:"users.modified_by_last_name"`
 	ModifiedByFullName     string     `json:"modifiedByFullName"     column:"users.modified_by_full_name"                                          special:"generated"`
 	HasModuleAccess        bool       `json:"hasModuleAccess"        column:"users.has_module_access"` //For showing/hiding user that doesn't have fixed asset access from global settings
+	IsGlobalActive         bool       `json:"isGlobalActive"         column:"users.is_global_active"`
 	IsDeleted              bool       `json:"isDeleted"              column:"users.is_deleted"`
 	DeleteFromDatabaseAt   *time.Time `json:"deleteFromDatabaseAt"   column:"users.deleted_at"`
 	CreatedAt              time.Time  `json:"createdAt"              column:"users.created_at"`
