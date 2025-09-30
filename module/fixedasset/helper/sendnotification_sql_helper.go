@@ -127,7 +127,6 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationToTransactionRolesSQL(
 	userTransactionRoleService := serviceProvider.MakePostgreSqlService(
 		db.FixedAssetDBName.CompanyDBName(companyCode),
 	)
-	userTransactionRoleService.Debug(3)
 
 	builder := sql_query.NewSQLSelectBuilder[any](db.UserTransactionRoleTableName, "utr").
 		Select("utr.user_id").
@@ -158,6 +157,8 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationToTransactionRolesSQL(
 		log.Printf("Error: %v\n", err.Error())
 		return entity.InternalServerError(err.Error())
 	}
+
+	log.Printf("Found %v roles for notif", len(roles))
 
 	var uniqueUserIds []string
 	var uniqueUserIdsCheck map[string]bool = make(map[string]bool)
@@ -208,6 +209,9 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationToSystemRolesSQL(
 		query,
 		args...,
 	)
+
+	log.Printf("Found %v roles for notif", len(roles))
+
 	if err != nil {
 		return entity.InternalServerError(err.Error())
 	}
@@ -239,13 +243,13 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationToUsersSQL(
 	userIds []string,
 	notificationDataWithoutUser util_fixedasset_new_model.Notification,
 ) *entity.HttpError {
+	log.Printf("SENDING NOTIF %v to %v user", notificationDataWithoutUser.Title, len(userIds))
 	if len(userIds) == 0 {
 		return nil
 	}
 	userService := serviceProvider.MakePostgreSqlService(
 		db.FixedAssetDBName.CompanyDBName(companyCode),
 	)
-	userService.Debug(3)
 	query, args, _ := sql_query.NewSQLSelectBuilder[util_fixedasset_new_model.User](
 		db.UserTableName,
 	).
