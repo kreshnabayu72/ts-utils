@@ -17,6 +17,7 @@ type RepairTicketingHistory struct {
 	AssetGroupName             string                  `json:"assetGroup"                 column:"repair_ticketing_histories.asset_group_name"`
 	AssetGroupId               int                     `json:"assetGroupId"               column:"repair_ticketing_histories.asset_group_id"`
 	RepairImage                string                  `json:"repairImage"                column:"repair_ticketing_histories.repair_image"`
+	DamageImage                string                  `json:"damageImage"                column:"repair_ticketing_histories.damage_image"`
 	PreviousStatus             AssetStatus             `json:"previousStatus"             column:"repair_ticketing_histories.previous_status"`
 	TransactionID              string                  `json:"transactionId"              column:"repair_ticketing_histories.transaction_id"`
 	Status                     RepairTicketingStatus   `json:"status"                     column:"repair_ticketing_histories.status"`
