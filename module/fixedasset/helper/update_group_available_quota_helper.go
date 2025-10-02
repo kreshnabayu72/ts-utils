@@ -55,17 +55,25 @@ func ChangeFixedAssetQuota(
 
 	// Step 1: update current group
 	setValue := map[string]any{
-		"available":          sql_query.UpdateRawSQL{Expr: "CASE WHEN available IS NULL THEN NULL ELSE available - ? END", Args: []any{amount}},
-		"used_by_this_group": sql_query.UpdateRawSQL{Expr: "used_by_this_group + ?", Args: []interface{}{amount}},
-		"used":               sql_query.UpdateRawSQL{Expr: "used + ?", Args: []interface{}{amount}},
+		"available": sql_query.UpdateRawSQL{
+			Expr: "CASE WHEN available IS NULL THEN NULL ELSE available - ? END",
+			Args: []any{amount},
+		},
+		"used_by_this_group": sql_query.UpdateRawSQL{
+			Expr: "used_by_this_group + ?",
+			Args: []interface{}{amount},
+		},
+		"used": sql_query.UpdateRawSQL{Expr: "used + ?", Args: []interface{}{amount}},
 	}
 	if err := UpdateGroupQuota(service, ctx, setValue, groupData.ID, quotaType); err != nil {
 		return err
 	}
 
 	// Step 2: if current group had available > 0, stop
-	if groupQuota.Type == quotaType && groupQuota.Available > 0 {
-		return nil
+	if groupQuota.Available != nil {
+		if groupQuota.Type == quotaType && *groupQuota.Available > 0 {
+			return nil
+		}
 	}
 
 	// Step 3: bubble up parents
@@ -74,21 +82,31 @@ func ChangeFixedAssetQuota(
 	for parentId != nil {
 		// Add to allocatedToSubGroups
 		setParent := map[string]any{
-			"allocated_to_sub_groups": sql_query.UpdateRawSQL{Expr: "allocated_to_sub_groups + ?", Args: []interface{}{amount}},
+			"allocated_to_sub_groups": sql_query.UpdateRawSQL{
+				Expr: "allocated_to_sub_groups + ?",
+				Args: []interface{}{amount},
+			},
 		}
 		if err := UpdateGroupQuota(service, ctx, setParent, *parentId, quotaType); err != nil {
 			return err
 		}
 
-		parentGroupData, parentGroupQuota, err := GetGroupWithQuota(ctx, service, groupId, quotaType)
+		parentGroupData, parentGroupQuota, err := GetGroupWithQuota(
+			ctx,
+			service,
+			groupId,
+			quotaType,
+		)
 		if err != nil {
 			return err
 		}
 		groupToUpdate = &parentGroupData
 
 		// Stop if parent has available > 0
-		if parentGroupQuota.Type == quotaType && parentGroupQuota.Available > 0 {
-			break
+		if parentGroupQuota.Available != nil {
+			if parentGroupQuota.Type == quotaType && *parentGroupQuota.Available > 0 {
+				break
+			}
 		}
 
 		// Keep climbing up
@@ -118,7 +136,13 @@ func ChangeFixedAssetQuota(
 //   - setValue: map of field names → SQL expressions to update
 //   - groupId: group ID to update
 //   - licenseType: quota type to filter by
-func UpdateGroupQuota(service service.PostgreSqlService, ctx context.Context, setValue map[string]any, groupId int, licenseType new_model.GroupQuotaType) error {
+func UpdateGroupQuota(
+	service service.PostgreSqlService,
+	ctx context.Context,
+	setValue map[string]any,
+	groupId int,
+	licenseType new_model.GroupQuotaType,
+) error {
 	queryQuota, argsQuota, _ := sql_query.NewSQLUpdateBuilder(
 		db.GroupQuotaTableName,
 	).
@@ -162,7 +186,9 @@ func GetGroupWithQuota(
 	if err := service.SelectOne(&groupData, ctx, queryGroup, argsGroup...); err != nil {
 		return new_model.Group{}, new_model.GroupQuota{}, errors.New("group not found")
 	}
-	queryQuota, argsQuota, _ := sql_query.NewSQLSelectBuilder[new_model.GroupQuota](db.GroupQuotaTableName).
+	queryQuota, argsQuota, _ := sql_query.NewSQLSelectBuilder[new_model.GroupQuota](
+		db.GroupQuotaTableName,
+	).
 		Where(map[string]sql_query.SQLCondition{
 			"group_id": {Operator: sql_query.SQLOperatorEqual, Value: groupId},
 			"type":     {Operator: sql_query.SQLOperatorEqual, Value: quotaType},
