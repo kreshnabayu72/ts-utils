@@ -26,7 +26,7 @@ type AssetName struct {
 	TransactionsAssign      bool       `json:"transactionsAssign"      column:"asset_names.transactions_assign"`
 	TransactionsTransfer    bool       `json:"transactionsTransfer"    column:"asset_names.transactions_transfer"`
 	TransactionsSelfService bool       `json:"transactionsSelfService" column:"asset_names.transactions_self_service"`
-	TagType                 TagType    `json:"tagType"                 column:"asset_names.tag_type"`
+	TagType                 *TagType   `json:"tagType"                 column:"asset_names.tag_type"`
 	IsDeleted               bool       `json:"isDeleted"               column:"asset_names.is_deleted"`
 	DeletedAt               *time.Time `json:"deletedAt"               column:"asset_names.deleted_at"`
 	CreatedAt               time.Time  `json:"createdAt"               column:"asset_names.created_at"`
