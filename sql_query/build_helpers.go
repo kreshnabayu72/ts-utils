@@ -353,7 +353,12 @@ func (s *SQLEloquentQuery) whereOrDestination(
 	for _, filter := range filters {
 		inner := &SQLEloquentQuery{Args: s.Args}
 		inner.sharedWhereAndQuery(filter)
-		orClause := fmt.Sprintf("(%s)", strings.Join(inner.Filters, " AND "))
+
+		filterClause := strings.Join(inner.Filters, " AND ")
+		if len(inner.Filters) == 0 {
+			continue
+		}
+		orClause := fmt.Sprintf("(%s)", filterClause)
 		orConditions = append(orConditions, orClause)
 		s.Args = inner.Args
 	}
