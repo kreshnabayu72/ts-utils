@@ -33,11 +33,11 @@ type GroupQuota struct {
 	ID                   int            `json:"id"                   column:"group_quotas.id"`
 	GroupID              int            `json:"groupId"              column:"group_quotas.group_id"`
 	Type                 GroupQuotaType `json:"type"                 column:"group_quotas.type"`
-	Total                int            `json:"total"                column:"group_quotas.total"`
+	Total                *int           `json:"total"                column:"group_quotas.total"`
 	Used                 int            `json:"used"                 column:"group_quotas.used"`
 	UsedByThisGroup      int            `json:"usedByThisGroup"      column:"group_quotas.used_by_this_group"`
 	AllocatedToSubgroups int            `json:"allocatedToSubgroups" column:"group_quotas.allocated_to_sub_groups"`
-	Available            int            `json:"available"            column:"group_quotas.available"`
+	Available            *int           `json:"available"            column:"group_quotas.available"` // nil is "Not Set"
 	CreatedAt            time.Time      `json:"createdAt"            column:"group_quotas.created_at"`
 	UpdatedAt            time.Time      `json:"updatedAt"            column:"group_quotas.updated_at"`
 }
