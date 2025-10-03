@@ -13,6 +13,7 @@ type AuditSchedule struct {
 	AuditType            AuditType  `json:"auditType"            column:"audit_schedules.audit_type"`
 	FrequencyLabel       Frequency  `json:"frequencyLabel"       column:"audit_schedules.frequency_label"`
 	FrequencyCustomValue *int       `json:"frequencyCustomValue" column:"audit_schedules.frequency_custom_value"`
+	FrequencyCustomLabel *string    `json:"frequencyCustomLabel" column:"audit_schedules.frequency_custom_label"`
 	Duration             int        `json:"duration"             column:"audit_schedules.duration"`
 	ModifiedById         int        `json:"modifiedById"         column:"audit_schedules.modified_by_id"`
 	IsDeleted            bool       `json:"isDeleted"            column:"audit_schedules.is_deleted"`
