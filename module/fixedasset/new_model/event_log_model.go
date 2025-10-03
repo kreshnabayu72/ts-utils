@@ -6,14 +6,14 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type EventLogType string
+type TaskEventLogType string
 
 const (
-	EvengLogTypeRoutine EventLogType = "Routine"
-	EvengLogTypeAudit   EventLogType = "Audit"
+	TaskEventLogTypeRoutine TaskEventLogType = "Routine"
+	TaskEventLogTypeAudit   TaskEventLogType = "Audit"
 )
 
-type EventLog struct {
+type TaskEventLog struct {
 	ID                    primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
 	TaskID                string             `json:"taskId" bson:"taskId"`
 	TaskName              string             `json:"taskName" bson:"taskName"`
@@ -21,7 +21,7 @@ type EventLog struct {
 	AssetNameWithSequence *string            `json:"assetNameWithSequence" bson:"assetNameWithSequence"`
 	Action                string             `json:"action" bson:"action"`
 	Group                 string             `json:"group" bson:"group"`
-	Type                  EventLogType       `json:"type" bson:"type"`
+	Type                  TaskEventLogType   `json:"type" bson:"type"`
 	AuditType             *AuditType         `json:"auditType" bson:"auditType"`
 	ModifiedBy            string             `json:"modifiedBy" bson:"modifiedBy"`
 	CreatedAt             time.Time          `json:"createdAt" bson:"createdAt"`
