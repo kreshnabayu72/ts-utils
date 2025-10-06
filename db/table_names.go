@@ -20,6 +20,8 @@ const (
 	AttachmentTableName                       = "attachments"
 	AuditApprovalTableName                    = "audit_approvals"
 	AuditApprovalAssetTableName               = "audit_approval_assets"
+	AuditEventLogTableName                    = "audit_event_logs"
+	AuditTaskEventLogTableName                = "audit_task_event_logs"
 	AuditScheduleTableName                    = "audit_schedules"
 	AuditScheduledAssetTableName              = "audit_scheduled_assets"
 	AuditScheduleCategoriesTableName          = "audit_schedule_categories"
