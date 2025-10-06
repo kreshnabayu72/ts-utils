@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"sync"
+	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -32,12 +33,17 @@ func ConnectMongo() *mongo.Client {
 	clientOnce.Do(func() {
 		clientOptions := options.Client().ApplyURI(mongoUri)
 		var err error
-		clientInstance, err = mongo.Connect(context.TODO(), clientOptions)
+
+		//Add timeout context
+		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+		defer cancel()
+
+		clientInstance, err = mongo.Connect(ctx, clientOptions)
 		if err != nil {
 			log.Fatal("Failed to connect to MongoDB:", err)
 		}
 
-		err = clientInstance.Ping(context.TODO(), nil)
+		err = clientInstance.Ping(ctx, nil)
 		if err != nil {
 			log.Fatal("Failed to ping MongoDB:", err)
 		}

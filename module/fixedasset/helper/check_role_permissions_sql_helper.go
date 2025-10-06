@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/db"
 	"gitea.qwertysystem.net/BETS/ts-utils/entity"
@@ -155,9 +156,17 @@ func CheckGroupPermissionSQL(
 		Where(dataFilter).
 		Build()
 
+	//Add timeout context
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	defer cancel()
+
 	permissionCheck := make([]map[string]any, 0)
-	err := service.SelectMany(&permissionCheck, context.Background(), query, args...)
+	err := service.SelectMany(&permissionCheck, ctx, query, args...)
 	if err != nil || len(permissionCheck) < 1 {
+		if errors.Is(err, context.DeadlineExceeded) {
+			return errors.New("request timed out while checking permissions")
+		}
+
 		return errors.New("Data not found")
 	}
 
@@ -260,9 +269,16 @@ func CheckTransactionRoleMultiGroupPermissionsSQL(
 		Where(dataFilter).
 		Build()
 
+	//Add timeout context
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	defer cancel()
+
 	permissionCheck := make([]map[string]any, 0)
-	err := service.SelectMany(&permissionCheck, context.Background(), query, args...)
+	err := service.SelectMany(&permissionCheck, ctx, query, args...)
 	if err != nil {
+		if errors.Is(err, context.DeadlineExceeded) {
+			return errors.New("request timed out while checking permissions")
+		}
 		fmt.Printf("ERR: %v\n", err.Error())
 		return errors.New("Data not found")
 	}

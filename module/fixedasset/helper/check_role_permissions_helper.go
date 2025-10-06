@@ -2,6 +2,7 @@ package helper
 
 import (
 	"fmt"
+	"time"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/db"
 	"gitea.qwertysystem.net/BETS/ts-utils/entity"
@@ -97,10 +98,14 @@ func CheckGroupPermission(service service.Service,
 		}).Unwind(bson.M{"path": "$systemRoles", "preserveNullAndEmptyArrays": true}).
 		Build()
 
+	//Add timeout context
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	defer cancel()
+
 	var permissionCheck []map[string]any
 	err := service.Aggregate(
 		&permissionCheck,
-		context.Background(),
+		ctx,
 		pipeline,
 		&options.AggregateOptions{
 			Collation: &options.Collation{
@@ -110,6 +115,9 @@ func CheckGroupPermission(service service.Service,
 		},
 	)
 	if err != nil || len(permissionCheck) < 1 {
+		if errors.Is(err, context.DeadlineExceeded) {
+			return errors.New("request timed out")
+		}
 		return errors.New("Data not found")
 	}
 
@@ -154,10 +162,14 @@ func CheckTransactionRoleMultiGroupPermissions(
 		}).Unwind(bson.M{"path": "$transactionRoles", "preserveNullAndEmptyArrays": true}).
 		Build()
 
+	//Add timeout context
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	defer cancel()
+
 	var permissionCheck []map[string]any
 	err := service.Aggregate(
 		&permissionCheck,
-		context.Background(),
+		ctx,
 		pipeline,
 		&options.AggregateOptions{
 			Collation: &options.Collation{
@@ -168,6 +180,9 @@ func CheckTransactionRoleMultiGroupPermissions(
 	)
 	if err != nil {
 		fmt.Printf("ERR: %v\n", err.Error())
+		if errors.Is(err, context.DeadlineExceeded) {
+			return errors.New("request timed out while checking permissions")
+		}
 		return errors.New("Data not found")
 	}
 	if len(permissionCheck) < 1 {
