@@ -121,7 +121,6 @@ const (
 	ServiceCenterTableName                    = "service_centers"
 	ServiceCenterBrandTableName               = "service_center_brands"
 	SessionLogTableName                       = "session_logs"
-	SigninTokenTableName                      = "sign_in_tokens"
 	TagEventLogsTableName                     = "tag_event_logs"
 	TrackingApprovalTableName                 = "tracking_approvals"
 	TrackingTableName                         = "trackings"

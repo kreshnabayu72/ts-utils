@@ -78,7 +78,7 @@ const (
 	RoutineScheduleModelName                  = "routine_schedules"
 	ServiceCenterModelName                    = "service_centers"
 	SessionLogModelName                       = "session_logs"
-	SigninTokenModelName                      = "signin_tokens"
+	SigninTokenModelName                      = "signin_tokens" // deprecated: PostgreSQL uses user_tokens
 	TagEventLogsModelName                     = "tag_event_logs"
 	TagTransactionHistoryModelName            = "tag_transaction_history"
 	TrackingApprovalModelName                 = "tracking_approvals"
