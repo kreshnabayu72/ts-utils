@@ -3,6 +3,7 @@ package helper
 import (
 	"context"
 	"log"
+	"time"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/db"
 	utildb "gitea.qwertysystem.net/BETS/ts-utils/db"
@@ -43,6 +44,10 @@ func (f *FileManagerHelperSQLImpl) CreateFileManagerSQL(
 	adminDb := utildb.AdminDBName
 	clientService := serviceFactory.MakePostgreSqlService(adminDb)
 
+	//Add timeout context
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+	defer cancel()
+
 	// Check if the company exists
 	queryStr, args, _ := sql_query.NewSQLSelectBuilder[admin_model.Client](db.ClientTableName).
 		Where(map[string]sql_query.SQLCondition{
@@ -55,7 +60,7 @@ func (f *FileManagerHelperSQLImpl) CreateFileManagerSQL(
 		Build()
 
 	var client admin_model.Client
-	err := clientService.SelectOne(&client, context.Background(), queryStr, args...)
+	err := clientService.SelectOne(&client, ctx, queryStr, args...)
 	if err != nil {
 		return &entity.HttpError{Message: "Company not found"}
 	}
@@ -96,7 +101,7 @@ func (f *FileManagerHelperSQLImpl) CreateFileManagerSQL(
 		Build()
 
 	_, err = clientService.UpdateOne(
-		context.Background(),
+		ctx,
 		queryStr,
 		args...,
 	)
@@ -115,7 +120,7 @@ func (f *FileManagerHelperSQLImpl) CreateFileManagerSQL(
 		Insert(data).
 		Build()
 
-	_, err = fileService.InsertOne(context.Background(), queryStr, args...)
+	_, err = fileService.InsertOne(ctx, queryStr, args...)
 	if err != nil {
 		return entity.InternalServerError(err.Error())
 	}

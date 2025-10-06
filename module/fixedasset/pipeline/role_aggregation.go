@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -322,7 +323,11 @@ func FindUserSystemRoles(v any, ctx context.Context, companyCode string, loggedI
 	db.ConnectToDB(db.FixedAssetDBName.CompanyDBName(companyCode))
 	coll := db.GetCollection(db.UserSystemRoleModelName)
 
-	cursor, err := coll.Find(context.Background(), bson.M{"user._id": loggedInUserId, "isActive": true})
+	//Add timeout context
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	defer cancel()
+
+	cursor, err := coll.Find(ctx, bson.M{"user._id": loggedInUserId, "isActive": true})
 	if err != nil {
 		return err
 	}

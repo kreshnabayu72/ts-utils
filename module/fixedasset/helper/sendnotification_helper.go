@@ -86,7 +86,11 @@ func (r *SendNotificationHelperImpl) GetAccessToken() error {
 	}
 
 	// 3. Request a token
-	tok, err := cfg.TokenSource(context.Background()).Token()
+	//Add timeout context
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	defer cancel()
+
+	tok, err := cfg.TokenSource(ctx).Token()
 	if err != nil {
 		return fmt.Errorf("failed to retrieve access token: %w", err)
 	}

@@ -106,7 +106,11 @@ func (r *SendNotificationSQLHelperImpl) GetAccessTokenSQL() error {
 	}
 
 	// 3. Request a token
-	tok, err := cfg.TokenSource(context.Background()).Token()
+	//Add timeout context
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	defer cancel()
+
+	tok, err := cfg.TokenSource(ctx).Token()
 	if err != nil {
 		return fmt.Errorf("failed to retrieve access token: %w", err)
 	}
@@ -124,6 +128,10 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationToTransactionRolesSQL(
 	notificationDataWithoutUser util_fixedasset_new_model.Notification,
 	approvalLevel ...int,
 ) *entity.HttpError {
+	//Add timeout context
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	defer cancel()
+
 	userTransactionRoleService := serviceProvider.MakePostgreSqlService(
 		db.FixedAssetDBName.CompanyDBName(companyCode),
 	)
@@ -149,7 +157,7 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationToTransactionRolesSQL(
 	var roles []map[string]int
 	err := userTransactionRoleService.SelectMany(
 		&roles,
-		context.Background(),
+		ctx,
 		query,
 		args...,
 	)
@@ -188,6 +196,10 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationToSystemRolesSQL(
 	roleAttribute []util_fixedasset_new_model.SystemRoleAttribute,
 	notificationDataWithoutUser util_fixedasset_new_model.Notification,
 ) *entity.HttpError {
+	//Add timeout context
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	defer cancel()
+
 	userSystemRoleService := serviceProvider.MakePostgreSqlService(
 		db.FixedAssetDBName.CompanyDBName(companyCode),
 	)
@@ -205,7 +217,7 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationToSystemRolesSQL(
 	var roles []util_fixedasset_new_model.UserSystemRole
 	err := userSystemRoleService.SelectMany(
 		&roles,
-		context.Background(),
+		ctx,
 		query,
 		args...,
 	)
@@ -243,6 +255,10 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationToUsersSQL(
 	userIds []string,
 	notificationDataWithoutUser util_fixedasset_new_model.Notification,
 ) *entity.HttpError {
+	//Add timeout context
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	defer cancel()
+
 	log.Printf("SENDING NOTIF %v to %v user", notificationDataWithoutUser.Title, len(userIds))
 	if len(userIds) == 0 {
 		return nil
@@ -261,7 +277,7 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationToUsersSQL(
 	var users []util_fixedasset_new_model.User
 	err := userService.SelectMany(
 		&users,
-		context.Background(),
+		ctx,
 		query,
 		args...,
 	)
@@ -374,7 +390,9 @@ func (r *SendNotificationSQLHelperImpl) SendMobileNotificationSQL(
 	opt := option.WithCredentialsJSON([]byte(cred))
 
 	// ─────── init firebase app ───────
-	ctx := context.Background()
+	//Add timeout context
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	defer cancel()
 
 	config := &firebase.Config{
 		ProjectID: "tag-samurai", // <-- explicitly set your Firebase project ID
