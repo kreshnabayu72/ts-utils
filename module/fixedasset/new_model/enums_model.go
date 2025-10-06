@@ -3,8 +3,8 @@ package new_model
 type AssetDefaultImage string
 
 const (
-	AssetDefaultImageFirstImage  = AssetDefaultImage("first_image")
-	AssetDefaultImageSecondImage = AssetDefaultImage("second_image")
+	AssetDefaultImageFirstImage  = AssetDefaultImage("firstImage")
+	AssetDefaultImageSecondImage = AssetDefaultImage("secondImage")
 )
 
 type AssetStatus string
