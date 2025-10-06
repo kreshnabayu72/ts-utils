@@ -18,7 +18,8 @@ type UserToken struct {
 type UserTokenType string
 
 const (
-	UserTokenTypeEmailChange    = UserTokenType("email_change")
-	UserTokenTypeOtp            = UserTokenType("otp")
-	UserTokenTypePasswordChange = UserTokenType("password_change")
+	UserTokenTypeEmailChange      = UserTokenType("email_change")
+	UserTokenTypeOtp              = UserTokenType("otp")
+	UserTokenTypePasswordChange   = UserTokenType("password_change")
+	UserTokenTypeUserConfirmation = UserTokenType("user_confirmation")
 )
