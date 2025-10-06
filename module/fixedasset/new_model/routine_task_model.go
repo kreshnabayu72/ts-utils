@@ -7,6 +7,7 @@ import (
 type RoutineTask struct {
 	ID            int               `json:"_id"           column:"routine_tasks.id"`
 	ScheduleID    int               `json:"scheduleId"    column:"routine_tasks.schedule_id"`
+	Name          string            `json:"name" column:"routine_tasks.name"`
 	AssetID       int               `json:"assetId"       column:"routine_tasks.asset_id"`
 	Status        RoutineTaskStatus `json:"status"        column:"routine_tasks.status"`
 	Duration      int               `json:"duration"      column:"routine_tasks.duration"`
