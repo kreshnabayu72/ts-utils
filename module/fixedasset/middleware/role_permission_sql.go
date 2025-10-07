@@ -75,7 +75,7 @@ func GlobalSystemRoleRestrictionSQL(permission new_model.PermissionType, resourc
 
 		// Check permissions based on the provided permissionKey and resourceTypes
 		err := helper.CheckSystemRolePermissionSQL(c, permission, resourceTypes, sql_query.SQLCondition{
-			Operator: sql_query.SQLOperatorIsNull,
+			Operator: "",
 		})
 		if err != nil {
 			return response.SendResponse(c, fiber.StatusUnauthorized, nil, "Unauthorized: "+err.Message)
