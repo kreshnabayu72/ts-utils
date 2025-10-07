@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"log"
+
 	"gitea.qwertysystem.net/BETS/ts-utils/middleware"
 	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/helper"
 	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
@@ -15,9 +17,12 @@ func CombineOrRestriction(middlewares ...fiber.Handler) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var lastErr error
 
+		log.Printf("Combine or %v middlewares\n", len(middlewares))
 		for _, mw := range middlewares {
 			// Run each middleware
 			err := mw(c)
+			log.Printf("Middleware error: %v\n", err)
+
 			if err == nil {
 				// At least one middleware passed then authorized
 				return nil
@@ -66,7 +71,7 @@ func PermittedUserRestrictionSQL(typeUser helper.PermittedUser, shouldPropagateE
 // they are granted access.
 //
 // Use this for global actions or routes that display information not specific to a single group.
-func GlobalSystemRoleRestrictionSQL(permission new_model.PermissionType, resourceTypes []new_model.SystemRoleAttribute) fiber.Handler {
+func GlobalSystemRoleRestrictionSQL(permission new_model.PermissionType, resourceTypes []new_model.SystemRoleAttribute, shouldPropagateError ...bool) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		isTest := c.Locals(middleware.IsTest)
 		if isTest != nil {
@@ -75,9 +80,14 @@ func GlobalSystemRoleRestrictionSQL(permission new_model.PermissionType, resourc
 
 		// Check permissions based on the provided permissionKey and resourceTypes
 		err := helper.CheckSystemRolePermissionSQL(c, permission, resourceTypes, sql_query.SQLCondition{
-			Operator: sql_query.SQLOperatorIsNull,
+			Operator: "",
 		})
+		log.Printf("GlobalSystemRoleRestrictionSQL err: %v\n", err)
+
 		if err != nil {
+			if len(shouldPropagateError) > 0 && shouldPropagateError[0] {
+				return err
+			}
 			return response.SendResponse(c, fiber.StatusUnauthorized, nil, "Unauthorized: "+err.Message)
 		}
 
@@ -174,7 +184,7 @@ func AssetListRoleRestrictionSQL() fiber.Handler {
 		systErr := helper.CheckSystemRolePermissionSQL(c, new_model.PermissionView,
 			[]new_model.SystemRoleAttribute{new_model.SystemRoleAttributeTag, new_model.SystemRoleAttributePurchaseInfo, new_model.SystemRoleAttributeRegisterAsset, new_model.SystemRoleAttributePurchaseDocument, new_model.SystemRoleAttributeDepreciationGroup, new_model.SystemRoleAttributeDepreciationMethod},
 			sql_query.SQLCondition{
-				Operator: sql_query.SQLOperatorIsNotNull,
+				Operator: "",
 			})
 		if systErr != nil && err != nil {
 			return response.SendResponse(c, fiber.StatusUnauthorized, nil, "Unauthorized: "+systErr.Message)
