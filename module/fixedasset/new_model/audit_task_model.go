@@ -7,6 +7,7 @@ import (
 type AuditTask struct {
 	ID            int             `json:"_id"            column:"audit_tasks.id"`
 	ScheduleID    int             `json:"scheduleId"     column:"audit_tasks.schedule_id"`
+	GroupID       int             `json:"groupId"     column:"audit_tasks.group_id"`
 	TransactionId string          `json:"transaction_id" column:"audit_tasks.transaction_id"`
 	Name          string          `json:"name" column:"audit_tasks.name"`
 	TagType       TagType         `json:"tagType"        column:"audit_tasks.tag_type"`
