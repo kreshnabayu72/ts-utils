@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"time"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/db"
@@ -70,6 +71,9 @@ func CheckSystemRolePermissionSQL(ctx *fiber.Ctx, permissionKey new_model.Permis
 		if groupFilter.Operator != sql_query.SQLOperatorIsNull && groupFilter.Operator != "" {
 			filter["group_id"] = groupFilter
 		}
+
+		log.Println("Count with filter system role")
+		service.Debug(3)
 
 		// Check for matching documents where the resource type is in the given array
 		count, err := service.CountWithFilter(ctx.Context(), db.UserSystemRoleTableName, filter)

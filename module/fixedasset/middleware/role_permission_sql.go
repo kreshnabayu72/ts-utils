@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"log"
+
 	"gitea.qwertysystem.net/BETS/ts-utils/middleware"
 	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/helper"
 	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
@@ -15,9 +17,12 @@ func CombineOrRestriction(middlewares ...fiber.Handler) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var lastErr error
 
+		log.Printf("Combine or %v middlewares\n", len(middlewares))
 		for _, mw := range middlewares {
 			// Run each middleware
 			err := mw(c)
+			log.Printf("Middleware error: %v\n", err)
+
 			if err == nil {
 				// At least one middleware passed then authorized
 				return nil
@@ -77,6 +82,8 @@ func GlobalSystemRoleRestrictionSQL(permission new_model.PermissionType, resourc
 		err := helper.CheckSystemRolePermissionSQL(c, permission, resourceTypes, sql_query.SQLCondition{
 			Operator: "",
 		})
+		log.Printf("GlobalSystemRoleRestrictionSQL err: %v\n", err)
+
 		if err != nil {
 			return response.SendResponse(c, fiber.StatusUnauthorized, nil, "Unauthorized: "+err.Message)
 		}
