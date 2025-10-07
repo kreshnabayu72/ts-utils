@@ -174,7 +174,7 @@ func AssetListRoleRestrictionSQL() fiber.Handler {
 		systErr := helper.CheckSystemRolePermissionSQL(c, new_model.PermissionView,
 			[]new_model.SystemRoleAttribute{new_model.SystemRoleAttributeTag, new_model.SystemRoleAttributePurchaseInfo, new_model.SystemRoleAttributeRegisterAsset, new_model.SystemRoleAttributePurchaseDocument, new_model.SystemRoleAttributeDepreciationGroup, new_model.SystemRoleAttributeDepreciationMethod},
 			sql_query.SQLCondition{
-				Operator: sql_query.SQLOperatorIsNotNull,
+				Operator: "",
 			})
 		if systErr != nil && err != nil {
 			return response.SendResponse(c, fiber.StatusUnauthorized, nil, "Unauthorized: "+systErr.Message)
