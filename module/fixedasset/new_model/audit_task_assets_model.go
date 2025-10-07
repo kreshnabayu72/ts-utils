@@ -15,6 +15,8 @@ type AuditTaskAssets struct {
 	FoundGroupId *int                    `json:"foundGroupId" column:"audit_task_assets.found_group_id"`
 	Address      string                  `json:"address"      column:"audit_task_assets.address"`
 	Coordinate   string                  `json:"coordinate"   column:"audit_task_assets.coordinate"`
+	FoundAt      *time.Time              `json:"foundAt"    column:"audit_task_assets.found_at"`
+	AuditedAt    *time.Time              `json:"auditedAt"    column:"audit_task_assets.audited_at"`
 	CreatedAt    time.Time               `json:"createdAt"    column:"audit_task_assets.created_at"`
 	UpdatedAt    time.Time               `json:"updatedAt"    column:"audit_task_assets.updated_at"`
 }
