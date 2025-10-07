@@ -13,6 +13,7 @@ type DisposalRequest struct {
 	PreviousStatus          AssetStatus           `json:"previousStatus"          column:"disposal_requests.previous_status"`
 	Status                  DisposalRequestStatus `json:"status"                  column:"disposal_requests.status"`
 	SalvageableParts        []string              `json:"salvageableParts"        column:"disposal_requests.salvageable_parts"`
+	SalePrice               *string               `json:"salePrice"               column:"disposal_requests.sale_price"`
 	Notes                   string                `json:"notes"                   column:"disposal_requests.notes"`
 	CompletionApprovalRound *int                  `json:"completionApprovalRound" column:"disposal_requests.completion_approval_round"`
 	IsVerified              bool                  `json:"isVerified"              column:"disposal_requests.is_verified"`
