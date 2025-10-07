@@ -71,7 +71,7 @@ func PermittedUserRestrictionSQL(typeUser helper.PermittedUser, shouldPropagateE
 // they are granted access.
 //
 // Use this for global actions or routes that display information not specific to a single group.
-func GlobalSystemRoleRestrictionSQL(permission new_model.PermissionType, resourceTypes []new_model.SystemRoleAttribute) fiber.Handler {
+func GlobalSystemRoleRestrictionSQL(permission new_model.PermissionType, resourceTypes []new_model.SystemRoleAttribute, shouldPropagateError ...bool) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		isTest := c.Locals(middleware.IsTest)
 		if isTest != nil {
@@ -85,6 +85,9 @@ func GlobalSystemRoleRestrictionSQL(permission new_model.PermissionType, resourc
 		log.Printf("GlobalSystemRoleRestrictionSQL err: %v\n", err)
 
 		if err != nil {
+			if len(shouldPropagateError) > 0 && shouldPropagateError[0] {
+				return err
+			}
 			return response.SendResponse(c, fiber.StatusUnauthorized, nil, "Unauthorized: "+err.Message)
 		}
 
