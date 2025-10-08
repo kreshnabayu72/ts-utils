@@ -19,9 +19,9 @@ type Tracking struct {
 	DownTimeSeconds float64            `json:"downTimeSeconds" column:"trackings.down_time_seconds"`
 	ReportSource    AssetReportSource  `json:"reportSource"    column:"trackings.report_source"`
 	ApprovalRound   int                `json:"approvalRound"   column:"trackings.approval_round"`
-	FoundAt         time.Time          `json:"foundAt"         column:"trackings.found_at"`
-	FoundBy         int                `json:"foundBy"         column:"trackings.found_by_id"`
-	FoundGroup      int                `json:"found_group"     column:"trackings.found_group_id"`
+	FoundAt         *time.Time         `json:"foundAt"         column:"trackings.found_at"`
+	FoundBy         *int               `json:"foundBy"         column:"trackings.found_by_id"`
+	FoundGroup      *int               `json:"found_group"     column:"trackings.found_group_id"`
 	CreatedAt       time.Time          `json:"createdAt"       column:"trackings.created_at"`
 	UpdatedAt       time.Time          `json:"updatedAt"       column:"trackings.updated_at"`
 }
