@@ -940,3 +940,39 @@ var TrackingConditionEnum = map[string]TrackingCondition{
 	"Asset found, damaged condition": TrackingConditionDamaged,
 	"TAG found, asset missing":       TrackingConditionTAGFound,
 }
+
+type ReportType string
+
+const (
+	ReportTypeCustomReport             ReportType = "Custom Report"
+	ReportTypeSummaryOverview          ReportType = "Summary Overview"
+	ReportTypeDepreciationReport       ReportType = "Depreciation Report"
+	ReportTypeMaintenanceRoutineReport ReportType = "Maintenance Routine Report"
+	ReportTypeRepairmentReport         ReportType = "Repairment Report"
+)
+
+type ReportListedBy string
+
+const (
+	ListedByGroup    ReportListedBy = "Group"
+	ListedByCategory ReportListedBy = "Category"
+)
+
+type ReportAssetInformationType string
+
+const (
+	ReportAssetInfoBasicInformation   ReportAssetInformationType = "Basic Information"
+	ReportAssetInfoBorrow             ReportAssetInformationType = "Borrow"
+	ReportAssetInfoTransfer           ReportAssetInformationType = "Transfer"
+	ReportAssetInfoAssignment         ReportAssetInformationType = "Assignment"
+	ReportAssetInfoTracking           ReportAssetInformationType = "Tracking"
+	ReportAssetInfoAudit              ReportAssetInformationType = "Audit"
+	ReportAssetInfoDisposal           ReportAssetInformationType = "Disposal"
+	ReportAssetInfoMaintenanceRoutine ReportAssetInformationType = "Maintenance Routine"
+	ReportAssetInfoRepairTicketing    ReportAssetInformationType = "Repair Ticketing"
+	ReportAssetInfoTagging            ReportAssetInformationType = "Tagging"
+	ReportAssetInfoLicense            ReportAssetInformationType = "License"
+	ReportAssetInfoAssetPolicy        ReportAssetInformationType = "Asset Policy"
+	ReportAssetInfoDamage             ReportAssetInformationType = "Damage"
+	ReportAssetInfoMissing            ReportAssetInformationType = "Missing"
+)

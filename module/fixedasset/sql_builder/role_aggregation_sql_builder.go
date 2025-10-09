@@ -1313,6 +1313,11 @@ func transactionRoleMultiPermissionAggregationCTE(
 			builder.GetCurrentArgIndex()+35,
 			builder.GetCurrentArgIndex()+36,
 		),
+		fmt.Sprintf(
+			`BOOL_OR(utr.role_type = $%d AND utr.role_attribute = $%d) AS "staff_maintenance"`,
+			builder.GetCurrentArgIndex()+37,
+			builder.GetCurrentArgIndex()+38,
+		),
 	)
 
 	builder.AddArgs(
@@ -1354,6 +1359,9 @@ func transactionRoleMultiPermissionAggregationCTE(
 		fixedasset_new_model.TransactionRoleAttributeMaintenance,
 		fixedasset_new_model.TransactionRoleTypeApproval,
 		fixedasset_new_model.TransactionRoleAttributeRepair,
+
+		fixedasset_new_model.TransactionRoleTypeStaff,
+		fixedasset_new_model.TransactionRoleAttributeMaintenance,
 	)
 
 	return builder.GroupBy("utr.group_id")
