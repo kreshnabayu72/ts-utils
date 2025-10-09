@@ -7,7 +7,7 @@ import (
 )
 
 type TransactionLog struct {
-	ID                        primitive.ObjectID     `json:"id,omitempty" bson:"_id,omitempty"`
+	ID                        primitive.ObjectID     `json:"_id,omitempty"              bson:"_id,omitempty"`
 	Type                      string                 `json:"type" bson:"type"`
 	Transaction               primitive.ObjectID     `json:"transaction" bson:"transaction"`
 	AssetName                 string                 `json:"assetName" bson:"assetName"`
