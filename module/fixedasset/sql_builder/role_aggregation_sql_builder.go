@@ -1206,7 +1206,12 @@ func transactionRoleMultiPermissionAggregationCTE(
 			},
 			"utr.role_type": {
 				Operator: sql_query.SQLOperatorIn,
-				Value:    []string{"Monitoring", "Manager", "Approval", "Staff"},
+				Value: []string{
+					string(fixedasset_new_model.TransactionRoleTypeManager),
+					string(fixedasset_new_model.TransactionRoleTypeMonitoring),
+					string(fixedasset_new_model.TransactionRoleTypeApproval),
+					string(fixedasset_new_model.TransactionRoleTypeStaff),
+				},
 			},
 			"utr.role_attribute": {
 				Operator: sql_query.SQLOperatorIn,
@@ -1217,6 +1222,7 @@ func transactionRoleMultiPermissionAggregationCTE(
 					fixedasset_new_model.TransactionRoleAttributeAudit,
 					fixedasset_new_model.TransactionRoleAttributeMaintenance,
 					fixedasset_new_model.TransactionRoleAttributeRepair,
+					fixedasset_new_model.TransactionRoleAttributeTracking,
 				},
 			},
 		})
