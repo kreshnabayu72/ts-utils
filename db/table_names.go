@@ -21,6 +21,7 @@ const (
 	AuditApprovalTableName                    = "audit_approvals"
 	AuditApprovalAssetTableName               = "audit_approval_assets"
 	AuditEventLogTableName                    = "audit_event_logs"
+	AuditOtherTransactionAssetTableName       = "audit_other_transaction_assets"
 	AuditTaskEventLogTableName                = "audit_task_event_logs"
 	AuditScheduleTableName                    = "audit_schedules"
 	AuditScheduledAssetTableName              = "audit_scheduled_assets"
