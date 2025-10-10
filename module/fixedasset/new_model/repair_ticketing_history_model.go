@@ -7,8 +7,8 @@ import (
 type RepairTicketingHistory struct {
 	ID                         int                     `json:"_id"                        column:"repair_ticketing_histories.id"`
 	Asset                      int                     `json:"asset"                      column:"repair_ticketing_histories.asset"`
-	BorrowerId                 int                     `json:"borrowerId"   column:"repair_ticketing_histories.borrower_id"`
-	AssignedToId               int                     `json:"assignedToId"   column:"repair_ticketing_histories.assigned_to_id"`
+	BorrowerId                 *int                    `json:"borrowerId"   column:"repair_ticketing_histories.borrower_id"`
+	AssignedToId               *int                    `json:"assignedToId"   column:"repair_ticketing_histories.assigned_to_id"`
 	ReportedById               int                     `json:"reportedById"   column:"repair_ticketing_histories.reported_by_id"`
 	ReportedByFullName         string                  `json:"reportedByFullName"         column:"repair_ticketing_histories.reported_by_full_name"`
 	TagType                    TagType                 `json:"tagType"                    column:"repair_ticketing_histories.tag_type"`
