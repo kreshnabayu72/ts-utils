@@ -9,6 +9,7 @@ const (
 	AssetTableName                            = "assets"
 	AssetLicenseTableName                     = "asset_licenses"
 	AssetCustomFieldTableName                 = "asset_custom_fields"
+	AssetNameGroupAddOnTableName              = "asset_name_group_addons"
 	AssetNameTableName                        = "asset_names"
 	AssignmentApprovalTableName               = "assignment_approvals"
 	AssignmentRequestTableName                = "assignment_requests"
