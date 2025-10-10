@@ -13,11 +13,6 @@ type AssetName struct {
 	AddOnTracking           bool       `json:"addonTracking"           column:"asset_names.addon_tracking"`
 	AddOnAssetControl       bool       `json:"addonAssetControl"       column:"asset_names.addon_asset_control"`
 	AddOnAudit              bool       `json:"addonAudit"              column:"asset_names.addon_audit"`
-	LicenseRepairTicketing  bool       `json:"licenseRepairTicketing"  column:"asset_names.license_repair_ticketing"`
-	LicenseMaintenance      bool       `json:"licenseMaintenance"      column:"asset_names.license_maintenance"`
-	LicenseTracking         bool       `json:"licenseTracking"         column:"asset_names.license_tracking"`
-	LicenseAssetControl     bool       `json:"licenseAssetControl"     column:"asset_names.license_asset_control"`
-	LicenseAudit            bool       `json:"licenseAudit"            column:"asset_names.license_audit"`
 	CategoryId              int        `json:"categoryId"              column:"asset_names.category_id"`
 	MeasurementId           int        `json:"measurementId"           column:"asset_names.measurement_id"`
 	DepreciationGroupId     *int       `json:"depreciationGroupId"     column:"asset_names.depreciation_group_id"`
