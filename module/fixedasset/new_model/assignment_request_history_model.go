@@ -23,6 +23,8 @@ type AssignmentRequestHistory struct {
 	Transaction      int                     `json:"transaction"      column:"assignment_request_histories.transaction"`
 	Status           AssignmentRequestStatus `json:"status"           column:"assignment_request_histories.status"`
 	Notes            string                  `json:"notes"            column:"assignment_request_histories.notes"`
+	TransactionID    string                  `json:"transactionId"              column:"assignment_request_histories.transaction_id"`
+	AssignedToId     int                     `json:"assignedToId"   column:"assignment_request_histories.assigned_to_id"`
 	AssignedTo       string                  `json:"assignedTo"       column:"assignment_request_histories.assigned_to"`
 	Manager          string                  `json:"manager"          column:"assignment_request_histories.manager"`
 	CreatedAt        time.Time               `json:"createdAt"        column:"assignment_request_histories.created_at"`
