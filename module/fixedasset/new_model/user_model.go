@@ -37,7 +37,7 @@ type User struct {
 	ModifiedByFirstName    string     `json:"modifiedByFirstName"    column:"users.modified_by_first_name"`
 	ModifiedByLastName     string     `json:"modifiedByLastName"     column:"users.modified_by_last_name"`
 	ModifiedByFullName     string     `json:"modifiedByFullName"     column:"users.modified_by_full_name"                                          special:"generated"`
-	HasModuleAccess        bool       `json:"hasModuleAccess"        column:"users.has_module_access"` //For showing/hiding user that doesn't have fixed asset access from global settings
+	HasModuleAccess        bool       `json:"hasModuleAccess"        column:"users.has_module_access"` // For showing/hiding user that doesn't have fixed asset access from global settings
 	IsGlobalActive         bool       `json:"isGlobalActive"         column:"users.is_global_active"`
 	IsDeleted              bool       `json:"isDeleted"              column:"users.is_deleted"`
 	DeleteFromDatabaseAt   *time.Time `json:"deleteFromDatabaseAt"   column:"users.deleted_at"`
@@ -46,7 +46,9 @@ type User struct {
 }
 
 type UserAttribute struct {
-	ID        string `json:"_id,omitempty" column:"id::text"`
-	FullName  string `json:"fullName"      column:"concat_ws(' ', first_name, last_name)"`
-	IsDefault bool   `json:"isDefault"     column:"is_default"`
+	ID             string `json:"_id,omitempty" column:"id::text"`
+	FullName       string `json:"fullName"      column:"concat_ws(' ', first_name, last_name)"`
+	IsDefault      bool   `json:"isDefault"     column:"is_default"`
+	IsReadOnly     bool   `json:"isReadOnly"             column:"users.is_read_only"                                                   special:"generated"`
+	IsTotalControl bool   `json:"isTotalControl"         column:"users.is_total_control"                                               special:"generated"`
 }
