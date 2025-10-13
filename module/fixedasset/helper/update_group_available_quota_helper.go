@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"strconv"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/db"
 	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
@@ -94,7 +95,7 @@ func ChangeFixedAssetQuota(
 		parentGroupData, parentGroupQuota, err := GetGroupWithQuota(
 			ctx,
 			service,
-			groupId,
+			strconv.Itoa(*parentId),
 			quotaType,
 		)
 		if err != nil {

@@ -61,6 +61,7 @@ const (
 	AuditTaskAssetStatusAudited     AuditTaskAssetStatus = "Audited"
 	AuditTaskAssetStatusTAGReported AuditTaskAssetStatus = "TAG Reported"
 	AuditTaskAssetStatusOverdue     AuditTaskAssetStatus = "Overdue"
+	AuditTaskAssetStatusGracePeriod AuditTaskAssetStatus = "Grace Period"
 	AuditTaskAssetStatusMisplaced   AuditTaskAssetStatus = "Misplaced"
 	AuditTaskAssetStatusFound       AuditTaskAssetStatus = "Found"
 )

@@ -25,7 +25,7 @@ type TransactionLog struct {
 	OriginGroup               string                 `json:"originGroup" bson:"originGroup"`
 	DestinationGroup          string                 `json:"destinationGroup" bson:"destinationGroup"`
 	TransactionId             string                 `json:"transactionId" bson:"transactionId"`
-	ReaderId                  primitive.ObjectID     `json:"readerId" bson:"readerId"`
+	ReaderId                  string                 `json:"readerId" bson:"readerId"`
 	ReaderName                string                 `json:"readerName" bson:"readerName"`
 	ReaderNameWithoutSequence string                 `json:"readerNameWithoutSequence" bson:"readerNameWithoutSequence"`
 	ReaderType                string                 `json:"readerType" bson:"readerType"`
