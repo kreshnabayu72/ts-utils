@@ -61,6 +61,9 @@ const (
 	AuditTaskAssetStatusAudited     AuditTaskAssetStatus = "Audited"
 	AuditTaskAssetStatusTAGReported AuditTaskAssetStatus = "TAG Reported"
 	AuditTaskAssetStatusOverdue     AuditTaskAssetStatus = "Overdue"
+	AuditTaskAssetStatusGracePeriod AuditTaskAssetStatus = "Grace Period"
+	AuditTaskAssetStatusMisplaced   AuditTaskAssetStatus = "Misplaced"
+	AuditTaskAssetStatusFound       AuditTaskAssetStatus = "Found"
 )
 
 type AuditTaskAssetCondition string
@@ -76,6 +79,7 @@ type AuditTaskStatus string
 
 const (
 	AuditTaskStatusOnSchedule         AuditTaskStatus = "On Schedule"
+	AuditTaskStatusInAudit            AuditTaskStatus = "In Audit"
 	AuditTaskStatusWaitingForApproval AuditTaskStatus = "Waiting for Approval"
 	AuditTaskStatusGracePeriod        AuditTaskStatus = "Grace Period"
 	AuditTaskStatusOverdue            AuditTaskStatus = "Overdue"
