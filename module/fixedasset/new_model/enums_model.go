@@ -78,6 +78,7 @@ type AuditTaskStatus string
 
 const (
 	AuditTaskStatusOnSchedule         AuditTaskStatus = "On Schedule"
+	AuditTaskStatusInAudit            AuditTaskStatus = "In Audit"
 	AuditTaskStatusWaitingForApproval AuditTaskStatus = "Waiting for Approval"
 	AuditTaskStatusGracePeriod        AuditTaskStatus = "Grace Period"
 	AuditTaskStatusOverdue            AuditTaskStatus = "Overdue"
