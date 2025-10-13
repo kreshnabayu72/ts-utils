@@ -353,22 +353,25 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationSQL(
 	notificationsInterface := []any{}
 	for _, pendingNotification := range notifications {
 		notificationsInterface = append(notificationsInterface, pendingNotification)
-		resp, err := http.Get(
-			fmt.Sprintf(
-				"%s/v2/sse/send?id=%s&message=user:unread-notification",
-				notificationApi,
-				pendingNotification.UserKey,
-			),
-		)
-		// Dont throw error, if notif is down, let transaction continue
-		if err != nil {
-			log.Println("NOTIFICATION ERROR: " + err.Error())
-			continue
-		}
 
-		// Drain & close body so the connection can be reused
-		_, _ = io.Copy(io.Discard, resp.Body)
-		resp.Body.Close()
+		go func(p util_fixedasset_new_model.Notification) {
+			resp, err := http.Get(
+				fmt.Sprintf(
+					"%s/v2/sse/send?id=%s&message=user:unread-notification",
+					notificationApi,
+					p.UserKey,
+				),
+			)
+			// Dont throw error, if notif is down, let transaction continue
+			if err != nil {
+				log.Println("NOTIFICATION ERROR: " + err.Error())
+			}
+
+			// Drain & close body so the connection can be reused
+			_, _ = io.Copy(io.Discard, resp.Body)
+			resp.Body.Close()
+		}(pendingNotification)
+
 	}
 
 	_, err := notificationService.InsertMany(context.Background(), notificationsInterface)
