@@ -362,9 +362,9 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationSQL(
 					p.UserKey,
 				),
 			)
-			// Dont throw error, if notif is down, let transaction continue
 			if err != nil {
 				log.Println("NOTIFICATION ERROR: " + err.Error())
+				return
 			}
 
 			// Drain & close body so the connection can be reused
