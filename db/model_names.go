@@ -11,6 +11,7 @@ const (
 	AssignmentTransactionModelName            = "assignment_transactions"
 	AttachmentModelName                       = "attachments"
 	AuditAssetModelName                       = "audit_asset"
+	AuditIotScanAssetLogModelName             = "audit_iot_scan_asset_logs"
 	AuditScheduleModelName                    = "audit_schedule"
 	AuditScheduledAssetModelName              = "audit_scheduled_assets"
 	AuditTaskModelName                        = "audit_tasks"
