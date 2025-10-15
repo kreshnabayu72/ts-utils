@@ -17,6 +17,7 @@ type DisposalRequest struct {
 	Notes                   string                `json:"notes"                   column:"disposal_requests.notes"`
 	CompletionApprovalRound *int                  `json:"completionApprovalRound" column:"disposal_requests.completion_approval_round"`
 	IsVerified              bool                  `json:"isVerified"              column:"disposal_requests.is_verified"`
+	DocumentationPhoto      *string               `json:"documentationPhoto"      column:"disposal_requests.documentation_photo"`
 	CreatedAt               time.Time             `json:"createdAt"               column:"disposal_requests.created_at"`
 	UpdatedAt               time.Time             `json:"updatedAt"               column:"disposal_requests.updated_at"`
 }
