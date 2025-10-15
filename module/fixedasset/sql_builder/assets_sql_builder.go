@@ -99,7 +99,9 @@ func GetAllAssetsBuilder(filters map[string]sql_query.SQLCondition) (string, []i
 }
 
 // Ex-dummy experiment
-func GetAllAssetsWithRoleBuilder(filters map[string]sql_query.SQLCondition) (string, []interface{}, error) {
+func GetAllAssetsWithRoleBuilder(
+	filters map[string]sql_query.SQLCondition,
+) (string, []interface{}, error) {
 	commonBuilder := CommonGetAssetListBuilder()
 	TransactionRolePermissionAggregation(
 		commonBuilder,
