@@ -8,7 +8,7 @@ type AuditTaskHistory struct {
 	ID            int        `json:"_id"            column:"audit_task_histories.id"`
 	TransactionId string     `json:"transaction_id" column:"audit_task_histories.transaction_id"`
 	Name          string     `json:"name"           column:"audit_task_histories.name"`
-	GroupID       string     `json:"groupId"        column:"audit_task_histories.group_id"`
+	GroupID       int        `json:"groupId"        column:"audit_task_histories.group_id"`
 	CategoryNames []string   `json:"categoryNames"  column:"audit_task_histories.category_names"`
 	GroupName     string     `json:"groupName"      column:"audit_task_histories.group_name"`
 	TagType       string     `json:"tagType"        column:"audit_task_histories.tag_type"`
