@@ -18,6 +18,7 @@ type BorrowingRequest struct {
 	Notes            string                 `json:"notes"            column:"borrowing_requests.notes"`
 	Duration         int                    `json:"duration"         column:"borrowing_requests.duration"`
 	PreviousDuration int                    `json:"previousDuration" column:"borrowing_requests.previous_duration"`
+	ExtendDuration   *int                   `json:"extendDuration"   column:"borrowing_requests.extend_duration"`
 	ActualReturnDate *time.Time             `json:"actualReturnDate" column:"borrowing_requests.actual_return_date"`
 	DueReturnDate    time.Time              `json:"dueReturnDate"    column:"borrowing_requests.due_return_date"`
 	IsOverdue        bool                   `json:"isOverdue"        column:"borrowing_requests.is_overdue"`
