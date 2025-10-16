@@ -12,6 +12,7 @@ type AuditTaskAssets struct {
 	Status       AuditTaskAssetStatus    `json:"status"       column:"audit_task_assets.status"`
 	Condition    AuditTaskAssetCondition `json:"condition"    column:"audit_task_assets.condition"`
 	Notes        string                  `json:"notes"        column:"audit_task_assets.notes"`
+	DamageImage  *string                 `json:"damageImage"        column:"audit_task_assets.damage_image"`
 	FoundGroupId *int                    `json:"foundGroupId" column:"audit_task_assets.found_group_id"`
 	Address      string                  `json:"address"      column:"audit_task_assets.address"`
 	Coordinate   string                  `json:"coordinate"   column:"audit_task_assets.coordinate"`
