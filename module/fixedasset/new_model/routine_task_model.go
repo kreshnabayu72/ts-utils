@@ -18,6 +18,8 @@ type RoutineTask struct {
 	SerialNumber    *string           `json:"serialNumber"    column:"routine_tasks.serial_number"`
 	ServiceCenterId *int              `json:"serviceCenterId" column:"routine_tasks.service_center_id"`
 	StartAt         time.Time         `json:"startAt"         column:"routine_tasks.start_at"`
+	ReviewedAt      *time.Time        `json:"reviewedAt"      column:"routine_tasks.reviewed_at"`
+	ReviewedById    *int              `json:"reviewedById"    column:"routine_tasks.reviewed_by_id"`
 	CreatedAt       time.Time         `json:"createdAt"       column:"routine_tasks.created_at"`
 	UpdatedAt       time.Time         `json:"updatedAt"       column:"routine_tasks.updated_at"`
 }
