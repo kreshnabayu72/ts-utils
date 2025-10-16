@@ -77,7 +77,7 @@ func (f *FileManagerHelperSQLImpl) CreateFileManagerSQL(
 		storageFieldName = "file_storage_attachment_kb"
 	case new_model.FileTypeDamage:
 		storageFieldName = "file_storage_damage_kb"
-	case new_model.FileTypeDisposal:
+	case new_model.FileTypeDisposalPhoto, new_model.FileTypeDisposalDocument:
 		storageFieldName = "file_storage_disposal_kb"
 	case new_model.FileTypeRepairTicketing:
 		storageFieldName = "file_storage_repair_ticketing_kb"
@@ -189,7 +189,7 @@ func (f *FileManagerHelperSQLImpl) DeleteFileManagerSQL(
 		storageFieldName = "file_storage_attachment_kb"
 	case new_model.FileTypeDamage:
 		storageFieldName = "file_storage_damaged_kb"
-	case new_model.FileTypeDisposal:
+	case new_model.FileTypeDisposalDocument, new_model.FileTypeDisposalPhoto:
 		storageFieldName = "file_storage_disposal_kb"
 	case new_model.FileTypeRepairTicketing:
 		storageFieldName = "file_storage_repair_ticketing_kb"
