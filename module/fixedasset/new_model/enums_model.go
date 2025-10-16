@@ -519,7 +519,8 @@ type FileType string
 const (
 	FileTypeAttachment         FileType = "Attachment"
 	FileTypeDamage             FileType = "Damage"
-	FileTypeDisposal           FileType = "Disposal"
+	FileTypeDisposalPhoto      FileType = "Disposal Photo"
+	FileTypeDisposalDocument   FileType = "Disposal Document"
 	FileTypeRepairTicketing    FileType = "Repair Ticketing"
 	FileTypeMaintenanceRoutine FileType = "Maintenance Routine"
 )
