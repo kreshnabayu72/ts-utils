@@ -1334,17 +1334,6 @@ func transactionRoleMultiPermissionAggregationCTE(
 			fixedasset_new_model.TransactionRoleTypeApproval,
 			fixedasset_new_model.TransactionRoleAttributeTracking,
 		),
-		// --- BOT MODIFICATION START ---
-		fmt.Sprintf(
-			`BOOL_OR(utr.role_type = '%v' AND utr.role_attribute = '%v') AS "staff_borrowing"`,
-			fixedasset_new_model.TransactionRoleTypeStaff,
-			fixedasset_new_model.TransactionRoleAttributeBorrowing,
-		),
-		fmt.Sprintf(
-			`BOOL_OR(utr.role_type = '%v' AND utr.role_attribute = '%v') AS "staff_transfer"`,
-			fixedasset_new_model.TransactionRoleTypeStaff,
-			fixedasset_new_model.TransactionRoleAttributeTransfer,
-		),
 		fmt.Sprintf(
 			`BOOL_OR(utr.role_type = '%v' AND utr.role_attribute = '%v') AS "staff_disposal"`,
 			fixedasset_new_model.TransactionRoleTypeStaff,
@@ -1370,7 +1359,6 @@ func transactionRoleMultiPermissionAggregationCTE(
 			fixedasset_new_model.TransactionRoleTypeStaff,
 			fixedasset_new_model.TransactionRoleAttributeTracking,
 		),
-		// --- BOT MODIFICATION END ---
 	)
 	return builder.GroupBy("utr.group_id")
 }
