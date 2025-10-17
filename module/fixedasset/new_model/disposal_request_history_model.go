@@ -28,6 +28,7 @@ type DisposalRequestHistory struct {
 	SalePrice                 string                `json:"salePrice"                 column:"disposal_request_histories.sale_price"`
 	LastCondition             DisposalLastCondition `json:"lastCondition"             column:"disposal_request_histories.last_condition"`
 	Method                    DisposalMethod        `json:"method"                    column:"disposal_request_histories.method"`
+	CustomMethod              *string               `json:"customMethod"              column:"disposal_request_histories.custom_method"`
 	Notes                     string                `json:"notes"                     column:"disposal_request_histories.notes"`
 	Manager                   string                `json:"manager"                   column:"disposal_request_histories.manager"`
 	DocumentationPhoto        *string               `json:"documentationPhoto"        column:"disposal_request_histories.documentation_photo"`
