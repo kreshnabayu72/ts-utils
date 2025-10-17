@@ -20,7 +20,7 @@ type AssignmentRequestHistory struct {
 	Image            *string                 `json:"image"            column:"assignment_request_histories.image"`
 	Group            string                  `json:"group"            column:"assignment_request_histories.group"`
 	GroupID          int                     `json:"groupId"          column:"assignment_request_histories.group_id"`
-	Transaction      int                     `json:"transaction"      column:"assignment_request_histories.transaction"`
+	Transaction      *int                    `json:"transaction"      column:"assignment_request_histories.transaction"`
 	Status           AssignmentRequestStatus `json:"status"           column:"assignment_request_histories.status"`
 	Notes            string                  `json:"notes"            column:"assignment_request_histories.notes"`
 	TransactionID    string                  `json:"transactionId"              column:"assignment_request_histories.transaction_id"`

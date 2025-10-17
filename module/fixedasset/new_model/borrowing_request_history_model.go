@@ -20,7 +20,7 @@ type BorrowingRequestHistory struct {
 	Group            string                 `json:"group"            column:"borrowing_request_histories.group"`
 	GroupID          int                    `json:"groupId"          column:"borrowing_request_histories.group_id"`
 	TransactionID    string                 `json:"transactionId"              column:"borrowing_request_histories.transaction_id"`
-	Transaction      int                    `json:"transaction"      column:"borrowing_request_histories.transaction"`
+	Transaction      *int                   `json:"transaction"      column:"borrowing_request_histories.transaction"`
 	Status           BorrowingRequestStatus `json:"status"           column:"borrowing_request_histories.status"`
 	Notes            string                 `json:"notes"            column:"borrowing_request_histories.notes"`
 	BorrowerId       int                    `json:"borrowerId"   column:"borrowing_request_histories.borrower_id"`
