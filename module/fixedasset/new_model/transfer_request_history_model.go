@@ -19,7 +19,8 @@ type TransferRequestHistory struct {
 	NameWithSequence   string                         `json:"nameWithSequence"   column:"transfer_request_histories.name_with_sequence"`
 	SequenceNumber     int                            `json:"sequenceNumber"     column:"transfer_request_histories.sequence_number"`
 	Image              *string                        `json:"image"              column:"transfer_request_histories.image"`
-	Transaction        int                            `json:"transaction"        column:"transfer_request_histories.transaction"`
+	Transaction        *int                           `json:"transaction"        column:"transfer_request_histories.transaction"`
+	TransactionID      string                         `json:"transactionId"             column:"transfer_request_histories.transaction_id"`
 	Status             TransferRequestStatus          `json:"status"             column:"transfer_request_histories.status"`
 	TagStatus          *TransferRequestAssetTagStatus `json:"tagStatus"          column:"transfer_request_histories.tag_status"`
 	OriginGroup        string                         `json:"originGroup"        column:"transfer_request_histories.origin_group"`
