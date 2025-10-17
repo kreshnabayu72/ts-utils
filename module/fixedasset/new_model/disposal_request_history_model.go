@@ -21,7 +21,8 @@ type DisposalRequestHistory struct {
 	OriginGroupID             int                   `json:"originGroupId"             column:"disposal_request_histories.origin_group_id"`
 	DisposalGroup             string                `json:"disposalGroup"             column:"disposal_request_histories.disposal_group"`
 	DisposalGroupID           int                   `json:"disposalGroupId"           column:"disposal_request_histories.disposal_group_id"`
-	Transaction               int                   `json:"transaction"               column:"disposal_request_histories.transaction"`
+	Transaction               *int                  `json:"transaction"               column:"disposal_request_histories.transaction"`
+	TransactionID             string                `json:"transactionId"             column:"disposal_request_histories.transaction_id"`
 	Status                    DisposalRequestStatus `json:"status"                    column:"disposal_request_histories.status"`
 	SalvageableParts          []string              `json:"salvageableParts"          column:"disposal_request_histories.salvageable_parts"`
 	SalePrice                 string                `json:"salePrice"                 column:"disposal_request_histories.sale_price"`
