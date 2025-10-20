@@ -23,6 +23,9 @@ type RepairApproval struct {
 	AdditionalCostPaymentProof string                `json:"additionalCostPaymentProof" column:"repair_approvals.additional_cost_payment_proof"`
 	Address                    string                `json:"address"         column:"repair_approvals.address"`
 	Coordinate                 string                `json:"coordinate"      column:"repair_approvals.coordinate"`
+	RepairImage                *string               `json:"repairImage"                column:"repair_approvals.repair_image"`
+	DamageImage                *string               `json:"damageImage"                column:"repair_approvals.damage_image"`
+	ServiceCenterName          *string               `json:"serviceCenterName" column:"repair_approvals.service_center_name"`
 	ApprovedAt                 *time.Time            `json:"approvedAt"      column:"repair_approvals.approved_at"`
 	CreatedAt                  time.Time             `json:"createdAt"       column:"repair_approvals.created_at"`
 	UpdatedAt                  time.Time             `json:"updatedAt"       column:"repair_approvals.updated_at"`
