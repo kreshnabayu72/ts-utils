@@ -981,3 +981,39 @@ const (
 	ReportAssetInfoDamage             ReportAssetInformationType = "Damage"
 	ReportAssetInfoMissing            ReportAssetInformationType = "Missing"
 )
+
+type ReportFrequency string
+
+const (
+	ReportFrequencyImmediately ReportFrequency = "Immediately"
+	ReportFrequencyOnce        ReportFrequency = "Once"
+	ReportFrequencyDaily       ReportFrequency = "Daily"
+	ReportFrequencyWeekly      ReportFrequency = "Weekly"
+	ReportFrequencyMonthly     ReportFrequency = "Monthly"
+	ReportFrequencyAnnually    ReportFrequency = "Annually"
+)
+
+type ReportTimeInterval string
+
+const (
+	ReportTimeIntervalLast24Hours ReportTimeInterval = "Last 24 hours"
+	ReportTimeIntervalLast7Days   ReportTimeInterval = "Last 7 days"
+	ReportTimeIntervalLastMonth   ReportTimeInterval = "Last month"
+	ReportTimeIntervalLastYear    ReportTimeInterval = "Last year"
+)
+
+type ReportSummaryOverviewContent string
+
+const (
+	ReportSummaryOverviewContentTAGStatus          ReportSummaryOverviewContent = "TAG Status"
+	ReportSummaryOverviewContentLicenseStatus      ReportSummaryOverviewContent = "License Status"
+	ReportSummaryOverviewContentAssetStatus        ReportSummaryOverviewContent = "Asset Status"
+	ReportSummaryOverviewContentBorrowing          ReportSummaryOverviewContent = "Borrowing"
+	ReportSummaryOverviewContentTransfer           ReportSummaryOverviewContent = "Transfer"
+	ReportSummaryOverviewContentDisposal           ReportSummaryOverviewContent = "Disposal"
+	ReportSummaryOverviewContentTracking           ReportSummaryOverviewContent = "Tracking"
+	ReportSummaryOverviewContentAudit              ReportSummaryOverviewContent = "Audit"
+	ReportSummaryOverviewContentMaintenanceRoutine ReportSummaryOverviewContent = "Maintenance Routine"
+	ReportSummaryOverviewContentAssignment         ReportSummaryOverviewContent = "Assignment"
+	ReportSummaryOverviewContentRepairment         ReportSummaryOverviewContent = "Repairment"
+)
