@@ -1,6 +1,10 @@
 package new_model
 
-import "time"
+import (
+	"time"
+
+	"gitea.qwertysystem.net/BETS/ts-utils/module/common/new_model"
+)
 
 type Report struct {
 	ID        int             `json:"_id"                  column:"reports.id"`
@@ -8,12 +12,6 @@ type Report struct {
 	Type      ReportType      `json:"type"                 column:"reports.type"`
 	Frequency ReportFrequency `json:"frequency"                 column:"reports.frequency"` //A.K.A Schedule
 	StartFrom *time.Time      `json:"startFrom"            column:"reports.start_from"`
-
-	//Filter
-	FilterGroup     []string `json:"filterGroup" column:"reports.filter_group"`
-	FilterCategory  []string `json:"filterCategory" column:"reports.filter_category"`
-	FilterAssetName []string `json:"filterAssetName" column:"reports.filter_asset_name"`
-	FilterBrand     []string `json:"filterBrand" column:"reports.filter_brand"`
 
 	//Not in depreciation report
 	TimeInterval *ReportTimeInterval `json:"timeInterval" column:"reports.time_interval"`
@@ -24,13 +22,13 @@ type Report struct {
 	// Custom Report
 	ListedBy             *ReportListedBy             `json:"listedBy"             column:"reports.listed_by"`
 	AssetInformationType *ReportAssetInformationType `json:"assetInformationType" column:"reports.asset_information_type"`
-	Columns              []string                    `json:"columns" column:"reports.columns"`
+	Columns              new_model.JSONBArrayString  `json:"columns" column:"reports.columns"`
 
 	//Email
-	Subject    string   `json:"subject"                 column:"reports.subject"`
-	Recipients []string `json:"recipients"                 column:"reports.recipients"`
-	Cc         []string `json:"cc"                 column:"reports.cc"`
-	Bcc        []string `json:"bcc"                 column:"reports.bcc"`
+	Subject    string                     `json:"subject"                 column:"reports.subject"`
+	Recipients new_model.JSONBArrayString `json:"recipients"                 column:"reports.recipients"`
+	Cc         new_model.JSONBArrayString `json:"cc"                 column:"reports.cc"`
+	Bcc        new_model.JSONBArrayString `json:"bcc"                 column:"reports.bcc"`
 
 	//Misc
 	NextSchedule *time.Time `json:"nextSchedule"         column:"reports.next_schedule"`
