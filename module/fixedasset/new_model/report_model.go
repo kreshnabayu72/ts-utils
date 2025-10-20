@@ -9,6 +9,12 @@ type Report struct {
 	Frequency ReportFrequency `json:"frequency"                 column:"reports.frequency"` //A.K.A Schedule
 	StartFrom *time.Time      `json:"startFrom"            column:"reports.start_from"`
 
+	//Filter
+	FilterGroup     []string `json:"filterGroup" column:"reports.filter_group"`
+	FilterCategory  []string `json:"filterCategory" column:"reports.filter_category"`
+	FilterAssetName []string `json:"filterAssetName" column:"reports.filter_asset_name"`
+	FilterBrand     []string `json:"filterBrand" column:"reports.filter_brand"`
+
 	//Not in depreciation report
 	TimeInterval *ReportTimeInterval `json:"timeInterval" column:"reports.time_interval"`
 
