@@ -626,12 +626,14 @@ func (s *SelectBuilder) Having(havingClause map[string]SQLCondition) SQLSelectCh
 
 func (s *SelectBuilder) OrderBy(sortBy []string, asc bool) SQLSelectChainBuilder {
 	direction := "ASC"
+	nulls := "FIRST"
 
 	if !asc {
 		direction = "DESC"
+		nulls = "LAST"
 	}
 
-	sortingRule := fmt.Sprintf("%s %s", strings.Join(sortBy, ", "), direction)
+	sortingRule := fmt.Sprintf("%s %s NULLS %s", strings.Join(sortBy, ", "), direction, nulls)
 	s.SortBy = append(s.SortBy, sortingRule)
 	return s
 }
