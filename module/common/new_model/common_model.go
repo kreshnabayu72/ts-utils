@@ -1,5 +1,7 @@
 package new_model
 
+import "encoding/json"
+
 type UserEmbedded struct {
 	ID        *string `json:"_id,omitempty"       bson:"_id,omitempty"`
 	FullName  *string `json:"fullName"            bson:"fullName"`
@@ -50,3 +52,36 @@ const (
 	FixedAssetModule  AppModule = "Fixed Asset"
 	SupplyAssetModule AppModule = "Supply Asset"
 )
+
+// JSONBArrayString is a custom type for handling a Go []string that is stored as
+// a JSONB array of strings in a PostgreSQL database.
+// It ensures correct marshaling and unmarshaling, particularly for handling nil/null states
+// when interacting with the database or API payloads.
+type JSONBArrayString []string
+
+// MarshalJSON implements the json.Marshaler interface.
+// It converts the Go slice to a JSON array string (e.g., '["a","b"]').
+// It explicitly returns 'null' for a nil Go slice, rather than '[]'.
+func (s JSONBArrayString) MarshalJSON() ([]byte, error) {
+	if s == nil {
+		return json.Marshal(nil)
+	}
+	return json.Marshal([]string(s))
+}
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+// It converts incoming JSON data (from an API or database query result) back into a Go slice.
+// It handles the JSON 'null' value gracefully by setting the slice to nil.
+func (s *JSONBArrayString) UnmarshalJSON(data []byte) error {
+	if string(data) == "null" {
+		*s = nil
+		return nil
+	}
+
+	var temp []string
+	if err := json.Unmarshal(data, &temp); err != nil {
+		return err
+	}
+	*s = temp
+	return nil
+}
