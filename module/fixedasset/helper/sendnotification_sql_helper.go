@@ -352,6 +352,8 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationSQL(
 
 	notificationsInterface := []any{}
 	for _, pendingNotification := range notifications {
+		pendingNotification.CreatedAt = time.Now()
+		pendingNotification.UpdatedAt = time.Now()
 		notificationsInterface = append(notificationsInterface, pendingNotification)
 
 		go func(p util_fixedasset_new_model.Notification) {
