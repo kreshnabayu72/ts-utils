@@ -13,6 +13,7 @@ type RepairApproval struct {
 	Status                     ApprovalStatus        `json:"status"          column:"repair_approvals.status"`
 	IsApproved                 *bool                 `json:"isApproved"      column:"repair_approvals.is_approved"`
 	Notes                      *string               `json:"notes"           column:"repair_approvals.notes"`
+	IsRepairSuccess            *bool                 `json:"isRepairSuccess" column:"repair_approvals.is_repair_success"`
 	ReportNotes                string                `json:"reportNotes"                column:"repair_approvals.report_notes"`
 	RepairNotes                string                `json:"repairNotes"                column:"repair_approvals.repair_notes"`
 	Type                       ApprovalType          `json:"type"            column:"repair_approvals.type"`
