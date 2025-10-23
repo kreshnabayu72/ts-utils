@@ -75,6 +75,13 @@ const (
 	AuditTaskAssetConditionTAGFoundAssetMissing AuditTaskAssetCondition = "TAG Found Asset Missing"
 )
 
+type AuditTaskAssetOriginalCondition string
+
+const (
+	AuditTaskAssetOriginalConditionDamaged     AuditTaskAssetOriginalCondition = "Damaged"
+	AuditTaskAssetOriginalConditionMaintenance AuditTaskAssetOriginalCondition = "Maintenance"
+)
+
 type AuditTaskStatus string
 
 const (
