@@ -7,6 +7,7 @@ import (
 type Group struct {
 	ID                                 int        `json:"id"                                 column:"groups.id"`
 	Name                               string     `json:"name"                               column:"groups.name"`
+	FullPath                           string     `json:"fullPath"                               column:"groups.full_path"`
 	Code                               *string    `json:"code"                               column:"groups.code"`
 	Level                              int        `json:"level"                              column:"groups.level"`
 	IsDisposable                       bool       `json:"isDisposable"                       column:"groups.is_disposable"`
