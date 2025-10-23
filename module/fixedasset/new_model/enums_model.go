@@ -218,7 +218,7 @@ type SystemRoleName string
 
 const (
 	SystemRoleNameImportData                SystemRoleName = "Import data"
-	SystemRoleNameManageAssetAttribute      SystemRoleName = "Manage asset names, brands, categories, and custom fields"
+	SystemRoleNameManageAssetAttribute      SystemRoleName = "Manage asset master data"
 	SystemRoleNameManageAssetPolicy         SystemRoleName = "Manage asset policy"
 	SystemRoleNameManageDepreciationGroup   SystemRoleName = "Manage depreciation group"
 	SystemRoleNameManageDepreciationMethod  SystemRoleName = "Manage depreciation method"
@@ -230,7 +230,7 @@ const (
 	SystemRoleNameManagePurchaseDocument    SystemRoleName = "Manage purchase document"
 	SystemRoleNameManagePurchaseInformation SystemRoleName = "Manage purchase information"
 	SystemRoleNameManageTag                 SystemRoleName = "Manage TAG"
-	SystemRoleNameRegisterAssets            SystemRoleName = "Register assets"
+	SystemRoleNameRegisterAssets            SystemRoleName = "Manage assets"
 	SystemRoleNameManageTagType             SystemRoleName = "Manage TAG type"
 	SystemRoleNameOpenAPI                   SystemRoleName = "Open API"
 )
