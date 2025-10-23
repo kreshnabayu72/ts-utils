@@ -229,6 +229,21 @@ type SQLUpdateChainBuilder interface {
 	//	WITH recent_orders AS (SELECT id, user_id FROM orders) ...
 	WithCTEBuilder(cteName string, cteBuilder *SQLEloquentQuery) SQLUpdateChainBuilder
 
+	// WithRecursiveCTEBuilder adds a Common Table Expression (CTE) to the query.
+	// It adjusts argument placeholders to avoid conflicts.
+	// This function just add the defined CTE to the top of query.
+	// You need to JOIN/LEFT JOIN the CTE builder to let main expression know that it should use CTE.
+	//
+	// Example:
+	//
+	//	cte := NewSQLSelectBuilder[Order]("orders").Select("id", "user_id")
+	//	builder.WithRecursiveCTEBuilder("recent_orders", cte.(*sql_query.SelectBuilder).SQLEloquentQuery)
+	//
+	// Generates:
+	//
+	//	WITH RECURSIVE recent_orders AS (SELECT id, user_id FROM orders) ...
+	WithRecursiveCTEBuilder(cteName string, cteBuilder *SQLEloquentQuery) SQLUpdateChainBuilder
+
 	// Return implements SQLUpdateChainBuilder. (Only able to be called once, overrides previous values if re-called).
 	// Return sets the columns to return after the update.
 	// Defaults to RETURNING id if no column is provided.
@@ -318,6 +333,27 @@ func (s *UpdateBuilder) WithCTEBuilder(cteName string, cteBuilder *SQLEloquentQu
 
 	s.WithClauses = append(s.WithClauses, fmt.Sprintf("%s AS (%s)", cteName, shiftedCTEQuery))
 	s.Args = append(s.Args, cteArgs...)
+
+	return s
+}
+
+func (s *UpdateBuilder) WithRecursiveCTEBuilder(cteName string, cteBuilder *SQLEloquentQuery) SQLUpdateChainBuilder {
+	cteQuery, cteArgs, err := cteBuilder.Build()
+	if err != nil {
+		s.LastError = err
+		return s
+	}
+
+	// Calculate the current argument offset
+	offset := len(s.Args)
+
+	// Shift the placeholders in the CTE query
+	shiftedCTEQuery := shiftSQLPlaceholders(cteQuery, offset)
+
+	s.WithClauses = append(s.WithClauses, fmt.Sprintf("%s AS (%s)", cteName, shiftedCTEQuery))
+	s.Args = append(s.Args, cteArgs...)
+
+	s.useWithRecursive = true
 
 	return s
 }
