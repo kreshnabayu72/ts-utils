@@ -7,6 +7,7 @@ import (
 type Category struct {
 	ID        int        `json:"_id"       column:"categories.id"`
 	Name      string     `json:"name"      column:"categories.name"`
+	FullPath  string     `json:"fullPath"                               column:"categories.full_path"`
 	Code      string     `json:"code"      column:"categories.code"`
 	ParentId  int        `json:"parentId"  column:"categories.parent_id"`
 	IsDeleted bool       `json:"isDeleted" column:"categories.is_deleted"`
