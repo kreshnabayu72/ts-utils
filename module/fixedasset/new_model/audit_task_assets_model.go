@@ -16,8 +16,8 @@ type AuditTaskAssets struct {
 	SerialNumber           *string                          `json:"serialNumber"        column:"audit_task_assets.serial_number"`
 	DamageImage            *string                          `json:"damageImage"        column:"audit_task_assets.damage_image"`
 	FoundGroupId           *int                             `json:"foundGroupId" column:"audit_task_assets.found_group_id"`
-	Address                string                           `json:"address"      column:"audit_task_assets.address"`
-	Coordinate             string                           `json:"coordinate"   column:"audit_task_assets.coordinate"`
+	Address                *string                          `json:"address"      column:"audit_task_assets.address"`
+	Coordinate             *string                          `json:"coordinate"   column:"audit_task_assets.coordinate"`
 	FoundAt                *time.Time                       `json:"foundAt"    column:"audit_task_assets.found_at"`
 	AuditedAt              *time.Time                       `json:"auditedAt"    column:"audit_task_assets.audited_at"`
 	CreatedAt              time.Time                        `json:"createdAt"    column:"audit_task_assets.created_at"`
