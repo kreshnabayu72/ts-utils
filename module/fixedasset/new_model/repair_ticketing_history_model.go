@@ -41,6 +41,7 @@ type RepairTicketingHistory struct {
 
 	Address           string     `json:"address"                    column:"repair_ticketing_histories.address"`
 	Coordinate        string     `json:"coordinate"                 column:"repair_ticketing_histories.coordinate"`
+	StaffId           *int       `json:"staffId" column:"repair_ticketing_histories.staff_id"`
 	StaffFullName     string     `json:"staffFullName"              column:"repair_ticketing_histories.staff_full_name"`
 	ServiceCenterName *string    `json:"serviceCenterName"          column:"repair_ticketing_histories.service_center_name"`
 	RepairStartAt     *time.Time `json:"repairStartAt"              column:"repair_ticketing_histories.repair_start_at"`
