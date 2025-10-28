@@ -14,6 +14,7 @@ type BorrowingApproval struct {
 	IsApproved       *bool          `json:"isApproved"       column:"borrowing_approvals.is_approved"`
 	Notes            *string        `json:"notes"            column:"borrowing_approvals.notes"`
 	Type             ApprovalType   `json:"type"             column:"borrowing_approvals.type"`
+	Duration         int            `json:"duration"         column:"borrowing_approvals.duration"`
 	ApprovedDuration *int           `json:"approvedDuration" column:"borrowing_approvals.approved_duration"`
 	ApprovedAt       *time.Time     `json:"approvedAt"       column:"borrowing_approvals.approved_at"`
 	CreatedAt        time.Time      `json:"createdAt"        column:"borrowing_approvals.created_at"`
