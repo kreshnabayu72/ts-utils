@@ -100,6 +100,7 @@ func ScanRowsArray(v any, rows pgx.Rows) error {
 	}
 
 	sliceVal := vVal.Elem()
+	sliceVal.Set(reflect.MakeSlice(vVal.Elem().Type(), 0, 0))
 	elemType := sliceVal.Type().Elem()
 
 	fieldDescs := rows.FieldDescriptions()
