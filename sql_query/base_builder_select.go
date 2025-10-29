@@ -64,7 +64,7 @@ type SQLSelectChainBuilder interface {
 	//	 s.Columns := []string{"id as _id", "asset_id as assetId", "groups"}
 	//
 	//	builder.FilterSelectsByAlias([]string{"_id","assetId"}) //removed groups from s.Columns
-	FilterColumnsByAlias(aliases []string) SQLSelectChainBuilder
+	FilterColumnsByAlias(aliases *[]string) SQLSelectChainBuilder
 
 	// SelectCaseWhen adds a CASE WHEN expression as a column.
 	//
@@ -428,25 +428,38 @@ func (s *SelectBuilder) ClearSelects() SQLSelectChainBuilder {
 	return s
 }
 
-func (s *SelectBuilder) FilterColumnsByAlias(aliases []string) SQLSelectChainBuilder {
-	selectedColumns := []string{}
-	for _, alias := range aliases {
-		//loop through columns
-		for _, existing := range s.Columns {
-			existingAlias := extractAlias(existing)
+func (s *SelectBuilder) FilterColumnsByAlias(aliases *[]string) SQLSelectChainBuilder {
+	if aliases == nil {
+		return s
+	}
 
-			if existingAlias == alias {
-				selectedColumns = append(selectedColumns, existing)
-			}
+	// make unique set of alias
+	aliasSet := make(map[string]struct{}, len(*aliases))
+	for _, alias := range *aliases {
+		trimmedAlias := trimString(alias)
+
+		aliasSet[trimmedAlias] = struct{}{} // struct{}{} uses zero memory
+	}
+
+	filteredColumns := make([]string, 0, len(aliasSet))
+
+	for _, existing := range s.Columns {
+		//loop through columns
+		existingAlias := extractAlias(existing)
+
+		_, foundInSet := aliasSet[existingAlias]
+
+		// _id should always be appended
+		if foundInSet || existingAlias == "_id" {
+			filteredColumns = append(filteredColumns, existing)
 		}
 	}
 
 	//overwrite s.Columns to attributes which have alias included in aliases array
-	s.Columns = selectedColumns
+	s.Columns = filteredColumns
 
 	return s
 }
-
 func (s *SelectBuilder) Select(columns ...string) SQLSelectChainBuilder {
 	for _, newCol := range columns {
 		newAlias := extractAlias(newCol)
@@ -1088,7 +1101,14 @@ func extractAlias(column string) string {
 	if len(parts) < 2 {
 		return "" // No alias
 	}
-	return strings.Trim(strings.TrimSpace(parts[len(parts)-1]), "\"")
+
+	alias := parts[len(parts)-1]
+
+	return trimString(alias)
+}
+
+func trimString(s string) string {
+	return strings.Trim(strings.TrimSpace(s), "\"")
 }
 
 // func validateGroupByColumns(availableColumns []string, groupByColumns []string) error {
