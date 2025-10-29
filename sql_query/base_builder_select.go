@@ -436,7 +436,7 @@ func (s *SelectBuilder) FilterColumnsByAlias(aliases *[]string) SQLSelectChainBu
 	// make unique set of alias
 	aliasSet := make(map[string]struct{}, len(*aliases))
 	for _, alias := range *aliases {
-		trimmedAlias := trimString(alias)
+		trimmedAlias := trimString(strings.ToLower(alias))
 
 		aliasSet[trimmedAlias] = struct{}{} // struct{}{} uses zero memory
 	}
