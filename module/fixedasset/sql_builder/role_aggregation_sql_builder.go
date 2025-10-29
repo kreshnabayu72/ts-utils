@@ -1180,6 +1180,107 @@ func TransactionRoleMultipleGroupAggregation(
 	builder.AddArgs(loggedInUserId, transactionGroupAttribute)
 }
 
+// TransactionRoleMultipleGroupAggregationV2 dynamically constructs a CTE and JOIN clauses
+// to aggregate user transaction roles across multiple groups.
+//
+// This function is designed for multi-group transactional contexts (e.g., origin/destination
+// groups in disposal, transfer, or assignment flows). It uses a Common Table Expression (CTE)
+// to pre-aggregate the user's roles (`Manager`, `Monitoring`, `Staff`, `Approver`) per group
+// in the `user_transaction_roles` table, filtered by user ID, active status, and role attribute.
+//
+// The generated CTE (`transaction_role_cte`) is then LEFT JOINed once per group field
+// specified in `groupFieldsAndAttribute`. For each group, the builder adds `BOOL_OR`
+// expressions to the SELECT clause, producing result columns like:
+//   - isOriginManager, isOriginMonitoring, isOriginStaff, isOriginApprover
+//   - isDestinationManager, isDestinationMonitoring, etc.
+//
+// Optionally, if `preserveEmptyRole` is not set or is false, the builder appends a WHERE
+// condition that ensures at least one of the joined role columns is true — effectively
+// filtering out transactions in which the user holds no relevant role.
+//
+// Parameters:
+//   - builder: SQL SelectBuilder used to construct the query.
+//   - loggedInUserId: ID of the user whose roles are being checked.
+//   - groupFieldsAndAttribute: slice of structs containing the group field and alias (e.g., origin, disposal).
+//   - transactionGroupAttribute: role attribute to filter `user_transaction_roles` by (e.g., disposalRole).
+//   - roleTypes: allowed transaction role types (Manager, Monitoring, Staff, Approval, etc.).
+//   - preserveEmptyRole (optional): when true, disables the automatic filter that removes rows with no roles.
+//
+// Internally this function:
+//  1. Builds a CTE (`transaction_role_cte`) that aggregates roles using BOOL_OR per group_id.
+//  2. LEFT JOINs the CTE for each group in `groupFieldsAndAttribute`.
+//  3. Adds `BOOL_OR`-based role checks to the SELECT clause for each group.
+//  4. Optionally filters out rows where the user has no role in any group.
+//
+// Example output columns:
+//   - isOriginManager, isOriginMonitoring, isOriginStaff, isOriginApprover
+//   - isDisposalManager, isDisposalMonitoring, isDisposalStaff, isDisposalApprover
+//
+// Example use:
+//
+//	TransactionRoleMultipleGroupAggregationV2(
+//	    builder,
+//	    currentUserID,
+//	    []GroupFieldAndAttributeName{
+//	        {Field: "dt.origin_group_id", AttributeName: "Origin"},
+//	        {Field: "dt.disposal_group_id", AttributeName: "Disposal"},
+//	    },
+//	    fixedasset_new_model.TransactionRoleAttributeDisposal,
+//	    []fixedasset_new_model.TransactionRoleType{
+//	        fixedasset_new_model.TransactionRoleTypeManager,
+//	        fixedasset_new_model.TransactionRoleTypeMonitoring,
+//	        fixedasset_new_model.TransactionRoleTypeStaff,
+//	        fixedasset_new_model.TransactionRoleTypeApprover,
+//	    },
+//	)
+func TransactionRoleMultipleGroupAggregationV2(
+	builder *sql_query.SelectBuilder,
+	loggedInUserId int,
+	groupFieldsAndAttribute []GroupFieldAndAttributeName,
+	transactionGroupAttribute fixedasset_new_model.TransactionRoleAttribute,
+	roleTypes []fixedasset_new_model.TransactionRoleType,
+	preserveEmptyRole ...bool,
+) {
+	cteBuilder := generateUserTransactionRolesBuilder(loggedInUserId, transactionGroupAttribute, roleTypes)
+	GetHasTransactionRole(cteBuilder.(*sql_query.SelectBuilder), transactionGroupAttribute)
+	cteBuilder.GroupBy("utr.group_id")
+
+	builder.WithCTEBuilder("transaction_role_cte", cteBuilder.(*sql_query.SelectBuilder).SQLEloquentQuery)
+
+	var knownFieldName []string
+	if len(groupFieldsAndAttribute) > 0 {
+		for i, each := range groupFieldsAndAttribute {
+			knownFieldName = append(
+				knownFieldName,
+				[]string{
+					fmt.Sprintf(`role%d."isManager"`, i),
+					fmt.Sprintf(`role%d."isMonitoring"`, i),
+					fmt.Sprintf(`role%d."isStaff"`, i),
+					fmt.Sprintf(`role%d."isApprover"`, i),
+				}...,
+			)
+			builder.
+				Select(
+					fmt.Sprintf(`bool_or(role%d."isManager") as is%sManager`, i, each.AttributeName),
+					fmt.Sprintf(`bool_or(role%d."isMonitoring") as is%sMonitoring`, i, each.AttributeName),
+					fmt.Sprintf(`bool_or(role%d."isStaff") as is%sStaff`, i, each.AttributeName),
+					fmt.Sprintf(`bool_or(role%d."isApprover") as is%sApprover`, i, each.AttributeName),
+				).
+				Join(fmt.Sprintf("groups gp%d", i), fmt.Sprintf("gp%d.id = %s", i, each.Field)).
+				LeftJoin(fmt.Sprintf("transaction_role_cte role%d", i), fmt.Sprintf("role%d.group_id = gp%d.ancestor_id", i, i))
+		}
+	}
+
+	if len(preserveEmptyRole) == 0 || (len(preserveEmptyRole) > 0 && !preserveEmptyRole[0]) {
+		builder.Where(map[string]sql_query.SQLCondition{
+			"": {
+				Operator: sql_query.SQLOperatorRaw,
+				Value:    strings.Join(knownFieldName, " or "),
+			},
+		})
+	}
+}
+
 // transactionRoleMultiPermissionAggregationCTE builds a Common Table Expression (CTE)
 // that aggregates all relevant transaction permissions for a given user across multiple
 // transaction types (Borrowing, Transfer, Disposal, Audit, Maintenance, Repair).
