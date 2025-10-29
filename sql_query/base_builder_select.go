@@ -56,6 +56,16 @@ type SQLSelectChainBuilder interface {
 	//	builder.ClearSelect()
 	ClearSelects() SQLSelectChainBuilder
 
+	// FilterSelectsByAlias filters out elements in select array using its aliases.
+	// Will be executed after all select functions
+	// Used for handling query.Columns for filtering response attribute from client-side
+	//
+	// Example:
+	//	 s.Columns := []string{"id as _id", "asset_id as assetId", "groups"}
+	//
+	//	builder.FilterSelectsByAlias([]string{"_id","assetId"}) //removed groups from s.Columns
+	FilterColumnsByAlias(aliases []string) SQLSelectChainBuilder
+
 	// SelectCaseWhen adds a CASE WHEN expression as a column.
 	//
 	// Example:
@@ -415,6 +425,25 @@ func (s *SelectBuilder) Distinct(alias string, columns ...string) SQLSelectChain
 
 func (s *SelectBuilder) ClearSelects() SQLSelectChainBuilder {
 	s.Columns = []string{}
+	return s
+}
+
+func (s *SelectBuilder) FilterColumnsByAlias(aliases []string) SQLSelectChainBuilder {
+	selectedColumns := []string{}
+	for _, alias := range aliases {
+		//loop through columns
+		for _, existing := range s.Columns {
+			existingAlias := extractAlias(existing)
+
+			if existingAlias == alias {
+				selectedColumns = append(selectedColumns, existing)
+			}
+		}
+	}
+
+	//overwrite s.Columns to attributes which have alias included in aliases array
+	s.Columns = selectedColumns
+
 	return s
 }
 
