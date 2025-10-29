@@ -11,6 +11,7 @@ type AuditTaskAssetHistory struct {
 	NameWithSequence string     `json:"nameWithSequence"    column:"audit_task_asset_histories.name_with_sequence"`
 	Sequence         int        `json:"sequence"            column:"audit_task_asset_histories.sequence"`
 	Asset            int        `json:"asset"               column:"audit_task_asset_histories.asset"`
+	AssetImage       *string    `json:"assetImage"               column:"audit_task_asset_histories.asset_image"`
 	AssetID          string     `json:"assetId"             column:"audit_task_asset_histories.asset_id"`
 	Brand            string     `json:"brand"               column:"audit_task_asset_histories.brand"`
 	Model            string     `json:"model"               column:"audit_task_asset_histories.model"`
