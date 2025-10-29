@@ -17,6 +17,7 @@ type AuditTaskHistory struct {
 	Duration      int        `json:"duration"       column:"audit_task_histories.duration"`
 	ModifiedById  *int       `json:"modifiedById"   column:"audit_task_histories.modified_by_id"`
 	ApprovalRound int        `json:"approvalRound"  column:"audit_task_histories.approval_round"`
+	GracePeriodAt *time.Time `json:"gracePeriodAt"  column:"audit_task_histories.grace_period_at"`
 	StartedAt     *time.Time `json:"startedAt"      column:"audit_task_histories.started_at"`
 	FinishedAt    *time.Time `json:"finishedAt"     column:"audit_task_histories.finished_at"`
 	CreatedAt     time.Time  `json:"createdAt"      column:"audit_task_histories.created_at"`
