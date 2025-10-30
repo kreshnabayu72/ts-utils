@@ -123,3 +123,10 @@ func (m *MockNotificationSQLHelper) RefreshNotificationSseWithFilter(
 	args := m.Mock.Called(ctx, serviceProvider, companyCode, filter)
 	return args.Error(0)
 }
+
+func (m *MockNotificationSQLHelper) EmitUpdateIotReaderSseSQL(
+	readerID []string,
+) *entity.HttpError {
+	args := m.Mock.Called(readerID)
+	return args.Get(0).(*entity.HttpError)
+}

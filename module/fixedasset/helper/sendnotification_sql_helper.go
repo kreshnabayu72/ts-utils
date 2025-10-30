@@ -73,6 +73,7 @@ type NotificationHelperSQL interface {
 	EmitHandoverSseSQL(userIds []string) *entity.HttpError
 	UpdateUserSseSQL(userIds []string) *entity.HttpError
 	EmitLoggedOutByAdminSseSQL(userIds []string) *entity.HttpError
+	EmitUpdateIotReaderSseSQL(readerID []string) *entity.HttpError
 }
 
 type SendNotificationSQLHelperImpl struct {
@@ -602,4 +603,10 @@ func (r *SendNotificationSQLHelperImpl) RefreshNotificationSseWithFilter(
 	}
 
 	return nil
+}
+
+func (r *SendNotificationSQLHelperImpl) EmitUpdateIotReaderSseSQL(
+	readerID []string,
+) *entity.HttpError {
+	return emitRefreshSse(readerID, "IOT_UPDATE")
 }
