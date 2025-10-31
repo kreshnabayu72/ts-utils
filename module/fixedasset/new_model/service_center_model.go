@@ -11,7 +11,9 @@ type ServiceCenter struct {
 	Name           string     `json:"name"           column:"service_centers.name"`
 	City           string     `json:"city"           column:"service_centers.city"`
 	Country        string     `json:"country"        column:"service_centers.country"`
+	CountryIso     string     `json:"countryIso"        column:"service_centers.country_iso"`
 	State          string     `json:"state"          column:"service_centers.state"`
+	StateIso       string     `json:"stateIso"        column:"service_centers.state_iso"`
 	ZipCode        string     `json:"zipCode"        column:"service_centers.zip_code"`
 	Address        string     `json:"address"        column:"service_centers.address"`
 	PhoneNumber    string     `json:"phoneNumber"    column:"service_centers.phone_number"`
