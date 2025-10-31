@@ -1059,12 +1059,8 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 			expr, ok := aliasToExpr[lookup]
 			// resolve alias -> expression (fallback to key as-is)
 			if ok {
-				fmt.Println("expr " + expr + dir)
-
 				orderSb.WriteString(expr + dir)
 			} else {
-				fmt.Println("key " + key + dir)
-
 				orderSb.WriteString(key + dir)
 			}
 		}
