@@ -15,6 +15,7 @@ type RoutineTaskIndicator struct {
 	IsMandatory         bool              `json:"isMandatory"         column:"routine_task_indicators.is_mandatory"`
 	IsHaveStandardValue bool              `json:"isHaveStandardValue" column:"routine_task_indicators.is_have_standard_value"`
 	Options             []string          `json:"options"             column:"routine_task_indicators.options"`
+	Value               *any              `json:"value"               column:"routine_task_indicators.value"`
 	CreatedAt           time.Time         `json:"createdAt"           column:"routine_task_indicators.created_at"`
 	UpdatedAt           time.Time         `json:"updatedAt"           column:"routine_task_indicators.updated_at"`
 }
