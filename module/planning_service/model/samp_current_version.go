@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-type SampCurrentVersion struct {
+type Samp struct {
 	ID int `json:"id" column:"samp_current_versions.id"`
 
 	IsSubmitted bool `json:"isSubmitted" column:"samp_current_versions.is_submitted"`
@@ -25,7 +25,9 @@ type SampCurrentVersion struct {
 	ScopeOfAMSystem                  *string `json:"scopeOfAMSystem" column:"samp_current_versions.scope_of_am_system"`
 	LegalAndRegulatoryRequirements   *string `json:"legalAndRegulatoryRequirements" column:"samp_current_versions.legal_and_regulatory_requirements"`
 
-	ModifiedByID int       `json:"modifiedById" column:"samp_current_versions.modified_by_id"`
-	CreatedAt    time.Time `json:"createdAt" column:"samp_current_versions.created_at"`
-	UpdatedAt    time.Time `json:"updatedAt" column:"samp_current_versions.updated_at"`
+	ModifiedByID int  `json:"modifiedById" column:"samp_current_versions.modified_by_id"`
+	IsDeleted    bool `json:"isDeleted"                          column:"groups.is_deleted"`
+
+	CreatedAt time.Time `json:"createdAt" column:"samp_current_versions.created_at"`
+	UpdatedAt time.Time `json:"updatedAt" column:"samp_current_versions.updated_at"`
 }
