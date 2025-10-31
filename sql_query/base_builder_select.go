@@ -675,7 +675,7 @@ func (s *SelectBuilder) OrderBy(sortBy []string, asc bool) SQLSelectChainBuilder
 		nulls = "LAST"
 	}
 
-	sortingRule := fmt.Sprintf("%s %s NULLS %s", QuoteAttributeList(strings.Join(sortBy, ", ")), direction, nulls)
+	sortingRule := fmt.Sprintf("%s %s NULLS %s", strings.Join(sortBy, ", "), direction, nulls)
 	s.SortBy = append(s.SortBy, sortingRule)
 	return s
 }
