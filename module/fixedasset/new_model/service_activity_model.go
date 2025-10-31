@@ -6,6 +6,7 @@ import (
 
 type ServiceActivity struct {
 	ID                    int        `json:"_id"                    column:"service_activities.id"`
+	AssetImage            string     `json:"assetImage"         column:"service_activities.asset_image"`
 	AssetBrandName        string     `json:"assetBrandName"         column:"service_activities.asset_brand_name"`
 	AssetNameWithSequence string     `json:"assetNameWithSequence"  column:"service_activities.asset_name_with_sequence"`
 	AssetModelName        string     `json:"assetModelName"         column:"service_activities.asset_model_name"`
