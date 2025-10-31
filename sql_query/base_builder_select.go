@@ -56,14 +56,14 @@ type SQLSelectChainBuilder interface {
 	//	builder.ClearSelect()
 	ClearSelects() SQLSelectChainBuilder
 
-	// FilterSelectsByAlias filters out elements in select array using its aliases.
+	// FilterColumnsByAlias filters out elements in select array using its aliases.
 	// Will be executed after all select functions
 	// Used for handling query.Columns for filtering response attribute from client-side
 	//
 	// Example:
 	//	 s.Columns := []string{"id as _id", "asset_id as assetId", "groups"}
 	//
-	//	builder.FilterSelectsByAlias([]string{"_id","assetId"}) //removed groups from s.Columns
+	//	builder.FilterColumnsByAlias([]string{"_id","assetId"}) //removed groups from s.Columns
 	FilterColumnsByAlias(aliases *[]string) SQLSelectChainBuilder
 
 	// SelectCaseWhen adds a CASE WHEN expression as a column.
@@ -675,7 +675,7 @@ func (s *SelectBuilder) OrderBy(sortBy []string, asc bool) SQLSelectChainBuilder
 		nulls = "LAST"
 	}
 
-	sortingRule := fmt.Sprintf("%s %s NULLS %s", strings.Join(sortBy, ", "), direction, nulls)
+	sortingRule := fmt.Sprintf("%s %s NULLS %s", QuoteAttributeList(strings.Join(sortBy, ", ")), direction, nulls)
 	s.SortBy = append(s.SortBy, sortingRule)
 	return s
 }
@@ -1001,7 +1001,6 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 	}
 
 	// ORDER BY
-	// ORDER BY
 	if len(s.SortBy) > 0 {
 		orderSb.WriteString("ORDER BY ")
 
@@ -1044,7 +1043,7 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 
 			srt = strings.TrimSpace(srt)
 
-			// get dir if present (keep original casing)
+			// get dir (asc/desc) if present (keep original casing)
 			fields := strings.Fields(srt)
 			dir := ""
 			if n := len(fields); n > 1 && (strings.EqualFold(fields[n-1], "asc") || strings.EqualFold(fields[n-1], "desc")) {
@@ -1054,12 +1053,18 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 			// key without ASC/DESC, then unquote/clean
 			key := strings.TrimSpace(stripDir.ReplaceAllString(srt, ""))
 			key = clean(key)
-			lookup := strings.ToLower(key)
+			lookup := strings.ToLower(key)                                       // "updatedAt" asc null last
+			lookup = strings.Split(strings.ReplaceAll(lookup, "\"", ""), " ")[0] // updatedAt
 
+			expr, ok := aliasToExpr[lookup]
 			// resolve alias -> expression (fallback to key as-is)
-			if expr, ok := aliasToExpr[lookup]; ok {
+			if ok {
+				fmt.Println("expr " + expr + dir)
+
 				orderSb.WriteString(expr + dir)
 			} else {
+				fmt.Println("key " + key + dir)
+
 				orderSb.WriteString(key + dir)
 			}
 		}
