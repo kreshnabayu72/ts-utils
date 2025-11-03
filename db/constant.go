@@ -10,6 +10,8 @@ const (
 	FixedAssetDBName  DBName = "tagsamurai_fixed_asset"
 	SupplyAssetDBName DBName = "tagsamurai_supply_asset"
 	GlobalDBName      DBName = "tagsamurai_global"
+
+	PlanningStrategyDBName DBName = "tagsamurai_planning_strategy"
 )
 
 func (dbName DBName) CompanyDBName(companyCode string) DBName {
