@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-type Samp struct {
+type SampCurrentVersion struct {
 	ID int `json:"id" column:"samp_current_versions.id"`
 
 	IsSubmitted bool `json:"isSubmitted" column:"samp_current_versions.is_submitted"`
