@@ -1,6 +1,9 @@
 package new_model
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"time"
+)
 
 type UserEmbedded struct {
 	ID        *string `json:"_id,omitempty"       bson:"_id,omitempty"`
@@ -84,4 +87,9 @@ func (s *JSONBArrayString) UnmarshalJSON(data []byte) error {
 	}
 	*s = temp
 	return nil
+}
+
+type TimeRange struct {
+	Start time.Time
+	End   time.Time
 }
