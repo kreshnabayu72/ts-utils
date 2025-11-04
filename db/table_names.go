@@ -191,4 +191,9 @@ const (
 	SampStrategicRiskRegistersTableName            = "samp_strategic_risk_registers"
 	SampStrategicRiskRegisterUsersTableName        = "samp_strategic_risk_register_users"
 	SampSupportingSystemAndToolsTableName          = "samp_supporting_system_and_tools"
+
+	AmpCurrentVersionTableName                   = "amp_current_versions"
+	AmpDemandAndPerformanceRequirementsTableName = "amp_demand_and_performance_requirements"
+	AmpLifecycleManagementPlansTableName         = "amp_lifecycle_management_plans"
+	AmpResourceBudgetPlansTableName              = "amp_resource_budget_plans"
 )

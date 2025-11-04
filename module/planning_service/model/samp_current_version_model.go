@@ -9,6 +9,7 @@ type SampCurrentVersion struct {
 
 	IsSubmitted bool `json:"isSubmitted" column:"samp_current_versions.is_submitted"`
 
+	// Need pointers, after init (before submit), the values are null
 	SampID                           *string `json:"sampId" column:"samp_current_versions.samp_id"`
 	Name                             *string `json:"name" column:"samp_current_versions.name"`
 	Version                          *string `json:"version" column:"samp_current_versions.version"`
@@ -25,8 +26,7 @@ type SampCurrentVersion struct {
 	ScopeOfAMSystem                  *string `json:"scopeOfAMSystem" column:"samp_current_versions.scope_of_am_system"`
 	LegalAndRegulatoryRequirements   *string `json:"legalAndRegulatoryRequirements" column:"samp_current_versions.legal_and_regulatory_requirements"`
 
-	ModifiedByID int  `json:"modifiedById" column:"samp_current_versions.modified_by_id"`
-	IsDeleted    bool `json:"isDeleted"                          column:"groups.is_deleted"`
+	ModifiedByID int `json:"modifiedById" column:"samp_current_versions.modified_by_id"`
 
 	CreatedAt time.Time `json:"createdAt" column:"samp_current_versions.created_at"`
 	UpdatedAt time.Time `json:"updatedAt" column:"samp_current_versions.updated_at"`

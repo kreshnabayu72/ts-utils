@@ -14,6 +14,7 @@ type RoutineSchedule struct {
 	FrequencyCustomLabel *string                  `json:"frequencyCustomLabel" column:"routine_schedules.frequency_custom_label"`
 	Duration             int                      `json:"duration"             column:"routine_schedules.duration"`
 	ModifiedByID         int                      `json:"modifiedById"         column:"routine_schedules.modified_by_id"`
+	CreatedByID          int                      `json:"createdById"          column:"routine_schedules.created_by_id"`
 	IsDeleted            bool                     `json:"isDeleted"            column:"routine_schedules.is_deleted"`
 	DeletedAt            *time.Time               `json:"deletedAt"            column:"routine_schedules.deleted_at"`
 	NextSchedule         time.Time                `json:"nextSchedule"         column:"routine_schedules.next_schedule"`
