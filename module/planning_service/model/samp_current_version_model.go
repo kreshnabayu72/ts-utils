@@ -9,7 +9,7 @@ type SampCurrentVersion struct {
 
 	IsSubmitted bool `json:"isSubmitted" column:"samp_current_versions.is_submitted"`
 
-	// Pointers since after init (before submit), the values are null
+	// Need pointers, after init (before submit), the values are null
 	SampID                           *string `json:"sampId" column:"samp_current_versions.samp_id"`
 	Name                             *string `json:"name" column:"samp_current_versions.name"`
 	Version                          *string `json:"version" column:"samp_current_versions.version"`
