@@ -8,7 +8,7 @@ import (
 type TransferTransactionHistory struct {
 	ID                 int                       `json:"_id"                column:"transfer_transaction_histories.id"`
 	TransactionID      string                    `json:"transactionId"      column:"transfer_transaction_histories.transaction_id"`
-	Manager            string                    `json:"manager"            column:"transfer_transaction_histories.manager"`
+	Manager            *string                   `json:"manager"            column:"transfer_transaction_histories.manager"`
 	OriginGroupID      int                       `json:"originGroupId"      column:"transfer_transaction_histories.origin_group_id"`
 	DestinationGroupID int                       `json:"destinationGroupId" column:"transfer_transaction_histories.destination_group_id"`
 	OriginGroup        string                    `json:"originGroup"        column:"transfer_transaction_histories.origin_group"`
