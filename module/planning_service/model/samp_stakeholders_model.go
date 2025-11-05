@@ -13,6 +13,9 @@ type SampStakeholders struct {
 	Role         string `json:"role" column:"samp_stakeholders.role"`
 	Expectations string `json:"expectations" column:"samp_stakeholders.expectations"`
 
+	IsDeleted bool       `json:"isDeleted"        column:"samp_stakeholders.is_deleted"`
+	DeletedAt *time.Time `json:"deletedAt"        column:"samp_stakeholders.deleted_at"`
+
 	CreatedAt time.Time `json:"createdAt" column:"samp_stakeholders.created_at"`
 	UpdatedAt time.Time `json:"updatedAt" column:"samp_stakeholders.updated_at"`
 }

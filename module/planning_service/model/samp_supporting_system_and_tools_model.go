@@ -13,6 +13,9 @@ type SampSupportingSystemAndTools struct {
 	Function string `json:"function" column:"samp_supporting_system_and_tools.function"`
 	Notes    string `json:"notes" column:"samp_supporting_system_and_tools.notes"`
 
+	IsDeleted bool       `json:"isDeleted"        column:"samp_supporting_system_and_tools.is_deleted"`
+	DeletedAt *time.Time `json:"deletedAt"        column:"samp_supporting_system_and_tools.deleted_at"`
+
 	CreatedAt time.Time `json:"createdAt" column:"samp_supporting_system_and_tools.created_at"`
 	UpdatedAt time.Time `json:"updatedAt" column:"samp_supporting_system_and_tools.updated_at"`
 }
