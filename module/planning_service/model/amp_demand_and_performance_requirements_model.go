@@ -13,6 +13,9 @@ type AmpDemandAndPerformanceRequirements struct {
 	MeasurementMethod string `json:"measurementMethod" column:"amp_demand_and_performance_requirements.measurement_method"`
 	Notes             string `json:"notes" column:"amp_demand_and_performance_requirements.notes"`
 
+	IsDeleted bool       `json:"isDeleted"        column:"amp_demand_and_performance_requirements.is_deleted"`
+	DeletedAt *time.Time `json:"deletedAt"        column:"amp_demand_and_performance_requirements.deleted_at"`
+
 	CreatedAt time.Time `json:"createdAt" column:"amp_demand_and_performance_requirements.created_at"`
 	UpdatedAt time.Time `json:"updatedAt" column:"amp_demand_and_performance_requirements.updated_at"`
 }

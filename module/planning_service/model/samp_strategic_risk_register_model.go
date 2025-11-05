@@ -19,6 +19,9 @@ type SampStrategicRiskRegister struct {
 	ImpactSeverity     int                 `json:"impactSeverity" column:"samp_strategic_risk_registers.impactSeverity"`
 	Timeline           new_model.TimeRange `json:"timeline" column:"samp_strategic_risk_registers.timeline"`
 
+	IsDeleted bool       `json:"isDeleted"        column:"samp_strategic_risk_registers.is_deleted"`
+	DeletedAt *time.Time `json:"deletedAt"        column:"samp_strategic_risk_registers.deleted_at"`
+
 	CreatedAt time.Time `json:"createdAt" column:"samp_strategic_risk_registers.created_at"`
 	UpdatedAt time.Time `json:"updatedAt" column:"samp_strategic_risk_registers.updated_at"`
 }

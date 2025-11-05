@@ -15,6 +15,9 @@ type SampAmObjective struct {
 	MeasurementMethod string              `json:"measurementMethod" column:"samp_am_objectives.measurement_method"`
 	Timeline          new_model.TimeRange `json:"timeline" column:"samp_am_objectives.timeline"`
 
+	IsDeleted bool       `json:"isDeleted"        column:"samp_am_objectives.is_deleted"`
+	DeletedAt *time.Time `json:"deletedAt"        column:"samp_am_objectives.deleted_at"`
+
 	CreatedAt time.Time `json:"createdAt" column:"samp_am_objectives.created_at"`
 	UpdatedAt time.Time `json:"updatedAt" column:"samp_am_objectives.updated_at"`
 }
