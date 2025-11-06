@@ -1005,7 +1005,7 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 		orderSb.WriteString("ORDER BY ")
 
 		asSplit := regexp.MustCompile(`(?i)\s+AS\s+`)
-		stripDir := regexp.MustCompile(`\s+(?i)(asc|desc)\s*$`)
+		stripDirAndNull := regexp.MustCompile(`\s+(?i)((?:asc|desc)(?:\s+NULLS (?:FIRST|LAST))?|(?:NULLS (?:FIRST|LAST)))\s*$`)
 
 		// helper: trim space, trailing comma, and surrounding double quotes
 		clean := func(s string) string {
@@ -1044,14 +1044,10 @@ func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
 			srt = strings.TrimSpace(srt)
 
 			// get dir (asc/desc) if present (keep original casing)
-			fields := strings.Fields(srt)
-			dir := ""
-			if n := len(fields); n > 1 && (strings.EqualFold(fields[n-1], "asc") || strings.EqualFold(fields[n-1], "desc")) {
-				dir = " " + fields[n-1]
-			}
+			dir := getSortDirection(srt)
 
 			// key without ASC/DESC, then unquote/clean
-			key := strings.TrimSpace(stripDir.ReplaceAllString(srt, ""))
+			key := strings.TrimSpace(stripDirAndNull.ReplaceAllString(srt, ""))
 			key = clean(key)
 			lookup := strings.ToLower(key)                                       // "updatedAt" asc null last
 			lookup = strings.Split(strings.ReplaceAll(lookup, "\"", ""), " ")[0] // updatedAt
@@ -1110,6 +1106,31 @@ func extractAlias(column string) string {
 
 func trimString(s string) string {
 	return strings.Trim(strings.TrimSpace(s), "\"")
+}
+
+func getSortDirection(srt string) string {
+	fields := strings.Fields(srt)
+	dir := ""
+
+	// Loop through all fields to find the first instance
+	// of "asc" or "desc", ignoring case.
+	for _, field := range fields {
+		if strings.EqualFold(field, "asc") {
+			dir = field // Keep the original casing (e.g., "asc", "ASC")
+			break       // Found it, stop searching
+		}
+		if strings.EqualFold(field, "desc") {
+			dir = field // Keep the original casing (e.g., "desc", "DESC")
+			break       // Found it, stop searching
+		}
+	}
+
+	// If we found a direction, add the space prefix
+	if dir != "" {
+		return " " + dir
+	}
+
+	return ""
 }
 
 // func validateGroupByColumns(availableColumns []string, groupByColumns []string) error {

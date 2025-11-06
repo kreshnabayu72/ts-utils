@@ -15,6 +15,9 @@ type SampStrategicOpportunityRegister struct {
 	Action      string              `json:"action" column:"samp_strategic_opportunity_registers.action"`
 	Timeline    new_model.TimeRange `json:"timeline" column:"samp_strategic_opportunity_registers.timeline"`
 
+	IsDeleted bool       `json:"isDeleted"        column:"samp_strategic_opportunity_registers.is_deleted"`
+	DeletedAt *time.Time `json:"deletedAt"        column:"samp_strategic_opportunity_registers.deleted_at"`
+
 	CreatedAt time.Time `json:"createdAt" column:"samp_strategic_opportunity_registers.created_at"`
 	UpdatedAt time.Time `json:"updatedAt" column:"samp_strategic_opportunity_registers.updated_at"`
 }
