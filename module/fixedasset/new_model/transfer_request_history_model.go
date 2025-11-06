@@ -25,9 +25,9 @@ type TransferRequestHistory struct {
 	TagStatus          *TransferRequestAssetTagStatus `json:"tagStatus"          column:"transfer_request_histories.tag_status"`
 	OriginGroup        string                         `json:"originGroup"        column:"transfer_request_histories.origin_group"`
 	OriginGroupID      int                            `json:"originGroupId"      column:"transfer_request_histories.origin_group_id"`
-	DestinationGroup   string                         `json:"destinationGroup"   column:"transfer_request_histories.destination_group"`
-	DestinationGroupID int                            `json:"destinationGroupId" column:"transfer_request_histories.destination_group_id"`
-	Manager            string                         `json:"manager"            column:"transfer_request_histories.manager"`
+	DestinationGroup   *string                        `json:"destinationGroup"   column:"transfer_request_histories.destination_group"`
+	DestinationGroupID *int                           `json:"destinationGroupId" column:"transfer_request_histories.destination_group_id"`
+	Manager            *string                        `json:"manager"            column:"transfer_request_histories.manager"`
 	Notes              string                         `json:"notes"              column:"transfer_request_histories.notes"`
 	CreatedAt          time.Time                      `json:"createdAt"          column:"transfer_request_histories.created_at"`
 	UpdatedAt          time.Time                      `json:"updatedAt"          column:"transfer_request_histories.updated_at"`
