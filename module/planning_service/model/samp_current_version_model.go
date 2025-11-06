@@ -28,6 +28,9 @@ type SampCurrentVersion struct {
 
 	ModifiedByID int `json:"modifiedById" column:"samp_current_versions.modified_by_id"`
 
+	IsDeleted bool       `json:"isDeleted"        column:"samp_current_versions.is_deleted"`
+	DeletedAt *time.Time `json:"deletedAt"        column:"samp_current_versions.deleted_at"`
+
 	CreatedAt time.Time `json:"createdAt" column:"samp_current_versions.created_at"`
 	UpdatedAt time.Time `json:"updatedAt" column:"samp_current_versions.updated_at"`
 }

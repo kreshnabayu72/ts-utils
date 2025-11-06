@@ -13,7 +13,7 @@ type ServiceActivity struct {
 	AssetGroupName        string     `json:"assetGroupName"         column:"service_activities.asset_group_name"`
 	Status                string     `json:"status"                 column:"service_activities.status"`
 	Type                  string     `json:"type"                   column:"service_activities.type"`           // Repair / Maintenance
-	TransactionID         *string    `json:"transactionId"          column:"service_activities.transaction_id"` // Refer to repair, repair history / routine,routine history
+	TransactionID         *int       `json:"transactionId"          column:"service_activities.transaction_id"` // Refer to repair, repair history / routine,routine history
 	ServiceCenterID       *int       `json:"serviceCenterId"        column:"service_activities.service_center_id"`
 	ServiceCenterName     string     `json:"serviceCenterName"      column:"service_activities.service_center_name"`
 	DownTime              *string    `json:"downTime"               column:"service_activities.down_time"`
