@@ -11,8 +11,10 @@ import (
 type PermittedUser string
 
 const (
-	PermittedUserAssigned = "Assigned"
-	PermittedUserBorrower = "Borrower"
+	PermittedUserAssigned          = "Assigned"
+	PermittedUserBorrower          = "Borrower"
+	PermittedUserRepairHistory     = "Repair History User"
+	PermittedUserRepairTransaction = "Repair Transaction User"
 )
 
 type RolePermissionHelperSQL interface {
