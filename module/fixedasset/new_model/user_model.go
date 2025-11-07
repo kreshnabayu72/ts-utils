@@ -27,6 +27,7 @@ type User struct {
 	EmployeeId             *string    `json:"employeeId"             column:"users.employee_id"`
 	IsSubUser              bool       `json:"isSubUser"              column:"users.is_sub_user"`
 	ParentId               *int       `json:"parentId"               column:"users.parent_id"`
+	ParentName             *string    `json:"parentName"             column:"users.parent_name"`
 	ReadOnlyIsActive       bool       `json:"readOnlyIsActive"       column:"users.read_only_is_active"`
 	ReadOnlyIsAssigned     bool       `json:"readOnlyIsAssigned"     column:"users.read_only_is_assigned"`
 	IsReadOnly             bool       `json:"isReadOnly"             column:"users.is_read_only"                                                   special:"generated"`

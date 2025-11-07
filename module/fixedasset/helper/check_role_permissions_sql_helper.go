@@ -447,18 +447,33 @@ func CheckUserAccessSQL(
 	}
 
 	var dbName string
-	if typeUser == PermittedUserAssigned {
+	switch typeUser {
+	case PermittedUserAssigned:
 		dbName = db.AssignmentTransactionTableName
 		filter["assigned_to_id"] = sql_query.SQLCondition{
 			Operator: sql_query.SQLOperatorEqual,
 			Value:    userId,
 		}
-	} else {
+	case PermittedUserBorrower:
 		dbName = db.BorrowingTransactionTableName
 		filter["borrower_id"] = sql_query.SQLCondition{
 			Operator: sql_query.SQLOperatorEqual,
 			Value:    userId,
 		}
+	case PermittedUserRepairHistory:
+		dbName = db.RepairTicketingHistoriesTableName
+		filter[""] = sql_query.SQLCondition{
+			Operator: sql_query.SQLOperatorRaw,
+			Value:    fmt.Sprintf("(reported_by_id = %[1]s OR borrower_id = %[1]s OR assigned_to_id = %[1]s)", userId),
+		}
+	case PermittedUserRepairTransaction:
+		dbName = db.RepairTicketingTableName
+		filter["reported_by_id"] = sql_query.SQLCondition{
+			Operator: sql_query.SQLOperatorEqual,
+			Value:    userId,
+		}
+	default:
+		return entity.InternalServerError("Invalid role in check user acess function")
 	}
 
 	count, err := service.CountWithFilter(ctx, dbName, filter)
