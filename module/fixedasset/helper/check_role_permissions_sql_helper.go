@@ -473,7 +473,7 @@ func CheckUserAccessSQL(
 			Value:    userId,
 		}
 	default:
-		return nil
+		return entity.InternalServerError("Invalid role in check user acess function")
 	}
 
 	count, err := service.CountWithFilter(ctx, dbName, filter)
