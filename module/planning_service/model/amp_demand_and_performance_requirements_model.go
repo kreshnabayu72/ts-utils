@@ -5,8 +5,9 @@ import (
 )
 
 type AmpDemandAndPerformanceRequirements struct {
-	ID    int `json:"id" column:"amp_demand_and_performance_requirements.id"`
-	AmpID int `json:"sampId" column:"amp_demand_and_performance_requirements.amp_id"` // Foreign Key to amp
+	ID           int `json:"id" column:"amp_demand_and_performance_requirements.id"`
+	AmpID        int `json:"ampId" column:"amp_demand_and_performance_requirements.amp_id"`                // Foreign Key to amp
+	AmpHistoryID int `json:"ampHistoryId" column:"amp_demand_and_performance_requirements.amp_history_id"` // Foreign Key to amp history
 
 	Description       string `json:"description" column:"amp_demand_and_performance_requirements.description"`
 	PerformanceTarget string `json:"performanceTarget" column:"amp_demand_and_performance_requirements.performance_target"`

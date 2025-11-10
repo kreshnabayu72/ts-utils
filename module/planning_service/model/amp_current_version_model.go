@@ -8,8 +8,8 @@ type AmpCurrentVersion struct {
 	ID int `json:"id" column:"amp_current_versions.id"`
 
 	IsSubmitted bool `json:"isSubmitted" column:"amp_current_versions.is_submitted"`
-	SampID      int  `json:"sampId" column:"amp_current_versions.samp_id"`   //FK to samp
-	GroupID     int  `json:"groupId" column:"amp_current_versions.group_id"` //FK to samp
+	SampID      int  `json:"sampId" column:"amp_current_versions.samp_id"`
+	GroupID     int  `json:"groupId" column:"amp_current_versions.group_id"`
 
 	// Need pointers, after init (before submit), the values are null
 	AmpID   *string  `json:"ampId" column:"amp_current_versions.amp_id"`
