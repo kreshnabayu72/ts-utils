@@ -33,6 +33,7 @@ type DisposalRequestHistory struct {
 	Manager                   string                `json:"manager"                   column:"disposal_request_histories.manager"`
 	DocumentationPhoto        *string               `json:"documentationPhoto"        column:"disposal_request_histories.documentation_photo"`
 	DocumentationPhotoAddress *string               `json:"documentationPhotoAddress" column:"disposal_request_histories.documentation_photo_address"`
+	ReaderName                *string               `json:"readerName"                column:"disposal_request_histories.reader_name"`
 	CreatedAt                 time.Time             `json:"createdAt"                 column:"disposal_request_histories.created_at"`
 	UpdatedAt                 time.Time             `json:"updatedAt"                 column:"disposal_request_histories.updated_at"`
 }
