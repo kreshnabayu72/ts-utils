@@ -7,7 +7,8 @@ import (
 type SampStakeholders struct {
 	ID int `json:"id" column:"samp_stakeholders.id"`
 
-	SampID int `json:"sampId" column:"samp_stakeholders.samp_id"`
+	SampID        int `json:"sampId" column:"samp_stakeholders.samp_id"`                // Foreign Key to samp
+	SampHistoryID int `json:"sampHistoryId" column:"samp_stakeholders.samp_history_id"` // Foreign Key to samp history
 
 	Name         string `json:"name" column:"samp_stakeholders.name"`
 	Role         string `json:"role" column:"samp_stakeholders.role"`

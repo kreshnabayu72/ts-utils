@@ -7,8 +7,9 @@ import (
 )
 
 type AmpLifecycleManagementPlans struct {
-	ID    int `json:"id" column:"amp_lifecycle_management_plans.id"`
-	AmpID int `json:"sampId" column:"amp_lifecycle_management_plans.amp_id"` // Foreign Key to amp
+	ID           int `json:"id" column:"amp_lifecycle_management_plans.id"`
+	AmpID        int `json:"ampId" column:"amp_lifecycle_management_plans.amp_id"`                // Foreign Key to amp
+	AmpHistoryID int `json:"ampHistoryId" column:"amp_lifecycle_management_plans.amp_history_id"` // Foreign Key to amp history
 
 	Stage    string              `json:"stage" column:"amp_lifecycle_management_plans.stage"`
 	Activity string              `json:"activity" column:"amp_lifecycle_management_plans.activity"`

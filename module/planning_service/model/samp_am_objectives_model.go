@@ -7,8 +7,9 @@ import (
 )
 
 type SampAmObjective struct {
-	ID     int `json:"id" column:"samp_am_objectives.id"`
-	SampID int `json:"sampId" column:"samp_am_objectives.samp_id"` // Foreign Key to samp_current_versions.id
+	ID            int `json:"id" column:"samp_am_objectives.id"`
+	SampID        int `json:"sampId" column:"samp_am_objectives.samp_id"`                // Foreign Key to samp
+	SampHistoryID int `json:"sampHistoryId" column:"samp_am_objectives.samp_history_id"` // Foreign Key to samp history
 
 	Objectives        string              `json:"objectives" column:"samp_am_objectives.objectives"`
 	KpiOrTarget       string              `json:"kpiOrTarget" column:"samp_am_objectives.kpi_or_target"`
