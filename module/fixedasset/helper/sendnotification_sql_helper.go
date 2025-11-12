@@ -260,7 +260,6 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationToUsersSQL(
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
 	defer cancel()
 
-	log.Printf("SENDING NOTIF %v to %v user", notificationDataWithoutUser.Title, len(userIds))
 	if len(userIds) == 0 {
 		return nil
 	}
@@ -326,10 +325,12 @@ func (r *SendNotificationSQLHelperImpl) SendNotificationToUsersSQL(
 		return entity.ToHttpError(sendNotifErr)
 	}
 
-	mobileNotifErr := r.SendMobileNotificationSQL(notificationDataWithoutUser, fcmTokens)
+	if len(fcmTokens) > 0 {
+		mobileNotifErr := r.SendMobileNotificationSQL(notificationDataWithoutUser, fcmTokens)
 
-	if mobileNotifErr != nil {
-		log.Println("MOBILE NOTIFICATION ERROR: " + mobileNotifErr.Error())
+		if mobileNotifErr != nil {
+			log.Println("MOBILE NOTIFICATION ERROR: " + mobileNotifErr.Error())
+		}
 	}
 
 	return nil
@@ -391,6 +392,7 @@ func (r *SendNotificationSQLHelperImpl) SendMobileNotificationSQL(
 	data util_fixedasset_new_model.Notification,
 	tokens []string,
 ) *entity.HttpError {
+
 	// ─────── credentials ───────
 	cred := os.Getenv("MOBILE_CREDENTIAL_JSON")
 	opt := option.WithCredentialsJSON([]byte(cred))
@@ -421,13 +423,37 @@ func (r *SendNotificationSQLHelperImpl) SendMobileNotificationSQL(
 	dataPayload := make(map[string]string)
 
 	for k, v := range data.Data {
-		if strVal, ok := v.(string); ok {
-			// The value 'v' was a string, so we can safely add it.
-			dataPayload[k] = strVal
-			continue
+		var strVal string
+
+		// Use a type switch to handle different possible types for v
+		switch val := v.(type) {
+		case string:
+			// The value 'v' was already a string.
+			strVal = val
+		case int:
+			// It's an int, convert it.
+			strVal = strconv.Itoa(val)
+		case int64:
+			// It's an int64, convert it.
+			strVal = strconv.FormatInt(val, 10) // 10 = base 10
+		case float64:
+			// It's a float64, convert it.
+			// 'f' = standard format, -1 = shortest precision, 64 = float64
+			strVal = strconv.FormatFloat(val, 'f', -1, 64)
+		case bool:
+			// It's a bool, convert it.
+			strVal = strconv.FormatBool(val)
+
+		// Add any other specific types you want to handle (e.g., int32, float32)
+
+		default:
+			// This type is not one we explicitly handle.
+			// Log it and skip, fulfilling the "if not possible" part.
+			log.Printf("Notification data attribute has unhandled type, skipping: %v (type=%v)\n", v, reflect.TypeOf(v))
+			continue // Skip this iteration
 		}
 
-		log.Printf("Notification data attribute isnt string: %v (type=%v)\n", v, reflect.TypeOf(v))
+		dataPayload[k] = strVal
 	}
 
 	// Tambahkan field lain sebagai string
