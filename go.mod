@@ -4,7 +4,7 @@ go 1.24.2
 
 require (
 	firebase.google.com/go/v4 v4.16.0
-	gitea.qwertysystem.net/BETS/go-agenda v0.0.0-20251113090027-e0abc43d74df
+	gitea.qwertysystem.net/BETS/go-agenda v0.0.0-20251113092354-cca64cb43a6f
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/disintegration/imaging v1.6.2
