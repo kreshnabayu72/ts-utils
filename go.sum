@@ -28,6 +28,8 @@ gitea.qwertysystem.net/BETS/cron/v3 v3.0.1-0.20250416093848-0119b14c6206 h1:sGqx
 gitea.qwertysystem.net/BETS/cron/v3 v3.0.1-0.20250416093848-0119b14c6206/go.mod h1:vQQG0vxsakUPek2s75Kk9MCNOvfbFC4qsxTwHPgs2+U=
 gitea.qwertysystem.net/BETS/go-agenda v0.0.0-20250430033213-9de617e4be39 h1:E7c+Q3Ev3X4yLZV+znAB9ZCz/hw2Lx/GEmOgrnzU2ew=
 gitea.qwertysystem.net/BETS/go-agenda v0.0.0-20250430033213-9de617e4be39/go.mod h1:NNlu9x8c5TbnAQ20FCigPPvNPNbNH0+RyPSXbCcoGYw=
+gitea.qwertysystem.net/BETS/go-agenda v0.0.0-20251113090027-e0abc43d74df h1:Jj8zQS102gkq9/h9dj1WoBRvFcGw151ejA7FG7BB5j0=
+gitea.qwertysystem.net/BETS/go-agenda v0.0.0-20251113090027-e0abc43d74df/go.mod h1:NNlu9x8c5TbnAQ20FCigPPvNPNbNH0+RyPSXbCcoGYw=
 github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.27.0 h1:ErKg/3iS1AKcTkf3yixlZ54f9U1rljCkQyEXWUnIUxc=
 github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.27.0/go.mod h1:yAZHSGnqScoU556rBOVkwLze6WP5N+U11RHuWaGVxwY=
 github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.51.0 h1:fYE9p3esPxA/C0rQ0AHhP0drtPXDRhaWiwg1DPqO7IU=
