@@ -57,6 +57,7 @@ const (
 type AuditTaskAssetStatus string
 
 const (
+	AuditTaskAssetStatusOnSchedule  AuditTaskAssetStatus = "On Schedule"
 	AuditTaskAssetStatusInAudit     AuditTaskAssetStatus = "In Audit"
 	AuditTaskAssetStatusAudited     AuditTaskAssetStatus = "Audited"
 	AuditTaskAssetStatusTAGReported AuditTaskAssetStatus = "TAG Reported"
