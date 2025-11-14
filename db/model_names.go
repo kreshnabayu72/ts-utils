@@ -121,4 +121,10 @@ const (
 	SupplierReturnCompletionModelName         = "supplier_return_completion_transactions"
 	SupplierReturnPreListItemModelName        = "supplier_return_prelist_items"
 	SupplierReturnPreListModelName            = "supplier_return_prelists"
+
+	//Planning & service
+	ContinuousImprovementLogModelName = "continuous_improvement_logs"
+	LessonLearnedLogModelName         = "lesson_learned_logs"
+	RiskRegisterLogModelName          = "risk_register_logs"
+	OpportunityRegisterLogModelName   = "opportunity_register_logs"
 )
