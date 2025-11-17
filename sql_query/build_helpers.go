@@ -91,11 +91,16 @@ func (s *SQLEloquentQuery) sharedWhereJsonArray(column string, each SQLCondition
 				return nil // Means unbounded
 			}
 
-			raw := val.Int()
-			if each.IsEpochTime {
-				return fmt.Sprintf("to_timestamp(%d)", raw/1000)
-			} else {
-				return raw
+			// Safely handle differend kind of numbers
+			switch val.Kind() {
+			case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+				return val.Int()
+			case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+				return val.Uint()
+			case reflect.Float32, reflect.Float64:
+				return val.Float()
+			default:
+				return val.Interface()
 			}
 		}
 
@@ -104,16 +109,31 @@ func (s *SQLEloquentQuery) sharedWhereJsonArray(column string, each SQLCondition
 
 		// Build literal
 		var argLiteral string
-		switch {
-		case startNorm == nil && endNorm == nil:
-			// Skip invalid filter
-			return ""
-		case startNorm == nil:
-			argLiteral = fmt.Sprintf("[,%v)", endNorm)
-		case endNorm == nil:
-			argLiteral = fmt.Sprintf("[%v,)", startNorm)
-		default:
-			argLiteral = fmt.Sprintf("[%v,%v)", startNorm, endNorm)
+		// Use specific function for timestamp
+		if each.IsEpochTime {
+			switch {
+			case startNorm == nil && endNorm == nil:
+				// Skip invalid filter
+				return ""
+			case startNorm == nil:
+				argLiteral = fmt.Sprintf("tstzrange(, to_timestamp(%v), '[)')", endNorm.(int64)/1000)
+			case endNorm == nil:
+				argLiteral = fmt.Sprintf("tstzrange(to_timestamp(%v), , '[)')", startNorm.(int64)/1000)
+			default:
+				argLiteral = fmt.Sprintf("tstzrange(to_timestamp(%v), to_timestamp(%v), '[)')", startNorm.(int64)/1000, endNorm.(int64)/1000)
+			}
+		} else { // Directly assign to args for common value
+			switch {
+			case startNorm == nil && endNorm == nil:
+				// Skip invalid filter
+				return ""
+			case startNorm == nil:
+				argLiteral = fmt.Sprintf("[,%v)", endNorm)
+			case endNorm == nil:
+				argLiteral = fmt.Sprintf("[%v,)", startNorm)
+			default:
+				argLiteral = fmt.Sprintf("[%v,%v)", startNorm, endNorm)
+			}
 		}
 
 		s.Args = append(s.Args, argLiteral)
@@ -310,11 +330,16 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 					return nil // Means unbounded
 				}
 
-				raw := val.Int()
-				if each.IsEpochTime {
-					return fmt.Sprintf("to_timestamp(%d)", raw/1000)
-				} else {
-					return raw
+				// Safely handle differend kind of numbers
+				switch val.Kind() {
+				case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+					return val.Int()
+				case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+					return val.Uint()
+				case reflect.Float32, reflect.Float64:
+					return val.Float()
+				default:
+					return val.Interface()
 				}
 			}
 
@@ -323,16 +348,31 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 
 			// Build literal
 			var argLiteral string
-			switch {
-			case startNorm == nil && endNorm == nil:
-				// Skip invalid filter
-				continue
-			case startNorm == nil:
-				argLiteral = fmt.Sprintf("[,%v)", endNorm)
-			case endNorm == nil:
-				argLiteral = fmt.Sprintf("[%v,)", startNorm)
-			default:
-				argLiteral = fmt.Sprintf("[%v,%v)", startNorm, endNorm)
+			// Use specific function for timestamp
+			if each.IsEpochTime {
+				switch {
+				case startNorm == nil && endNorm == nil:
+					// Skip invalid filter
+					continue
+				case startNorm == nil:
+					argLiteral = fmt.Sprintf("tstzrange(, to_timestamp(%v), '[)')", endNorm.(int64)/1000)
+				case endNorm == nil:
+					argLiteral = fmt.Sprintf("tstzrange(to_timestamp(%v), , '[)')", startNorm.(int64)/1000)
+				default:
+					argLiteral = fmt.Sprintf("tstzrange(to_timestamp(%v), to_timestamp(%v), '[)')", startNorm.(int64)/1000, endNorm.(int64)/1000)
+				}
+			} else { // Directly assign to args for common value
+				switch {
+				case startNorm == nil && endNorm == nil:
+					// Skip invalid filter
+					continue
+				case startNorm == nil:
+					argLiteral = fmt.Sprintf("[,%v)", endNorm)
+				case endNorm == nil:
+					argLiteral = fmt.Sprintf("[%v,)", startNorm)
+				default:
+					argLiteral = fmt.Sprintf("[%v,%v)", startNorm, endNorm)
+				}
 			}
 
 			s.Args = append(s.Args, argLiteral)
