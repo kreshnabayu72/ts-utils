@@ -82,8 +82,8 @@ func (s *SQLEloquentQuery) sharedWhereJsonArray(column string, each SQLCondition
 			return ""
 		}
 
-		start := v.Index(0)
-		end := v.Index(1)
+		start := getVal(v.Index(0))
+		end := getVal(v.Index(1))
 
 		// Normalize values based on type
 		normalize := func(val reflect.Value) any {
@@ -107,37 +107,42 @@ func (s *SQLEloquentQuery) sharedWhereJsonArray(column string, each SQLCondition
 		startNorm := normalize(start)
 		endNorm := normalize(end)
 
-		// Build literal
-		var argLiteral string
-		// Use specific function for timestamp
 		if each.IsEpochTime {
+			// Use separate parameters for to_timestamp()
 			switch {
 			case startNorm == nil && endNorm == nil:
-				// Skip invalid filter
-				return ""
-			case startNorm == nil:
-				argLiteral = fmt.Sprintf("tstzrange(, to_timestamp(%v), '[)')", endNorm.(int64)/1000)
-			case endNorm == nil:
-				argLiteral = fmt.Sprintf("tstzrange(to_timestamp(%v), , '[)')", startNorm.(int64)/1000)
-			default:
-				argLiteral = fmt.Sprintf("tstzrange(to_timestamp(%v), to_timestamp(%v), '[)')", startNorm.(int64)/1000, endNorm.(int64)/1000)
-			}
-		} else { // Directly assign to args for common value
-			switch {
-			case startNorm == nil && endNorm == nil:
-				// Skip invalid filter
-				return ""
-			case startNorm == nil:
-				argLiteral = fmt.Sprintf("[,%v)", endNorm)
-			case endNorm == nil:
-				argLiteral = fmt.Sprintf("[%v,)", startNorm)
-			default:
-				argLiteral = fmt.Sprintf("[%v,%v)", startNorm, endNorm)
-			}
-		}
+				return "" // skip invalid filter
 
-		s.Args = append(s.Args, argLiteral)
-		clause = fmt.Sprintf(`value ->> '%s' %s $%d`, each.Key, each.Operator, len(s.Args))
+			case startNorm != nil && endNorm != nil:
+				s.Args = append(s.Args, startNorm.(int64)/1000, endNorm.(int64)/1000)
+				clause = fmt.Sprintf(`value ->> '%s' && tstzrange(to_timestamp($%d), to_timestamp($%d), '[)')`,
+					each.Key, len(s.Args)-1, len(s.Args))
+			case startNorm != nil:
+				s.Args = append(s.Args, startNorm.(int64)/1000)
+				clause = fmt.Sprintf(`value ->> '%s' && tstzrange(to_timestamp($%d), NULL, '[)')`,
+					each.Key, len(s.Args))
+			default: // endNorm != nil
+				s.Args = append(s.Args, endNorm.(int64)/1000)
+				clause = fmt.Sprintf(`value ->> '%s' && tstzrange(NULL, to_timestamp($%d), '[)')`,
+					each.Key, len(s.Args))
+			}
+		} else {
+			var argLiteral string
+			switch {
+			// plain range (non-timestamp)
+			case startNorm == nil && endNorm == nil:
+				return ""
+			case startNorm != nil && endNorm != nil:
+				argLiteral = fmt.Sprintf("[%v,%v)", startNorm, endNorm)
+			case startNorm != nil:
+				argLiteral = fmt.Sprintf("[%v,)", startNorm)
+			default: // endNorm != nil
+				argLiteral = fmt.Sprintf("[,%v)", endNorm)
+			}
+
+			s.Args = append(s.Args, argLiteral)
+			clause = fmt.Sprintf(`value ->> '%s' && $%d`, each.Key, len(s.Args))
+		}
 
 	/* ────────────────── = ANY($n) ─────────────────── */
 	// products.user.id = ANY ($1) (array became args)
@@ -346,37 +351,41 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 			startNorm := normalize(start)
 			endNorm := normalize(end)
 
-			// Build literal
-			var argLiteral string
-			// Use specific function for timestamp
 			if each.IsEpochTime {
+				// Use separate parameters for to_timestamp()
 				switch {
 				case startNorm == nil && endNorm == nil:
-					// Skip invalid filter
-					continue
-				case startNorm == nil:
-					argLiteral = fmt.Sprintf("tstzrange(, to_timestamp(%v), '[)')", endNorm.(int64)/1000)
-				case endNorm == nil:
-					argLiteral = fmt.Sprintf("tstzrange(to_timestamp(%v), , '[)')", startNorm.(int64)/1000)
-				default:
-					argLiteral = fmt.Sprintf("tstzrange(to_timestamp(%v), to_timestamp(%v), '[)')", startNorm.(int64)/1000, endNorm.(int64)/1000)
+					continue // skip invalid filter
+				case startNorm != nil && endNorm != nil:
+					s.Args = append(s.Args, startNorm.(int64)/1000, endNorm.(int64)/1000)
+					clause = fmt.Sprintf(`%s && tstzrange(to_timestamp($%d), to_timestamp($%d), '[)')`,
+						quotedColumn, len(s.Args)-1, len(s.Args))
+				case startNorm != nil:
+					s.Args = append(s.Args, startNorm.(int64)/1000)
+					clause = fmt.Sprintf(`%s && tstzrange(to_timestamp($%d), NULL, '[)')`,
+						quotedColumn, len(s.Args))
+				default: // endNorm != nil
+					s.Args = append(s.Args, endNorm.(int64)/1000)
+					clause = fmt.Sprintf(`%s && tstzrange(NULL, to_timestamp($%d), '[)')`,
+						quotedColumn, len(s.Args))
 				}
-			} else { // Directly assign to args for common value
+			} else {
+				var argLiteral string
 				switch {
+				// plain range (non-timestamp)
 				case startNorm == nil && endNorm == nil:
-					// Skip invalid filter
 					continue
-				case startNorm == nil:
-					argLiteral = fmt.Sprintf("[,%v)", endNorm)
-				case endNorm == nil:
-					argLiteral = fmt.Sprintf("[%v,)", startNorm)
-				default:
+				case startNorm != nil && endNorm != nil:
 					argLiteral = fmt.Sprintf("[%v,%v)", startNorm, endNorm)
+				case startNorm != nil:
+					argLiteral = fmt.Sprintf("[%v,)", startNorm)
+				default: // endNorm != nil
+					argLiteral = fmt.Sprintf("[,%v)", endNorm)
 				}
-			}
 
-			s.Args = append(s.Args, argLiteral)
-			clause = fmt.Sprintf(`%s %s $%d`, quotedColumn, each.Operator, len(s.Args))
+				s.Args = append(s.Args, argLiteral)
+				clause = fmt.Sprintf(`%s && $%d`, quotedColumn, len(s.Args))
+			}
 
 		/* ────────────────── = ANY($n) ─────────────────── */
 		// products.user.id = ANY ($1) (array became args)
