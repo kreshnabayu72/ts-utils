@@ -91,9 +91,9 @@ func (s *SQLEloquentQuery) sharedWhereJsonArray(column string, each SQLCondition
 				return nil // Means unbounded
 			}
 
-			raw := val.Int() / 1000
+			raw := val.Int()
 			if each.IsEpochTime {
-				return fmt.Sprintf("to_timestamp(%d)", raw)
+				return fmt.Sprintf("to_timestamp(%d)", raw/1000)
 			} else {
 				return raw
 			}
@@ -310,9 +310,9 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 					return nil // Means unbounded
 				}
 
-				raw := val.Int() / 1000
+				raw := val.Int()
 				if each.IsEpochTime {
-					return fmt.Sprintf("to_timestamp(%d)", raw)
+					return fmt.Sprintf("to_timestamp(%d)", raw/1000)
 				} else {
 					return raw
 				}
