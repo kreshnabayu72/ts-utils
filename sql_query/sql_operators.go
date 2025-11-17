@@ -68,6 +68,9 @@ const (
 	// Usage: {"price": {Operator: SQLOperatorNotBetween, Value: []int{10, 50}}}
 	// →  "price" NOT BETWEEN $1 AND $2
 	SQLOperatorNotBetween SQLOperators = "NOT BETWEEN"
+	// Usage #1: {"timeline": {Operator: SQLOperatorOverlaps, Value: []int{10, 20}}}  →  "age_range" && $1 (args = '[10,20)')
+	// Usage #2: {"timeline": {Operator: SQLOperatorOverlaps, Value: []*int{nil, end_at}, IsEpochTime: true}}  →  "timeline" && $1 (args = '[,to_timestamp(end_at))')
+	SQLOperatorOverlaps SQLOperators = "&&"
 
 	// ─────────────── Subqueries / Existence ───────────────
 
