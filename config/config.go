@@ -8,7 +8,15 @@ import (
 )
 
 // ConfigOptions holds environment variables data as struct for convenient auto-complete.
+//
+// All variables will be loaded as string, it is up to you to parse it to any type you need.
 type ConfigOptions struct {
+	// ENV possible values: "production", "development", "local". Defaults to "local"
+	ENV string
+	// PORT is the service's exposed port. Defaults to "8080"
+	PORT    string
+	JWT_KEY string
+
 	POSTGRES_USERNAME string
 	POSTGRES_PASSWORD string
 
@@ -31,6 +39,16 @@ func LoadConfig(filenames ...string) ConfigOptions {
 	if err != nil {
 		log.Fatal("Error while loading .env file", err)
 	}
+
+	if config.ENV = os.Getenv("ENV"); config.ENV == "" {
+		config.ENV = "local"
+	}
+
+	if config.PORT = os.Getenv("PORT"); config.PORT == "" {
+		config.PORT = "8080"
+	}
+
+	config.JWT_KEY = os.Getenv("JWT_KEY")
 
 	config.POSTGRES_USERNAME = os.Getenv("POSTGRES_USERNAME")
 	config.POSTGRES_PASSWORD = os.Getenv("POSTGRES_PASSWORD")
