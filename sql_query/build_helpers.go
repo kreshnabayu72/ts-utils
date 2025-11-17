@@ -74,6 +74,51 @@ func (s *SQLEloquentQuery) sharedWhereJsonArray(column string, each SQLCondition
 		clause = fmt.Sprintf(`value ->> '%s' %s $%d AND $%d`,
 			each.Key, each.Operator, argIdx(1), argIdx(0))
 
+	/* ────────────────── = column_range && $n ─────────────────── */
+	// products.usable_timeline && $1 (array became args)
+	case SQLOperatorOverlaps:
+		v := reflect.ValueOf(each.Value)
+		if v.Kind() != reflect.Slice || v.Len() != 2 {
+			return ""
+		}
+
+		start := v.Index(0)
+		end := v.Index(1)
+
+		// Normalize values based on type
+		normalize := func(val reflect.Value) any {
+			if !val.IsValid() || val.IsZero() {
+				return nil // Means unbounded
+			}
+
+			raw := val.Int() / 1000
+			if each.IsEpochTime {
+				return fmt.Sprintf("to_timestamp(%d)", raw)
+			} else {
+				return raw
+			}
+		}
+
+		startNorm := normalize(start)
+		endNorm := normalize(end)
+
+		// Build literal
+		var argLiteral string
+		switch {
+		case startNorm == nil && endNorm == nil:
+			// Skip invalid filter
+			return ""
+		case startNorm == nil:
+			argLiteral = fmt.Sprintf("[,%v)", endNorm)
+		case endNorm == nil:
+			argLiteral = fmt.Sprintf("[%v,)", startNorm)
+		default:
+			argLiteral = fmt.Sprintf("[%v,%v)", startNorm, endNorm)
+		}
+
+		s.Args = append(s.Args, argLiteral)
+		clause = fmt.Sprintf(`value ->> '%s' %s $%d`, each.Key, each.Operator, len(s.Args))
+
 	/* ────────────────── = ANY($n) ─────────────────── */
 	// products.user.id = ANY ($1) (array became args)
 	case SQLOperatorAny, SQLOperatorIn, SQLOperatorNotIn:
@@ -245,6 +290,53 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 			s.Args = append(s.Args, firstVal.Interface(), secondVal.Interface())
 			clause = fmt.Sprintf(`%s %s $%d AND $%d`,
 				escapeQuoteColumns(column), each.Operator, argIdx(1), argIdx(0))
+
+		/* ────────────────── = column_range && $n ─────────────────── */
+		// products.usable_timeline && $1 (array became args)
+		case SQLOperatorOverlaps:
+			quotedColumn := escapeQuoteColumns(column)
+
+			v := reflect.ValueOf(each.Value)
+			if v.Kind() != reflect.Slice || v.Len() != 2 {
+				continue
+			}
+
+			start := getVal(v.Index(0))
+			end := getVal(v.Index(1))
+
+			// Normalize values based on type
+			normalize := func(val reflect.Value) any {
+				if !val.IsValid() || val.IsZero() {
+					return nil // Means unbounded
+				}
+
+				raw := val.Int() / 1000
+				if each.IsEpochTime {
+					return fmt.Sprintf("to_timestamp(%d)", raw)
+				} else {
+					return raw
+				}
+			}
+
+			startNorm := normalize(start)
+			endNorm := normalize(end)
+
+			// Build literal
+			var argLiteral string
+			switch {
+			case startNorm == nil && endNorm == nil:
+				// Skip invalid filter
+				continue
+			case startNorm == nil:
+				argLiteral = fmt.Sprintf("[,%v)", endNorm)
+			case endNorm == nil:
+				argLiteral = fmt.Sprintf("[%v,)", startNorm)
+			default:
+				argLiteral = fmt.Sprintf("[%v,%v)", startNorm, endNorm)
+			}
+
+			s.Args = append(s.Args, argLiteral)
+			clause = fmt.Sprintf(`%s %s $%d`, quotedColumn, each.Operator, len(s.Args))
 
 		/* ────────────────── = ANY($n) ─────────────────── */
 		// products.user.id = ANY ($1) (array became args)
