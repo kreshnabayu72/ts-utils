@@ -33,10 +33,10 @@ func (s *ServiceManager) Unregister(name string) {
 	delete(s.RegisteredServices, name)
 }
 
-// GetService retrieves the registered service.
+// Get retrieves the registered service.
 //
 // May panic if service has not been registered yet.
-func (s *ServiceManager) GetService(name string) any {
+func (s *ServiceManager) Get(name string) any {
 	if s.RegisteredServices == nil {
 		panic("no service has been registered yet")
 	}
