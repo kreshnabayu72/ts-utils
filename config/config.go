@@ -69,8 +69,13 @@ func LoadConfig(filenames ...string) ConfigOptions {
 	config.MAILER_HOST = os.Getenv("MAILER_HOST")
 	config.MAILER_PORT = os.Getenv("MAILER_PORT")
 
-	config.TEMPORAL_CLIENT_HOST = os.Getenv("TEMPORAL_CLIENT_HOST")
-	config.TEMPORAL_CLIENT_PORT = os.Getenv("TEMPORAL_CLIENT_PORT")
+	if config.TEMPORAL_CLIENT_HOST = os.Getenv("TEMPORAL_CLIENT_HOST"); config.TEMPORAL_CLIENT_HOST == "" {
+		config.TEMPORAL_CLIENT_HOST = "localhost"
+	}
+
+	if config.TEMPORAL_CLIENT_PORT = os.Getenv("TEMPORAL_CLIENT_PORT"); config.TEMPORAL_CLIENT_PORT == "" {
+		config.TEMPORAL_CLIENT_PORT = "7233"
+	}
 
 	return config
 }
