@@ -25,10 +25,17 @@ type ConfigOptions struct {
 	SSH_USER     string
 	SSH_PASSWORD string
 
+	// Mailer specific configurations.
 	MAILER_USER     string
 	MAILER_PASSWORD string
 	MAILER_HOST     string
 	MAILER_PORT     string
+
+	// Temporal configurations.
+	// TEMPORAL_CLIENT_HOST is the temporal server host. Defaults to "localhost"
+	TEMPORAL_CLIENT_HOST string
+	// TEMPORAL_CLIENT_PORT is the temporal server port. Defaults to "7233"
+	TEMPORAL_CLIENT_PORT string
 }
 
 // LoadConfig loads environment variables and returns as a struct.
@@ -61,6 +68,9 @@ func LoadConfig(filenames ...string) ConfigOptions {
 	config.MAILER_PASSWORD = os.Getenv("MAILER_PASSWORD")
 	config.MAILER_HOST = os.Getenv("MAILER_HOST")
 	config.MAILER_PORT = os.Getenv("MAILER_PORT")
+
+	config.TEMPORAL_CLIENT_HOST = os.Getenv("TEMPORAL_CLIENT_HOST")
+	config.TEMPORAL_CLIENT_PORT = os.Getenv("TEMPORAL_CLIENT_PORT")
 
 	return config
 }
