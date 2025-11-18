@@ -27,13 +27,13 @@ func (s *ServiceManager) Unregister(name string) {
 
 func (s *ServiceManager) GetService(name string) (any, error) {
 	if s.RegisteredServices == nil {
-		return nil, errors.New("no service has been registered")
+		return nil, errors.New("no service has been registered yet")
 	}
 
-	service, ok := s.RegisteredServices[name]
+	r, ok := s.RegisteredServices[name]
 	if !ok {
-		return nil, errors.New(fmt.Sprintf(`service "%s" is not registered`, name))
+		return nil, errors.New(fmt.Sprintf("service '%s' is not registered", name))
 	}
 
-	return service, nil
+	return r.Service, nil
 }
