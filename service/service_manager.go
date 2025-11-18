@@ -6,15 +6,28 @@ import (
 
 // RegisteredService is the registered service.
 //
-// TODO(refan): Might be better off as an interface, so every service must comply to the interface's implementation.
+// TODO(refan): The field Service might be better off as an interface, so every service must comply to the interface's implementation.
 type RegisteredService struct {
 	Name    string
 	Service any
 }
 
+type ServiceManagerer interface {
+	Register(name string, service any)
+	Unregister(name string)
+	Get(name string) any
+}
+
 // ServiceManager is the manager for registration, unregistration and retrieval of services.
 type ServiceManager struct {
 	RegisteredServices map[string]RegisteredService
+}
+
+// MakeServiceManager creates service manager instance.
+func MakeServiceManager() ServiceManagerer {
+	return &ServiceManager{
+		RegisteredServices: make(map[string]RegisteredService),
+	}
 }
 
 // Register registers service.
