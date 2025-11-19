@@ -564,6 +564,7 @@ type LicenseModuleType string
 const (
 	LicenseModuleTypeFixedAsset         = LicenseModuleType("Fixed Asset")
 	LicenseModuleTypeAssetControl       = LicenseModuleType("+Asset Control")
+	LicenseModuleTypeAudit              = LicenseModuleType("+Audit")
 	LicenseModuleTypeMaintenanceRoutine = LicenseModuleType("+Maintenance Routine")
 	LicenseModuleTypeRepairTicketing    = LicenseModuleType("+Repair Ticketing")
 	LicenseModuleTypeTracking           = LicenseModuleType("+Tracking")
