@@ -362,6 +362,28 @@ var SystemRoleAttributeArray = []string{
 	string(SystemRoleAttributeOpenAPI),
 }
 
+var GroupSystemRoleAttributeArray = []string{
+	string(SystemRoleAttributeDocumentDeletion),
+	string(SystemRoleAttributeGroup),
+	string(SystemRoleAttributeUserAndRole),
+	string(SystemRoleAttributeIoTReader),
+	string(SystemRoleAttributeLicense),
+	string(SystemRoleAttributePurchaseDocument),
+	string(SystemRoleAttributePurchaseInfo),
+	string(SystemRoleAttributeTag),
+	string(SystemRoleAttributeRegisterAsset),
+}
+
+var GlobalSystemRoleAttributeArray = []string{
+	string(SystemRoleAttributeAssetAttribute),
+	string(SystemRoleAttributeDepreciationGroup),
+	string(SystemRoleAttributeAssetPolicies),
+	string(SystemRoleAttributeDepreciationMethod),
+	string(SystemRoleAttributeTagType),
+	string(SystemRoleAttributeOpenAPI),
+	string(SystemRoleAttributeImportData),
+}
+
 type TransactionRoleAttribute string
 
 const (
