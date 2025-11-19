@@ -2,44 +2,26 @@ package model
 
 import (
 	"time"
-
-	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/common/model"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type UserEmbeddedRole struct {
-	IsActive   bool `json:"isActive"   bson:"isActive"`
-	IsAssigned bool `json:"isAssigned" bson:"isAssigned"`
-}
-
 type User struct {
-	ID          primitive.ObjectID `json:"id,omitempty"         bson:"_id,omitempty"`
-	Key         int                `json:"key"                  bson:"key"`
-	FirstName   string             `json:"firstName"            bson:"firstName"`
-	LastName    string             `json:"lastName"             bson:"lastName"`
-	Division    string             `json:"division"             bson:"division"`
-	Position    *string            `json:"position"             bson:"position"`
-	EmployeeID  *string            `json:"employeeId"           bson:"employeeId"`
-	PhoneNumber string             `json:"phoneNumber"          bson:"phoneNumber"`
-	Email       string             `json:"email"                bson:"email"`
-	RFID        *struct {
-		Code      string `json:"code" bson:"code"`
-		ShortCode string `json:"shortCode" bson:"shortCode"`
-	} `json:"rfid"                 bson:"rfid"`
-	DefaultGroup       *model.AttributeEmbedded `json:"defaultGroup"         bson:"defaultGroup"`
-	IsActive           bool                     `json:"isActive"             bson:"isActive"`
-	IsTemporary        bool                     `json:"isTemporary"          bson:"isTemporary"`
-	ExpiryDate         *time.Time               `json:"expiryDate"           bson:"expiryDate"`
-	IsAdmin            bool                     `json:"isAdmin"              bson:"isAdmin"`
-	PendingEmailChange string                   `json:"pendingEmailChange"   bson:"pendingEmailChange"`
-	ModifiedBy         *primitive.ObjectID      `json:"modifiedBy"           bson:"modifiedBy"`
-	Parent             *primitive.ObjectID      `json:"parent"               bson:"parent"`
-	ProfilePicture     *string                  `json:"profilePicture"  bson:"profilePicture"`
-	IsDeleted          bool                     `json:"isDeleted"            bson:"isDeleted"`
-	IsConfirmed        bool                     `json:"isConfirmed"          bson:"isConfirmed"`
-	IsDefault          bool                     `json:"isDefault"            bson:"isDefault"`
-	TotalControl       *UserEmbeddedRole        `json:"totalControl"         bson:"totalControl"`
-	ReadOnly           *UserEmbeddedRole        `json:"readOnly"             bson:"readOnly"`
-	CreatedAt          time.Time                `json:"createdAt"            bson:"createdAt"`
-	UpdatedAt          time.Time                `json:"updatedAt"            bson:"updatedAt"`
+	ID               int        `json:"_id"              column:"users.id"`
+	FirstName        string     `json:"firstName"        column:"users.first_name"`
+	LastName         string     `json:"lastName"         column:"users.last_name"`
+	FullName         string     `json:"fullName"         column:"users.full_name"           special:"generated"`
+	Email            string     `json:"email"            column:"users.email"`
+	IsActive         bool       `json:"isActive"         column:"users.is_active"`
+	IsDefault        bool       `json:"isDefault"        column:"users.is_default"`
+	Position         *string    `json:"position"         column:"users.position"`
+	Division         string     `json:"division"         column:"users.division"`
+	RFIDCode         *string    `json:"rfidCode"         column:"users.rfid_code"`
+	ProfilePicture   *string    `json:"profilePicture"   column:"users.profile_picture"`
+	EmployeeID       *string    `json:"employeeId"       column:"users.employee_id"`
+	ModifiedByID     int        `json:"modifiedById"     column:"users.modified_by_id"`
+	HasModuleAccess  bool       `json:"hasModuleAccess"  column:"users.has_module_access"` //For showing/hiding user that doesn't have fixed asset access from global settings
+	IsEmailConfirmed bool       `json:"isEmailConfirmed" column:"users.is_email_confirmed"`
+	IsDeleted        bool       `json:"isDeleted"        column:"users.is_deleted"`
+	DeletedAt        *time.Time `json:"deletedAt"        column:"users.deleted_at"`
+	CreatedAt        time.Time  `json:"createdAt"        column:"users.created_at"`
+	UpdatedAt        time.Time  `json:"updatedAt"        column:"users.updated_at"`
 }

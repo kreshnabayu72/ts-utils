@@ -3,7 +3,7 @@ package new_model
 import (
 	"time"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/common/new_model"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/common/model"
 )
 
 type SampAmObjective struct {
@@ -11,10 +11,10 @@ type SampAmObjective struct {
 	SampID        int `json:"sampId" column:"samp_am_objectives.samp_id"`                // Foreign Key to samp
 	SampHistoryID int `json:"sampHistoryId" column:"samp_am_objectives.samp_history_id"` // Foreign Key to samp history
 
-	Objectives        string              `json:"objectives" column:"samp_am_objectives.objectives"`
-	KpiOrTarget       string              `json:"kpiOrTarget" column:"samp_am_objectives.kpi_or_target"`
-	MeasurementMethod string              `json:"measurementMethod" column:"samp_am_objectives.measurement_method"`
-	Timeline          new_model.TimeRange `json:"timeline" column:"samp_am_objectives.timeline"`
+	Objectives        string          `json:"objectives" column:"samp_am_objectives.objectives"`
+	KpiOrTarget       string          `json:"kpiOrTarget" column:"samp_am_objectives.kpi_or_target"`
+	MeasurementMethod string          `json:"measurementMethod" column:"samp_am_objectives.measurement_method"`
+	Timeline          model.TimeRange `json:"timeline" column:"samp_am_objectives.timeline"`
 
 	IsDeleted bool       `json:"isDeleted"        column:"samp_am_objectives.is_deleted"`
 	DeletedAt *time.Time `json:"deletedAt"        column:"samp_am_objectives.deleted_at"`

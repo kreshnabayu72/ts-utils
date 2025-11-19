@@ -2,19 +2,17 @@ package model
 
 import (
 	"time"
-
-	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/common/model"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type AssetControlRequest struct {
-	ID primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
+	ID int `json:"id"           column:"asset_control_requests.id"`
 
-	Transaction      primitive.ObjectID      `json:"transaction" bson:"transaction"`
-	Asset            primitive.ObjectID      `json:"asset" bson:"asset"`
-	OriginGroup      model.AttributeEmbedded `json:"originGroup" bson:"originGroup"`
-	DestinationGroup model.AttributeEmbedded `json:"destinationGroup" bson:"destinationGroup"`
+	TransferRequestId  int  `json:"transferRequestId"      column:"asset_control_requests.transfer_request_id"`
+	TransactionId      int  `json:"transactionId"      column:"asset_control_requests.transaction_id"`
+	AssetId            int  `json:"assetId"      column:"asset_control_requests.asset_id"`
+	OriginGroupId      int  `json:"originGroupId"      column:"asset_control_requests.origin_group_id"`
+	DestinationGroupId *int `json:"destinationGroupId"      column:"asset_control_requests.destination_group_id"`
 
-	CreatedAt time.Time `json:"createdAt" bson:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt" bson:"updatedAt"`
+	CreatedAt time.Time `json:"createdAt"    column:"asset_control_requests.created_at"`
+	UpdatedAt time.Time `json:"updatedAt"    column:"asset_control_requests.updated_at"`
 }

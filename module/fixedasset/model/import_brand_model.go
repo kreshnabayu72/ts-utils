@@ -2,16 +2,15 @@ package model
 
 import (
 	"time"
-
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type ImportBrand struct {
-	ID        primitive.ObjectID `bson:"_id,omitempty"       json:"_id,omitempty"` // MongoDB ObjectID
-	Name      string             `bson:"name,omitempty"      json:"name,omitempty"`
-	Category  string             `bson:"category,omitempty"  json:"category,omitempty"`
-	Models    string             `bson:"models,omitempty"    json:"models,omitempty"`
-	Key       int                `bson:"key,omitempty"       json:"key,omitempty"`
-	CreatedAt time.Time          `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
-	UpdatedAt time.Time          `bson:"updatedAt,omitempty" json:"updatedAt,omitempty"`
+	ID           int       `json:"_id"          column:"import_brands.id"`
+	Key          int       `json:"key"          column:"import_brands.key"`
+	Name         string    `json:"name"         column:"import_brands.name"`
+	Category     string    `json:"category"     column:"import_brands.category"`
+	CategoryCode string    `json:"categoryCode" column:"import_brands.category_code"`
+	Models       string    `json:"models"       column:"import_brands.models"`
+	CreatedAt    time.Time `json:"createdAt"    column:"import_brands.created_at"`
+	UpdatedAt    time.Time `json:"updatedAt"    column:"import_brands.updated_at"`
 }

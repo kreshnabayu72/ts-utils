@@ -560,20 +560,20 @@ func shiftSQLPlaceholders(query string, offset int) string {
 }
 
 // // flattenArgs handles []any or single value
-// func (b *SQLBuilder) flattenArgs(val interface{}) []interface{} {
+// func (b *SQLBuilder) flattenArgs(val any) []any {
 // 	v := reflect.ValueOf(val)
 // 	if v.Kind() == reflect.Slice {
-// 		args := make([]interface{}, v.Len())
+// 		args := make([]any, v.Len())
 // 		for i := 0; i < v.Len(); i++ {
 // 			args[i] = v.Index(i).Interface()
 // 		}
 // 		return args
 // 	}
 // 	// fallback for single values
-// 	return []interface{}{val}
+// 	return []any{val}
 // }
 
-// func (b *SQLBuilder) makePlaceholders(val interface{}) string {
+// func (b *SQLBuilder) makePlaceholders(val any) string {
 // 	v := reflect.ValueOf(val)
 // 	if v.Kind() != reflect.Slice {
 // 		return fmt.Sprintf("$%d", b.argIndex)
@@ -586,7 +586,7 @@ func shiftSQLPlaceholders(query string, offset int) string {
 // 	return strings.Join(placeholders, ", ")
 // }
 
-// func (b *SQLBuilder) countArgs(val interface{}) int {
+// func (b *SQLBuilder) countArgs(val any) int {
 // 	v := reflect.ValueOf(val)
 // 	if v.Kind() == reflect.Slice {
 // 		return v.Len()

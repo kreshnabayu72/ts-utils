@@ -44,28 +44,27 @@ const (
 type NotificationApp string
 
 const (
-	NotificationAppFixedAsset NotificationModule = "Fixed Asset"
+	NotificationAppFixedAsset  NotificationApp = "Fixed Asset"
+	NotificationAppSupplyAsset NotificationApp = "Supply Asset"
 )
 
 type Notification struct {
-	ID         primitive.ObjectID     `json:"_id,omitempty" bson:"_id,omitempty"`
-	User       primitive.ObjectID     `json:"user" bson:"user"`
-	UserKey    int                    `json:"userKey" bson:"userKey"`
-	Title      string                 `json:"title"         bson:"title"`
-	Detail     string                 `json:"detail"        bson:"detail"`
-	Plan       string                 `json:"plan"        bson:"plan"`
-	IsRead     bool                   `json:"isRead"        bson:"isRead"`
-	IsReadOnly bool                   `json:"isReadOnly"    bson:"isReadOnly"`
-	IsManager  bool                   `json:"isManager"     bson:"isManager"`
-	App        NotificationApp        `json:"app"        bson:"app"`
-	Module     NotificationModule     `json:"module"        bson:"module"`
-	Status     string                 `json:"status"        bson:"status"`
-	Severity   NotificationSeverity   `json:"severity"      bson:"severity"`
-	Category   NotificationCategory   `json:"category"      bson:"category"`
-	Type       string                 `json:"type"          bson:"type"`
-	FCMToken   string                 `json:"fcmToken"    bson:"fcmToken"`
-	Data       map[string]interface{} `json:"data"          bson:"data"`
-
-	CreatedAt time.Time `json:"createdAt" bson:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt" bson:"updatedAt"`
+	ID         primitive.ObjectID   `json:"_id,omitempty" bson:"_id,omitempty"`
+	UserKey    string               `json:"user"          bson:"user"`
+	Title      string               `json:"title"         bson:"title"`
+	Detail     string               `json:"detail"        bson:"detail"`
+	Plan       string               `json:"plan"          bson:"plan"`
+	IsRead     bool                 `json:"isRead"        bson:"isRead"`
+	IsReadOnly bool                 `json:"isReadOnly"    bson:"isReadOnly"`
+	IsManager  bool                 `json:"isManager"     bson:"isManager"`
+	App        NotificationApp      `json:"app"           bson:"app"`
+	Module     NotificationModule   `json:"module"        bson:"module"`
+	Status     string               `json:"status"        bson:"status"`
+	Severity   NotificationSeverity `json:"severity"      bson:"severity"`
+	Category   NotificationCategory `json:"category"      bson:"category"`
+	Type       string               `json:"type"          bson:"type"`
+	FCMToken   string               `json:"fcmToken"      bson:"fcmToken"`
+	Data       map[string]any       `json:"data"          bson:"data"`
+	CreatedAt  time.Time            `json:"createdAt"     bson:"createdAt"`
+	UpdatedAt  time.Time            `json:"updatedAt"     bson:"updatedAt"`
 }

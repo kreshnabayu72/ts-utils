@@ -11,15 +11,15 @@ import (
 
 type UpdateRawSQL struct {
 	Expr string
-	Args []interface{}
+	Args []any
 }
 
 // type string struct {
 // 	Key       string
 // 	Operator  SQLOperators // e.g., '=', '>', '<=', 'LIKE', 'IN', 'IS NULL'
-// 	Value     interface{}  // could be a single value, slice, or nil
+// 	Value     any  // could be a single value, slice, or nil
 // 	IsRef     bool         // to determine whether WHERE is targeting literal value or reference
-// 	ExtraArgs []interface{}
+// 	ExtraArgs []any
 // }
 
 type UpdateCases interface {
@@ -38,7 +38,7 @@ type UpdateCases interface {
 	//       body.TagType:   {SourceIsValue: true, Operator: SQLOperatorEqual, Value: "Non TAG"},
 	//     },
 	//   }, "Available", false)
-	Case(conditions MultiFilterCondition, value interface{}, isRef bool)
+	Case(conditions MultiFilterCondition, value any, isRef bool)
 	// Else sets the default ELSE value for the current CASE expression.
 	// It is used when none of the WHEN conditions match.
 	//
@@ -48,7 +48,7 @@ type UpdateCases interface {
 	//
 	// Example:
 	//   c.Else("status", true) // fallback to the original "status" column value
-	Else(value interface{}, isRef bool)
+	Else(value any, isRef bool)
 }
 
 // To ensure SQLUpdateBuilder has its own initial methods
@@ -87,7 +87,7 @@ type SQLUpdateInitBuilder interface {
 	//     })
 	//
 	// By default, it will automatically add `updated_at = NOW()` if not explicitly provided.
-	Update(values interface{}) SQLUpdateChainBuilder
+	Update(values any) SQLUpdateChainBuilder
 	// UpdateEach updates multiple rows at once using VALUES() with a slice of structs.
 	// Matches rows using the given rowIdentifier (e.g., "id").
 	//
@@ -99,7 +99,7 @@ type SQLUpdateInitBuilder interface {
 	//
 	//	FROM (VALUES ($1,$2),($3,$4)) AS v(id,name,updated_at)
 	//	WHERE users.id = v.id
-	UpdateEach(values interface{}, rowIdentifier string) SQLUpdateChainBuilder
+	UpdateEach(values any, rowIdentifier string) SQLUpdateChainBuilder
 
 	// AddCase initializes a conditional CASE expression for the given column in an UPDATE statement.
 	// It use completely different CASE expressions from previous AddCase and allows chaining multiple conditional branches using Case() and Else().
@@ -155,7 +155,7 @@ type SQLUpdateInitBuilder interface {
 	// whether to add "updated_at = NOW()" automatically.
 	extractUpdateFieldsStruct(v reflect.Value) ([]string, bool)
 
-	// extractUpdateFieldsMap takes a map[string]interface{} and returns a slice of
+	// extractUpdateFieldsMap takes a map[string]any and returns a slice of
 	// SET clauses for an UPDATE query. It uses the map keys as column names.
 	// It also checks if an "updated_at" key exists, so the builder knows
 	// whether to add "updated_at = NOW()" automatically.
@@ -261,7 +261,7 @@ type SQLUpdateChainBuilder interface {
 
 	// buildUpdateQuery constructs the final UPDATE query string and its arguments.
 	// Ensures that CustomQuery is set and that a WHERE clause exists for safety.
-	Build() (string, []interface{}, error)
+	Build() (string, []any, error)
 }
 
 type UpdateBuilder struct {
@@ -385,7 +385,7 @@ func (s *UpdateBuilder) AddCase(setColumn string, fn func(b UpdateCases)) SQLUpd
 	return s
 }
 
-func (s *UpdateBuilder) Case(conditions MultiFilterCondition, value interface{}, isRef bool) {
+func (s *UpdateBuilder) Case(conditions MultiFilterCondition, value any, isRef bool) {
 	filters := []string{}
 
 	if len(conditions.And) > 0 {
@@ -415,7 +415,7 @@ func (s *UpdateBuilder) Case(conditions MultiFilterCondition, value interface{},
 	)
 }
 
-func (s *UpdateBuilder) Else(value interface{}, isRef bool) {
+func (s *UpdateBuilder) Else(value any, isRef bool) {
 	var valueSb strings.Builder
 	if isRef {
 		valueSb.WriteString(value.(string))
@@ -431,7 +431,7 @@ func (s *UpdateBuilder) Else(value interface{}, isRef bool) {
 	)
 }
 
-func (s *UpdateBuilder) Update(values interface{}) SQLUpdateChainBuilder {
+func (s *UpdateBuilder) Update(values any) SQLUpdateChainBuilder {
 	v := reflect.ValueOf(values)
 
 	setClauses := []string{}
@@ -454,7 +454,7 @@ func (s *UpdateBuilder) Update(values interface{}) SQLUpdateChainBuilder {
 	return s
 }
 
-func (s *UpdateBuilder) UpdateEach(values interface{}, rowIdentifier string) SQLUpdateChainBuilder {
+func (s *UpdateBuilder) UpdateEach(values any, rowIdentifier string) SQLUpdateChainBuilder {
 	v := reflect.ValueOf(values)
 
 	// Slice data, plus length checking
@@ -553,7 +553,7 @@ func NewSQLUpdateBuilder(tableName string, alias ...string) SQLUpdateInitBuilder
 	}
 }
 
-func (s *SQLEloquentQuery) buildUpdateQuery() (string, []interface{}, error) {
+func (s *SQLEloquentQuery) buildUpdateQuery() (string, []any, error) {
 	if s.LastError != nil {
 		return "", nil, errors.New(s.LastError.Error())
 	}
@@ -639,7 +639,7 @@ func (s *UpdateBuilder) updateEachClausesGenerator(
 	slice reflect.Value,
 	rowIdentifier string,
 ) ([]string, []string, []string) {
-	var args []interface{}
+	var args []any
 	var setClauses, valueClauses, valuePlaceholders []string
 
 	// Loop through slice
@@ -888,7 +888,7 @@ func buildUpdateCase(updateCaseClauses map[string][]UpdateCaseParam, tableName s
 	return updateExpr
 }
 
-func isZeroValue(v interface{}) bool {
+func isZeroValue(v any) bool {
 	if v == nil {
 		return true
 	}

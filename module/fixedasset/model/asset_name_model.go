@@ -2,131 +2,28 @@ package model
 
 import (
 	"time"
-
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func NewAssetName() AssetName {
-	activeStatus := "Active"
-	return AssetName{
-		Transactions: AssetNameTransactionAttr{
-			Borrow:      false,
-			Assign:      false,
-			Transfer:    false,
-			SelfService: false,
-		},
-		AddOn: &AssetNameAddOnAttr{
-			RepairTicketing: false,
-			Maintenance:     false,
-			Tracking:        false,
-			Audit:           false,
-		},
-		IsDeleted:   false,
-		TotalAssets: 0,
-		UpdatedAt:   time.Now(),
-		CreatedAt:   time.Now(),
-		TagType:     nil,
-		AccountCode: nil,
-		Measurement: nil,
-		Category:    nil,
-		License: AssetNameLicenseAttr{
-			FixedAsset: AssetNameLicenseStatusAttr{
-				Status:  activeStatus,
-				AddedAt: nil,
-			},
-			Maintenance: AssetNameLicenseStatusAttr{
-				Status:  activeStatus,
-				AddedAt: nil,
-			},
-			Tracking: AssetNameLicenseStatusAttr{
-				Status:  activeStatus,
-				AddedAt: nil,
-			},
-			Audit: AssetNameLicenseStatusAttr{
-				Status:  activeStatus,
-				AddedAt: nil,
-			},
-			RepairTicketing: AssetNameLicenseStatusAttr{
-				Status:  activeStatus,
-				AddedAt: nil,
-			},
-		},
-	}
-}
-
-type AssetNameEmbedAttr struct {
-	ID               primitive.ObjectID `json:"_id" bson:"_id"`
-	Name             string             `json:"name" bson:"name"`
-	Key              int                `json:"key" bson:"key"`
-	Sequence         int                `json:"sequence" bson:"sequence"`
-	NameWithSequence string             `json:"nameWithSequence" bson:"nameWithSequence"`
-	AliasCode        string             `json:"aliasCode" bson:"aliasCode"`
-}
-
-type AssetNameTransactionAttr struct {
-	Borrow      bool `json:"borrow"      bson:"borrow"`
-	Assign      bool `json:"assign"      bson:"assign"`
-	Transfer    bool `json:"transfer"    bson:"transfer"`
-	SelfService bool `json:"selfService" bson:"selfService"`
-}
-
-type AssetNameCategoryAttr struct {
-	ID   primitive.ObjectID `json:"_id"  bson:"_id"`
-	Name string             `json:"name" bson:"name"`
-	Key  int                `json:"key"  bson:"key"`
-}
-
-type AssetNameMeasurementAttr struct {
-	ID   primitive.ObjectID `json:"_id"  bson:"_id"`
-	Name string             `json:"name" bson:"name"`
-}
-
-type AssetNameAccountCodeAttr struct {
-	ID   primitive.ObjectID `json:"_id"  bson:"_id"`
-	Name string             `json:"name" bson:"name"`
-	Key  int                `json:"key"  bson:"key"`
-	Code string             `json:"code" bson:"code"`
-}
-
-type AssetNameAddOnAttr struct {
-	RepairTicketing bool `json:"repairTicketing" bson:"repairTicketing"`
-	Maintenance     bool `json:"maintenance"     bson:"maintenance"`
-	Tracking        bool `json:"tracking"        bson:"tracking"`
-	Audit           bool `json:"audit"           bson:"audit"`
-}
-
-type AssetNameLicenseStatusAttr struct {
-	Status  string     `json:"status"  bson:"status"`
-	AddedAt *time.Time `json:"addedAt" bson:"addedAt"`
-}
-
-type AssetNameLicenseAttr struct {
-	FixedAsset      AssetNameLicenseStatusAttr `json:"fixedAsset"      bson:"fixedAsset"`
-	Maintenance     AssetNameLicenseStatusAttr `json:"maintenance"     bson:"maintenance"`
-	Tracking        AssetNameLicenseStatusAttr `json:"tracking"        bson:"tracking"`
-	Audit           AssetNameLicenseStatusAttr `json:"audit"           bson:"audit"`
-	RepairTicketing AssetNameLicenseStatusAttr `json:"repairTicketing" bson:"repairTicketing"`
-}
-
-type AssetNameDepreciationGroupAttr = AssetNameCategoryAttr
-
 type AssetName struct {
-	ID                   primitive.ObjectID              `json:"_id,omitempty"        bson:"_id,omitempty"`
-	Key                  int                             `json:"key"                  bson:"key"`
-	Name                 string                          `json:"name"                 bson:"name"`
-	AliasCode            string                          `json:"aliasCode"            bson:"aliasCode"`
-	TotalAssets          int                             `json:"totalAssets"          bson:"totalAssets"`
-	IsDeleted            bool                            `json:"isDeleted"            bson:"isDeleted"`
-	TagType              *string                         `json:"tagType"              bson:"tagType"`
-	DeleteFromDatabaseAt *time.Time                      `json:"deleteFromDatabaseAt" bson:"deleteFromDatabaseAt"`
-	Transactions         AssetNameTransactionAttr        `json:"transactions"         bson:"transactions"`
-	Category             *AssetNameCategoryAttr          `json:"category"             bson:"category"`
-	Measurement          *AssetNameMeasurementAttr       `json:"measurement"          bson:"measurement"`
-	DepreciationGroup    *AssetNameDepreciationGroupAttr `json:"depreciationGroup"    bson:"depreciationGroup"`
-	AccountCode          *AssetNameAccountCodeAttr       `json:"accountCode"          bson:"accountCode"`
-	AddOn                *AssetNameAddOnAttr             `json:"addOn"                bson:"addOn"`
-	License              AssetNameLicenseAttr            `json:"license"              bson:"license"`
-	CreatedAt            time.Time                       `json:"createdAt"            bson:"createdAt"`
-	UpdatedAt            time.Time                       `json:"updatedAt"            bson:"updatedAt"`
-	Code                 string                          `json:"code" bson:"code"`
+	ID                      int        `json:"_id"                     column:"asset_names.id"`
+	Name                    string     `json:"name"                    column:"asset_names.name"`
+	Code                    *string    `json:"code"                    column:"asset_names.code"`
+	AddOnRepairTicketing    bool       `json:"addonRepairTicketing"    column:"asset_names.addon_repair_ticketing"`
+	AddOnMaintenance        bool       `json:"addonMaintenance"        column:"asset_names.addon_maintenance"`
+	AddOnTracking           bool       `json:"addonTracking"           column:"asset_names.addon_tracking"`
+	AddOnAssetControl       bool       `json:"addonAssetControl"       column:"asset_names.addon_asset_control"`
+	AddOnAudit              bool       `json:"addonAudit"              column:"asset_names.addon_audit"`
+	CategoryId              int        `json:"categoryId"              column:"asset_names.category_id"`
+	MeasurementId           int        `json:"measurementId"           column:"asset_names.measurement_id"`
+	DepreciationGroupId     *int       `json:"depreciationGroupId"     column:"asset_names.depreciation_group_id"`
+	AccountCodeId           *int       `json:"accountCodeId"           column:"asset_names.account_code_id"`
+	TransactionsBorrow      bool       `json:"transactionsBorrow"      column:"asset_names.transactions_borrow"`
+	TransactionsAssign      bool       `json:"transactionsAssign"      column:"asset_names.transactions_assign"`
+	TransactionsTransfer    bool       `json:"transactionsTransfer"    column:"asset_names.transactions_transfer"`
+	TransactionsSelfService bool       `json:"transactionsSelfService" column:"asset_names.transactions_self_service"`
+	TagType                 *TagType   `json:"tagType"                 column:"asset_names.tag_type"`
+	IsDeleted               bool       `json:"isDeleted"               column:"asset_names.is_deleted"`
+	DeletedAt               *time.Time `json:"deletedAt"               column:"asset_names.deleted_at"`
+	CreatedAt               time.Time  `json:"createdAt"               column:"asset_names.created_at"`
+	UpdatedAt               time.Time  `json:"updatedAt"               column:"asset_names.updated_at"`
 }

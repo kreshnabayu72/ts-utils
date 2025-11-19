@@ -4,6 +4,7 @@ import (
 	"math/rand"
 )
 
+// GenerateRandomString generates random length of string. Possible characters: [a-Z:0-9]
 func GenerateRandomString(length int) string {
 	const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
 

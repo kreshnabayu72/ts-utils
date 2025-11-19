@@ -5,6 +5,7 @@ import (
 	"fmt"
 )
 
+// JSONStringify stringifies any representation of a json.
 func JSONStringify(val any) (string, error) {
 	jsonStr, err := json.Marshal(val)
 	if err != nil {
@@ -13,9 +14,10 @@ func JSONStringify(val any) (string, error) {
 	return string(jsonStr), nil
 }
 
-func JSONParse[T any](stringified string) (T, error) {
+// JSONParse parses any value representation of json.
+func JSONParse[T any](s string) (T, error) {
 	var parsed T
-	err := json.Unmarshal([]byte(stringified), &parsed)
+	err := json.Unmarshal([]byte(s), &parsed)
 	if err != nil {
 		return parsed, fmt.Errorf("%v", err)
 	}

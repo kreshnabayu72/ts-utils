@@ -12,7 +12,7 @@ import "reflect"
 // would be tedious and error-prone.
 //
 // Parameters:
-// - model: An interface{} representing the struct to check.
+// - model: An any representing the struct to check.
 //
 // Returns:
 // - bool: true if the struct is equal to its zero value, false otherwise.
@@ -20,7 +20,7 @@ import "reflect"
 // Usage: This function simplifies checking if a struct is "empty" or in its default state,
 // which can be difficult to do manually. It's especially helpful when dealing with nested structs
 // or dynamic types where the struct's fields may not be known at compile time.
-func IsZeroValue(v interface{}) bool {
+func IsZeroValue(v any) bool {
 	if v == nil {
 		return true
 	}
@@ -66,4 +66,27 @@ func ComparePointers[T comparable](v1, v2 *T) bool {
 	}
 
 	return *v1 == *v2
+}
+
+// src:
+// - https://github.com/samber/lo/blob/dc8a175ce1dbd833bdd14404d95c41b3c72e4ae9/condition.go#L5
+// - https://stackoverflow.com/a/59375088/13359128
+
+// Ternary is a 1 line if/else statement.
+//
+// !! USE WITH DISCRETION FOR VERBOSITY ISSUES !!
+//
+// EXAMPLE:
+//
+// result := functions.Ternary(true, "Yes", "No")
+// // "Yes"
+//
+// result := functions.Ternary(false, "Yes", "No")
+// // "No"
+func Ternary[T any](condition bool, ifOutput T, elseOutput T) T {
+	if condition {
+		return ifOutput
+	}
+
+	return elseOutput
 }

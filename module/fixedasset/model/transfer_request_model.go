@@ -2,29 +2,19 @@ package model
 
 import (
 	"time"
-
-	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/common/model"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// TransferRequest represents the transfer_requests table in the database.
 type TransferRequest struct {
-	ID               primitive.ObjectID      `json:"id,omitempty" bson:"_id,omitempty"`
-	Transaction      primitive.ObjectID      `json:"transaction" bson:"transaction"`
-	AssetParent      *primitive.ObjectID     `json:"assetParent" bson:"assetParent"`
-	Asset            primitive.ObjectID      `json:"asset" bson:"asset"`
-	Manager          model.UserEmbedded      `json:"manager" bson:"manager"`
-	OriginGroup      model.AttributeEmbedded `json:"originGroup" bson:"originGroup"`
-	DestinationGroup model.AttributeEmbedded `json:"destinationGroup" bson:"destinationGroup"`
-	AssetImage       string                  `json:"assetImage" bson:"assetImage"`
-	AssetName        AssetNameEmbedAttr      `json:"assetName" bson:"assetName"`
-	AssetBrand       model.AttributeEmbedded `json:"assetBrand" bson:"assetBrand"`
-	AssetModel       model.AttributeEmbedded `json:"assetModel" bson:"assetModel"`
-	Status           TransferStatus          `json:"status" bson:"status"`
-	AssetTagType     string                  `json:"assetTagType" bson:"assetTagType"`
-	AssetQr          string                  `json:"assetQr" bson:"assetQr"`
-	AssetRfid        string                  `json:"assetRfid" bson:"assetRfid"`
-	Notes            string                  `json:"notes" bson:"notes"`
-	HasChildren      bool                    `json:"hasChildren" bson:"hasChildren"`
-	CreatedAt        time.Time               `json:"createdAt" bson:"createdAt"`
-	UpdatedAt        time.Time               `json:"updatedAt" bson:"updatedAt"`
+	ID             int                           `json:"id"             column:"transfer_requests.id"`
+	Asset          int                           `json:"asset"          column:"transfer_requests.asset"`
+	Transaction    int                           `json:"transaction"    column:"transfer_requests.transaction"`
+	ParentID       *int                          `json:"parentId"       column:"transfer_requests.parent_id"`
+	Status         TransferRequestStatus         `json:"status"         column:"transfer_requests.status"`
+	AssetTagStatus TransferRequestAssetTagStatus `json:"assetTagStatus" column:"transfer_requests.asset_tag_status"`
+	AssetStatus    *TransferRequestAssetStatus   `json:"assetStatus"    column:"transfer_requests.asset_status"`
+	IsVerified     bool                          `json:"isVerified"     column:"transfer_requests.is_verified"`
+	Notes          string                        `json:"notes"          column:"transfer_requests.notes"`
+	CreatedAt      time.Time                     `json:"createdAt"      column:"transfer_requests.created_at"`
+	UpdatedAt      time.Time                     `json:"updatedAt"      column:"transfer_requests.updated_at"`
 }

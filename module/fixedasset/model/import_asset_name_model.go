@@ -2,17 +2,16 @@ package model
 
 import (
 	"time"
-
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type ImportAssetName struct {
-	ID          primitive.ObjectID `bson:"_id,omitempty"       json:"id,omitempty"`                            // MongoDB ObjectID
-	Name        string             `bson:"name"                json:"name"                validate:"required"` // Name, required and unique
-	AliasCode   *string            `bson:"aliasCode,omitempty" json:"aliasCode,omitempty"`                     // Alias code, optional
-	Category    string             `bson:"category"            json:"category"            validate:"required"` // Category, required
-	Measurement string             `bson:"measurement"         json:"measurement"         validate:"required"` // Measurement, required
-	Key         int                `bson:"key"                 json:"key"                 validate:"required"` // Key, required
-	CreatedAt   time.Time          `bson:"createdAt,omitempty" json:"createdAt,omitempty"`                     // Timestamp for creation
-	UpdatedAt   time.Time          `bson:"updatedAt,omitempty" json:"updatedAt,omitempty"`                     // Timestamp for last update
+	ID           int       `json:"_id"          column:"import_asset_names.id"`
+	Key          int       `json:"key"          column:"import_asset_names.key"`
+	Name         string    `json:"name"         column:"import_asset_names.name"`
+	Code         string    `json:"code"         column:"import_asset_names.code"`
+	Category     string    `json:"category"     column:"import_asset_names.category"`
+	CategoryCode string    `json:"categoryCode" column:"import_asset_names.category_code"`
+	Measurement  string    `json:"measurement"  column:"import_asset_names.measurement"`
+	CreatedAt    time.Time `json:"createdAt"    column:"import_asset_names.created_at"`
+	UpdatedAt    time.Time `json:"updatedAt"    column:"import_asset_names.updated_at"`
 }

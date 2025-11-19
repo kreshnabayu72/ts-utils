@@ -2,15 +2,13 @@ package model
 
 import (
 	"time"
-
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Measurement struct {
-	ID                   primitive.ObjectID `json:"_id,omitempty"        bson:"_id,omitempty"`
-	Name                 string             `json:"name"                 bson:"name"`
-	IsDeleted            bool               `json:"isDeleted"            bson:"isDeleted"`
-	DeleteFromDatabaseAt *time.Time         `json:"deleteFromDatabaseAt" bson:"deleteFromDatabaseAt"`
-	CreatedAt            time.Time          `json:"createdAt"            bson:"createdAt"`
-	UpdatedAt            time.Time          `json:"updatedAt"            bson:"updatedAt"`
+	ID        int        `json:"_id"       column:"measurements.id"`
+	Name      string     `json:"name"      column:"measurements.name"`
+	IsDeleted bool       `json:"isDeleted" column:"measurements.is_deleted"`
+	DeletedAt *time.Time `json:"deletedAt" column:"measurements.deleted_at"`
+	CreatedAt time.Time  `json:"createdAt" column:"measurements.created_at"`
+	UpdatedAt time.Time  `json:"updatedAt" column:"measurements.updated_at"`
 }

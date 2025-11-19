@@ -2,42 +2,21 @@ package model
 
 import (
 	"time"
-
-	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/common/model"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type AssignmentStatus string
-
-const (
-	AssignStatusAssigned   = AssignmentStatus("Assigned")
-	AssignStatusDamaged    = AssignmentStatus("Reported Damaged")
-	AssignStatusMissing    = AssignmentStatus("Reported Missing")
-	AssignStatusUnassigned = AssignmentStatus("Unassigned")
-)
-
+// AssignmentRequest represents the assignment_requests table in the database.
 type AssignmentRequest struct {
-	ID primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
-
-	Transaction   primitive.ObjectID      `json:"transaction" bson:"transaction"`
-	TransactionId string                  `json:"transactionId" bson:"transactionId"`
-	Asset         primitive.ObjectID      `json:"asset" bson:"asset"`
-	AssetId       string                  `json:"assetId" bson:"assetId"`
-	AssetParent   *primitive.ObjectID     `json:"assetParent" bson:"assetParent"`
-	AssetImage    *string                 `json:"assetImage" bson:"assetImage"`
-	Status        AssignmentStatus        `json:"status" bson:"status"`
-	AssetName     AssetNameEmbedAttr      `json:"assetName" bson:"assetName"`
-	AssetCategory model.AttributeEmbedded `json:"assetCategory" bson:"assetCategory"`
-	Group         model.AttributeEmbedded `json:"group" bson:"group"`
-
-	AssetBrand model.AttributeEmbedded `json:"assetBrand" bson:"assetBrand"`
-	AssetModel model.AttributeEmbedded `json:"assetModel" bson:"assetModel"`
-
-	Manager    model.UserEmbedded `json:"manager" bson:"manager"`
-	AssignedTo model.UserEmbedded `json:"assignedTo" bson:"assignedTo"`
-
-	Notes string `json:"notes" bson:"notes"`
-
-	CreatedAt time.Time `json:"createdAt" bson:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt" bson:"updatedAt"`
+	ID             int                     `json:"id"             column:"assignment_requests.id"`
+	Asset          int                     `json:"asset"          column:"assignment_requests.asset"`
+	Transaction    int                     `json:"transaction"    column:"assignment_requests.transaction"`
+	ParentID       *int                    `json:"parentId"       column:"assignment_requests.parent_id"`
+	RepairID       *int                    `json:"repairId"       column:"assignment_requests.repair_id"`
+	TrackingID     *int                    `json:"trackingId"     column:"assignment_requests.tracking_id"`
+	Status         AssignmentRequestStatus `json:"status"         column:"assignment_requests.status"`
+	PreviousStatus AssignmentRequestStatus `json:"previousStatus" column:"assignment_requests.previous_status"`
+	IsVerified     bool                    `json:"isVerified"     column:"assignment_requests.is_verified"`
+	Notes          string                  `json:"notes"          column:"assignment_requests.notes"`
+	SerialNumber   *string                 `json:"serialNumber"   column:"assignment_requests.serial_number"`
+	CreatedAt      time.Time               `json:"createdAt"      column:"assignment_requests.created_at"`
+	UpdatedAt      time.Time               `json:"updatedAt"      column:"assignment_requests.updated_at"`
 }

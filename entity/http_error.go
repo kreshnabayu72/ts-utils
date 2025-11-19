@@ -1,7 +1,7 @@
 package entity
 
 import (
-	"gitea.qwertysystem.net/BETS/ts-utils/v2/response"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/functions"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -17,11 +17,7 @@ func (e *HttpError) Error() string {
 }
 
 func (e *HttpError) SendResponse(ctx *fiber.Ctx) error {
-	return response.SendResponse(ctx, e.Code, nil, e.Message)
-}
-
-func (e *HttpError) SendResponseWithError(ctx *fiber.Ctx) error {
-	return response.SendResponseWithError(ctx, e.Code, nil, e.Message, e.Err)
+	return functions.SendResponse(ctx, e.Code, nil, e.Message, e.Err)
 }
 
 func InternalServerError(message string) *HttpError {
@@ -73,7 +69,3 @@ func ToHttpError(err error) *HttpError {
 
 	return InternalServerError(err.Error())
 }
-
-// ─────── Specific error messages ───────
-
-// Auth

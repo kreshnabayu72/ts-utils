@@ -2,16 +2,14 @@ package model
 
 import (
 	"time"
-
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type ImportGroup struct {
-	ID           primitive.ObjectID `bson:"_id,omitempty"       json:"_id,omitempty"` // MongoDB ObjectID
-	Name         string             `bson:"name"                json:"name"`
-	IsDisposable string             `bson:"isDisposable"        json:"isDisposable"`
-	GroupCode    string             `bson:"groupCode"        json:"groupCode"`
-	Key          int                `bson:"key,omitempty"       json:"key,omitempty"`
-	CreatedAt    time.Time          `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
-	UpdatedAt    time.Time          `bson:"updatedAt,omitempty" json:"updatedAt,omitempty"`
+	ID           int       `json:"_id"          column:"import_groups.id"`
+	Key          int       `json:"key"          column:"import_groups.key"           special:"generated"`
+	Name         string    `json:"name"         column:"import_groups.name"`
+	GroupCode    string    `json:"groupCode"    column:"import_groups.group_code"`
+	IsDisposable *string   `json:"isDisposable" column:"import_groups.is_disposable"`
+	CreatedAt    time.Time `json:"createdAt"    column:"import_groups.created_at"`
+	UpdatedAt    time.Time `json:"updatedAt"    column:"import_groups.updated_at"`
 }

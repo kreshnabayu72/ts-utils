@@ -10,7 +10,7 @@ func IncrementBuilder(
 	tableName string,
 	query map[string]sql_query.SQLCondition,
 	body map[string]any,
-) (string, []interface{}) {
+) (string, []any) {
 	res, args, err := sql_query.NewSQLUpdateBuilder(tableName).
 		Increment(body).
 		Return("id").

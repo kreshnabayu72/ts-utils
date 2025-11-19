@@ -52,8 +52,8 @@ func getQueryTransform(transform string) (QueryTransform, error) {
 }
 
 // transformQueryValue transforms the given string value based on the specified transform type.
-// It returns the transformed value as an interface{}.
-func transformQueryValue(value string, transform string) interface{} {
+// It returns the transformed value as an any.
+func transformQueryValue(value string, transform string) any {
 	transformType, err := getQueryTransform(transform)
 	if err != nil {
 		fmt.Println("Error getting query transform:", err)
@@ -77,14 +77,14 @@ func transformQueryValue(value string, transform string) interface{} {
 		}
 		return v
 	case TransformArray:
-		var v []interface{}
+		var v []any
 		json.Unmarshal([]byte(value), &v)
 		return v
 	case TransformObjectID:
 		v, _ := primitive.ObjectIDFromHex(value)
 		return v
 	case TransformObjectIDArray:
-		var v []interface{}
+		var v []any
 		var objectIdArr []primitive.ObjectID
 
 		json.Unmarshal([]byte(value), &v)
@@ -121,7 +121,7 @@ func transformQueryValue(value string, transform string) interface{} {
 func ParseQuery[T any](query map[string]string) (*T, error) {
 	t := reflect.TypeFor[T]()
 
-	parsedQuery := map[string]interface{}{}
+	parsedQuery := map[string]any{}
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
 

@@ -2,30 +2,24 @@ package model
 
 import (
 	"time"
-
-	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/common/model"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// DisposalRequest represents the disposal_requests table in the database.
 type DisposalRequest struct {
-	ID            primitive.ObjectID      `json:"id,omitempty" bson:"_id,omitempty"`
-	Transaction   primitive.ObjectID      `json:"transaction" bson:"transaction"`
-	Asset         primitive.ObjectID      `json:"asset" bson:"asset"`
-	Manager       model.UserEmbedded      `json:"manager" bson:"manager"`
-	OriginGroup   model.AttributeEmbedded `json:"originGroup" bson:"originGroup"`
-	DisposalGroup model.AttributeEmbedded `json:"disposalGroup" bson:"disposalGroup"`
-	AssetImage    string                  `json:"assetImage" bson:"assetImage"`
-	AssetName     AssetNameEmbedAttr      `json:"assetName" bson:"assetName"`
-	AssetBrand    model.AttributeEmbedded `json:"assetBrand" bson:"assetBrand"`
-	AssetModel    model.AttributeEmbedded `json:"assetModel" bson:"assetModel"`
-	Status        DisposalStatus          `json:"status" bson:"status"`
-	AssetTagType  string                  `json:"assetTagType" bson:"assetTagType"`
-	AssetQr       string                  `json:"assetQr" bson:"assetQr"`
-	AssetRfid     string                  `json:"assetRfid" bson:"assetRfid"`
-	Method        string                  `json:"method" bson:"method"`
-
-	Reason string `json:"reason" bson:"reason"`
-
-	CreatedAt time.Time `json:"createdAt" bson:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt" bson:"updatedAt"`
+	ID                        int                   `json:"id"                        column:"disposal_requests.id"`
+	Asset                     int                   `json:"asset"                     column:"disposal_requests.asset"`
+	Transaction               int                   `json:"transaction"               column:"disposal_requests.transaction"`
+	ReportID                  *int                  `json:"reportId"                  column:"disposal_requests.report_id"`
+	PreviousStatus            AssetStatus           `json:"previousStatus"            column:"disposal_requests.previous_status"`
+	Status                    DisposalRequestStatus `json:"status"                    column:"disposal_requests.status"`
+	SalvageableParts          []string              `json:"salvageableParts"          column:"disposal_requests.salvageable_parts"`
+	SalePrice                 *string               `json:"salePrice"                 column:"disposal_requests.sale_price"`
+	Notes                     string                `json:"notes"                     column:"disposal_requests.notes"`
+	CompletionApprovalRound   *int                  `json:"completionApprovalRound"   column:"disposal_requests.completion_approval_round"`
+	IsVerified                bool                  `json:"isVerified"                column:"disposal_requests.is_verified"`
+	DocumentationPhoto        *string               `json:"documentationPhoto"        column:"disposal_requests.documentation_photo"`
+	DocumentationPhotoAddress *string               `json:"documentationPhotoAddress" column:"disposal_requests.documentation_photo_address"`
+	ReaderName                *string               `json:"readerName"                column:"disposal_requests.reader_name"`
+	CreatedAt                 time.Time             `json:"createdAt"                 column:"disposal_requests.created_at"`
+	UpdatedAt                 time.Time             `json:"updatedAt"                 column:"disposal_requests.updated_at"`
 }

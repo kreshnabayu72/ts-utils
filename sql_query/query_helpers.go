@@ -31,7 +31,7 @@ func ScanRowObject(v any, row pgx.Rows) error {
 		return err
 	}
 
-	rowMap := make(map[string]interface{})
+	rowMap := make(map[string]any)
 	for i, fd := range fieldDescs {
 		columnName := string(fd.Name)
 		rowMap[columnName] = values[i]
@@ -110,7 +110,7 @@ func ScanRowsArray(v any, rows pgx.Rows) error {
 			return err
 		}
 
-		rowMap := make(map[string]interface{})
+		rowMap := make(map[string]any)
 		for i, fd := range fieldDescs {
 			columnName := string(fd.Name)
 			rowMap[columnName] = values[i]
@@ -214,8 +214,8 @@ Example input:
 		Unit: "cm",
 	}
 */
-func BuildInsertOneQuery(table string, data interface{}) (query string, err error) {
-	var args []interface{}
+func BuildInsertOneQuery(table string, data any) (query string, err error) {
+	var args []any
 
 	v := reflect.ValueOf(data)
 	if v.Kind() != reflect.Struct {
@@ -271,8 +271,8 @@ Example input:
 		{Name: "Temp", Unit: "C"},
 	}
 */
-func BuildInsertManyQuery(table string, dataSlice interface{}) (query string, err error) {
-	var args []interface{}
+func BuildInsertManyQuery(table string, dataSlice any) (query string, err error) {
+	var args []any
 
 	v := reflect.ValueOf(dataSlice)
 

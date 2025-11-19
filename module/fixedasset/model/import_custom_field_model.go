@@ -2,22 +2,18 @@ package model
 
 import (
 	"time"
-
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type ImportCustomField struct {
-	ID primitive.ObjectID `bson:"_id,omitempty"       json:"_id,omitempty"` // MongoDB ObjectID
-
-	Name         string `bson:"name"                json:"name"`
-	Type         string `bson:"type"        json:"type"`
-	DataType     string `bson:"dataType"        json:"dataType"`
-	OptionValue  string `bson:"optionValue"        json:"optionValue"`
-	IsRequired   string `bson:"isRequired"        json:"isRequired"`
-	Category     string `bson:"category"        json:"category"`
-	CategoryCode string `bson:"categoryCode"        json:"categoryCode"` //not used in basic
-
-	Key       int       `bson:"key,omitempty"       json:"key,omitempty"`
-	CreatedAt time.Time `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
-	UpdatedAt time.Time `bson:"updatedAt,omitempty" json:"updatedAt,omitempty"`
+	ID           int                 `json:"_id"          column:"import_custom_fields.id"`
+	Key          int                 `json:"key"          column:"import_custom_fields.key"           special:"generated"`
+	IsRequired   string              `json:"isRequired"   column:"import_custom_fields.is_required"`
+	OptionValue  string              `json:"optionValue"  column:"import_custom_fields.option_value"`
+	DataType     CustomFieldDataType `json:"dataType"     column:"import_custom_fields.data_type"`
+	Type         CustomFieldType     `json:"type"         column:"import_custom_fields.type"`
+	Name         string              `json:"name"         column:"import_custom_fields.name"`
+	Category     string              `json:"category"     column:"import_custom_fields.category"`
+	CategoryCode string              `json:"categoryCode" column:"import_custom_fields.category_code"`
+	CreatedAt    time.Time           `json:"createdAt"    column:"import_custom_fields.created_at"`
+	UpdatedAt    time.Time           `json:"updatedAt"    column:"import_custom_fields.updated_at"`
 }

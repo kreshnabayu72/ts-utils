@@ -2,21 +2,16 @@ package model
 
 import (
 	"time"
-
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Category struct {
-	ID                   primitive.ObjectID  `json:"_id,omitempty"        bson:"_id,omitempty"`
-	Name                 string              `json:"name"                 bson:"name"`
-	FullPath             string              `json:"fullPath"             bson:"fullPath"`
-	Parent               *primitive.ObjectID `json:"parent"               bson:"parent"`
-	Level                int                 `json:"level"                bson:"level"`
-	IsDefault            bool                `json:"isDefault"            bson:"isDefault"`
-	IsDeleted            bool                `json:"isDeleted"            bson:"isDeleted"`
-	Key                  int                 `json:"key"                  bson:"key"`
-	DeleteFromDatabaseAt *time.Time          `json:"deleteFromDatabaseAt" bson:"deleteFromDatabaseAt"`
-	CreatedAt            time.Time           `json:"createdAt"            bson:"createdAt"`
-	UpdatedAt            time.Time           `json:"updatedAt"            bson:"updatedAt"`
-	Code                 string              `json:"code"                 bson:"code"`
+	ID        int        `json:"_id"       column:"categories.id"`
+	Name      string     `json:"name"      column:"categories.name"`
+	FullPath  string     `json:"fullPath"                               column:"categories.full_path"`
+	Code      string     `json:"code"      column:"categories.code"`
+	ParentId  int        `json:"parentId"  column:"categories.parent_id"`
+	IsDeleted bool       `json:"isDeleted" column:"categories.is_deleted"`
+	DeletedAt *time.Time `json:"deletedAt" column:"categories.deleted_at"`
+	CreatedAt time.Time  `json:"createdAt" column:"categories.created_at"`
+	UpdatedAt time.Time  `json:"updatedAt" column:"categories.updated_at"`
 }

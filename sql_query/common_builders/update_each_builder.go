@@ -6,7 +6,7 @@ import (
 	"gitea.qwertysystem.net/BETS/ts-utils/v2/sql_query"
 )
 
-func UpdateEachBuilder(tableName string, rowIdentifier string, query map[string]sql_query.SQLCondition, body interface{}) (string, []interface{}) {
+func UpdateEachBuilder(tableName string, rowIdentifier string, query map[string]sql_query.SQLCondition, body any) (string, []any) {
 	res, args, err := sql_query.NewSQLUpdateBuilder(tableName).
 		UpdateEach(body, rowIdentifier).
 		Return("id").

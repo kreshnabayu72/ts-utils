@@ -3,7 +3,7 @@ package new_model
 import (
 	"time"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/common/new_model"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/common/model"
 )
 
 type AmpLifecycleManagementPlans struct {
@@ -11,11 +11,11 @@ type AmpLifecycleManagementPlans struct {
 	AmpID        int `json:"ampId" column:"amp_lifecycle_management_plans.amp_id"`                // Foreign Key to amp
 	AmpHistoryID int `json:"ampHistoryId" column:"amp_lifecycle_management_plans.amp_history_id"` // Foreign Key to amp history
 
-	Stage    string              `json:"stage" column:"amp_lifecycle_management_plans.stage"`
-	Activity string              `json:"activity" column:"amp_lifecycle_management_plans.activity"`
-	Timeline new_model.TimeRange `json:"timeline" column:"amp_lifecycle_management_plans.timeline"`
-	Pic      string              `json:"pic" column:"amp_lifecycle_management_plans.pic"`
-	Notes    string              `json:"notes" column:"amp_lifecycle_management_plans.notes"`
+	Stage    string          `json:"stage" column:"amp_lifecycle_management_plans.stage"`
+	Activity string          `json:"activity" column:"amp_lifecycle_management_plans.activity"`
+	Timeline model.TimeRange `json:"timeline" column:"amp_lifecycle_management_plans.timeline"`
+	Pic      string          `json:"pic" column:"amp_lifecycle_management_plans.pic"`
+	Notes    string          `json:"notes" column:"amp_lifecycle_management_plans.notes"`
 
 	IsDeleted bool       `json:"isDeleted"        column:"amp_lifecycle_management_plans.is_deleted"`
 	DeletedAt *time.Time `json:"deletedAt"        column:"amp_lifecycle_management_plans.deleted_at"`

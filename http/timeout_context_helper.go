@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/v2/entity"
-	"gitea.qwertysystem.net/BETS/ts-utils/v2/response"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/functions"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -67,10 +67,10 @@ func RunWithTimeout[T any](
 
 	select {
 	case <-ctxWithTimeout.Done():
-		return response.SendResponse(ctx, fiber.StatusRequestTimeout, nil, "Timeout")
+		return functions.SendResponse(ctx, fiber.StatusRequestTimeout, nil, "Timeout", nil)
 	case err := <-errorChan:
-		return response.SendResponse(ctx, err.Code, err.Data, err.Message)
+		return functions.SendResponse(ctx, err.Code, err.Data, err.Message, err)
 	case res := <-resultChan:
-		return response.SendResponse(ctx, successCode, res, successMessage)
+		return functions.SendResponse(ctx, successCode, res, successMessage, nil)
 	}
 }

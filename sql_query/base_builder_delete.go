@@ -52,7 +52,7 @@ type SQLDeleteChainBuilder interface {
 	// Example Output:
 	//
 	//	DELETE FROM users USING roles WHERE users.role_id = roles.id RETURNING id
-	Build() (string, []interface{}, error)
+	Build() (string, []any, error)
 }
 
 // <---To wrap builder to its respective interface, used as pointer type in method of each builder--->
@@ -118,7 +118,7 @@ func NewSQLDeleteBuilder(tableName string, alias ...string) SQLDeleteInitBuilder
 	}
 }
 
-func (s *SQLEloquentQuery) buildDeleteQuery() (string, []interface{}, error) {
+func (s *SQLEloquentQuery) buildDeleteQuery() (string, []any, error) {
 	if s.LastError != nil {
 		return "", nil, errors.New(s.LastError.Error())
 	}

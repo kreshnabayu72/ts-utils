@@ -2,15 +2,13 @@ package model
 
 import (
 	"time"
-
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type ImportCategory struct {
-	ID           primitive.ObjectID `bson:"_id,omitempty"       json:"_id,omitempty"` // MongoDB ObjectID
-	Name         string             `bson:"name"      json:"name"`
-	CategoryCode string             `bson:"categoryCode"        json:"categoryCode"`
-	Key          int                `bson:"key,omitempty"       json:"key,omitempty"`
-	CreatedAt    time.Time          `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
-	UpdatedAt    time.Time          `bson:"updatedAt,omitempty" json:"updatedAt,omitempty"`
+	ID           int       `json:"_id"          column:"import_categories.id"`
+	Key          int       `json:"key"          column:"import_categories.key"           special:"generated"`
+	Name         string    `json:"name"         column:"import_categories.name"`
+	CategoryCode string    `json:"categoryCode" column:"import_categories.category_code"`
+	CreatedAt    time.Time `json:"createdAt"    column:"import_categories.created_at"`
+	UpdatedAt    time.Time `json:"updatedAt"    column:"import_categories.updated_at"`
 }

@@ -12,7 +12,7 @@ import (
 
 // Parser defines the interface for parsing Excel files.
 type Parser interface {
-	ParseXlsxToJson(file *multipart.FileHeader, columns []string) ([]map[string]interface{}, error)
+	ParseXlsxToJson(file *multipart.FileHeader, columns []string) ([]map[string]any, error)
 }
 
 // DefaultParser is the default implementation of the Parser interface.
@@ -22,7 +22,7 @@ type DefaultParser struct{}
 func (p *DefaultParser) ParseXlsxToJson(
 	file *multipart.FileHeader,
 	columns []string,
-) ([]map[string]interface{}, error) {
+) ([]map[string]any, error) {
 	// Buka file
 	rows, err := getExcelRows(file)
 	if err != nil {
@@ -32,7 +32,7 @@ func (p *DefaultParser) ParseXlsxToJson(
 	// Cari header
 	header, headerRowIndex := findHeader(rows, columns)
 	if headerRowIndex == -1 {
-		return []map[string]interface{}{}, nil // Return array kosong jika tidak ada header
+		return []map[string]any{}, nil // Return array kosong jika tidak ada header
 	}
 
 	// Konversi data menjadi slice JSON
@@ -81,10 +81,10 @@ func parseRows(
 	header []string,
 	headerRowIndex int,
 	columns []string,
-) []map[string]interface{} {
-	var result []map[string]interface{}
+) []map[string]any {
+	var result []map[string]any
 	for _, row := range rows[headerRowIndex+1:] { // Mulai dari baris setelah header
-		rowData := make(map[string]interface{})
+		rowData := make(map[string]any)
 		for i, cell := range row {
 			if i < len(header) && contains(columns, header[i]) {
 				rowData[header[i]] = parseValue(cell)
@@ -98,7 +98,7 @@ func parseRows(
 }
 
 // parseValue menentukan tipe data berdasarkan nilai string
-func parseValue(value string) interface{} {
+func parseValue(value string) any {
 	if boolValue, err := strconv.ParseBool(value); err == nil {
 		return boolValue
 	}
@@ -140,7 +140,7 @@ type MockParser struct {
 func (m *MockParser) ParseXlsxToJson(
 	file *multipart.FileHeader,
 	columns []string,
-) ([]map[string]interface{}, error) {
+) ([]map[string]any, error) {
 	args := m.Called(file, columns)
-	return args.Get(0).([]map[string]interface{}), args.Error(1)
+	return args.Get(0).([]map[string]any), args.Error(1)
 }

@@ -2,33 +2,27 @@ package model
 
 import (
 	"time"
-
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type ImportAsset struct {
-	ID primitive.ObjectID `bson:"_id,omitempty"       json:"_id,omitempty"` // MongoDB ObjectID
-
-	Group       string `bson:"group"                json:"group"`
-	Category    string `bson:"category"        json:"category"`
-	Name        string `bson:"name"        json:"name"`
-	Qty         int    `bson:"qty"        json:"qty"`
-	Brand       string `bson:"brand"        json:"brand"`
-	Model       string `bson:"model"        json:"model"`
-	Measurement string `bson:"measurement"        json:"measurement"`
-
-	//not used in basic
-	GroupCode          string `bson:"groupCode"        json:"groupCode"`
-	CategoryCode       string `bson:"categoryCode"        json:"categoryCode"`
-	NameCode           string `bson:"nameCode"        json:"nameCode"`
-	Currency           string `bson:"currency"        json:"currency"`
-	PurchaseCost       string `bson:"purchaseCost"        json:"purchaseCost"`
-	TangibleAssetGroup string `bson:"tangibleAssetGroup"        json:"tangibleAssetGroup"`
-	UsefulLife         string `bson:"usefulLife"        json:"usefulLife"`
-	PurchaseDate       string `bson:"purchaseDate"        json:"purchaseDate"`
-	AliasName          string `bson:"aliasName"        json:"aliasName"`
-
-	Key       int       `bson:"key,omitempty"       json:"key,omitempty"`
-	CreatedAt time.Time `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
-	UpdatedAt time.Time `bson:"updatedAt,omitempty" json:"updatedAt,omitempty"`
+type ImportFixedAsset struct {
+	ID                 int        `json:"_id"                column:"import_assets.id"`
+	Key                int        `json:"key"                column:"import_assets.key"                  special:"generated"`
+	Group              string     `json:"group"              column:"import_assets.group"`
+	GroupCode          *string    `json:"groupCode"          column:"import_assets.group_code"`
+	Category           string     `json:"category"           column:"import_assets.category"`
+	CategoryCode       *string    `json:"categoryCode"       column:"import_assets.category_code"`
+	Currency           *string    `json:"currency"           column:"import_assets.currency"`
+	PurchaseCost       *int       `json:"purchaseCost"       column:"import_assets.purchase_cost"`
+	TangibleAssetGroup *string    `json:"tangibleAssetGroup" column:"import_assets.tangible_asset_group"`
+	UsefulLife         *int       `json:"usefulLife"         column:"import_assets.useful_life"`
+	PurchaseDate       *time.Time `json:"purchaseDate"       column:"import_assets.purchase_date"`
+	Name               *string    `json:"name"               column:"import_assets.name"`
+	NameCode           *string    `json:"nameCode"           column:"import_assets.name_code"`
+	Quantity           *int       `json:"quantity"           column:"import_assets.quantity"`
+	AliasName          *string    `json:"aliasName"          column:"import_assets.alias_name"`
+	Brand              *string    `json:"brand"              column:"import_assets.brand"`
+	Model              *string    `json:"model"              column:"import_assets.model"`
+	Measurement        *string    `json:"measurement"        column:"import_assets.measurement"`
+	CreatedAt          time.Time  `json:"createdAt"          column:"import_assets.created_at"`
+	UpdatedAt          time.Time  `json:"updatedAt"          column:"import_assets.updated_at"`
 }

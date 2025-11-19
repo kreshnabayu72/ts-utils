@@ -14,7 +14,7 @@ type SQLSelectChainBuilder interface {
 	GetCurrentArgIndex() int
 	// AddArgs appends one or more arguments to the query's argument list.
 	// Can be used to manually manage parameter placeholders.
-	AddArgs(arg ...interface{}) SQLSelectChainBuilder
+	AddArgs(arg ...any) SQLSelectChainBuilder
 	// StartPlaceholderFrom set starting point of next generated placeholders.
 	// Useful for creating sub query from this builder for another main query.
 	// Placeholders for this sub query will be started from this given value.
@@ -75,7 +75,7 @@ type SQLSelectChainBuilder interface {
 	// Generates:
 	//
 	//	CASE WHEN role = 'admin' THEN 'Yes' ELSE 'No' END AS is_admin
-	SelectCaseWhen(thenExpr, elseExpr, alias string, whenClause string, whenArgs ...interface{}) SQLSelectChainBuilder
+	SelectCaseWhen(thenExpr, elseExpr, alias string, whenClause string, whenArgs ...any) SQLSelectChainBuilder
 	// SelectBoolAnd adds a bool_or aggregate column with an alias.
 	//
 	// Example:
@@ -85,7 +85,7 @@ type SQLSelectChainBuilder interface {
 	// Generates:
 	//
 	//	bool_and(is_active) AS any_active
-	SelectBoolAnd(expr, alias string, args ...interface{}) SQLSelectChainBuilder
+	SelectBoolAnd(expr, alias string, args ...any) SQLSelectChainBuilder
 	// SelectBoolOr adds a bool_or aggregate column with an alias.
 	//
 	// Example:
@@ -95,7 +95,7 @@ type SQLSelectChainBuilder interface {
 	// Generates:
 	//
 	//	bool_or(is_active) AS any_active
-	SelectBoolOr(expr, alias string, args ...interface{}) SQLSelectChainBuilder
+	SelectBoolOr(expr, alias string, args ...any) SQLSelectChainBuilder
 
 	SelectArrayAggregation(alias string, source string, config ArrayAggConfig) SQLSelectChainBuilder
 
@@ -314,7 +314,7 @@ type SQLSelectChainBuilder interface {
 
 	// Build finalizes the SELECT query and returns the query string and arguments.
 	// Returns an error if the query is invalid (e.g., HAVING without GROUP BY).
-	Build() (string, []interface{}, error)
+	Build() (string, []any, error)
 }
 
 type SelectBuilder struct {
@@ -335,7 +335,7 @@ func (s *SelectBuilder) GetCurrentArgIndex() int {
 	return len(s.Args)
 }
 
-func (s *SelectBuilder) AddArgs(arg ...interface{}) SQLSelectChainBuilder {
+func (s *SelectBuilder) AddArgs(arg ...any) SQLSelectChainBuilder {
 	s.Args = append(s.Args, arg...)
 	return s
 }
@@ -349,7 +349,7 @@ func (s *SelectBuilder) StartPlaceholderFrom(index int) SQLSelectChainBuilder {
 		// Need to pad so that first existing arg becomes $index
 		pad := index - 1
 		if pad > 0 {
-			temp := make([]interface{}, pad+len(s.Args))
+			temp := make([]any, pad+len(s.Args))
 			// fill padding with nils
 			for i := 0; i < pad; i++ {
 				temp[i] = nil
@@ -361,7 +361,7 @@ func (s *SelectBuilder) StartPlaceholderFrom(index int) SQLSelectChainBuilder {
 	} else {
 		// If empty, just pad with nils up to index-1
 		if index > 1 {
-			temp := make([]interface{}, index-1)
+			temp := make([]any, index-1)
 			for i := 0; i < index-1; i++ {
 				temp[i] = nil
 			}
@@ -375,7 +375,7 @@ func (s *SelectBuilder) StartPlaceholderFrom(index int) SQLSelectChainBuilder {
 func (s *SelectBuilder) Search(keyword string, fields []string) SQLSelectChainBuilder {
 	if keyword != "" && len(fields) > 0 {
 		var orClauses []string
-		orArgs := []interface{}{}
+		orArgs := []any{}
 
 		for _, field := range fields {
 			isArrayColumn := strings.HasSuffix(field, ":array")
@@ -482,7 +482,7 @@ func (s *SelectBuilder) Select(columns ...string) SQLSelectChainBuilder {
 	return s
 }
 
-func (s *SelectBuilder) SelectBoolAnd(expr, alias string, args ...interface{}) SQLSelectChainBuilder {
+func (s *SelectBuilder) SelectBoolAnd(expr, alias string, args ...any) SQLSelectChainBuilder {
 	boolAndColumn := fmt.Sprintf("bool_and(%s) AS \"%s\"", expr, alias)
 
 	// Check if alias exists in current list
@@ -504,7 +504,7 @@ func (s *SelectBuilder) SelectBoolAnd(expr, alias string, args ...interface{}) S
 	return s
 }
 
-func (s *SelectBuilder) SelectBoolOr(expr, alias string, args ...interface{}) SQLSelectChainBuilder {
+func (s *SelectBuilder) SelectBoolOr(expr, alias string, args ...any) SQLSelectChainBuilder {
 	boolOrColumn := fmt.Sprintf("bool_or(%s) AS \"%s\"", expr, alias)
 
 	// Check if alias exists in current list
@@ -562,7 +562,7 @@ func (s *SelectBuilder) SelectArrayAggregation(alias string, source string, conf
 	return s
 }
 
-func (s *SelectBuilder) SelectCaseWhen(thenExpr, elseExpr, alias string, whenClause string, whenArgs ...interface{}) SQLSelectChainBuilder {
+func (s *SelectBuilder) SelectCaseWhen(thenExpr, elseExpr, alias string, whenClause string, whenArgs ...any) SQLSelectChainBuilder {
 	caseWhenColumn := fmt.Sprintf("CASE WHEN %s THEN %s ELSE %s END AS \"%s\"", whenClause, thenExpr, elseExpr, alias)
 
 	// Check if alias exists in current list
@@ -865,7 +865,7 @@ func NewSQLCountBuilder(tableName string, alias ...string) SQLSelectChainBuilder
 	}
 }
 
-func (s *SQLEloquentQuery) buildSelectQuery() (string, []interface{}, error) {
+func (s *SQLEloquentQuery) buildSelectQuery() (string, []any, error) {
 	if len(s.HavingClauses) > 0 && len(s.Grouping) == 0 {
 		return "", nil, errors.New("HAVING clauses only allowed if GROUP BY clause is exists")
 	}

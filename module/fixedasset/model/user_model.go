@@ -2,50 +2,54 @@ package model
 
 import (
 	"time"
-
-	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/common/model"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type UserEmbeddedRole struct {
-	IsActive   bool `json:"isActive"   bson:"isActive"`
-	IsAssigned bool `json:"isAssigned" bson:"isAssigned"`
+type User struct {
+	ID                     int        `json:"_id"                    column:"users.id"`
+	FCMToken               string     `json:"fcmToken"               column:"users.fcm_token"`
+	FirstName              string     `json:"firstName"              column:"users.first_name"`
+	LastName               string     `json:"lastName"               column:"users.last_name"`
+	FullName               string     `json:"fullName"               column:"users.full_name"                                                      special:"generated"`
+	Email                  string     `json:"email"                  column:"users.email"`
+	PhoneNumber            string     `json:"phoneNumber"            column:"users.phone_number"`
+	PendingEmailChange     string     `json:"pendingEmailChange"     column:"users.pending_email_change"`
+	IsActive               bool       `json:"isActive"               column:"users.is_active"`
+	IsTemporary            bool       `json:"isTemporary"            column:"users.is_temporary"`
+	IsDefault              bool       `json:"isDefault"              column:"users.is_default"`
+	IsEmailConfirmed       bool       `json:"isEmailConfirmed"       column:"users.is_email_confirmed"`
+	ExpiryDate             *time.Time `json:"expiryDate"             column:"users.expiry_date"`
+	IsExpired              *bool      `json:"isExpired"              column:"CASE WHEN expiry_date IS NULL THEN NULL ELSE expiry_date < NOW() END" special:"generated"`
+	Position               *string    `json:"position"               column:"users.position"`
+	Division               string     `json:"division"               column:"users.division"`
+	RfidCode               *string    `json:"rfidCode"               column:"users.rfid_code"`
+	RfidId                 *int       `json:"rfidId"                 column:"users.rfid_id"`
+	ProfilePicture         *string    `json:"profilePicture"         column:"users.profile_picture"`
+	EmployeeId             *string    `json:"employeeId"             column:"users.employee_id"`
+	IsSubUser              bool       `json:"isSubUser"              column:"users.is_sub_user"`
+	ParentId               *int       `json:"parentId"               column:"users.parent_id"`
+	ParentName             *string    `json:"parentName"             column:"users.parent_name"`
+	ReadOnlyIsActive       bool       `json:"readOnlyIsActive"       column:"users.read_only_is_active"`
+	ReadOnlyIsAssigned     bool       `json:"readOnlyIsAssigned"     column:"users.read_only_is_assigned"`
+	IsReadOnly             bool       `json:"isReadOnly"             column:"users.is_read_only"                                                   special:"generated"`
+	TotalControlIsActive   bool       `json:"totalControlIsActive"   column:"users.total_control_is_active"`
+	TotalControlIsAssigned bool       `json:"totalControlIsAssigned" column:"users.total_control_is_assigned"`
+	IsTotalControl         bool       `json:"isTotalControl"         column:"users.is_total_control"                                               special:"generated"`
+	ModifiedById           int        `json:"modifiedById"           column:"users.modified_by_id"`
+	ModifiedByFirstName    string     `json:"modifiedByFirstName"    column:"users.modified_by_first_name"`
+	ModifiedByLastName     string     `json:"modifiedByLastName"     column:"users.modified_by_last_name"`
+	ModifiedByFullName     string     `json:"modifiedByFullName"     column:"users.modified_by_full_name"                                          special:"generated"`
+	HasModuleAccess        bool       `json:"hasModuleAccess"        column:"users.has_module_access"` // For showing/hiding user that doesn't have fixed asset access from global settings
+	IsGlobalActive         bool       `json:"isGlobalActive"         column:"users.is_global_active"`
+	IsDeleted              bool       `json:"isDeleted"              column:"users.is_deleted"`
+	DeleteFromDatabaseAt   *time.Time `json:"deleteFromDatabaseAt"   column:"users.deleted_at"`
+	CreatedAt              time.Time  `json:"createdAt"              column:"users.created_at"`
+	UpdatedAt              time.Time  `json:"updatedAt"              column:"users.updated_at"`
 }
 
-type User struct {
-	ID          primitive.ObjectID `json:"id,omitempty"         bson:"_id,omitempty"`
-	Key         int                `json:"key"                  bson:"key"`
-	FirstName   string             `json:"firstName"            bson:"firstName"`
-	LastName    string             `json:"lastName"             bson:"lastName"`
-	Division    string             `json:"division"             bson:"division"`
-	Position    *string            `json:"position"             bson:"position"`
-	EmployeeID  *string            `json:"employeeId"           bson:"employeeId"`
-	PhoneNumber string             `json:"phoneNumber"          bson:"phoneNumber"`
-	Email       string             `json:"email"                bson:"email"`
-	Password    *string            `json:"password"             bson:"password"`
-	RFID        *struct {
-		Code      string `json:"code" bson:"code"`
-		ShortCode string `json:"shortCode" bson:"shortCode"`
-	} `json:"rfid"                 bson:"rfid"`
-	DefaultGroup       *model.AttributeEmbedded `json:"defaultGroup"         bson:"defaultGroup"`
-	IsActive           bool                     `json:"isActive"             bson:"isActive"`
-	IsTemporary        bool                     `json:"isTemporary"          bson:"isTemporary"`
-	ExpiryDate         *time.Time               `json:"expiryDate"           bson:"expiryDate"`
-	IsAdmin            bool                     `json:"isAdmin"              bson:"isAdmin"`
-	PendingEmailChange string                   `json:"pendingEmailChange"   bson:"pendingEmailChange"`
-	ModifiedBy         *model.UserEmbedded      `json:"modifiedBy"           bson:"modifiedBy"`
-	Parent             *primitive.ObjectID      `json:"parent"               bson:"parent"`
-	ProfilePicture     *string                  `json:"profilePicture"  bson:"profilePicture"`
-	IsDeleted          bool                     `json:"isDeleted"            bson:"isDeleted"`
-	IsSubUser          bool                     `json:"isSubUser"            bson:"isSubUser"`
-	IsConfirmed        bool                     `json:"isConfirmed"          bson:"isConfirmed"`
-	IsDefault          bool                     `json:"isDefault"            bson:"isDefault"`
-	SubUserID          *string                  `json:"subUserId"            bson:"subUserId"`
-	ParentName         *string                  `json:"parentName"           bson:"parentName"`
-	TotalControl       *UserEmbeddedRole        `json:"totalControl"         bson:"totalControl"`
-	ReadOnly           *UserEmbeddedRole        `json:"readOnly"             bson:"readOnly"`
-	Access             []string                 `json:"access" bson:"access"`
-	FCMToken           string                   `json:"fcmToken"    bson:"fcmToken"`
-	CreatedAt          time.Time                `json:"createdAt"            bson:"createdAt"`
-	UpdatedAt          time.Time                `json:"updatedAt"            bson:"updatedAt"`
+type UserAttribute struct {
+	ID             string `json:"_id,omitempty" column:"id::text"`
+	FullName       string `json:"fullName"      column:"concat_ws(' ', first_name, last_name)"`
+	IsDefault      bool   `json:"isDefault"     column:"is_default"`
+	IsReadOnly     bool   `json:"isReadOnly"             column:"users.is_read_only"                                                   special:"generated"`
+	IsTotalControl bool   `json:"isTotalControl"         column:"users.is_total_control"                                               special:"generated"`
 }

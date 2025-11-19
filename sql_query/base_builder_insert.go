@@ -23,7 +23,7 @@ type SQLInsertInitBuilder interface {
 	//
 	//	Insert(user, "id", "name")
 	//	Insert([]User{u1, u2})
-	Insert(values interface{}, returningColumns ...string) SQLInsertChainBuilder
+	Insert(values any, returningColumns ...string) SQLInsertChainBuilder
 
 	// insertSingle handles the insert logic for a single struct.
 	// It auto-generates a Snowflake ID and builds the VALUES list
@@ -63,7 +63,7 @@ type SQLInsertChainBuilder interface {
 	// buildInsertQuery finalizes the insert query into SQL string + args.
 	// It prevents unsafe cases (like adding filters, joins, or pagination)
 	// and appends RETURNING and ON CONFLICT if defined.
-	Build() (string, []interface{}, error)
+	Build() (string, []any, error)
 }
 
 type InsertBuilder struct {
@@ -81,7 +81,7 @@ func (s *InsertBuilder) Conflict(constraint, do string) SQLInsertChainBuilder {
 }
 
 func (s *InsertBuilder) Insert(
-	values interface{},
+	values any,
 	returningColumns ...string,
 ) SQLInsertChainBuilder {
 	if len(returningColumns) > 0 {
@@ -137,7 +137,7 @@ func NewSQLInsertBuilder(tableName string, alias ...string) SQLInsertInitBuilder
 	}
 }
 
-func (s *SQLEloquentQuery) buildInsertQuery() (string, []interface{}, error) {
+func (s *SQLEloquentQuery) buildInsertQuery() (string, []any, error) {
 	if s.LastError != nil {
 		return "", nil, errors.New(s.LastError.Error())
 	}
@@ -235,7 +235,7 @@ func (s *InsertBuilder) cachedInsertSingle(v reflect.Value) SQLInsertChainBuilde
 		InsertCache[typeName] = cachedTemplate
 	}
 
-	args := make([]interface{}, 0, len(cachedTemplate.FieldIndexes)+1)
+	args := make([]any, 0, len(cachedTemplate.FieldIndexes)+1)
 	db.InitSnowflake()
 
 	for i, idx := range cachedTemplate.FieldIndexes {
@@ -264,7 +264,7 @@ func (s *InsertBuilder) cachedInsertSingle(v reflect.Value) SQLInsertChainBuilde
 }
 
 func (s *InsertBuilder) insertSingle(v reflect.Value) SQLInsertChainBuilder {
-	var args []interface{}
+	var args []any
 	var columns []string
 	var placeholders []string
 
@@ -390,7 +390,7 @@ func (s *InsertBuilder) cachedInsertMany(slice reflect.Value) SQLInsertChainBuil
 	numRows := slice.Len()
 	numCols := len(cachedTemplate.basePlaceholders)
 
-	args := make([]interface{}, numRows*numCols)
+	args := make([]any, numRows*numCols)
 	var allPlaceholders strings.Builder
 	allPlaceholders.Grow(numRows * (numCols * 4)) // pre-allocate
 
@@ -439,7 +439,7 @@ func (s *InsertBuilder) cachedInsertMany(slice reflect.Value) SQLInsertChainBuil
 }
 
 func (s *InsertBuilder) insertMany(slice reflect.Value) SQLInsertChainBuilder {
-	var args []interface{}
+	var args []any
 	var columns []string
 	var valuePlaceholders []string
 

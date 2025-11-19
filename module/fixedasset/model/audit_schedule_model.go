@@ -2,39 +2,24 @@ package model
 
 import (
 	"time"
-
-	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/common/model"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
-
-type auditScheduleStatus = string
-
-const (
-	AuditScheduleStatus_Active   auditScheduleStatus = "Active"
-	AuditScheduleStatus_Inactive auditScheduleStatus = "Inactive"
-)
-
-type AuditScheduleCustomValue struct {
-	Value     int    `json:"value" bson:"value"`
-	Frequency string `json:"frequency" bson:"frequency"`
-}
 
 type AuditSchedule struct {
-	ID             primitive.ObjectID        `json:"_id,omitempty" bson:"_id,omitempty"`
-	Status         auditScheduleStatus       `json:"status" bson:"status"`
-	TaskName       string                    `json:"taskName" bson:"taskName"`
-	Group          model.AttributeEmbedded   `json:"group" bson:"group"`
-	Category       []model.AttributeEmbedded `json:"category" bson:"category"`
-	TagType        TagType                   `json:"tagType" bson:"tagType"`
-	AuditType      string                    `json:"auditType" bson:"auditType"`
-	Frequency      string                    `json:"frequency" bson:"frequency"`
-	CustomValue    AuditScheduleCustomValue  `json:"customValue" bson:"customValue"`
-	Duration       int                       `json:"duration" bson:"duration"`
-	NextAudit      time.Time                 `json:"nextAudit" bson:"nextAudit"`
-	AuditableAsset int                       `json:"auditableAsset" bson:"auditableAsset"`
-	ActiveAsset    int                       `json:"activeAsset" bson:"activeAsset"`
-	ModifiedBy     model.UserEmbedded        `json:"modifiedBy" bson:"modifiedBy"`
-	CreatedBy      model.UserEmbedded        `json:"createdBy" bson:"createdBy"`
-	CreatedAt      time.Time                 `json:"createdAt" bson:"createdAt"`
-	UpdatedAt      time.Time                 `json:"updatedAt" bson:"updatedAt"`
+	ID                   int        `json:"_id"                  column:"audit_schedules.id"`
+	IsActive             bool       `json:"isActive"             column:"audit_schedules.is_active"`
+	Name                 string     `json:"name"                 column:"audit_schedules.name"`
+	GroupID              int        `json:"groupId"              column:"audit_schedules.group_id"`
+	TagType              TagType    `json:"tagType"              column:"audit_schedules.tag_type"`
+	AuditType            AuditType  `json:"auditType"            column:"audit_schedules.audit_type"`
+	FrequencyLabel       Frequency  `json:"frequencyLabel"       column:"audit_schedules.frequency_label"`
+	FrequencyCustomValue *int       `json:"frequencyCustomValue" column:"audit_schedules.frequency_custom_value"`
+	FrequencyCustomLabel *string    `json:"frequencyCustomLabel" column:"audit_schedules.frequency_custom_label"`
+	Duration             int        `json:"duration"             column:"audit_schedules.duration"`
+	CreatedById          int        `json:"createdById"         column:"audit_schedules.created_by_id"`
+	ModifiedById         int        `json:"modifiedById"         column:"audit_schedules.modified_by_id"`
+	IsDeleted            bool       `json:"isDeleted"            column:"audit_schedules.is_deleted"`
+	NextSchedule         *time.Time `json:"nextSchedule"         column:"audit_schedules.next_schedule"`
+	DeletedAt            *time.Time `json:"deletedAt"            column:"audit_schedules.deleted_at"`
+	CreatedAt            time.Time  `json:"createdAt"            column:"audit_schedules.created_at"`
+	UpdatedAt            time.Time  `json:"updatedAt"            column:"audit_schedules.updated_at"`
 }

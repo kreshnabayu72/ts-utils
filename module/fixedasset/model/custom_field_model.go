@@ -2,24 +2,19 @@ package model
 
 import (
 	"time"
-
-	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/common/model"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type CustomField struct {
-	ID                   primitive.ObjectID        `json:"_id,omitempty"        bson:"_id,omitempty"`
-	Name                 string                    `json:"name"                 bson:"name"`
-	Type                 string                    `json:"type"                 bson:"type"`
-	DataType             string                    `json:"dataType"             bson:"dataType"`
-	IsRequired           bool                      `json:"isRequired"           bson:"isRequired"`
-	IsShowOnTable        bool					   `json:"isShowOnTable"        bson:"isShowOnTable"`
-	OptionValue          []string                  `json:"optionValue"          bson:"optionValue"`
-	Value                any                       `json:"value"                bson:"value"`
-	Category             []model.AttributeEmbedded `json:"category"             bson:"category"`
-	Status               bool                      `json:"status"               bson:"status"`
-	IsDeleted            bool                      `json:"isDeleted"            bson:"isDeleted"`
-	DeleteFromDatabaseAt *time.Time                `json:"deleteFromDatabaseAt" bson:"deleteFromDatabaseAt"`
-	CreatedAt            time.Time                 `json:"createdAt"            bson:"createdAt"`
-	UpdatedAt            time.Time                 `json:"updatedAt"            bson:"updatedAt"`
+	ID            int                 `json:"_id"           column:"custom_fields.id"`
+	Name          string              `json:"name"          column:"custom_fields.name"`
+	Type          CustomFieldType     `json:"type"          column:"custom_fields.type"`
+	DataType      CustomFieldDataType `json:"dataType"      column:"custom_fields.data_type"`
+	IsRequired    bool                `json:"isRequired"    column:"custom_fields.is_required"`
+	OptionValue   []string            `json:"optionValue"   column:"custom_fields.option_value"`
+	IsActive      bool                `json:"isActive"      column:"custom_fields.is_active"`
+	IsShowOnTable bool                `json:"isShowOnTable" column:"custom_fields.is_show_on_table"`
+	IsDeleted     bool                `json:"isDeleted"     column:"custom_fields.is_deleted"`
+	DeletedAt     *time.Time          `json:"deletedAt"     column:"custom_fields.deleted_at"`
+	CreatedAt     time.Time           `json:"createdAt"     column:"custom_fields.created_at"`
+	UpdatedAt     time.Time           `json:"updatedAt"     column:"custom_fields.updated_at"`
 }
