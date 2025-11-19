@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/sql_query"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/stretchr/testify/mock"

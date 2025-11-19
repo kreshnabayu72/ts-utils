@@ -8,10 +8,10 @@ import (
 	"runtime/debug"
 	"time"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/db"
-	"gitea.qwertysystem.net/BETS/ts-utils/dto"
-	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
-	"gitea.qwertysystem.net/BETS/ts-utils/sql_query/common_builders"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/db"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/dto"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/sql_query"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/sql_query/common_builders"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"slices"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/functions"
-	supply_model "gitea.qwertysystem.net/BETS/ts-utils/module/supply/model"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/functions"
+	supply_model "gitea.qwertysystem.net/BETS/ts-utils/v2/module/supply/model"
 )
 
 // StockStatusPriority is a struct that contains the priority of a stock status for ordering purposes.

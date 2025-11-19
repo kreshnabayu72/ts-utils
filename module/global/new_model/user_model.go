@@ -3,7 +3,7 @@ package new_model
 import (
 	"time"
 
-	fixed_asset_model "gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
+	fixed_asset_model "gitea.qwertysystem.net/BETS/ts-utils/v2/module/fixedasset/new_model"
 )
 
 type User struct {

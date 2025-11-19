@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"time"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/db"
-	"gitea.qwertysystem.net/BETS/ts-utils/entity"
-	"gitea.qwertysystem.net/BETS/ts-utils/middleware"
-	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/model"
-	"gitea.qwertysystem.net/BETS/ts-utils/service"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/db"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/entity"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/middleware"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/fixedasset/model"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/service"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -16,8 +16,8 @@ import (
 	"context"
 	"errors"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/pipeline"
-	utilpipeline "gitea.qwertysystem.net/BETS/ts-utils/pipeline"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/pipeline"
+	utilpipeline "gitea.qwertysystem.net/BETS/ts-utils/v2/pipeline"
 
 	"go.mongodb.org/mongo-driver/mongo/options"
 )

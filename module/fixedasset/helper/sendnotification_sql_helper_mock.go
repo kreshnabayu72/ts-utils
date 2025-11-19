@@ -3,10 +3,10 @@ package helper
 import (
 	"context"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/entity"
-	util_fixedasset_new_model "gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
-	"gitea.qwertysystem.net/BETS/ts-utils/provider"
-	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/entity"
+	util_fixedasset_new_model "gitea.qwertysystem.net/BETS/ts-utils/v2/module/fixedasset/new_model"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/provider"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/sql_query"
 	"github.com/stretchr/testify/mock"
 )
 

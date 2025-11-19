@@ -3,10 +3,10 @@ package helper
 import (
 	"context"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
-	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/sql_builder"
-	"gitea.qwertysystem.net/BETS/ts-utils/service"
-	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/fixedasset/new_model"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/fixedasset/sql_builder"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/service"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/sql_query"
 )
 
 type GetAsset struct {

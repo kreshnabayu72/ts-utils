@@ -15,7 +15,7 @@ import (
 	"strings"
 	"time"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/middleware"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/middleware"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/valyala/fasthttp"

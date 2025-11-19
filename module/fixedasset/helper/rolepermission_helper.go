@@ -1,9 +1,9 @@
 package helper
 
 import (
-	"gitea.qwertysystem.net/BETS/ts-utils/entity"
-	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/model"
-	"gitea.qwertysystem.net/BETS/ts-utils/service"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/entity"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/fixedasset/model"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/service"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )

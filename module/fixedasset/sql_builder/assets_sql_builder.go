@@ -1,7 +1,7 @@
 package sql_builder
 
 import (
-	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/sql_query"
 )
 
 type Asset struct {

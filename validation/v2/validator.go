@@ -1,9 +1,9 @@
 package validation
 
 import (
-	"gitea.qwertysystem.net/BETS/ts-utils/entity"
-	"gitea.qwertysystem.net/BETS/ts-utils/parser"
-	"gitea.qwertysystem.net/BETS/ts-utils/validation/v2/custom_validator"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/entity"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/parser"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/validation/v2/custom_validator"
 	"github.com/gofiber/fiber/v2"
 	"github.com/kittipat1413/go-common/framework/validator"
 )

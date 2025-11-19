@@ -7,9 +7,9 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/db"
-	supply_model "gitea.qwertysystem.net/BETS/ts-utils/module/supply/model"
-	"gitea.qwertysystem.net/BETS/ts-utils/pipeline"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/db"
+	supply_model "gitea.qwertysystem.net/BETS/ts-utils/v2/module/supply/model"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/pipeline"
 )
 
 type TransactionRoleRestriction struct {

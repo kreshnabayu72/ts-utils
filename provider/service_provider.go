@@ -3,8 +3,8 @@ package provider
 import (
 	"github.com/stretchr/testify/mock"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/db"
-	"gitea.qwertysystem.net/BETS/ts-utils/service"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/db"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/service"
 )
 
 type ServiceProvider interface {

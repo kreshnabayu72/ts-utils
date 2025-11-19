@@ -5,7 +5,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
-	common "gitea.qwertysystem.net/BETS/ts-utils/module/common/model"
+	common "gitea.qwertysystem.net/BETS/ts-utils/v2/module/common/model"
 )
 
 type Qr struct {

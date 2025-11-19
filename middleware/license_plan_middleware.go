@@ -3,11 +3,11 @@ package middleware
 import (
 	"slices"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/db"
-	common_model "gitea.qwertysystem.net/BETS/ts-utils/module/common/model"
-	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/model"
-	"gitea.qwertysystem.net/BETS/ts-utils/response"
-	"gitea.qwertysystem.net/BETS/ts-utils/service"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/db"
+	common_model "gitea.qwertysystem.net/BETS/ts-utils/v2/module/common/model"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/fixedasset/model"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/response"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/service"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"

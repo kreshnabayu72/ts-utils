@@ -3,7 +3,7 @@ package model
 import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/module/common/model"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/common/model"
 )
 
 type AttributeEmbedded struct {

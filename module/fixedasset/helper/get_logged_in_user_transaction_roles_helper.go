@@ -5,9 +5,9 @@ import (
 	"errors"
 	"time"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
-	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/sql_builder"
-	"gitea.qwertysystem.net/BETS/ts-utils/service"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/fixedasset/new_model"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/fixedasset/sql_builder"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/service"
 )
 
 // Cant use new_model.UserTransactionRole since the builder has join & need table alias (utr.id, etc)

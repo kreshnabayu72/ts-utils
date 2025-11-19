@@ -9,9 +9,9 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/db"
-	fixedasset_model "gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/model"
-	"gitea.qwertysystem.net/BETS/ts-utils/pipeline"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/db"
+	fixedasset_model "gitea.qwertysystem.net/BETS/ts-utils/v2/module/fixedasset/model"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/pipeline"
 )
 
 type TransactionRoleRestriction struct {

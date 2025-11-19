@@ -3,7 +3,7 @@ package model
 import (
 	"time"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/module/common/model"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/common/model"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 

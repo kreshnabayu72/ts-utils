@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/middleware"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/middleware"
 	"github.com/stretchr/testify/assert"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 

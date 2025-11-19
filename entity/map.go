@@ -3,7 +3,7 @@ package entity
 import (
 	"reflect"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/functions"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/functions"
 )
 
 // Container represents a high-level pseudo map-like function.

@@ -16,11 +16,11 @@ import (
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/messaging"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/db"
-	"gitea.qwertysystem.net/BETS/ts-utils/entity"
-	util_fixedasset_new_model "gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
-	"gitea.qwertysystem.net/BETS/ts-utils/provider"
-	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/db"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/entity"
+	util_fixedasset_new_model "gitea.qwertysystem.net/BETS/ts-utils/v2/module/fixedasset/new_model"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/provider"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/sql_query"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"

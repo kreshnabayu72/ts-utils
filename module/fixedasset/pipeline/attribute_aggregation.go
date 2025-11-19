@@ -5,9 +5,9 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/db"
-	fixed_asset_model "gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/model"
-	"gitea.qwertysystem.net/BETS/ts-utils/pipeline"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/db"
+	fixed_asset_model "gitea.qwertysystem.net/BETS/ts-utils/v2/module/fixedasset/model"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/pipeline"
 )
 
 // Lookup and unwind user attribute + adding fullName, so user attributes are up to date to db

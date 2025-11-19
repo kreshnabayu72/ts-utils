@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
-	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/sql_builder"
-	"gitea.qwertysystem.net/BETS/ts-utils/service"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/fixedasset/new_model"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/fixedasset/sql_builder"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/service"
 )
 
 func GetLoggedInUserHelper(service service.PostgreSqlService, ctx context.Context, loggedInUserId string) (*new_model.UserAttribute, error) {

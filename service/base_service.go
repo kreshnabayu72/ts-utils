@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/db"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/db"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"

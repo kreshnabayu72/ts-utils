@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"gitea.qwertysystem.net/BETS/ts-utils/log"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/log"
 	"github.com/gofiber/fiber/v2"
 )
 

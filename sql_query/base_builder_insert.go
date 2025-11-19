@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/db"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/db"
 )
 
 // To ensure SQLInsertBuilder has its own initial methods

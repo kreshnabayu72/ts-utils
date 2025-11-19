@@ -3,7 +3,7 @@ package common_builders
 import (
 	"log"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/sql_query"
 )
 
 func UpdateBuilder(tableName string, query map[string]sql_query.SQLCondition, body interface{}, returningColumn ...string) (string, []interface{}) {

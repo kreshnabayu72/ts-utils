@@ -5,11 +5,11 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/db"
-	"gitea.qwertysystem.net/BETS/ts-utils/dto"
-	"gitea.qwertysystem.net/BETS/ts-utils/response"
-	"gitea.qwertysystem.net/BETS/ts-utils/service"
-	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/db"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/dto"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/response"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/service"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/sql_query"
 )
 
 // GetLicensePlanSQL is a Fiber handler that retrieves the license plan information

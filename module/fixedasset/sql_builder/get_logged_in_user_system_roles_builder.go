@@ -1,9 +1,9 @@
 package sql_builder
 
 import (
-	util_db "gitea.qwertysystem.net/BETS/ts-utils/db"
-	util_fixedasset_new_model "gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
-	util_sql_query "gitea.qwertysystem.net/BETS/ts-utils/sql_query"
+	util_db "gitea.qwertysystem.net/BETS/ts-utils/v2/db"
+	util_fixedasset_new_model "gitea.qwertysystem.net/BETS/ts-utils/v2/module/fixedasset/new_model"
+	util_sql_query "gitea.qwertysystem.net/BETS/ts-utils/v2/sql_query"
 )
 
 func GetLoggedInUserSystemRolesBuilder(userId string, groupId ...int) (string, []interface{}, error) {

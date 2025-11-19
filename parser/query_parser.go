@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/functions"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/functions"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 

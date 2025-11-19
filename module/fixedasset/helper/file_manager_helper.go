@@ -5,13 +5,13 @@ import (
 	"log"
 	"time"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/db"
-	utildb "gitea.qwertysystem.net/BETS/ts-utils/db"
-	"gitea.qwertysystem.net/BETS/ts-utils/entity"
-	admin_model "gitea.qwertysystem.net/BETS/ts-utils/module/admin/new_model"
-	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
-	utilprovider "gitea.qwertysystem.net/BETS/ts-utils/provider"
-	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/db"
+	utildb "gitea.qwertysystem.net/BETS/ts-utils/v2/db"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/entity"
+	admin_model "gitea.qwertysystem.net/BETS/ts-utils/v2/module/admin/new_model"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/fixedasset/new_model"
+	utilprovider "gitea.qwertysystem.net/BETS/ts-utils/v2/provider"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/sql_query"
 )
 
 type FileManagerHelperSQL interface {

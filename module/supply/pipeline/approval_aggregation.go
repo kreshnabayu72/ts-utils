@@ -4,8 +4,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
-	supply_model "gitea.qwertysystem.net/BETS/ts-utils/module/supply/model"
-	"gitea.qwertysystem.net/BETS/ts-utils/pipeline"
+	supply_model "gitea.qwertysystem.net/BETS/ts-utils/v2/module/supply/model"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/pipeline"
 )
 
 // ApprovalAggregation adds the necessary aggregation to the existing pipeline builder

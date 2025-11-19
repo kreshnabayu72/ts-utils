@@ -3,8 +3,8 @@ package helper
 import (
 	"context"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/entity"
-	"gitea.qwertysystem.net/BETS/ts-utils/service"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/entity"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/service"
 	"github.com/stretchr/testify/mock"
 )
 

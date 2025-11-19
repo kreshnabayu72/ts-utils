@@ -3,7 +3,7 @@ package new_model
 import (
 	"time"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/module/common/new_model"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/common/new_model"
 )
 
 type SampHistory struct {

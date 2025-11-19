@@ -4,9 +4,9 @@ import (
 	"context"
 	"log"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/entity"
-	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/sql_builder"
-	"gitea.qwertysystem.net/BETS/ts-utils/service"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/entity"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/fixedasset/sql_builder"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/service"
 )
 
 type AssetsAliasCodeHelper interface {

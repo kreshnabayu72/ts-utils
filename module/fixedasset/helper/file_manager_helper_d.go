@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/db"
-	utildb "gitea.qwertysystem.net/BETS/ts-utils/db"
-	"gitea.qwertysystem.net/BETS/ts-utils/entity"
-	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/model"
-	utilprovider "gitea.qwertysystem.net/BETS/ts-utils/provider"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/db"
+	utildb "gitea.qwertysystem.net/BETS/ts-utils/v2/db"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/entity"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/fixedasset/model"
+	utilprovider "gitea.qwertysystem.net/BETS/ts-utils/v2/provider"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )

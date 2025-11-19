@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/service"
-	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/service"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/sql_query"
 )
 
 type PrelistModuleEnum string

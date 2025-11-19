@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
-	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/sql_builder"
-	"gitea.qwertysystem.net/BETS/ts-utils/service"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/fixedasset/new_model"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/fixedasset/sql_builder"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/service"
 )
 
 func GetLoggedInUserSystemRolesHelper(service service.PostgreSqlService, ctx context.Context, loggedInUserId int, roleFilter ...sql_builder.SystemRoleFilter) (*[]new_model.UserSystemRole, error) {

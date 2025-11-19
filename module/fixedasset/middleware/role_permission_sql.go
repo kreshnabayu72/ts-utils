@@ -3,11 +3,11 @@ package middleware
 import (
 	"log"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/middleware"
-	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/helper"
-	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
-	"gitea.qwertysystem.net/BETS/ts-utils/response"
-	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/middleware"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/fixedasset/helper"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/fixedasset/new_model"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/response"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/sql_query"
 	"github.com/gofiber/fiber/v2"
 )
 

@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/response"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/response"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
 )

@@ -5,7 +5,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/module/common/model"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/common/model"
 )
 
 // PlacedItem represents the possible item sku that stock can be placed in a group, along with its capacity

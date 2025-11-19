@@ -5,8 +5,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/module/supply/functions"
-	supply_model "gitea.qwertysystem.net/BETS/ts-utils/module/supply/model"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/supply/functions"
+	supply_model "gitea.qwertysystem.net/BETS/ts-utils/v2/module/supply/model"
 )
 
 func TestAddStockStatus(t *testing.T) {

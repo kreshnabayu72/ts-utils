@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/entity"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/entity"
 )
 
 func TestMakeMap(t *testing.T) {

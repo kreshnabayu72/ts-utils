@@ -1,10 +1,10 @@
 package middleware
 
 import (
-	"gitea.qwertysystem.net/BETS/ts-utils/middleware"
-	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/helper"
-	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/model"
-	"gitea.qwertysystem.net/BETS/ts-utils/response"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/middleware"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/fixedasset/helper"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/fixedasset/model"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/response"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 )

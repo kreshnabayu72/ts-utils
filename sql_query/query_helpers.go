@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"strings"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/dto"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/dto"
 	"github.com/jackc/pgx/v5"
 )
 

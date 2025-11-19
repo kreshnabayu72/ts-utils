@@ -6,10 +6,10 @@ import (
 	"log"
 	"strconv"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/db"
-	"gitea.qwertysystem.net/BETS/ts-utils/module/fixedasset/new_model"
-	"gitea.qwertysystem.net/BETS/ts-utils/service"
-	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/db"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/fixedasset/new_model"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/service"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/sql_query"
 )
 
 // ChangeFixedAssetQuota adjusts the quota of a group and, if necessary, bubbles the

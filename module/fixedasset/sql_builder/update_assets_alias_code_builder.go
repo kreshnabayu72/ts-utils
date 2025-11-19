@@ -3,9 +3,9 @@ package sql_builder
 import (
 	"fmt"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/db"
-	"gitea.qwertysystem.net/BETS/ts-utils/sql_query"
-	util_sql_query "gitea.qwertysystem.net/BETS/ts-utils/sql_query"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/db"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/sql_query"
+	util_sql_query "gitea.qwertysystem.net/BETS/ts-utils/v2/sql_query"
 )
 
 func UpdateAssetAliasCodeBuilder() (string, []interface{}, error) {
