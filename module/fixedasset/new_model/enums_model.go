@@ -562,11 +562,15 @@ var ModuleAccessEnum = map[string]ModuleAccess{
 type LicenseModuleType string
 
 const (
-	LicenseModuleTypeFixedAsset         = LicenseModuleType("Fixed Asset")
+	LicenseModuleTypeFixedAsset = LicenseModuleType("Fixed Asset")
+
 	LicenseModuleTypeAssetControl       = LicenseModuleType("+Asset Control")
+	LicenseModuleTypeAudit              = LicenseModuleType("+Audit")
 	LicenseModuleTypeMaintenanceRoutine = LicenseModuleType("+Maintenance Routine")
 	LicenseModuleTypeRepairTicketing    = LicenseModuleType("+Repair Ticketing")
 	LicenseModuleTypeTracking           = LicenseModuleType("+Tracking")
+
+	LicenseModuleTypeConcurrentUser = LicenseModuleType("Concurrent User")
 )
 
 type LicensePurchaseType string

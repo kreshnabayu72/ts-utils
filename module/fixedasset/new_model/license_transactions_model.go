@@ -7,7 +7,7 @@ import (
 type LicenseTransaction struct {
 	ID            int                 `json:"_id"           column:"license_transactions.id"`
 	Type          LicenseModuleType   `json:"type"          column:"license_transactions.type"`
-	LicenseType   LicensePurchaseType `json:"licenseType"   column:"license_transactions.license_type"`
+	LicenseType   LicenseUseType      `json:"licenseType"   column:"license_transactions.license_type"`
 	Amount        int                 `json:"amount"        column:"license_transactions.amount"`
 	DurationMonth int                 `json:"durationMonth" column:"license_transactions.duration_month"`
 	DurationText  string              `json:"durationText"  column:"license_transactions.duration_text"`
