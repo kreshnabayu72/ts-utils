@@ -1,8 +1,8 @@
 package parser
 
 import (
-	"encoding/json"
 	"fmt"
+	"github.com/goccy/go-json"
 	"reflect"
 	"strconv"
 	"strings"

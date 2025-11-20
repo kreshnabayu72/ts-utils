@@ -1,6 +1,6 @@
 package parser
 
-import "encoding/json"
+import "github.com/goccy/go-json"
 
 // SerializeJSON serializes the provided json data into struct
 func SerializeJSON[T any](data any, out *T) error {

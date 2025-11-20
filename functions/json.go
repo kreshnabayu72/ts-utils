@@ -1,8 +1,8 @@
 package functions
 
 import (
-	"encoding/json"
 	"fmt"
+	"github.com/goccy/go-json"
 )
 
 // JSONStringify stringifies any representation of a json.
