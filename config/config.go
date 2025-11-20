@@ -11,6 +11,8 @@ import (
 //
 // All variables will be loaded as string, it is up to you to parse it to any type you need.
 type ConfigOptions struct {
+	// SERVICE_NAME is the service's name. Defaults to "service"
+	SERVICE_NAME string
 	// ENV possible values: "production", "development", "local". Defaults to "local"
 	ENV string
 	// PORT is the service's exposed port. Defaults to "8080"
@@ -45,6 +47,10 @@ func LoadConfig(filenames ...string) ConfigOptions {
 	err := godotenv.Load(filenames...)
 	if err != nil {
 		log.Fatal("Error while loading .env file\n", err)
+	}
+
+	if config.SERVICE_NAME = os.Getenv("SERVICE_NAME"); config.SERVICE_NAME == "" {
+		config.SERVICE_NAME = "service"
 	}
 
 	if config.ENV = os.Getenv("ENV"); config.ENV == "" {
