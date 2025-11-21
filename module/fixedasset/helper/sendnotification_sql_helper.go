@@ -2,6 +2,7 @@ package helper
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -392,9 +393,30 @@ func (r *SendNotificationSQLHelperImpl) SendMobileNotificationSQL(
 	data util_fixedasset_new_model.Notification,
 	tokens []string,
 ) *entity.HttpError {
-
 	// ─────── credentials ───────
 	cred := os.Getenv("MOBILE_CREDENTIAL_JSON")
+
+	//parse credential
+	var result map[string]interface{}
+
+	// 2. Unmarshal into the map
+	if err := json.Unmarshal([]byte(cred), &result); err != nil {
+		fmt.Println("Error parsing JSON:", err)
+		return nil
+	}
+
+	projectId, ok := result["project_id"]
+	if !ok {
+		fmt.Println("project_id not found in JSON")
+		return nil
+	}
+
+	projectIdStr, ok := projectId.(string)
+	if !ok {
+		fmt.Println("project_id is not a string")
+		return nil
+	}
+
 	opt := option.WithCredentialsJSON([]byte(cred))
 
 	// ─────── init firebase app ───────
@@ -403,7 +425,7 @@ func (r *SendNotificationSQLHelperImpl) SendMobileNotificationSQL(
 	defer cancel()
 
 	config := &firebase.Config{
-		ProjectID: "tag-samurai", // <-- explicitly set your Firebase project ID
+		ProjectID: projectIdStr,
 	}
 
 	app, err := firebase.NewApp(ctx, config, opt)
