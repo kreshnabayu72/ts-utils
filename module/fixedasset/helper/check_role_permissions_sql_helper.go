@@ -152,7 +152,8 @@ func CheckGroupPermissionSQL(
 
 	query, args, _ := builder.
 		Select(tableName+".id", "usr.id as \"userSystemRoleId\"").
-		LeftJoin(fmt.Sprintf("%s as usr", db.UserSystemRoleTableName), fmt.Sprintf("%s = usr.group_id", groupIdField), filter).
+		Join(fmt.Sprintf("%s as g", db.GroupTableName), fmt.Sprintf("%s = g.id", groupIdField)).
+		Join(fmt.Sprintf("%s as usr", db.UserSystemRoleTableName), "g.ancestor_id = usr.group_id", filter).
 		Where(dataFilter).
 		Build()
 
