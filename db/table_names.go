@@ -197,4 +197,10 @@ const (
 	AmpDemandAndPerformanceRequirementsTableName = "amp_demand_and_performance_requirements"
 	AmpLifecycleManagementPlansTableName         = "amp_lifecycle_management_plans"
 	AmpResourceBudgetPlansTableName              = "amp_resource_budget_plans"
+
+	AuditFindingAndCorrectiveActionTableName = "audit_finding_and_corrective_actions"
+	ContinuousImprovementLogTableName        = "continuous_improvement_logs"
+	LessonLearnedLogTableName                = "lesson_learned_logs"
+	RiskRegisterLogTableName                 = "risk_register_logs"
+	OpportunityRegisterLogTableName          = "opportunity_register_logs"
 )
