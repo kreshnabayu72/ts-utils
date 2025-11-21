@@ -56,6 +56,13 @@ type MultiFilterCondition struct {
 	Or  []map[string]SQLCondition
 }
 
+// Used in SelectMultiCaseWhen
+type CaseWhenPart struct {
+	When string        // The condition (e.g., "status = ?")
+	Then string        // The result value (e.g., "'Active'")
+	Args []interface{} // Arguments for the 'When' condition (e.g., 1, "text")
+}
+
 // Base struct that contains params used by methods
 type SQLEloquentQuery struct {
 	NestedAggregation []string
