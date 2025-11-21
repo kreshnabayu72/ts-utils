@@ -44,9 +44,13 @@ type ConfigOptions struct {
 func LoadConfig(filenames ...string) ConfigOptions {
 	config := ConfigOptions{}
 
+	// In containerized environments (Docker, Kubernetes), this function may return
+	// an error (e.g., 'no such file or directory') because the .env file is not
+	// included in the final image or not mounted at the expected path.
 	err := godotenv.Load(filenames...)
 	if err != nil {
-		log.Fatal("Error while loading .env file\n", err)
+		// Docker compose will inject env to os directly
+		log.Print("Error while loading .env file\n", err)
 	}
 
 	if config.SERVICE_NAME = os.Getenv("SERVICE_NAME"); config.SERVICE_NAME == "" {
