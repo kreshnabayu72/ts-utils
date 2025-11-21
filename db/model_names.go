@@ -123,8 +123,9 @@ const (
 	SupplierReturnPreListModelName            = "supplier_return_prelists"
 
 	//Planning & service
-	ContinuousImprovementLogModelName = "continuous_improvement_logs"
-	LessonLearnedLogModelName         = "lesson_learned_logs"
-	RiskRegisterLogModelName          = "risk_register_logs"
-	OpportunityRegisterLogModelName   = "opportunity_register_logs"
+	AuditFindingAndCorrectiveActionLogModelName = "audit_finding_and_corrective_action_logs"
+	ContinuousImprovementLogModelName           = "continuous_improvement_logs"
+	LessonLearnedLogModelName                   = "lesson_learned_logs"
+	RiskRegisterLogModelName                    = "risk_register_logs"
+	OpportunityRegisterLogModelName             = "opportunity_register_logs"
 )
