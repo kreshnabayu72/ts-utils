@@ -33,6 +33,10 @@ type ConfigOptions struct {
 	MAILER_HOST     string
 	MAILER_PORT     string
 
+	// Kafka configurations.
+	// KAFKA_BROKERS is the list of Kafka brokers. Defaults to "localhost:9092"
+	KAFKA_BROKERS string
+
 	// Temporal configurations.
 	// TEMPORAL_CLIENT_HOST is the temporal server host. Defaults to "localhost"
 	TEMPORAL_CLIENT_HOST string
@@ -78,6 +82,10 @@ func LoadConfig(filenames ...string) ConfigOptions {
 	config.MAILER_PASSWORD = os.Getenv("MAILER_PASSWORD")
 	config.MAILER_HOST = os.Getenv("MAILER_HOST")
 	config.MAILER_PORT = os.Getenv("MAILER_PORT")
+
+	if config.KAFKA_BROKERS = os.Getenv("KAFKA_BROKERS"); config.KAFKA_BROKERS == "" {
+		config.KAFKA_BROKERS = "localhost:9092"
+	}
 
 	if config.TEMPORAL_CLIENT_HOST = os.Getenv("TEMPORAL_CLIENT_HOST"); config.TEMPORAL_CLIENT_HOST == "" {
 		config.TEMPORAL_CLIENT_HOST = "localhost"
