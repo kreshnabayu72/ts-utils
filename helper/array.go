@@ -1,4 +1,4 @@
-package functions
+package helper
 
 // Filter is a generic utility function that processes a slice of any type (T)
 // and returns a new slice containing only the elements that satisfy the provided

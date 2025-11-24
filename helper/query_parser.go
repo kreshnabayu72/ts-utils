@@ -1,14 +1,14 @@
-package parser
+package helper
 
 import (
 	"fmt"
-	"github.com/goccy/go-json"
 	"reflect"
 	"strconv"
 	"strings"
 	"time"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/v2/functions"
+	"github.com/goccy/go-json"
+
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -131,7 +131,7 @@ func ParseQuery[T any](query map[string]string) (*T, error) {
 		transformValue := transformQueryValue(query[key], transform)
 		isZeroValue := transformValue == nil
 		if transformValue != nil {
-			isZeroValue = functions.IsZeroValue(transformValue)
+			isZeroValue = IsZeroValue(transformValue)
 		}
 		if !strings.Contains(rawKey, "omitempty") || !isZeroValue {
 			parsedQuery[key] = transformValue

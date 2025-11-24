@@ -3,7 +3,7 @@ package entity
 import (
 	"reflect"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/v2/functions"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/helper"
 )
 
 // Container represents a high-level pseudo map-like function.
@@ -39,7 +39,7 @@ func MakeMap[K any, V any]() Map[K, V] {
 
 // Exist checks whether a key exists in a map.
 func (m *Map[K, V]) Exist(key K) bool {
-	exists := functions.Any(m._m, func(m M[K, V], _ int) bool {
+	exists := helper.Any(m._m, func(m M[K, V], _ int) bool {
 		return reflect.DeepEqual(m.Key, key)
 	})
 
@@ -52,7 +52,7 @@ func (m *Map[K, V]) Get(key K, fallback V) V {
 		return fallback
 	}
 
-	v := functions.Find(m._m, func(m M[K, V], _ int) bool {
+	v := helper.Find(m._m, func(m M[K, V], _ int) bool {
 		return reflect.DeepEqual(m.Key, key)
 	})
 
@@ -68,7 +68,7 @@ func (m *Map[K, V]) Set(key K, value V) {
 
 // Delete deletes the key-value pair from the map, doesn't return anything whether the key exists or not.
 func (m *Map[K, V]) Delete(key K) {
-	functions.ForEach(m._m, func(_m M[K, V], index int) {
+	helper.ForEach(m._m, func(_m M[K, V], index int) {
 		if reflect.DeepEqual(_m.Key, key) {
 			m._m = remove(m._m, index)
 		}

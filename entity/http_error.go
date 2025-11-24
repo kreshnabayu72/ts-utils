@@ -1,7 +1,7 @@
 package entity
 
 import (
-	"gitea.qwertysystem.net/BETS/ts-utils/v2/functions"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/helper"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -17,7 +17,7 @@ func (e *HttpError) Error() string {
 }
 
 func (e *HttpError) SendResponse(ctx *fiber.Ctx) error {
-	return functions.SendResponse(ctx, e.Code, nil, e.Message, e.Err)
+	return helper.SendResponse(ctx, e.Code, nil, e.Message, e.Err)
 }
 
 func InternalServerError(message string) *HttpError {

@@ -1,3 +1,6 @@
+// http is scheduled to be deprecated in v2.
+//
+// This won't be needed with the arrival of KrakenD request timeout.
 package http
 
 import (
@@ -5,7 +8,7 @@ import (
 	"time"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/v2/entity"
-	"gitea.qwertysystem.net/BETS/ts-utils/v2/functions"
+	"gitea.qwertysystem.net/BETS/ts-utils/v2/helper"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -67,10 +70,10 @@ func RunWithTimeout[T any](
 
 	select {
 	case <-ctxWithTimeout.Done():
-		return functions.SendResponse(ctx, fiber.StatusRequestTimeout, nil, "Timeout", nil)
+		return helper.SendResponse(ctx, fiber.StatusRequestTimeout, nil, "Timeout", nil)
 	case err := <-errorChan:
-		return functions.SendResponse(ctx, err.Code, err.Data, err.Message, err)
+		return helper.SendResponse(ctx, err.Code, err.Data, err.Message, err)
 	case res := <-resultChan:
-		return functions.SendResponse(ctx, successCode, res, successMessage, nil)
+		return helper.SendResponse(ctx, successCode, res, successMessage, nil)
 	}
 }

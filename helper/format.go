@@ -1,4 +1,4 @@
-package functions
+package helper
 
 import (
 	"gitea.qwertysystem.net/BETS/ts-utils/v2/dto"

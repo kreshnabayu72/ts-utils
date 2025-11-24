@@ -1,4 +1,4 @@
-package functions
+package helper
 
 type FrequencyCustomValue struct {
 	Value     int    `json:"value"`

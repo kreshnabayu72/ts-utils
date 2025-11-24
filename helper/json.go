@@ -1,7 +1,8 @@
-package functions
+package helper
 
 import (
 	"fmt"
+
 	"github.com/goccy/go-json"
 )
 

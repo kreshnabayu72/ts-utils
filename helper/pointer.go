@@ -1,4 +1,4 @@
-package functions
+package helper
 
 // Empty returns an empty value.
 func Empty[T any]() T {

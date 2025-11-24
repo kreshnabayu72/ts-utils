@@ -1,4 +1,4 @@
-package parser
+package helper
 
 import "github.com/goccy/go-json"
 
