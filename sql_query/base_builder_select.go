@@ -75,7 +75,22 @@ type SQLSelectChainBuilder interface {
 	// Generates:
 	//
 	//	CASE WHEN role = 'admin' THEN 'Yes' ELSE 'No' END AS is_admin
-	SelectCaseWhen(thenExpr, elseExpr, alias string, whenClause string, whenArgs ...any) SQLSelectChainBuilder
+	SelectCaseWhen(thenExpr, elseExpr, alias string, whenClause string, whenArgs ...interface{}) SQLSelectChainBuilder
+	// SelectMultiCaseWhen adds a complex CASE statement with multiple WHEN conditions as a column.
+	// It iterates through the provided parts to build the logic and appends the elseExpr as the fallback.
+	//
+	// Example:
+	//
+	// 	parts := []CaseWhenPart{
+	// 		{When: "quantity > ?", Then: "'High'", Args: []interface{}{100}},
+	// 		{When: "quantity > ?", Then: "'Medium'", Args: []interface{}{50}},
+	// 	}
+	// 	builder.SelectMultiCaseWhen(parts, "'Low'", "stock_level")
+	//
+	// Generates:
+	//
+	// 	CASE WHEN quantity > ? THEN 'High' WHEN quantity > ? THEN 'Medium' ELSE 'Low' END AS "stock_level"
+	SelectMultiCaseWhen(parts []CaseWhenPart, elseExpr, alias string) SQLSelectChainBuilder
 	// SelectBoolAnd adds a bool_or aggregate column with an alias.
 	//
 	// Example:
@@ -581,6 +596,51 @@ func (s *SelectBuilder) SelectCaseWhen(thenExpr, elseExpr, alias string, whenCla
 	}
 
 	s.Args = append(s.Args, whenArgs...)
+	return s
+}
+
+func (s *SelectBuilder) SelectMultiCaseWhen(parts []CaseWhenPart, elseExpr, alias string) SQLSelectChainBuilder {
+	var caseBuilder strings.Builder
+	var allArgs []interface{}
+
+	// Start the CASE statement
+	caseBuilder.WriteString("CASE")
+
+	// Loop through all provided parts to build the WHEN...THEN clauses
+	for _, part := range parts {
+		// Append the clause string
+		// Result looks like: CASE WHEN status = 1 THEN 'Active' WHEN status = 2 THEN 'Pending'
+		caseBuilder.WriteString(fmt.Sprintf(" WHEN %s THEN %s", part.When, part.Then))
+
+		// Collect arguments in order
+		if len(part.Args) > 0 {
+			allArgs = append(allArgs, part.Args...)
+		}
+	}
+
+	// Close with ELSE and END AS
+	caseBuilder.WriteString(fmt.Sprintf(" ELSE %s END AS \"%s\"", elseExpr, alias))
+
+	finalColumnStr := caseBuilder.String()
+
+	// --- Existing Logic to Replace or Append Column ---
+	replaced := false
+	for i, existing := range s.Columns {
+		extracted := extractAlias(existing)
+		if extracted != "" && extracted == strings.ToLower(alias) {
+			s.Columns[i] = finalColumnStr // Overwrite
+			replaced = true
+			break
+		}
+	}
+
+	if !replaced {
+		s.Columns = append(s.Columns, finalColumnStr)
+	}
+
+	// Append all collected arguments to the main builder
+	s.Args = append(s.Args, allArgs...)
+
 	return s
 }
 
