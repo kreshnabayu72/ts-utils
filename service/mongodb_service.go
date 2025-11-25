@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"time"
 
 	"gitea.qwertysystem.net/BETS/ts-utils/v2/db"
 	"go.mongodb.org/mongo-driver/bson"
@@ -159,6 +160,20 @@ func (s *MongoDBService) InsertOne(ctx context.Context, data any,
 		return "", err
 	}
 
+	// Injecting updatedAt and createdAt on the insert function call to always gives timestamp to the field.
+	updatedAt := bson.M{
+		"$set": bson.M{
+			"updatedAt": time.Now(),
+			"createdAt": time.Now(),
+		},
+	}
+	_, err = s.collection.UpdateOne(ctx, bson.M{
+		"_id": result.InsertedID,
+	}, updatedAt)
+	if err != nil {
+		return nil, err
+	}
+
 	return result.InsertedID, nil
 }
 
@@ -166,6 +181,22 @@ func (s *MongoDBService) InsertMany(ctx context.Context, data []any,
 	opts ...*options.InsertManyOptions,
 ) ([]any, error) {
 	result, err := s.collection.InsertMany(ctx, data, opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	// Injecting updatedAt and createdAt on the insert function call to always gives timestamp to the field.
+	updatedAt := bson.M{
+		"$set": bson.M{
+			"updatedAt": time.Now(),
+			"createdAt": time.Now(),
+		},
+	}
+	_, err = s.collection.UpdateMany(ctx, bson.M{
+		"_id": bson.M{
+			"$in": result.InsertedIDs,
+		},
+	}, updatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -190,6 +221,17 @@ func (s *MongoDBService) FindOneAndUpdate(
 		return err
 	}
 
+	// Injecting updatedAt on the update function call to always update the updatedAt field.
+	updatedAt := bson.M{
+		"$set": bson.M{
+			"updatedAt": time.Now(),
+		},
+	}
+	_, err = s.collection.UpdateOne(ctx, filter, updatedAt)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -202,6 +244,17 @@ func (s *MongoDBService) UpdateOne(ctx context.Context, filter any, data any,
 		return 0, err
 	}
 
+	// Injecting updatedAt on the update function call to always update the updatedAt field.
+	updatedAt := bson.M{
+		"$set": bson.M{
+			"updatedAt": time.Now(),
+		},
+	}
+	_, err = s.collection.UpdateOne(ctx, filter, updatedAt)
+	if err != nil {
+		return 0, err
+	}
+
 	return result.ModifiedCount, nil
 }
 
@@ -209,6 +262,17 @@ func (s *MongoDBService) UpdateMany(ctx context.Context, filter any, data any,
 	opts ...*options.UpdateOptions,
 ) (int64, error) {
 	result, err := s.collection.UpdateMany(ctx, filter, data, opts...)
+	if err != nil {
+		return 0, err
+	}
+
+	// Injecting updatedAt on the update function call to always update the updatedAt field.
+	updatedAt := bson.M{
+		"$set": bson.M{
+			"updatedAt": time.Now(),
+		},
+	}
+	_, err = s.collection.UpdateMany(ctx, filter, updatedAt)
 	if err != nil {
 		return 0, err
 	}
