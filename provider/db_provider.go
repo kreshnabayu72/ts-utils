@@ -11,7 +11,7 @@ import (
 type DBProviderer interface {
 	Init()
 	MakeMongoDBService(dbName db.DBName, collection string) service.MongoDBServicer
-	MakePostgreSQLService(dbName db.DBName) service.PostgreSQLServicer
+	MakePostgreSQLService(dbName db.DBName, options ...db.PostgreSQLServiceOptions) service.PostgreSQLServicer
 	Close()
 }
 
@@ -28,8 +28,8 @@ func (dp *DBProvider) MakeMongoDBService(dbName db.DBName, collection string) se
 }
 
 // MakePostgreSQLService creates a postgresql service
-func (dp *DBProvider) MakePostgreSQLService(dbName db.DBName) service.PostgreSQLServicer {
-	return service.MakePostgreSQLService(dbName)
+func (dp *DBProvider) MakePostgreSQLService(dbName db.DBName, options ...db.PostgreSQLServiceOptions) service.PostgreSQLServicer {
+	return service.MakePostgreSQLService(dbName, options...)
 }
 
 func (dp *DBProvider) Close() {

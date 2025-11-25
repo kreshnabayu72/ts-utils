@@ -270,8 +270,8 @@ type PostgreSQLService struct {
 }
 
 // MakePostgreSQLService creates a new PostgreSQLServicer instance.
-func MakePostgreSQLService(dbName db.DBName) *PostgreSQLService {
-	pool := db.ConnectPostgres(dbName)
+func MakePostgreSQLService(dbName db.DBName, options ...db.PostgreSQLServiceOptions) *PostgreSQLService {
+	pool := db.ConnectPostgres(dbName, options...)
 
 	return &PostgreSQLService{
 		Pool: pool,
@@ -833,6 +833,7 @@ func (s *PostgreSQLService) Close() {
 }
 
 // UseTransactions executes fn within a transaction.
+// DEPRECATED!
 // If fn returns an error, the transaction is rolled back.
 // If fn succeeds, the transaction is committed.
 // The returned value is whatever fn returns, or an error if commit/rollback fails.

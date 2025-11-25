@@ -22,8 +22,8 @@ func (m *MockDBProvider) MakeMongoDBService(dbName db.DBName, collection string)
 	return args.Get(0).(service.MongoDBServicer)
 }
 
-func (m *MockDBProvider) MakePostgreSQLService(dbName db.DBName) service.PostgreSQLServicer {
-	args := m.Called(dbName)
+func (m *MockDBProvider) MakePostgreSQLService(dbName db.DBName, options ...db.PostgreSQLServiceOptions) service.PostgreSQLServicer {
+	args := m.Called(dbName, options)
 	return args.Get(0).(service.PostgreSQLServicer)
 }
 

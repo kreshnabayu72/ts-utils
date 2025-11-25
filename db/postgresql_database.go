@@ -22,6 +22,19 @@ var (
 	sshClients    = make(map[string]*ssh.Client)
 )
 
+type PostgreSQLServiceOptions struct {
+	Host     string
+	Port     int
+	User     string
+	Password string
+	SSLMode  string
+
+	SSHHost     string
+	SSHPort     int
+	SSHUser     string
+	SSHPassword string
+}
+
 func InitSnowflake() {
 	snowflakeOnce.Do(func() {
 		var err error
@@ -34,7 +47,7 @@ func InitSnowflake() {
 }
 
 // ConnectPostgres initializes the PostgreSQL connection pool once
-func ConnectPostgres(dbName DBName) *pgxpool.Pool {
+func ConnectPostgres(dbName DBName, options ...PostgreSQLServiceOptions) *pgxpool.Pool {
 	key := string(dbName)
 
 	// 1. Check for an existing, healthy pool.
@@ -53,15 +66,45 @@ func ConnectPostgres(dbName DBName) *pgxpool.Pool {
 	}
 
 	// 2. Gather all configuration details first.
-	postgresHost := os.Getenv("POSTGRES_HOST")
-	postgresUsername := os.Getenv("POSTGRES_USERNAME")
-	postgresPassword := os.Getenv("POSTGRES_PASSWORD")
-	postgresSslMode := os.Getenv("POSTGRES_SSLMODE")
+	var (
+		postgresHost     string
+		postgresUsername string
+		postgresPassword string
+		postgresSslMode  string
+		sshHost          string
+		sshPort          string = "22"
+		sshUser          string
+		sshPassword      string
+	)
+
+	if len(options) > 0 {
+		opt := options[0]
+		postgresHost = fmt.Sprintf("%s:%d", opt.Host, opt.Port)
+		postgresUsername = opt.User
+		postgresPassword = opt.Password
+		postgresSslMode = opt.SSLMode
+
+		sshHost = opt.SSHHost
+		if opt.SSHPort != 0 {
+			sshPort = fmt.Sprintf("%d", opt.SSHPort)
+		}
+		sshUser = opt.SSHUser
+		sshPassword = opt.SSHPassword
+	} else {
+		postgresHost = os.Getenv("POSTGRES_HOST")
+		postgresUsername = os.Getenv("POSTGRES_USERNAME")
+		postgresPassword = os.Getenv("POSTGRES_PASSWORD")
+		postgresSslMode = os.Getenv("POSTGRES_SSLMODE")
+
+		sshHost = os.Getenv("SSH_HOST")
+		sshUser = os.Getenv("SSH_USER")
+		sshPassword = os.Getenv("SSH_PASSWORD")
+	}
 
 	if postgresSslMode == "" {
 		postgresSslMode = "disable"
 	}
-	if postgresHost == "" {
+	if postgresHost == "" || postgresHost == ":0" {
 		postgresHost = "localhost:5432"
 	}
 
@@ -78,11 +121,7 @@ func ConnectPostgres(dbName DBName) *pgxpool.Pool {
 	var sshClient *ssh.Client // Declare here to be accessible for storage later.
 
 	// 3. Configure the SSH tunnel (if needed) and apply it to the config object.
-	sshHost := os.Getenv("SSH_HOST")
 	if sshHost != "" {
-		sshPort := "22"
-		sshUser := os.Getenv("SSH_USER")
-		sshPassword := os.Getenv("SSH_PASSWORD")
 
 		sshConfig := &ssh.ClientConfig{
 			User:            sshUser,
