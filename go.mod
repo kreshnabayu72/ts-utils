@@ -5,6 +5,7 @@ go 1.24.2
 require (
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/eclipse/paho.mqtt.golang v1.5.1
+	github.com/go-playground/validator/v10 v10.28.0
 	github.com/goccy/go-json v0.10.3
 	github.com/gofiber/fiber/v2 v2.52.6
 	github.com/jackc/pgx/v5 v5.7.5
@@ -20,6 +21,9 @@ require (
 
 require (
 	github.com/facebookgo/clock v0.0.0-20150410010913-600d898af40a // indirect
+	github.com/gabriel-vasile/mimetype v1.4.10 // indirect
+	github.com/go-playground/locales v0.14.1 // indirect
+	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
@@ -29,6 +33,7 @@ require (
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
+	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/nexus-rpc/sdk-go v0.5.1 // indirect
 	github.com/pierrec/lz4/v4 v4.1.15 // indirect
 	github.com/robfig/cron v1.2.0 // indirect
