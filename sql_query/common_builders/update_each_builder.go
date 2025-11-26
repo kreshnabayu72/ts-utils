@@ -3,7 +3,7 @@ package common_builders
 import (
 	"log"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/v2/sql_query"
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/sql_query"
 )
 
 func UpdateEachBuilder(tableName string, rowIdentifier string, query map[string]sql_query.SQLCondition, body any) (string, []any) {

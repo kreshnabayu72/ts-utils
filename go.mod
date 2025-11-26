@@ -1,4 +1,4 @@
-module gitea.qwertysystem.net/BETS/ts-utils/v2
+module gitea.tagsamurai.local/BETS-V2/ts-utils/v2
 
 go 1.24.2
 

@@ -7,8 +7,8 @@ import (
 	"context"
 	"time"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/v2/entity"
-	"gitea.qwertysystem.net/BETS/ts-utils/v2/helper"
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/entity"
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/helper"
 	"github.com/gofiber/fiber/v2"
 )
 

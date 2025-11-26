@@ -3,7 +3,7 @@ package new_model
 import (
 	"time"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/v2/module/common/model"
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/common/model"
 )
 
 type AmpLifecycleManagementPlans struct {

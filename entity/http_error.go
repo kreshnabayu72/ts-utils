@@ -1,7 +1,7 @@
 package entity
 
 import (
-	"gitea.qwertysystem.net/BETS/ts-utils/v2/helper"
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/helper"
 	"github.com/gofiber/fiber/v2"
 )
 

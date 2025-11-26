@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/v2/config"
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/config"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/worker"
 )

@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/v2/db"
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/db"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"

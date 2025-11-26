@@ -1,8 +1,8 @@
 package provider
 
 import (
-	"gitea.qwertysystem.net/BETS/ts-utils/v2/db"
-	"gitea.qwertysystem.net/BETS/ts-utils/v2/service"
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/db"
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/service"
 )
 
 // DBProviderer provides a way to create database service for various supported databases.
