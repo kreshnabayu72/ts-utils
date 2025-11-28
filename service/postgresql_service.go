@@ -6,6 +6,7 @@ import (
 	"log"
 	"reflect"
 	"runtime/debug"
+	"slices"
 	"time"
 
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/db"
@@ -283,7 +284,7 @@ func (s *PostgreSQLService) Init() {
 }
 
 func (s *PostgreSQLService) Debug(level ...int) {
-	if len(level) > 0 && sql_query.ArrayIncludes([]int{1, 2, 3}, level[0]) {
+	if len(level) > 0 && slices.Contains([]int{1, 2, 3}, level[0]) {
 		s.debugLevel = level[0]
 		return
 	}

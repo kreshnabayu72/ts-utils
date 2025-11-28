@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -393,7 +394,7 @@ func (s *UpdateBuilder) updateEachClausesGenerator(
 				}
 			}
 
-			if ok := ArrayIncludes(valueClauses, "updated_at"); !ok {
+			if ok := slices.Contains(valueClauses, "updated_at"); !ok {
 				setClauses = append(setClauses, `"updated_at" = NOW()`)
 			}
 		}

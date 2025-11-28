@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -127,11 +128,11 @@ func (s *InsertBuilder) cachedInsertSingle(v reflect.Value) Inserter {
 				continue
 			}
 
-			if ArrayIncludes([]string{"_id", "id"}, meta.JSONTag) || meta.ColumnTag == "id" {
+			if slices.Contains([]string{"_id", "id"}, meta.JSONTag) || meta.ColumnTag == "id" {
 				continue
 			}
-			if ArrayIncludes([]string{"", "-"}, meta.JSONTag) &&
-				ArrayIncludes([]string{"", "-"}, meta.ColumnTag) {
+			if slices.Contains([]string{"", "-"}, meta.JSONTag) &&
+				slices.Contains([]string{"", "-"}, meta.ColumnTag) {
 				continue
 			}
 
@@ -145,7 +146,7 @@ func (s *InsertBuilder) cachedInsertSingle(v reflect.Value) Inserter {
 				}
 			}
 
-			if ArrayIncludes([]string{"updated_at", "created_at"}, setTag) {
+			if slices.Contains([]string{"updated_at", "created_at"}, setTag) {
 				continue
 			}
 
@@ -226,12 +227,12 @@ func (s *InsertBuilder) insertSingle(v reflect.Value) Inserter {
 		jsonTag := field.Tag.Get("json")
 		columnTag := field.Tag.Get("column")
 
-		if ArrayIncludes([]string{"_id", "id"}, jsonTag) || columnTag == "id" {
+		if slices.Contains([]string{"_id", "id"}, jsonTag) || columnTag == "id" {
 			continue
 		}
 
-		if ArrayIncludes([]string{"", "-"}, jsonTag) &&
-			ArrayIncludes([]string{"", "-"}, columnTag) {
+		if slices.Contains([]string{"", "-"}, jsonTag) &&
+			slices.Contains([]string{"", "-"}, columnTag) {
 			continue
 		}
 
@@ -242,7 +243,7 @@ func (s *InsertBuilder) insertSingle(v reflect.Value) Inserter {
 
 		columns = append(columns, `"`+setTag+`"`)
 
-		if ArrayIncludes([]string{"updated_at", "created_at"}, setTag) {
+		if slices.Contains([]string{"updated_at", "created_at"}, setTag) {
 			placeholders = append(placeholders, "NOW()")
 			continue
 		}
@@ -290,11 +291,11 @@ func (s *InsertBuilder) cachedInsertMany(slice reflect.Value) Inserter {
 				continue
 			}
 
-			if ArrayIncludes([]string{"_id", "id"}, meta.JSONTag) || meta.ColumnTag == "id" {
+			if slices.Contains([]string{"_id", "id"}, meta.JSONTag) || meta.ColumnTag == "id" {
 				continue
 			}
-			if ArrayIncludes([]string{"", "-"}, meta.JSONTag) &&
-				ArrayIncludes([]string{"", "-"}, meta.ColumnTag) {
+			if slices.Contains([]string{"", "-"}, meta.JSONTag) &&
+				slices.Contains([]string{"", "-"}, meta.ColumnTag) {
 				continue
 			}
 
@@ -307,7 +308,7 @@ func (s *InsertBuilder) cachedInsertMany(slice reflect.Value) Inserter {
 					setTag = meta.ColumnTag
 				}
 			}
-			if ArrayIncludes([]string{"updated_at", "created_at"}, setTag) {
+			if slices.Contains([]string{"updated_at", "created_at"}, setTag) {
 				continue
 			}
 
@@ -397,12 +398,12 @@ func (s *InsertBuilder) insertMany(slice reflect.Value) Inserter {
 				jsonTag := field.Tag.Get("json")
 				columnTag := field.Tag.Get("column")
 
-				if ArrayIncludes([]string{"_id", "id"}, jsonTag) || columnTag == "id" {
+				if slices.Contains([]string{"_id", "id"}, jsonTag) || columnTag == "id" {
 					continue
 				}
 
-				if ArrayIncludes([]string{"", "-"}, jsonTag) &&
-					ArrayIncludes([]string{"", "-"}, columnTag) {
+				if slices.Contains([]string{"", "-"}, jsonTag) &&
+					slices.Contains([]string{"", "-"}, columnTag) {
 					continue
 				}
 
@@ -432,16 +433,16 @@ func (s *InsertBuilder) insertMany(slice reflect.Value) Inserter {
 				setTag = columnTag
 			}
 
-			if ArrayIncludes([]string{"_id", "id"}, jsonTag) || columnTag == "id" {
+			if slices.Contains([]string{"_id", "id"}, jsonTag) || columnTag == "id" {
 				continue
 			}
 
-			if ArrayIncludes([]string{"", "-"}, jsonTag) &&
-				ArrayIncludes([]string{"", "-"}, columnTag) {
+			if slices.Contains([]string{"", "-"}, jsonTag) &&
+				slices.Contains([]string{"", "-"}, columnTag) {
 				continue
 			}
 
-			if ArrayIncludes([]string{"updated_at", "created_at"}, setTag) {
+			if slices.Contains([]string{"updated_at", "created_at"}, setTag) {
 				rowPlaceholders = append(rowPlaceholders, "NOW()")
 				continue
 			}
@@ -475,11 +476,11 @@ func BuildInsertTemplate(t reflect.Type) *InsertTemplate {
 	fieldIndexes = append(fieldIndexes, nil)
 
 	for _, m := range meta {
-		if ArrayIncludes([]string{"_id", "id"}, m.JSONTag) || m.ColumnTag == "id" {
+		if slices.Contains([]string{"_id", "id"}, m.JSONTag) || m.ColumnTag == "id" {
 			continue
 		}
-		if ArrayIncludes([]string{"", "-"}, m.JSONTag) &&
-			ArrayIncludes([]string{"", "-"}, m.ColumnTag) {
+		if slices.Contains([]string{"", "-"}, m.JSONTag) &&
+			slices.Contains([]string{"", "-"}, m.ColumnTag) {
 			continue
 		}
 

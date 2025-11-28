@@ -2,11 +2,12 @@ package sql_query
 
 import (
 	"fmt"
-	"github.com/goccy/go-json"
 	"reflect"
 	"strings"
 
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/dto"
+	"github.com/goccy/go-json"
+
 	"github.com/jackc/pgx/v5"
 )
 
@@ -190,178 +191,6 @@ func FormatPaginationResult[T any](result []dto.PaginationResult[T]) dto.Paginat
 	return result[0]
 }
 
-/*
-BuildInsertOneQuery generates an INSERT SQL query for a single struct.
-
-Parameters:
-- table: the name of the SQL table
-- data: a struct with fields tagged with `json`
-
-Returns:
-- SQL query string
-- list of arguments in correct order
-- error if input is invalid
-
-Example input:
-
-	type MeasurementInput struct {
-		Name string `json:"name"`
-		Unit string `json:"unit"`
-	}
-
-	input := MeasurementInput{
-		Name: "Height",
-		Unit: "cm",
-	}
-*/
-func BuildInsertOneQuery(table string, data any) (query string, err error) {
-	var args []any
-
-	v := reflect.ValueOf(data)
-	if v.Kind() != reflect.Struct {
-		return "", fmt.Errorf("data must be a struct")
-	}
-
-	t := v.Type()
-	var columns []string
-	var placeholders []string
-
-	for i := 0; i < v.NumField(); i++ {
-		field := t.Field(i)
-		tag := field.Tag.Get("json")
-		if tag == "" || tag == "-" {
-			continue
-		}
-		columns = append(columns, tag)
-		placeholders = append(placeholders, fmt.Sprintf("$%d", len(args)+1))
-		args = append(args, v.Field(i).Interface())
-	}
-
-	query = fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s) RETURNING id",
-		table,
-		strings.Join(columns, ", "),
-		strings.Join(placeholders, ", "),
-	)
-
-	return query, nil
-}
-
-/*
-BuildInsertManyQuery generates an INSERT SQL query for a slice of structs.
-
-Parameters:
-- table: the name of the SQL table
-- dataSlice: a slice of structs with fields tagged with `json`
-
-Returns:
-- SQL query string with multiple value sets
-- list of arguments in correct order
-- error if input is invalid
-
-Example input:
-
-	type MeasurementInput struct {
-		Name string `json:"name"`
-		Unit string `json:"unit"`
-	}
-
-	inputs := []MeasurementInput{
-		{Name: "Height", Unit: "cm"},
-		{Name: "Weight", Unit: "kg"},
-		{Name: "Temp", Unit: "C"},
-	}
-*/
-func BuildInsertManyQuery(table string, dataSlice any) (query string, err error) {
-	var args []any
-
-	v := reflect.ValueOf(dataSlice)
-
-	if v.Kind() != reflect.Slice || v.Len() == 0 {
-		return "", fmt.Errorf("data must be a non-empty slice of structs")
-	}
-
-	elemType := v.Index(0).Type()
-	if elemType.Kind() != reflect.Struct {
-		return "", fmt.Errorf("slice elements must be structs")
-	}
-
-	var columns []string
-	for i := 0; i < elemType.NumField(); i++ {
-		tag := elemType.Field(i).Tag.Get("json")
-		if tag != "" && tag != "-" {
-			columns = append(columns, tag)
-		}
-	}
-
-	var valuePlaceholders []string
-	argIndex := 1
-
-	for i := 0; i < v.Len(); i++ {
-		row := v.Index(i)
-		var rowPlaceholders []string
-		for j := 0; j < row.NumField(); j++ {
-			field := elemType.Field(j)
-			tag := field.Tag.Get("json")
-			if tag == "" || tag == "-" {
-				continue
-			}
-			args = append(args, row.Field(j).Interface())
-			rowPlaceholders = append(rowPlaceholders, fmt.Sprintf("$%d", argIndex))
-			argIndex++
-		}
-		valuePlaceholders = append(valuePlaceholders, fmt.Sprintf("(%s)", strings.Join(rowPlaceholders, ", ")))
-	}
-
-	query = fmt.Sprintf(
-		"INSERT INTO %s (%s) VALUES %s RETURNING id",
-		table,
-		strings.Join(columns, ", "),
-		strings.Join(valuePlaceholders, ", "),
-	)
-
-	return query, nil
-}
-
-func GenerateArrayFilter[T comparable](filter *[]T) SQLCondition {
-	if filter == nil {
-		var zeroVal T
-		switch any(zeroVal).(type) {
-		case string:
-			return SQLCondition{
-				Operator: SQLOperatorNotEqual,
-				Value:    "__never_used_random_string__",
-			}
-		case int, int32, int64:
-			return SQLCondition{
-				Operator: SQLOperatorNotEqual,
-				Value:    -999999999,
-			}
-		case float32, float64:
-			return SQLCondition{
-				Operator: SQLOperatorNotEqual,
-				Value:    -99999999.99,
-			}
-		case bool:
-			// return "column IN (true, false)" to match all rows
-			return SQLCondition{
-				Operator: SQLOperatorIn,
-				Value:    []bool{true, false},
-			}
-		default:
-			// fallback: column = column
-			return SQLCondition{
-				Operator: SQLOperatorEqual,
-				Value:    zeroVal,
-			}
-		}
-	}
-
-	return SQLCondition{
-		Operator: SQLOperatorIn,
-		Value:    *filter,
-	}
-}
-
 func PaginationQuery(withQuery, mainQuery, filteredDataQuery, paginatedDataQuery, paginatedCountQuery string) string {
 	cleanWithQuery := strings.TrimPrefix(strings.TrimSpace(withQuery), "WITH")
 	if cleanWithQuery != "" {
@@ -381,30 +210,4 @@ func PaginationQuery(withQuery, mainQuery, filteredDataQuery, paginatedDataQuery
 	`, cleanWithQuery, filteredDataQuery, paginatedDataQuery, paginatedCountQuery, mainQuery)
 
 	return paginationQuery
-}
-
-func PaginationQuery_old(dataQuery, totalQuery string) string {
-	paginationQuery := fmt.Sprintf(`
-		WITH
-			paginated AS (%s),
-			totalRow AS (%s),
-			total AS (
-				SELECT COUNT(*) FROM totalRow
-			)
-		SELECT
-			COALESCE((SELECT jsonb_agg(paginated) FROM paginated), '[]') AS data,
-			(SELECT COUNT FROM total) AS totalRecords;
-	`, dataQuery, totalQuery)
-
-	return paginationQuery
-}
-
-func ArrayIncludes[T comparable](slice []T, value T) bool {
-	for _, each := range slice {
-		if each == value {
-			return true
-		}
-	}
-
-	return false
 }
