@@ -130,13 +130,13 @@ type PostgreSQLServicer interface {
 	// and returns the updated row ID.
 	UpdateOne(ctx context.Context, queryString string, args ...any) (any, error)
 	// UpdateOneWithData builds and executes an UPDATE query using a filter map (`query`)
-	// and a struct or map as the update body (`body`).
+	// and an UpdateQuery (map[string]any) as the update body (`body`).
 	//
 	// Parameters:
 	//
 	//	ctx         - The request context for cancellation and deadlines.
 	//	query       - A map of column names to SQLCondition objects used in the WHERE clause.
-	//	body        - A struct or map representing the columns to update (uses `column` tags for structs).
+	//	body        - An UpdateQuery (map[string]any) representing the columns to update.
 	//	returnOption (optional) - A variadic argument of ReturningConfig that defines:
 	//	    • Column      - A slice of column names to include in the RETURNING clause.
 	//	    • Destination - A pointer to a struct where the returned row will be scanned.
@@ -169,7 +169,7 @@ type PostgreSQLServicer interface {
 	//
 	//	ctx         - The request context for cancellation and deadlines.
 	//	query       - A map of column names to SQLCondition objects used in the WHERE clause.
-	//	body        - A struct or map representing the columns to update (uses `column` tags for structs).
+	//	body        - An UpdateQuery (map[string]any) representing the columns to update.
 	//	returnOption (optional) - A variadic argument of ReturningConfig that defines:
 	//	    • Column      - Slice of column names to include in RETURNING.
 	//	    • Destination - Pointer to a slice where all updated rows will be scanned.
