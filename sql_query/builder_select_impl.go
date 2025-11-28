@@ -18,7 +18,7 @@ import (
 // Example:
 //
 //	builder := NewSQLSelectBuilder[User]("users","u").Select("id", "name")
-func NewSQLSelectBuilder[T any](tableName string, alias ...string) SQLSelectChainBuilder {
+func NewSQLSelectBuilder[T any](tableName string, alias ...string) Selector {
 	columns := ExtractJSONTags[T]()
 
 	if len(alias) > 0 {
@@ -49,7 +49,7 @@ func NewSQLSelectBuilder[T any](tableName string, alias ...string) SQLSelectChai
 // Example:
 //
 //	builder := NewSQLCountBuilder("users","u").Where(...)
-func NewSQLCountBuilder(tableName string, alias ...string) SQLSelectChainBuilder {
+func NewSQLCountBuilder(tableName string, alias ...string) Selector {
 	defaultColumns := []string{"COUNT(*)"}
 
 	if len(alias) > 0 {
@@ -73,12 +73,12 @@ func NewSQLCountBuilder(tableName string, alias ...string) SQLSelectChainBuilder
 	}
 }
 
-func (s *SelectBuilder) Where(filters map[string]SQLCondition) SQLSelectChainBuilder {
+func (s *SelectBuilder) Where(filters map[string]SQLCondition) Selector {
 	s.SQLEloquentQuery.sharedWhereAndQuery(filters)
 	return s
 }
 
-func (s *SelectBuilder) WhereOr(filters ...map[string]SQLCondition) SQLSelectChainBuilder {
+func (s *SelectBuilder) WhereOr(filters ...map[string]SQLCondition) Selector {
 	s.SQLEloquentQuery.sharedWhereOrQuery(filters...)
 	return s
 }
@@ -87,12 +87,12 @@ func (s *SelectBuilder) GetCurrentArgIndex() int {
 	return len(s.Args)
 }
 
-func (s *SelectBuilder) AddArgs(arg ...any) SQLSelectChainBuilder {
+func (s *SelectBuilder) AddArgs(arg ...any) Selector {
 	s.Args = append(s.Args, arg...)
 	return s
 }
 
-func (s *SelectBuilder) StartPlaceholderFrom(index int) SQLSelectChainBuilder {
+func (s *SelectBuilder) StartPlaceholderFrom(index int) Selector {
 	if index < 1 {
 		index = 1
 	}
@@ -124,7 +124,7 @@ func (s *SelectBuilder) StartPlaceholderFrom(index int) SQLSelectChainBuilder {
 	return s
 }
 
-func (s *SelectBuilder) Search(keyword string, fields []string) SQLSelectChainBuilder {
+func (s *SelectBuilder) Search(keyword string, fields []string) Selector {
 	if keyword != "" && len(fields) > 0 {
 		var orClauses []string
 		orArgs := []any{}
@@ -151,7 +151,7 @@ func (s *SelectBuilder) Search(keyword string, fields []string) SQLSelectChainBu
 	return s
 }
 
-func (s *SelectBuilder) Distinct(alias string, columns ...string) SQLSelectChainBuilder {
+func (s *SelectBuilder) Distinct(alias string, columns ...string) Selector {
 	s.DistinctAlias = alias
 	for _, newCol := range columns {
 		newAlias := extractAlias(newCol)
@@ -175,12 +175,12 @@ func (s *SelectBuilder) Distinct(alias string, columns ...string) SQLSelectChain
 	return s
 }
 
-func (s *SelectBuilder) ClearSelects() SQLSelectChainBuilder {
+func (s *SelectBuilder) ClearSelects() Selector {
 	s.Columns = []string{}
 	return s
 }
 
-func (s *SelectBuilder) FilterColumnsByAlias(aliases *[]string) SQLSelectChainBuilder {
+func (s *SelectBuilder) FilterColumnsByAlias(aliases *[]string) Selector {
 	if aliases == nil {
 		return s
 	}
@@ -213,7 +213,7 @@ func (s *SelectBuilder) FilterColumnsByAlias(aliases *[]string) SQLSelectChainBu
 	return s
 }
 
-func (s *SelectBuilder) Select(columns ...string) SQLSelectChainBuilder {
+func (s *SelectBuilder) Select(columns ...string) Selector {
 	for _, newCol := range columns {
 		newAlias := extractAlias(newCol)
 
@@ -235,7 +235,7 @@ func (s *SelectBuilder) Select(columns ...string) SQLSelectChainBuilder {
 	return s
 }
 
-func (s *SelectBuilder) SelectBoolAnd(expr, alias string, args ...any) SQLSelectChainBuilder {
+func (s *SelectBuilder) SelectBoolAnd(expr, alias string, args ...any) Selector {
 	boolAndColumn := fmt.Sprintf("bool_and(%s) AS \"%s\"", expr, alias)
 
 	// Check if alias exists in current list
@@ -257,7 +257,7 @@ func (s *SelectBuilder) SelectBoolAnd(expr, alias string, args ...any) SQLSelect
 	return s
 }
 
-func (s *SelectBuilder) SelectBoolOr(expr, alias string, args ...any) SQLSelectChainBuilder {
+func (s *SelectBuilder) SelectBoolOr(expr, alias string, args ...any) Selector {
 	boolOrColumn := fmt.Sprintf("bool_or(%s) AS \"%s\"", expr, alias)
 
 	// Check if alias exists in current list
@@ -279,7 +279,7 @@ func (s *SelectBuilder) SelectBoolOr(expr, alias string, args ...any) SQLSelectC
 	return s
 }
 
-func (s *SelectBuilder) SelectArrayAggregation(alias string, source string, config ArrayAggConfig) SQLSelectChainBuilder {
+func (s *SelectBuilder) SelectArrayAggregation(alias string, source string, config ArrayAggConfig) Selector {
 	if config.Expr == "" {
 		s.LastError = errors.New("expression should not empty")
 	}
@@ -315,7 +315,7 @@ func (s *SelectBuilder) SelectArrayAggregation(alias string, source string, conf
 	return s
 }
 
-func (s *SelectBuilder) SelectCaseWhen(thenExpr, elseExpr, alias string, whenClause string, whenArgs ...any) SQLSelectChainBuilder {
+func (s *SelectBuilder) SelectCaseWhen(thenExpr, elseExpr, alias string, whenClause string, whenArgs ...any) Selector {
 	caseWhenColumn := fmt.Sprintf("CASE WHEN %s THEN %s ELSE %s END AS \"%s\"", whenClause, thenExpr, elseExpr, alias)
 
 	// Check if alias exists in current list
@@ -337,7 +337,7 @@ func (s *SelectBuilder) SelectCaseWhen(thenExpr, elseExpr, alias string, whenCla
 	return s
 }
 
-func (s *SelectBuilder) SelectMultiCaseWhen(parts []CaseWhenPart, elseExpr, alias string) SQLSelectChainBuilder {
+func (s *SelectBuilder) SelectMultiCaseWhen(parts []CaseWhenPart, elseExpr, alias string) Selector {
 	var caseBuilder strings.Builder
 	var allArgs []interface{}
 
@@ -382,7 +382,7 @@ func (s *SelectBuilder) SelectMultiCaseWhen(parts []CaseWhenPart, elseExpr, alia
 	return s
 }
 
-func (s *SelectBuilder) Join(table string, onCondition string, additionalConditions ...map[string]SQLCondition) SQLSelectChainBuilder {
+func (s *SelectBuilder) Join(table string, onCondition string, additionalConditions ...map[string]SQLCondition) Selector {
 	if table == "" {
 		return s
 	}
@@ -402,7 +402,7 @@ func (s *SelectBuilder) Join(table string, onCondition string, additionalConditi
 	return s
 }
 
-func (s *SelectBuilder) LeftJoin(table string, mainCondition string, additionalConditions ...map[string]SQLCondition) SQLSelectChainBuilder {
+func (s *SelectBuilder) LeftJoin(table string, mainCondition string, additionalConditions ...map[string]SQLCondition) Selector {
 	if table == "" {
 		return s
 	}
@@ -422,7 +422,7 @@ func (s *SelectBuilder) LeftJoin(table string, mainCondition string, additionalC
 	return s
 }
 
-func (s *SelectBuilder) LeftJoinLateralWithQuery(joinName string, joinQueryBuilder *SQLEloquentQuery, mainCondition string, additionalConditions ...map[string]SQLCondition) SQLSelectChainBuilder {
+func (s *SelectBuilder) LeftJoinLateralWithQuery(joinName string, joinQueryBuilder *SQLEloquentQuery, mainCondition string, additionalConditions ...map[string]SQLCondition) Selector {
 	joinQuery, joinArgs, err := joinQueryBuilder.Build()
 	if err != nil {
 		s.LastError = err
@@ -453,18 +453,18 @@ func (s *SelectBuilder) LeftJoinLateralWithQuery(joinName string, joinQueryBuild
 	return s
 }
 
-func (s *SelectBuilder) GroupBy(groupBy ...string) SQLSelectChainBuilder {
+func (s *SelectBuilder) GroupBy(groupBy ...string) Selector {
 	s.Grouping = append(s.Grouping, groupBy...)
 	return s
 }
 
-func (s *SelectBuilder) Having(havingClause map[string]SQLCondition) SQLSelectChainBuilder {
+func (s *SelectBuilder) Having(havingClause map[string]SQLCondition) Selector {
 	s.useHaving = true
 	s.SQLEloquentQuery.sharedWhereAndQuery(havingClause)
 	return s
 }
 
-func (s *SelectBuilder) OrderBy(sortBy []string, asc bool) SQLSelectChainBuilder {
+func (s *SelectBuilder) OrderBy(sortBy []string, asc bool) Selector {
 	direction := "ASC"
 	nulls := "FIRST"
 
@@ -478,7 +478,7 @@ func (s *SelectBuilder) OrderBy(sortBy []string, asc bool) SQLSelectChainBuilder
 	return s
 }
 
-func (s *SelectBuilder) Paginate(query Pagination) SQLSelectChainBuilder {
+func (s *SelectBuilder) Paginate(query Pagination) Selector {
 	var normalizedPage int
 	if query.Page > 0 {
 		normalizedPage = query.Page - 1
@@ -513,7 +513,7 @@ func (s *SelectBuilder) Paginate(query Pagination) SQLSelectChainBuilder {
 	return s
 }
 
-func (s *SelectBuilder) SetLimit(limit int) SQLSelectChainBuilder {
+func (s *SelectBuilder) SetLimit(limit int) Selector {
 	var normalizedPage int
 
 	s.Limit = limit
@@ -522,7 +522,7 @@ func (s *SelectBuilder) SetLimit(limit int) SQLSelectChainBuilder {
 	return s
 }
 
-func (s *SelectBuilder) WithCTEBuilder(cteName string, cteBuilder *SQLEloquentQuery) SQLSelectChainBuilder {
+func (s *SelectBuilder) WithCTEBuilder(cteName string, cteBuilder *SQLEloquentQuery) Selector {
 	cteQuery, cteArgs, err := cteBuilder.Build()
 	if err != nil {
 		s.LastError = err
@@ -541,7 +541,7 @@ func (s *SelectBuilder) WithCTEBuilder(cteName string, cteBuilder *SQLEloquentQu
 	return s
 }
 
-func (s *SelectBuilder) WithRecursiveCTEBuilder(cteName string, cteBuilder *SQLEloquentQuery) SQLSelectChainBuilder {
+func (s *SelectBuilder) WithRecursiveCTEBuilder(cteName string, cteBuilder *SQLEloquentQuery) Selector {
 	cteQuery, cteArgs, err := cteBuilder.Build()
 	if err != nil {
 		s.LastError = err
@@ -562,7 +562,7 @@ func (s *SelectBuilder) WithRecursiveCTEBuilder(cteName string, cteBuilder *SQLE
 	return s
 }
 
-func (s *SelectBuilder) UnionAll(cteBuilders ...*SQLEloquentQuery) SQLSelectChainBuilder {
+func (s *SelectBuilder) UnionAll(cteBuilders ...*SQLEloquentQuery) Selector {
 	for _, cteBuilder := range cteBuilders {
 		s.useUnionAll = true // only set true if len >0
 		cteQuery, cteArgs, err := cteBuilder.Build()
@@ -583,7 +583,7 @@ func (s *SelectBuilder) UnionAll(cteBuilders ...*SQLEloquentQuery) SQLSelectChai
 	return s
 }
 
-func (s *SelectBuilder) SelectJSONArrayElements(alias string, arrayElements []map[string]string) SQLSelectChainBuilder {
+func (s *SelectBuilder) SelectJSONArrayElements(alias string, arrayElements []map[string]string) Selector {
 	if alias == "" {
 		alias = "array_elements"
 	}
@@ -604,7 +604,7 @@ func (s *SelectBuilder) SelectJSONArrayElements(alias string, arrayElements []ma
 	return s
 }
 
-func (s *SelectBuilder) SelectJSONAggregate(alias string, dto any, condition string, asArrayAggregation bool, orderByClauses ...string) SQLSelectChainBuilder {
+func (s *SelectBuilder) SelectJSONAggregate(alias string, dto any, condition string, asArrayAggregation bool, orderByClauses ...string) Selector {
 	var mappedJSON map[string]string
 
 	v := reflect.ValueOf(dto)
@@ -660,7 +660,7 @@ func (s *SelectBuilder) SelectJSONAggregate(alias string, dto any, condition str
 	return s
 }
 
-func (s *SelectBuilder) SelectJSONAggregateCoalesce(alias string, dto any, condition string, asArrayAggregation bool, coalesce string, orderByClauses ...string) SQLSelectChainBuilder {
+func (s *SelectBuilder) SelectJSONAggregateCoalesce(alias string, dto any, condition string, asArrayAggregation bool, coalesce string, orderByClauses ...string) Selector {
 	var mappedJSON map[string]string
 
 	v := reflect.ValueOf(dto)
@@ -722,7 +722,7 @@ func (s *SelectBuilder) SelectJSONAggregateCoalesce(alias string, dto any, condi
 	return s
 }
 
-func (s *SelectBuilder) SelectJSONAggregateDistinct(alias string, dto any, condition string, asArrayAggregation bool, orderByClauses ...string) SQLSelectChainBuilder {
+func (s *SelectBuilder) SelectJSONAggregateDistinct(alias string, dto any, condition string, asArrayAggregation bool, orderByClauses ...string) Selector {
 	var mappedJSON map[string]string
 
 	v := reflect.ValueOf(dto)
@@ -778,7 +778,7 @@ func (s *SelectBuilder) SelectJSONAggregateDistinct(alias string, dto any, condi
 	return s
 }
 
-func (s *SelectBuilder) SelectJSONAggregateFunc(alias string, fn func(builder *SelectBuilder)) SQLSelectChainBuilder {
+func (s *SelectBuilder) SelectJSONAggregateFunc(alias string, fn func(builder *SelectBuilder)) Selector {
 	if alias == "" {
 		alias = "json_result"
 	}

@@ -1,33 +1,33 @@
 package sql_query
 
-type SQLSelectChainBuilder interface {
+type Selector interface {
 	// GetCurrentArgIndex returns the current number of arguments in the query.
 	// Useful for calculating placeholder positions when building parameterized SQL.
 	GetCurrentArgIndex() int
 	// AddArgs appends one or more arguments to the query's argument list.
 	// Can be used to manually manage parameter placeholders.
-	AddArgs(arg ...any) SQLSelectChainBuilder
+	AddArgs(arg ...any) Selector
 	// StartPlaceholderFrom set starting point of next generated placeholders.
 	// Useful for creating sub query from this builder for another main query.
 	// Placeholders for this sub query will be started from this given value.
-	StartPlaceholderFrom(index int) SQLSelectChainBuilder
+	StartPlaceholderFrom(index int) Selector
 
-	// Distinct implements SQLSelectChainBuilder.
+	// Distinct implements Selector.
 	// Distinct defines one or more columns for the DISTINCT ON(...) statement.
 	//
 	// Example:
 	//
 	//	builder.Distinct("distinct", "u.id", "u.name")
-	Distinct(alias string, columns ...string) SQLSelectChainBuilder
+	Distinct(alias string, columns ...string) Selector
 
-	// Select implements SQLSelectChainBuilder.
+	// Select implements Selector.
 	// Select defines one or more columns for the SELECT statement.
 	// If a column alias already exists, its expression will be overwritten with the new one.
 	//
 	// Example:
 	//
 	//	builder.Select("u.id AS user_id", "u.name")
-	Select(columns ...string) SQLSelectChainBuilder
+	Select(columns ...string) Selector
 
 	// USE WITH CAUTION
 	// Reset all previous appended selects
@@ -46,7 +46,7 @@ type SQLSelectChainBuilder interface {
 	// Example usage:
 	//
 	//	builder.ClearSelect()
-	ClearSelects() SQLSelectChainBuilder
+	ClearSelects() Selector
 
 	// FilterColumnsByAlias filters out elements in select array using its aliases.
 	// Will be executed after all select functions
@@ -56,7 +56,7 @@ type SQLSelectChainBuilder interface {
 	//	 s.Columns := []string{"id as _id", "asset_id as assetId", "groups"}
 	//
 	//	builder.FilterColumnsByAlias([]string{"_id","assetId"}) //removed groups from s.Columns
-	FilterColumnsByAlias(aliases *[]string) SQLSelectChainBuilder
+	FilterColumnsByAlias(aliases *[]string) Selector
 
 	// SelectCaseWhen adds a CASE WHEN expression as a column.
 	//
@@ -67,7 +67,7 @@ type SQLSelectChainBuilder interface {
 	// Generates:
 	//
 	//	CASE WHEN role = 'admin' THEN 'Yes' ELSE 'No' END AS is_admin
-	SelectCaseWhen(thenExpr, elseExpr, alias string, whenClause string, whenArgs ...interface{}) SQLSelectChainBuilder
+	SelectCaseWhen(thenExpr, elseExpr, alias string, whenClause string, whenArgs ...interface{}) Selector
 	// SelectMultiCaseWhen adds a complex CASE statement with multiple WHEN conditions as a column.
 	// It iterates through the provided parts to build the logic and appends the elseExpr as the fallback.
 	//
@@ -82,7 +82,7 @@ type SQLSelectChainBuilder interface {
 	// Generates:
 	//
 	// 	CASE WHEN quantity > ? THEN 'High' WHEN quantity > ? THEN 'Medium' ELSE 'Low' END AS "stock_level"
-	SelectMultiCaseWhen(parts []CaseWhenPart, elseExpr, alias string) SQLSelectChainBuilder
+	SelectMultiCaseWhen(parts []CaseWhenPart, elseExpr, alias string) Selector
 	// SelectBoolAnd adds a bool_or aggregate column with an alias.
 	//
 	// Example:
@@ -92,7 +92,7 @@ type SQLSelectChainBuilder interface {
 	// Generates:
 	//
 	//	bool_and(is_active) AS any_active
-	SelectBoolAnd(expr, alias string, args ...any) SQLSelectChainBuilder
+	SelectBoolAnd(expr, alias string, args ...any) Selector
 	// SelectBoolOr adds a bool_or aggregate column with an alias.
 	//
 	// Example:
@@ -102,9 +102,9 @@ type SQLSelectChainBuilder interface {
 	// Generates:
 	//
 	//	bool_or(is_active) AS any_active
-	SelectBoolOr(expr, alias string, args ...any) SQLSelectChainBuilder
+	SelectBoolOr(expr, alias string, args ...any) Selector
 
-	SelectArrayAggregation(alias string, source string, config ArrayAggConfig) SQLSelectChainBuilder
+	SelectArrayAggregation(alias string, source string, config ArrayAggConfig) Selector
 
 	// SelectJSONArrayElements selects elements from a Go slice of maps
 	// and expands them as rows using jsonb_array_elements().
@@ -119,7 +119,7 @@ type SQLSelectChainBuilder interface {
 	// Generates:
 	//
 	//	jsonb_array_elements($1::jsonb) AS items
-	SelectJSONArrayElements(alias string, arrayElements []map[string]string) SQLSelectChainBuilder
+	SelectJSONArrayElements(alias string, arrayElements []map[string]string) Selector
 	// SelectJSONAggregate builds a JSON object or JSON array aggregation using jsonb_build_object
 	// or jsonb_agg(jsonb_build_object(...)). It supports optional filtering and ordering.
 	//
@@ -153,19 +153,19 @@ type SQLSelectChainBuilder interface {
 	//
 	//	jsonb_agg(jsonb_build_object('id', items.id, 'name', items.name) ORDER BY items.created_at)
 	//	  FILTER (WHERE items.is_active = TRUE) AS order_items
-	SelectJSONAggregate(alias string, dto any, condition string, asArrayAggregation bool, orderByClauses ...string) SQLSelectChainBuilder
+	SelectJSONAggregate(alias string, dto any, condition string, asArrayAggregation bool, orderByClauses ...string) Selector
 	// Read documentation for SelectJSONAggregate since the function is similar but with additional COALESCE
 	// Generates:
 	//
 	//	COALESCE(jsonb_agg(DISTINCT jsonb_build_object('id', items.id, 'name', items.name) ORDER BY items.created_at)
 	//	  FILTER (WHERE items.is_active = TRUE) AS order_items, ${coalesce})
-	SelectJSONAggregateCoalesce(alias string, dto any, condition string, asArrayAggregation bool, coalesce string, orderByClauses ...string) SQLSelectChainBuilder
+	SelectJSONAggregateCoalesce(alias string, dto any, condition string, asArrayAggregation bool, coalesce string, orderByClauses ...string) Selector
 	// Read documentation for SelectJSONAggregate since the function is similar but with additional DISTINCT
 	// Generates:
 	//
 	//	jsonb_agg(DISTINCT jsonb_build_object('id', items.id, 'name', items.name) ORDER BY items.created_at)
 	//	  FILTER (WHERE items.is_active = TRUE) AS order_items
-	SelectJSONAggregateDistinct(alias string, dto any, condition string, asArrayAggregation bool, orderByClauses ...string) SQLSelectChainBuilder
+	SelectJSONAggregateDistinct(alias string, dto any, condition string, asArrayAggregation bool, orderByClauses ...string) Selector
 	// SelectJSONAggregateFunc builds a nested JSON object by executing a callback
 	// that itself adds JSON aggregate fields. The resulting fields are combined
 	// into a single jsonb_build_object aliased as `alias`.
@@ -193,14 +193,14 @@ type SQLSelectChainBuilder interface {
 	//	        'create', <expr>, 'view', <expr>, 'update', <expr>, 'delete', <expr>
 	//	    ) ELSE NULL END
 	//	) AS hasSystemRole
-	SelectJSONAggregateFunc(alias string, fn func(builder *SelectBuilder)) SQLSelectChainBuilder
+	SelectJSONAggregateFunc(alias string, fn func(builder *SelectBuilder)) Selector
 
-	// Where implements SQLSelectChainBuilder. (Accumulates previous value if called again)
-	Where(filters map[string]SQLCondition) SQLSelectChainBuilder
-	// WhereOr implements SQLSelectChainBuilder. (Accumulates previous value if called again)
-	WhereOr(filters ...map[string]SQLCondition) SQLSelectChainBuilder
+	// Where implements Selector. (Accumulates previous value if called again)
+	Where(filters map[string]SQLCondition) Selector
+	// WhereOr implements Selector. (Accumulates previous value if called again)
+	WhereOr(filters ...map[string]SQLCondition) Selector
 
-	// Search implements SQLSelectChainBuilder and accumulates conditions if called multiple times.
+	// Search implements Selector and accumulates conditions if called multiple times.
 	// Adds a case-insensitive ILIKE condition across multiple fields, combined with OR.
 	//
 	// To search inside array columns, add suffix ":array" to the column name.
@@ -213,25 +213,25 @@ type SQLSelectChainBuilder interface {
 	// Generates:
 	//
 	//	(first_name ILIKE $1 OR last_name ILIKE $1 OR EXISTS (SELECT 1 FROM unnest(tags) AS val WHERE val ILIKE $1))
-	Search(keyword string, fields []string) SQLSelectChainBuilder
+	Search(keyword string, fields []string) Selector
 	// SetLimit sets a fixed LIMIT value for the query (overwrites any previous limit).
 	//
 	// Example:
 	//
 	//	builder.SetLimit(5)
-	SetLimit(limit int) SQLSelectChainBuilder
+	SetLimit(limit int) Selector
 	// Join adds an INNER JOIN clause with the specified ON condition.
 	//
 	// Example:
 	//
 	//	builder.Join("roles r", "r.id = u.role_id")
-	Join(table string, onCondition string, additionalConditions ...map[string]SQLCondition) SQLSelectChainBuilder
+	Join(table string, onCondition string, additionalConditions ...map[string]SQLCondition) Selector
 	// LeftJoin adds a LEFT JOIN clause with the specified ON condition.
 	//
 	// Example:
 	//
 	//	builder.LeftJoin("roles r", "r.id = u.role_id")
-	LeftJoin(table string, onCondition string, additionalConditions ...map[string]SQLCondition) SQLSelectChainBuilder
+	LeftJoin(table string, onCondition string, additionalConditions ...map[string]SQLCondition) Selector
 
 	// Example:
 	//
@@ -242,30 +242,30 @@ type SQLSelectChainBuilder interface {
 	// 	LEFT JOIN LATERAL (
 	//     `Sql queries here`
 	//   ) `alias` ON `condition`
-	LeftJoinLateralWithQuery(joinName string, joinQueryBuilder *SQLEloquentQuery, mainCondition string, additionalConditions ...map[string]SQLCondition) SQLSelectChainBuilder
+	LeftJoinLateralWithQuery(joinName string, joinQueryBuilder *SQLEloquentQuery, mainCondition string, additionalConditions ...map[string]SQLCondition) Selector
 
-	// Paginate implements SQLSelectChainBuilder. (Overrides previous value if called again).
+	// Paginate implements Selector. (Overrides previous value if called again).
 	// Paginate applies LIMIT, OFFSET, and ORDER BY using a Pagination struct.
 	// It supports single or multiple sorting rules.
 	//
 	// Example:
 	//
 	//	builder.Paginate(Pagination{Page: 2, Limit: 10, SortBy: "name", SortOrder: 1})
-	Paginate(query Pagination) SQLSelectChainBuilder
+	Paginate(query Pagination) Selector
 	// OrderBy adds sorting rules to the query. Multiple calls accumulate sorting.
 	//
 	// Example:
 	//
 	//	builder.OrderBy([]string{"created_at"}, false) // DESC
-	OrderBy(sortBy []string, asc bool) SQLSelectChainBuilder
+	OrderBy(sortBy []string, asc bool) Selector
 	// GroupBy adds one or more columns to the GROUP BY clause.
 	// Multiple calls accumulate columns.
 	//
 	// Example:
 	//
 	//	builder.GroupBy("department", "role")
-	GroupBy(groupBy ...string) SQLSelectChainBuilder
-	// Having implements SQLSelectChainBuilder. (Overrides previous value if called again).
+	GroupBy(groupBy ...string) Selector
+	// Having implements Selector. (Overrides previous value if called again).
 	// Having adds a HAVING clause for grouped queries.
 	// Overwrites any previous HAVING condition.
 	//
@@ -274,7 +274,7 @@ type SQLSelectChainBuilder interface {
 	//	builder.GroupBy("role").Having(map[string]SQLCondition{
 	//	    "count(*)": {Op: ">", Value: 5},
 	//	})
-	Having(havingClauses map[string]SQLCondition) SQLSelectChainBuilder
+	Having(havingClauses map[string]SQLCondition) Selector
 
 	// WithCTEBuilder adds a Common Table Expression (CTE) to the query.
 	// It adjusts argument placeholders to avoid conflicts.
@@ -289,7 +289,7 @@ type SQLSelectChainBuilder interface {
 	// Generates:
 	//
 	//	WITH recent_orders AS (SELECT id, user_id FROM orders) ...
-	WithCTEBuilder(cteName string, cteBuilder *SQLEloquentQuery) SQLSelectChainBuilder
+	WithCTEBuilder(cteName string, cteBuilder *SQLEloquentQuery) Selector
 
 	// WithRecursiveCTEBuilder adds a Common Table Expression (CTE) to the query.
 	// It adjusts argument placeholders to avoid conflicts.
@@ -304,7 +304,7 @@ type SQLSelectChainBuilder interface {
 	// Generates:
 	//
 	//	WITH RECURSIVE recent_orders AS (SELECT id, user_id FROM orders) ...
-	WithRecursiveCTEBuilder(cteName string, cteBuilder *SQLEloquentQuery) SQLSelectChainBuilder
+	WithRecursiveCTEBuilder(cteName string, cteBuilder *SQLEloquentQuery) Selector
 
 	// Add "UNION ALL" in between the queries
 	// example:
@@ -317,7 +317,7 @@ type SQLSelectChainBuilder interface {
 	// SELECT c.id
 	// FROM categories c
 	// INNER JOIN category_tree ct ON c.parent_id = ct.id
-	UnionAll(cteBuilders ...*SQLEloquentQuery) SQLSelectChainBuilder
+	UnionAll(cteBuilders ...*SQLEloquentQuery) Selector
 
 	// Build finalizes the SELECT query and returns the query string and arguments.
 	// Returns an error if the query is invalid (e.g., HAVING without GROUP BY).

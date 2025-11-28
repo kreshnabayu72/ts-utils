@@ -2,8 +2,8 @@ package sql_query
 
 // To ensure SQLDeleteBuilder has its own initial methods
 // e.g. DeleteBuilder(...).Delete()...Rest
-type SQLDeleteInitBuilder interface {
-	// Delete implements SQLDeleteChainBuilder. (Only able to be called once)
+type DeleteStarter interface {
+	// Delete implements Deleter. (Only able to be called once)
 	// Delete initializes a DELETE statement for the current table.
 	// By default, it returns the deleted "id", but you can pass custom RETURNING columns.
 	//
@@ -15,18 +15,18 @@ type SQLDeleteInitBuilder interface {
 	// Generates:
 	//
 	//	DELETE FROM table_name RETURNING id
-	Delete(returningColumns ...string) SQLDeleteChainBuilder
+	Delete(returningColumns ...string) Deleter
 }
 
 // To ensure method .Delete() has its own chaining methods
 // e.g. .Delete(...).Using(...).Where(...).Build()
-type SQLDeleteChainBuilder interface {
-	// Where implements SQLDeleteChainBuilder. (Accumulates previous value if called again)
-	Where(filters map[string]SQLCondition) SQLDeleteChainBuilder
-	// WhereOr implements SQLDeleteChainBuilder. (Accumulates previous value if called again)
-	WhereOr(filters ...map[string]SQLCondition) SQLDeleteChainBuilder
+type Deleter interface {
+	// Where implements Deleter. (Accumulates previous value if called again)
+	Where(filters map[string]SQLCondition) Deleter
+	// WhereOr implements Deleter. (Accumulates previous value if called again)
+	WhereOr(filters ...map[string]SQLCondition) Deleter
 
-	// Using implements SQLDeleteChainBuilder. (Overrides previous value if called again)
+	// Using implements Deleter. (Overrides previous value if called again)
 	// Using adds a USING clause to the DELETE statement.
 	// It is useful for multi-table DELETE with a join-like behavior.
 	//
@@ -37,7 +37,7 @@ type SQLDeleteChainBuilder interface {
 	// Generates:
 	//
 	//	DELETE FROM table_name USING other_table
-	Using(tables []string) SQLDeleteChainBuilder
+	Using(tables []string) Deleter
 
 	// buildDeleteQuery finalizes the DELETE query into a full SQL string + args.
 	// It adds USING, WHERE, and RETURNING clauses if provided.

@@ -48,7 +48,7 @@ type UpdateCases interface {
 
 // To ensure SQLUpdateBuilder has its own initial methods
 // e.g. UpdateBuilder(...).Update()...Rest
-type SQLUpdateInitBuilder interface {
+type UpdateStarter interface {
 	// Update builds an UPDATE query using UpdateQuery (map[string]any).
 	//
 	// It supports two value types:
@@ -67,7 +67,7 @@ type SQLUpdateInitBuilder interface {
 	//     })
 	//
 	// By default, it will automatically add `updated_at = NOW()` if not explicitly provided.
-	Update(values UpdateQuery) SQLUpdateChainBuilder
+	Update(values UpdateQuery) Updater
 	// UpdateEach updates multiple rows at once using VALUES() with a slice of structs.
 	// Matches rows using the given rowIdentifier (e.g., "id").
 	//
@@ -79,7 +79,7 @@ type SQLUpdateInitBuilder interface {
 	//
 	//	FROM (VALUES ($1,$2),($3,$4)) AS v(id,name,updated_at)
 	//	WHERE users.id = v.id
-	UpdateEach(values any, rowIdentifier string) SQLUpdateChainBuilder
+	UpdateEach(values any, rowIdentifier string) Updater
 
 	// AddCase initializes a conditional CASE expression for the given column in an UPDATE statement.
 	// It use completely different CASE expressions from previous AddCase and allows chaining multiple conditional branches using Case() and Else().
@@ -95,8 +95,8 @@ type SQLUpdateInitBuilder interface {
 	//   - fn: a function that defines the CASE conditions using the provided UpdateCases interface.
 	//
 	// Returns:
-	//   - SQLUpdateChainBuilder: the builder itself for method chaining.
-	AddCase(setColumn string, fn func(b UpdateCases)) SQLUpdateChainBuilder
+	//   - Updater: the builder itself for method chaining.
+	AddCase(setColumn string, fn func(b UpdateCases)) Updater
 
 	// Increment is used to replace Update() for adding int value cause update cant handle that
 	// Increment builds an UPDATE query that increases integer columns by a given value.
@@ -107,7 +107,7 @@ type SQLUpdateInitBuilder interface {
 	//	builder.Increment(map[string]any{"count": 1})
 	//
 	// → UPDATE table SET "count" = "count" + $1, "updated_at" = NOW()
-	Increment(values map[string]any) SQLUpdateChainBuilder
+	Increment(values map[string]any) Updater
 
 	// updateEachClausesGenerator looks at every struct in the slice and builds:
 	//  1. The SET part of the query (e.g., "name = v.name"),
@@ -136,7 +136,7 @@ type SQLUpdateInitBuilder interface {
 
 // To ensure method .Update() has its own chaining methods
 // e.g. .Update(...).From(...).Build()
-type SQLUpdateChainBuilder interface {
+type Updater interface {
 	// AddCase initializes a conditional CASE expression for the given column in an UPDATE statement.
 	// It clears any existing CASE expressions and allows chaining multiple conditional branches using Case() and Else().
 	//
@@ -151,16 +151,16 @@ type SQLUpdateChainBuilder interface {
 	//   - fn: a function that defines the CASE conditions using the provided UpdateCases interface.
 	//
 	// Returns:
-	//   - SQLUpdateChainBuilder: the builder itself for method chaining.
-	AddCase(setColumn string, fn func(b UpdateCases)) SQLUpdateChainBuilder
+	//   - Updater: the builder itself for method chaining.
+	AddCase(setColumn string, fn func(b UpdateCases)) Updater
 
 	// By default, the Update builder includes all fields, even if their values are zero or nil.
 	// Calling this method tells the builder to skip fields with zero values when generating the SET clause.
 	//
 	// Note: This option only affects single-row Update operations.
 	// It has no effect on bulk UPDATE, because all rows in those operations must have the same set of columns.
-	ExcludeEmpty() SQLUpdateChainBuilder
-	// Update implements SQLUpdateChainBuilder. (Only able to be called once, will override previous call).
+	ExcludeEmpty() Updater
+	// Update implements Updater. (Only able to be called once, will override previous call).
 	// Conflict adds an ON CONFLICT clause with the specified constraint and action.
 	//
 	// Example:
@@ -168,24 +168,24 @@ type SQLUpdateChainBuilder interface {
 	//	builder.Conflict("(id)", "NOTHING")
 	//
 	// → ON CONFLICT (id) DO NOTHING
-	Conflict(constraint, do string) SQLUpdateChainBuilder
-	// Where implements SQLUpdateChainBuilder. (Accumulates previous value if called again)
-	Where(filters map[string]SQLCondition) SQLUpdateChainBuilder
-	// WhereOr implements SQLUpdateChainBuilder. (Accumulates previous value if called again)
-	WhereOr(filters ...map[string]SQLCondition) SQLUpdateChainBuilder
+	Conflict(constraint, do string) Updater
+	// Where implements Updater. (Accumulates previous value if called again)
+	Where(filters map[string]SQLCondition) Updater
+	// WhereOr implements Updater. (Accumulates previous value if called again)
+	WhereOr(filters ...map[string]SQLCondition) Updater
 
 	// Join adds an INNER JOIN clause with the specified ON condition.
 	//
 	// Example:
 	//
 	//	builder.Join("roles r", "r.id = u.role_id")
-	Join(table string, onCondition string, additionalConditions ...map[string]SQLCondition) SQLUpdateChainBuilder
+	Join(table string, onCondition string, additionalConditions ...map[string]SQLCondition) Updater
 	// LeftJoin adds a LEFT JOIN clause with the specified ON condition.
 	//
 	// Example:
 	//
 	//	builder.LeftJoin("roles r", "r.id = u.role_id")
-	LeftJoin(table string, onCondition string, additionalConditions ...map[string]SQLCondition) SQLUpdateChainBuilder
+	LeftJoin(table string, onCondition string, additionalConditions ...map[string]SQLCondition) Updater
 
 	// WithCTEBuilder adds a Common Table Expression (CTE) to the query.
 	// It adjusts argument placeholders to avoid conflicts.
@@ -199,7 +199,7 @@ type SQLUpdateChainBuilder interface {
 	// Generates:
 	//
 	//	WITH recent_orders AS (SELECT id, user_id FROM orders) ...
-	WithCTEBuilder(cteName string, cteBuilder *SQLEloquentQuery) SQLUpdateChainBuilder
+	WithCTEBuilder(cteName string, cteBuilder *SQLEloquentQuery) Updater
 
 	// WithRecursiveCTEBuilder adds a Common Table Expression (CTE) to the query.
 	// It adjusts argument placeholders to avoid conflicts.
@@ -214,14 +214,14 @@ type SQLUpdateChainBuilder interface {
 	// Generates:
 	//
 	//	WITH RECURSIVE recent_orders AS (SELECT id, user_id FROM orders) ...
-	WithRecursiveCTEBuilder(cteName string, cteBuilder *SQLEloquentQuery) SQLUpdateChainBuilder
+	WithRecursiveCTEBuilder(cteName string, cteBuilder *SQLEloquentQuery) Updater
 
-	// Return implements SQLUpdateChainBuilder. (Only able to be called once, overrides previous values if re-called).
+	// Return implements Updater. (Only able to be called once, overrides previous values if re-called).
 	// Return sets the columns to return after the update.
 	// Defaults to RETURNING id if no column is provided.
-	Return(columns ...string) SQLUpdateChainBuilder
+	Return(columns ...string) Updater
 
-	// From implements SQLUpdateChainBuilder. (Overrides previous value if called again)
+	// From implements Updater. (Overrides previous value if called again)
 	// From adds a FROM clause to the UPDATE query, allowing joins with other tables.
 	//
 	// Example:
@@ -229,7 +229,7 @@ type SQLUpdateChainBuilder interface {
 	//	builder.From([]string{"users u", "roles r"})
 	//
 	// → FROM users u, roles r
-	From(tables []string) SQLUpdateChainBuilder
+	From(tables []string) Updater
 
 	// buildUpdateQuery constructs the final UPDATE query string and its arguments.
 	// Ensures that CustomQuery is set and that a WHERE clause exists for safety.

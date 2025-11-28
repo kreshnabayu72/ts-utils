@@ -14,7 +14,7 @@ import (
 // Example:
 //
 //	builder := NewSQLInsertBuilder("users","u")
-func NewSQLInsertBuilder(tableName string, alias ...string) SQLInsertInitBuilder {
+func NewSQLInsertBuilder(tableName string, alias ...string) InsertStarter {
 	if len(alias) > 0 {
 		tableName = fmt.Sprintf("%s %s", tableName, strings.TrimSpace(alias[0]))
 	}
@@ -30,12 +30,12 @@ func NewSQLInsertBuilder(tableName string, alias ...string) SQLInsertInitBuilder
 	}
 }
 
-func (s *InsertBuilder) ExcludeEmpty() SQLInsertChainBuilder {
+func (s *InsertBuilder) ExcludeEmpty() Inserter {
 	s.excludeEmptyValue = true
 	return s
 }
 
-func (s *InsertBuilder) Conflict(constraint, do string) SQLInsertChainBuilder {
+func (s *InsertBuilder) Conflict(constraint, do string) Inserter {
 	s.ConflictClause = fmt.Sprintf(" ON CONFLICT %s DO %s", constraint, do)
 	return s
 }
@@ -43,7 +43,7 @@ func (s *InsertBuilder) Conflict(constraint, do string) SQLInsertChainBuilder {
 func (s *InsertBuilder) Insert(
 	values any,
 	returningColumns ...string,
-) SQLInsertChainBuilder {
+) Inserter {
 	if len(returningColumns) > 0 {
 		s.Columns = returningColumns
 	} else {
@@ -99,7 +99,7 @@ func (s *SQLEloquentQuery) buildInsertQuery() (string, []any, error) {
 	return s.CustomQuery, s.Args, nil
 }
 
-func (s *InsertBuilder) cachedInsertSingle(v reflect.Value) SQLInsertChainBuilder {
+func (s *InsertBuilder) cachedInsertSingle(v reflect.Value) Inserter {
 	t := v.Type()
 	typeName := t.PkgPath() + "." + t.Name()
 
@@ -203,7 +203,7 @@ func (s *InsertBuilder) cachedInsertSingle(v reflect.Value) SQLInsertChainBuilde
 	return s
 }
 
-func (s *InsertBuilder) insertSingle(v reflect.Value) SQLInsertChainBuilder {
+func (s *InsertBuilder) insertSingle(v reflect.Value) Inserter {
 	var args []any
 	var columns []string
 	var placeholders []string
@@ -257,7 +257,7 @@ func (s *InsertBuilder) insertSingle(v reflect.Value) SQLInsertChainBuilder {
 	return s
 }
 
-func (s *InsertBuilder) cachedInsertMany(slice reflect.Value) SQLInsertChainBuilder {
+func (s *InsertBuilder) cachedInsertMany(slice reflect.Value) Inserter {
 	db.InitSnowflake()
 	firstElem := slice.Index(0)
 	t := firstElem.Type()
@@ -378,7 +378,7 @@ func (s *InsertBuilder) cachedInsertMany(slice reflect.Value) SQLInsertChainBuil
 	return s
 }
 
-func (s *InsertBuilder) insertMany(slice reflect.Value) SQLInsertChainBuilder {
+func (s *InsertBuilder) insertMany(slice reflect.Value) Inserter {
 	var args []any
 	var columns []string
 	var valuePlaceholders []string

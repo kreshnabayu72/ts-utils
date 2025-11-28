@@ -14,7 +14,7 @@ import (
 //
 //	builder := NewSQLUpdateBuilder("users","u")
 //	builder.Update(user).Return("id").Build()
-func NewSQLUpdateBuilder(tableName string, alias ...string) SQLUpdateInitBuilder {
+func NewSQLUpdateBuilder(tableName string, alias ...string) UpdateStarter {
 	if len(alias) > 0 {
 		tableName = fmt.Sprintf("%s %s", tableName, strings.TrimSpace(alias[0]))
 	}
@@ -32,17 +32,17 @@ func NewSQLUpdateBuilder(tableName string, alias ...string) SQLUpdateInitBuilder
 	}
 }
 
-func (s *UpdateBuilder) Where(filters map[string]SQLCondition) SQLUpdateChainBuilder {
+func (s *UpdateBuilder) Where(filters map[string]SQLCondition) Updater {
 	s.SQLEloquentQuery.sharedWhereAndQuery(filters)
 	return s
 }
 
-func (s *UpdateBuilder) WhereOr(filters ...map[string]SQLCondition) SQLUpdateChainBuilder {
+func (s *UpdateBuilder) WhereOr(filters ...map[string]SQLCondition) Updater {
 	s.SQLEloquentQuery.sharedWhereOrQuery(filters...)
 	return s
 }
 
-func (s *UpdateBuilder) Join(table string, onCondition string, additionalConditions ...map[string]SQLCondition) SQLUpdateChainBuilder {
+func (s *UpdateBuilder) Join(table string, onCondition string, additionalConditions ...map[string]SQLCondition) Updater {
 	if table == "" {
 		return s
 	}
@@ -62,7 +62,7 @@ func (s *UpdateBuilder) Join(table string, onCondition string, additionalConditi
 	return s
 }
 
-func (s *UpdateBuilder) LeftJoin(table string, mainCondition string, additionalConditions ...map[string]SQLCondition) SQLUpdateChainBuilder {
+func (s *UpdateBuilder) LeftJoin(table string, mainCondition string, additionalConditions ...map[string]SQLCondition) Updater {
 	if table == "" {
 		return s
 	}
@@ -82,7 +82,7 @@ func (s *UpdateBuilder) LeftJoin(table string, mainCondition string, additionalC
 	return s
 }
 
-func (s *UpdateBuilder) WithCTEBuilder(cteName string, cteBuilder *SQLEloquentQuery) SQLUpdateChainBuilder {
+func (s *UpdateBuilder) WithCTEBuilder(cteName string, cteBuilder *SQLEloquentQuery) Updater {
 	cteQuery, cteArgs, err := cteBuilder.Build()
 	if err != nil {
 		s.LastError = err
@@ -101,7 +101,7 @@ func (s *UpdateBuilder) WithCTEBuilder(cteName string, cteBuilder *SQLEloquentQu
 	return s
 }
 
-func (s *UpdateBuilder) WithRecursiveCTEBuilder(cteName string, cteBuilder *SQLEloquentQuery) SQLUpdateChainBuilder {
+func (s *UpdateBuilder) WithRecursiveCTEBuilder(cteName string, cteBuilder *SQLEloquentQuery) Updater {
 	cteQuery, cteArgs, err := cteBuilder.Build()
 	if err != nil {
 		s.LastError = err
@@ -122,12 +122,12 @@ func (s *UpdateBuilder) WithRecursiveCTEBuilder(cteName string, cteBuilder *SQLE
 	return s
 }
 
-func (s *UpdateBuilder) ExcludeEmpty() SQLUpdateChainBuilder {
+func (s *UpdateBuilder) ExcludeEmpty() Updater {
 	s.excludeEmptyValue = true
 	return s
 }
 
-func (s *UpdateBuilder) Return(column ...string) SQLUpdateChainBuilder {
+func (s *UpdateBuilder) Return(column ...string) Updater {
 	if len(column) > 0 {
 		s.Columns = column
 	} else {
@@ -136,12 +136,12 @@ func (s *UpdateBuilder) Return(column ...string) SQLUpdateChainBuilder {
 	return s
 }
 
-func (s *UpdateBuilder) Conflict(constraint, do string) SQLUpdateChainBuilder {
+func (s *UpdateBuilder) Conflict(constraint, do string) Updater {
 	s.ConflictClause = fmt.Sprintf(" ON CONFLICT %s DO %s", constraint, do)
 	return s
 }
 
-func (s *UpdateBuilder) AddCase(setColumn string, fn func(b UpdateCases)) SQLUpdateChainBuilder {
+func (s *UpdateBuilder) AddCase(setColumn string, fn func(b UpdateCases)) Updater {
 	s.UpdateCaseClauses = make(map[string][]UpdateCaseParam, 0)
 	s.UpdateCaseClauses[setColumn] = []UpdateCaseParam{}
 	s.currentUpdateCaseKey = setColumn
@@ -195,7 +195,7 @@ func (s *UpdateBuilder) Else(value any, isRef bool) {
 	)
 }
 
-func (s *UpdateBuilder) Update(values UpdateQuery) SQLUpdateChainBuilder {
+func (s *UpdateBuilder) Update(values UpdateQuery) Updater {
 	// Directly call extractUpdateFieldsMap since UpdateQuery is map[string]any
 	setClauses, hasUpdatedAt := s.extractUpdateFieldsMap(values)
 
@@ -208,7 +208,7 @@ func (s *UpdateBuilder) Update(values UpdateQuery) SQLUpdateChainBuilder {
 	return s
 }
 
-func (s *UpdateBuilder) UpdateEach(values any, rowIdentifier string) SQLUpdateChainBuilder {
+func (s *UpdateBuilder) UpdateEach(values any, rowIdentifier string) Updater {
 	v := reflect.ValueOf(values)
 
 	// Slice data, plus length checking
@@ -253,7 +253,7 @@ func (s *UpdateBuilder) UpdateEach(values any, rowIdentifier string) SQLUpdateCh
 
 func (s *UpdateBuilder) Increment(
 	values map[string]any,
-) SQLUpdateChainBuilder {
+) Updater {
 	var setClauses []string
 
 	for key, val := range values {
@@ -272,7 +272,7 @@ func (s *UpdateBuilder) Increment(
 	return s
 }
 
-func (s *UpdateBuilder) From(tables []string) SQLUpdateChainBuilder {
+func (s *UpdateBuilder) From(tables []string) Updater {
 	if len(tables) < 1 {
 		return s
 	}

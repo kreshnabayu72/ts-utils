@@ -11,7 +11,7 @@ import (
 // Example:
 //
 //	builder := NewSQLDeleteBuilder("users","u")
-func NewSQLDeleteBuilder(tableName string, alias ...string) SQLDeleteInitBuilder {
+func NewSQLDeleteBuilder(tableName string, alias ...string) DeleteStarter {
 	if len(alias) > 0 {
 		tableName = fmt.Sprintf("%s %s", tableName, strings.TrimSpace(alias[0]))
 	}
@@ -29,17 +29,17 @@ func NewSQLDeleteBuilder(tableName string, alias ...string) SQLDeleteInitBuilder
 	}
 }
 
-func (s *DeleteBuilder) Where(filters map[string]SQLCondition) SQLDeleteChainBuilder {
+func (s *DeleteBuilder) Where(filters map[string]SQLCondition) Deleter {
 	s.SQLEloquentQuery.sharedWhereAndQuery(filters)
 	return s
 }
 
-func (s *DeleteBuilder) WhereOr(filters ...map[string]SQLCondition) SQLDeleteChainBuilder {
+func (s *DeleteBuilder) WhereOr(filters ...map[string]SQLCondition) Deleter {
 	s.SQLEloquentQuery.sharedWhereOrQuery(filters...)
 	return s
 }
 
-func (s *DeleteBuilder) Delete(returningColumns ...string) SQLDeleteChainBuilder {
+func (s *DeleteBuilder) Delete(returningColumns ...string) Deleter {
 	if len(returningColumns) > 0 {
 		s.Columns = returningColumns
 	} else {
@@ -53,7 +53,7 @@ func (s *DeleteBuilder) Delete(returningColumns ...string) SQLDeleteChainBuilder
 	return s
 }
 
-func (s *DeleteBuilder) Using(tables []string) SQLDeleteChainBuilder {
+func (s *DeleteBuilder) Using(tables []string) Deleter {
 	if len(tables) < 1 {
 		return s
 	}
