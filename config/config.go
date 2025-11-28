@@ -21,6 +21,8 @@ type ConfigOptions struct {
 
 	POSTGRES_USERNAME string
 	POSTGRES_PASSWORD string
+	POSTGRES_HOST     string
+	POSTGRES_PORT     string
 
 	// SSH_* is currently used exclusively for postgres connection.
 	SSH_HOST     string
@@ -73,6 +75,14 @@ func LoadConfig(filenames ...string) ConfigOptions {
 
 	config.POSTGRES_USERNAME = os.Getenv("POSTGRES_USERNAME")
 	config.POSTGRES_PASSWORD = os.Getenv("POSTGRES_PASSWORD")
+
+	if config.POSTGRES_HOST = os.Getenv("POSTGRES_HOST"); config.POSTGRES_HOST == "" {
+		config.POSTGRES_HOST = "localhost"
+	}
+
+	if config.POSTGRES_PORT = os.Getenv("POSTGRES_PORT"); config.POSTGRES_PORT == "" {
+		config.POSTGRES_PORT = "5432"
+	}
 
 	config.SSH_HOST = os.Getenv("SSH_HOST")
 	config.SSH_USER = os.Getenv("SSH_USER")
