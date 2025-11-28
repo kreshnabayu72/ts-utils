@@ -6,8 +6,9 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
-	"time"
 )
+
+type UpdateQuery map[string]any
 
 type UpdateRawSQL struct {
 	Expr string
@@ -54,31 +55,16 @@ type UpdateCases interface {
 // To ensure SQLUpdateBuilder has its own initial methods
 // e.g. UpdateBuilder(...).Update()...Rest
 type SQLUpdateInitBuilder interface {
-	// Update builds an UPDATE query for a single struct or map using reflection.
+	// Update builds an UPDATE query using UpdateQuery (map[string]any).
 	//
 	// It supports two value types:
 	//   • Normal values (int, string, time.Time, etc.): converted into positional parameters ($1, $2, …).
 	//   • Raw SQL expressions: allows embedding expressions with placeholders ("?")
 	//     which will be replaced with proper PostgreSQL-style parameters ($1, $2, …).
 	//
-	// Example using struct:
+	// Example:
 	//
-	//     type GroupQuota struct {
-	//         Used int `column:"used"`
-	//         Available sql_query.UpdateRawSQL `column:"available"`
-	//     }
-	//
-	//     builder.Update(GroupQuota{
-	//         Used: 5,
-	//         Available: sql_query.UpdateRawSQL{
-	//             Expr: "CASE WHEN available IS NULL THEN NULL ELSE available - ? END",
-	//             Args: []any{5},
-	//         },
-	//     })
-	//
-	// Example using map:
-	//
-	//     builder.Update(map[string]any{
+	//     builder.Update(sql_query.UpdateQuery{
 	//         "used": 5,
 	//         "available": sql_query.UpdateRawSQL{
 	//             Expr: "CASE WHEN available IS NULL THEN NULL ELSE available - ? END",
@@ -87,7 +73,7 @@ type SQLUpdateInitBuilder interface {
 	//     })
 	//
 	// By default, it will automatically add `updated_at = NOW()` if not explicitly provided.
-	Update(values any) SQLUpdateChainBuilder
+	Update(values UpdateQuery) SQLUpdateChainBuilder
 	// UpdateEach updates multiple rows at once using VALUES() with a slice of structs.
 	// Matches rows using the given rowIdentifier (e.g., "id").
 	//
@@ -146,14 +132,6 @@ type SQLUpdateInitBuilder interface {
 		slice reflect.Value,
 		rowIdentifier string,
 	) ([]string, []string, []string)
-
-	// extractUpdateFieldsStruct goes through a struct's fields and turns them into
-	// SET clauses for an UPDATE query. It uses the "column" or "json" tag (or
-	// the field name if tags are missing) to pick the column name.
-	//
-	// It also checks if an "updated_at" field exists, so the builder knows
-	// whether to add "updated_at = NOW()" automatically.
-	extractUpdateFieldsStruct(v reflect.Value) ([]string, bool)
 
 	// extractUpdateFieldsMap takes a map[string]any and returns a slice of
 	// SET clauses for an UPDATE query. It uses the map keys as column names.
@@ -431,19 +409,9 @@ func (s *UpdateBuilder) Else(value any, isRef bool) {
 	)
 }
 
-func (s *UpdateBuilder) Update(values any) SQLUpdateChainBuilder {
-	v := reflect.ValueOf(values)
-
-	setClauses := []string{}
-	hasUpdatedAt := false
-	if v.Kind() == reflect.Struct {
-		setClauses, hasUpdatedAt = s.extractUpdateFieldsStruct(v)
-	} else if v.Kind() == reflect.Map {
-		setClauses, hasUpdatedAt = s.extractUpdateFieldsMap(values.(map[string]any))
-	} else {
-		s.LastError = fmt.Errorf("invalid update values: expected struct or map, got %T", values)
-		return s
-	}
+func (s *UpdateBuilder) Update(values UpdateQuery) SQLUpdateChainBuilder {
+	// Directly call extractUpdateFieldsMap since UpdateQuery is map[string]any
+	setClauses, hasUpdatedAt := s.extractUpdateFieldsMap(values)
 
 	if !hasUpdatedAt {
 		setClauses = append(setClauses, `"updated_at" = NOW()`)
@@ -692,94 +660,6 @@ func (s *UpdateBuilder) updateEachClausesGenerator(
 	return setClauses, valueClauses, valuePlaceholders
 }
 
-func (s *UpdateBuilder) extractUpdateFieldsStruct(v reflect.Value) ([]string, bool) {
-	var setClauses []string
-	var hasUpdatedAt bool
-
-	t := v.Type()
-
-	for i := 0; i < v.NumField(); i++ {
-		field := t.Field(i)
-		val := v.Field(i)
-
-		if val.IsZero() && s.excludeEmptyValue {
-			continue
-		}
-
-		// Skip unexported or invalid fields
-		if !val.IsValid() || !val.CanInterface() {
-			continue
-		}
-
-		jsonTag := field.Tag.Get("json")
-
-		specialTag := field.Tag.Get("special")
-
-		// Handle ignored fields
-		if jsonTag == "-" || strings.Contains(specialTag, "generated") {
-			continue
-		}
-
-		// Use column tag > json tag > field name
-		col := field.Tag.Get("column")
-		if col == "" {
-			if jsonTag != "" {
-				col = CamelToSnake(jsonTag)
-			} else {
-				col = CamelToSnake(field.Name)
-			}
-		}
-		// Slice from the first character all the way to the "." character
-		if strings.Contains(col, ".") {
-			col = col[strings.Index(col, ".")+1:]
-		}
-
-		// Recurse into nested structs (excluding time.Time)
-		if val.Kind() == reflect.Struct && field.Type != reflect.TypeOf(time.Time{}) && field.Type != reflect.TypeOf(UpdateRawSQL{}) {
-			childClauses, childHasUpdated := s.extractUpdateFieldsStruct(val)
-			setClauses = append(setClauses, childClauses...)
-			if childHasUpdated {
-				hasUpdatedAt = true
-			}
-			continue
-		}
-
-		// If value is a map, recurse into it
-		if val.Kind() == reflect.Map {
-			childClauses, childHasUpdated := s.extractUpdateFieldsMap(
-				val.Interface().(map[string]any),
-			)
-			setClauses = append(setClauses, childClauses...)
-			if childHasUpdated {
-				hasUpdatedAt = true
-			}
-			continue
-		}
-
-		fieldVal := val.Interface()
-
-		switch v := fieldVal.(type) {
-		case UpdateRawSQL:
-			expr := v.Expr
-			for _, arg := range v.Args {
-				expr = strings.Replace(expr, "?", fmt.Sprintf("$%d", len(s.Args)+1), 1)
-				s.Args = append(s.Args, arg)
-			}
-			setClauses = append(setClauses, fmt.Sprintf(`"%s" = %s`, col, expr))
-
-		default:
-			setClauses = append(setClauses, fmt.Sprintf(`"%s" = $%d`, col, len(s.Args)+1))
-			s.Args = append(s.Args, fieldVal)
-		}
-
-		if col == "updated_at" {
-			hasUpdatedAt = true
-		}
-	}
-
-	return setClauses, hasUpdatedAt
-}
-
 func (s *UpdateBuilder) extractUpdateFieldsMap(v map[string]any) ([]string, bool) {
 	setClauses := []string{}
 	hasUpdatedAt := false
@@ -791,15 +671,6 @@ func (s *UpdateBuilder) extractUpdateFieldsMap(v map[string]any) ([]string, bool
 		}
 
 		v := reflect.ValueOf(value)
-		// if value is a struct, recurse into it
-		if v.Kind() == reflect.Struct && v.Type() != reflect.TypeOf(time.Time{}) && v.Type() != reflect.TypeOf(UpdateRawSQL{}) {
-			childClauses, childHasUpdated := s.extractUpdateFieldsStruct(v)
-			setClauses = append(setClauses, childClauses...)
-			if childHasUpdated {
-				hasUpdatedAt = true
-			}
-			continue
-		}
 
 		// if value is map, recurse into it
 		if v.Kind() == reflect.Map {
