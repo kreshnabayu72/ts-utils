@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/db"
-	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/dto"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/sql_query"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/sql_query/common_builders"
 	"github.com/jackc/pgx/v5"
@@ -157,7 +156,7 @@ type PostgreSQLServicer interface {
 		ctx context.Context,
 		tableName string,
 		query map[string]sql_query.SQLCondition,
-		body any,
+		body sql_query.UpdateQuery,
 		returnOption ...ReturningConfig,
 	) (any, error)
 	// UpdateMany executes an UPDATE query that may affect multiple rows
@@ -189,7 +188,7 @@ type PostgreSQLServicer interface {
 		ctx context.Context,
 		tableName string,
 		query map[string]sql_query.SQLCondition,
-		body any,
+		body sql_query.UpdateQuery,
 		returnOption ...ReturningConfig,
 	) (int64, error)
 	// UpdateEachWithData performs a bulk update per row (row-specific values)
@@ -623,7 +622,7 @@ func (s *PostgreSQLService) UpdateOneWithData(
 	ctx context.Context,
 	tableName string,
 	query map[string]sql_query.SQLCondition,
-	body any,
+	body sql_query.UpdateQuery,
 	returnOption ...ReturningConfig,
 ) (any, error) {
 	returnColumn := []string{}
@@ -670,7 +669,7 @@ func (s *PostgreSQLService) UpdateManyWithData(
 	ctx context.Context,
 	tableName string,
 	query map[string]sql_query.SQLCondition,
-	body any,
+	body sql_query.UpdateQuery,
 	returnOption ...ReturningConfig,
 ) (int64, error) {
 	returnColumn := []string{}
@@ -720,10 +719,15 @@ func (s *PostgreSQLService) SoftDeleteOne(
 	if len(returnOption) > 0 {
 		returnColumn = append(returnColumn, returnOption[0].Column...)
 	}
-	queryString, args := common_builders.UpdateBuilder(tableName, filter, dto.SetSoftDelete{
-		IsDeleted: true,
-		DeletedAt: "NOW()",
-	}, returnColumn...)
+	queryString, args := common_builders.UpdateBuilder(
+		tableName,
+		filter,
+		sql_query.UpdateQuery{
+			"is_deleted": true,
+			"deleted_at": "NOW()",
+		},
+		returnColumn...,
+	)
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	if len(returnOption) > 0 && returnOption[0].Destination != nil {
@@ -745,9 +749,9 @@ func (s *PostgreSQLService) SoftDeleteMany(
 	}
 	queryString, args := common_builders.UpdateBuilder(tableName,
 		filter,
-		dto.SetSoftDelete{
-			IsDeleted: true,
-			DeletedAt: "NOW()",
+		sql_query.UpdateQuery{
+			"is_deleted": true,
+			"deleted_at": "NOW()",
 		},
 		returnColumn...,
 	)
@@ -871,7 +875,6 @@ func UseTransactions[T any](
 		}()
 
 		result, err = fn(tx)
-
 		if err != nil {
 			log.Printf("Error %v\n", err.Error())
 		}
