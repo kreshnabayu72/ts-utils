@@ -330,22 +330,11 @@ func (s *PostgreSQLService) Count(
 	queryString string,
 	args ...any,
 ) (int, error) {
-	shouldShowQuery(s.debugLevel, queryString, args...)
-
 	var count int
-	var err error
-
-	if s.Transaction != nil {
-		err = s.Transaction.QueryRow(ctx, queryString, args...).Scan(&count)
-	} else {
-		err = s.Pool.QueryRow(ctx, queryString, args...).Scan(&count)
-	}
-
-	if err != nil {
+	if err := s.executeQueryRow(ctx, queryString, args, &count); err != nil {
 		log.Println("Count query failed:", err)
 		return 0, err
 	}
-
 	return count, nil
 }
 
@@ -353,17 +342,7 @@ func (s *PostgreSQLService) Execute(
 	ctx context.Context,
 	queryString string,
 ) error {
-	shouldShowQuery(s.debugLevel, queryString)
-
-	var rows pgx.Rows
-	var err error
-
-	if s.Transaction != nil {
-		rows, err = s.Transaction.Query(ctx, queryString)
-	} else {
-		rows, err = s.Pool.Query(ctx, queryString)
-	}
-
+	rows, err := s.executeQuery(ctx, queryString, nil)
 	if err != nil {
 		return err
 	}
@@ -388,17 +367,7 @@ func (s *PostgreSQLService) SelectOne(
 	queryString string,
 	args ...any,
 ) error {
-	shouldShowQuery(s.debugLevel, queryString, args...)
-
-	var rows pgx.Rows
-	var err error
-
-	if s.Transaction != nil {
-		rows, err = s.Transaction.Query(ctx, queryString, args...)
-	} else {
-		rows, err = s.Pool.Query(ctx, queryString, args...)
-	}
-
+	rows, err := s.executeQuery(ctx, queryString, args)
 	if err != nil {
 		return err
 	}
@@ -419,17 +388,7 @@ func (s *PostgreSQLService) SelectMany(
 	queryString string,
 	args ...any,
 ) error {
-	shouldShowQuery(s.debugLevel, queryString, args...)
-
-	var rows pgx.Rows
-	var err error
-
-	if s.Transaction != nil {
-		rows, err = s.Transaction.Query(ctx, queryString, args...)
-	} else {
-		rows, err = s.Pool.Query(ctx, queryString, args...)
-	}
-
+	rows, err := s.executeQuery(ctx, queryString, args)
 	if err != nil {
 		return err
 	}
@@ -454,21 +413,10 @@ func (s *PostgreSQLService) InsertOne(
 	queryString string,
 	args ...any,
 ) (any, error) {
-	shouldShowQuery(s.debugLevel, queryString, args...)
-
 	var resultId int
-	var err error
-
-	if s.Transaction != nil {
-		err = s.Transaction.QueryRow(ctx, queryString, args...).Scan(&resultId)
-	} else {
-		err = s.Pool.QueryRow(ctx, queryString, args...).Scan(&resultId)
-	}
-
-	if err != nil {
+	if err := s.executeQueryRow(ctx, queryString, args, &resultId); err != nil {
 		return nil, err
 	}
-
 	return resultId, nil
 }
 
@@ -496,22 +444,7 @@ func (s *PostgreSQLService) InsertMany(
 	queryString string,
 	args ...any,
 ) (int64, error) {
-	shouldShowQuery(s.debugLevel, queryString, args...)
-
-	var commandTag pgconn.CommandTag
-	var err error
-
-	if s.Transaction != nil {
-		commandTag, err = s.Transaction.Exec(ctx, queryString, args...)
-	} else {
-		commandTag, err = s.Pool.Exec(ctx, queryString, args...)
-	}
-
-	if err != nil {
-		return 0, err
-	}
-
-	return commandTag.RowsAffected(), nil
+	return s.executeExec(ctx, queryString, args)
 }
 
 func (s *PostgreSQLService) InsertManyWithData(
@@ -600,21 +533,10 @@ func (s *PostgreSQLService) UpdateOne(
 	queryString string,
 	args ...any,
 ) (any, error) {
-	shouldShowQuery(s.debugLevel, queryString, args...)
-
 	var resultId int
-	var err error
-
-	if s.Transaction != nil {
-		err = s.Transaction.QueryRow(ctx, queryString, args...).Scan(&resultId)
-	} else {
-		err = s.Pool.QueryRow(ctx, queryString, args...).Scan(&resultId)
-	}
-
-	if err != nil {
+	if err := s.executeQueryRow(ctx, queryString, args, &resultId); err != nil {
 		return nil, err
 	}
-
 	return resultId, nil
 }
 
@@ -647,22 +569,7 @@ func (s *PostgreSQLService) UpdateMany(
 	queryString string,
 	args ...any,
 ) (int64, error) {
-	shouldShowQuery(s.debugLevel, queryString, args...)
-
-	var commandTag pgconn.CommandTag
-	var err error
-
-	if s.Transaction != nil {
-		commandTag, err = s.Transaction.Exec(ctx, queryString, args...)
-	} else {
-		commandTag, err = s.Pool.Exec(ctx, queryString, args...)
-	}
-
-	if err != nil {
-		return 0, err
-	}
-
-	return commandTag.RowsAffected(), nil
+	return s.executeExec(ctx, queryString, args)
 }
 
 func (s *PostgreSQLService) UpdateManyWithData(
@@ -771,21 +678,10 @@ func (s *PostgreSQLService) DeleteOne(
 	queryString string,
 	args ...any,
 ) (any, error) {
-	shouldShowQuery(s.debugLevel, queryString, args...)
-
 	var resultId int
-	var err error
-
-	if s.Transaction != nil {
-		err = s.Transaction.QueryRow(ctx, queryString, args...).Scan(&resultId)
-	} else {
-		err = s.Pool.QueryRow(ctx, queryString, args...).Scan(&resultId)
-	}
-
-	if err != nil {
+	if err := s.executeQueryRow(ctx, queryString, args, &resultId); err != nil {
 		return nil, err
 	}
-
 	return resultId, nil
 }
 
@@ -804,22 +700,7 @@ func (s *PostgreSQLService) DeleteMany(
 	queryString string,
 	args ...any,
 ) (int64, error) {
-	shouldShowQuery(s.debugLevel, queryString, args...)
-
-	var commandTag pgconn.CommandTag
-	var err error
-
-	if s.Transaction != nil {
-		commandTag, err = s.Transaction.Exec(ctx, queryString, args...)
-	} else {
-		commandTag, err = s.Pool.Exec(ctx, queryString, args...)
-	}
-
-	if err != nil {
-		return 0, err
-	}
-
-	return commandTag.RowsAffected(), nil
+	return s.executeExec(ctx, queryString, args)
 }
 
 func (s *PostgreSQLService) DeleteManyWithFilter(
@@ -834,6 +715,89 @@ func (s *PostgreSQLService) DeleteManyWithFilter(
 
 func (s *PostgreSQLService) Close() {
 	s.Pool.Close()
+}
+
+// executeQueryRow handles transaction/pool selection for QueryRow operations.
+// It automatically calls shouldShowQuery for debug logging.
+//
+// Parameters:
+//   - ctx: context for the operation
+//   - queryString: the SQL query to execute
+//   - args: query arguments
+//   - dest: pointer to destination variable for Scan (e.g., &resultId)
+//
+// Returns:
+//   - error: any error from QueryRow or Scan
+func (s *PostgreSQLService) executeQueryRow(
+	ctx context.Context,
+	queryString string,
+	args []any,
+	dest any,
+) error {
+	shouldShowQuery(s.debugLevel, queryString, args...)
+
+	if s.Transaction != nil {
+		return s.Transaction.QueryRow(ctx, queryString, args...).Scan(dest)
+	}
+	return s.Pool.QueryRow(ctx, queryString, args...).Scan(dest)
+}
+
+// executeExec handles transaction/pool selection for Exec operations.
+// It automatically calls shouldShowQuery for debug logging.
+//
+// Parameters:
+//   - ctx: context for the operation
+//   - queryString: the SQL query to execute
+//   - args: query arguments
+//
+// Returns:
+//   - int64: number of rows affected
+//   - error: any error from Exec
+func (s *PostgreSQLService) executeExec(
+	ctx context.Context,
+	queryString string,
+	args []any,
+) (int64, error) {
+	shouldShowQuery(s.debugLevel, queryString, args...)
+
+	var commandTag pgconn.CommandTag
+	var err error
+
+	if s.Transaction != nil {
+		commandTag, err = s.Transaction.Exec(ctx, queryString, args...)
+	} else {
+		commandTag, err = s.Pool.Exec(ctx, queryString, args...)
+	}
+
+	if err != nil {
+		return 0, err
+	}
+	return commandTag.RowsAffected(), nil
+}
+
+// executeQuery handles transaction/pool selection for Query operations.
+// It automatically calls shouldShowQuery for debug logging.
+// Caller is responsible for closing the returned rows.
+//
+// Parameters:
+//   - ctx: context for the operation
+//   - queryString: the SQL query to execute
+//   - args: query arguments
+//
+// Returns:
+//   - pgx.Rows: the result rows (must be closed by caller)
+//   - error: any error from Query
+func (s *PostgreSQLService) executeQuery(
+	ctx context.Context,
+	queryString string,
+	args []any,
+) (pgx.Rows, error) {
+	shouldShowQuery(s.debugLevel, queryString, args...)
+
+	if s.Transaction != nil {
+		return s.Transaction.Query(ctx, queryString, args...)
+	}
+	return s.Pool.Query(ctx, queryString, args...)
 }
 
 // UseTransactions executes fn within a transaction.
