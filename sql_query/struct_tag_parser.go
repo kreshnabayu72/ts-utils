@@ -112,7 +112,7 @@ func traverseNestedStruct(parentField FieldMeta, nestedFieldMeta []FieldMeta) st
 			continue
 		}
 
-		exprs = append(exprs, fmt.Sprintf(`'%s', %s`, jsonTag, escapeQuoteColumns(columnTag)))
+		exprs = append(exprs, fmt.Sprintf(`'%s', %s`, jsonTag, EscapeQuoteColumns(columnTag)))
 	}
 
 	if len(exprs) == 0 {
