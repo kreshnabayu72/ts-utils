@@ -232,6 +232,7 @@ func IndexOf[T any](src []T, findFn func(T) bool) int {
 
 // Distinct is a utility function that removes duplicate elements from a slice of any comparable type (T).
 // It returns a new slice containing only unique elements from the input slice.
+// Time complexity: O(n) using hashmap for deduplication.
 //
 // Parameters:
 // - src: A slice of elements of type T from which duplicates will be removed.
@@ -245,18 +246,17 @@ func IndexOf[T any](src []T, findFn func(T) bool) int {
 // uniqueNumbers := Distinct(numbers)
 // fmt.Println(uniqueNumbers) // Output: [1, 2, 3, 4, 5]
 func Distinct[T comparable](src []T) []T {
-	distincted := []T{}
-	for _, v := range src {
-		found := Find(distincted, func(d T, _ int) bool {
-			return d == v
-		})
+	seen := make(map[T]struct{}, len(src))
+	result := make([]T, 0, len(src))
 
-		if found == nil {
-			distincted = append(distincted, v)
+	for _, v := range src {
+		if _, exists := seen[v]; !exists {
+			seen[v] = struct{}{}
+			result = append(result, v)
 		}
 	}
 
-	return distincted
+	return result
 }
 
 // DistinctBy is a utility function that removes duplicate elements from a slice of any type (T)
@@ -339,6 +339,7 @@ func Reduce[T any, R any](
 
 // Contains checks whether a given value exists in a slice of comparable elements.
 // It iterates through the slice and returns true if the value is found, otherwise false.
+// Time complexity: O(n) with early return optimization.
 //
 // Parameters:
 // - src: A slice of elements of type T to be searched. The type T must be comparable.
@@ -357,13 +358,10 @@ func Reduce[T any, R any](
 //	fmt.Println(Contains(fruits, "banana")) // Output: true
 //	fmt.Println(Contains(fruits, "grape"))  // Output: false
 func Contains[T comparable](src []T, value T) bool {
-	contain := false
 	for _, v := range src {
-		contain = v == value
-		if contain {
-			break
+		if v == value {
+			return true
 		}
 	}
-
-	return contain
+	return false
 }
