@@ -39,6 +39,11 @@ func (m *MockRedisService) Del(ctx context.Context, keys ...string) error {
 	return args.Error(0)
 }
 
+func (m *MockRedisService) HGetAll(ctx context.Context, key string) (map[string]string, error) {
+	args := m.Called(ctx, key)
+	return args.Get(0).(map[string]string), args.Error(1)
+}
+
 func (m *MockRedisService) Close() {
 	m.Called()
 }

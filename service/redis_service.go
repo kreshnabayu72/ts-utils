@@ -16,6 +16,7 @@ type RedisServicer interface {
 	Set(ctx context.Context, key string, value any, expiration time.Duration) error
 	Get(ctx context.Context, key string) (string, error)
 	Del(ctx context.Context, keys ...string) error
+	HGetAll(ctx context.Context, key string) (map[string]string, error)
 	Close()
 }
 
@@ -57,6 +58,12 @@ func (s *RedisService) Get(ctx context.Context, key string) (string, error) {
 func (s *RedisService) Del(ctx context.Context, keys ...string) error {
 	slog.Debug("Redis Del", "keys", keys)
 	return s.Client.Del(ctx, keys...).Err()
+}
+
+// HGetAll retrieves all fields and values of the hash stored at key.
+func (s *RedisService) HGetAll(ctx context.Context, key string) (map[string]string, error) {
+	slog.Debug("Redis HGetAll", "key", key)
+	return s.Client.HGetAll(ctx, key).Result()
 }
 
 func (s *RedisService) Close() {
