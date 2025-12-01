@@ -44,6 +44,11 @@ func (m *MockRedisService) HGetAll(ctx context.Context, key string) (map[string]
 	return args.Get(0).(map[string]string), args.Error(1)
 }
 
+func (m *MockRedisService) Expire(ctx context.Context, key string, expiration time.Duration) error {
+	args := m.Called(ctx, key, expiration)
+	return args.Error(0)
+}
+
 func (m *MockRedisService) Close() {
 	m.Called()
 }

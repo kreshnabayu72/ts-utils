@@ -17,6 +17,7 @@ type RedisServicer interface {
 	Get(ctx context.Context, key string) (string, error)
 	Del(ctx context.Context, keys ...string) error
 	HGetAll(ctx context.Context, key string) (map[string]string, error)
+	Expire(ctx context.Context, key string, expiration time.Duration) error
 	Close()
 }
 
@@ -64,6 +65,12 @@ func (s *RedisService) Del(ctx context.Context, keys ...string) error {
 func (s *RedisService) HGetAll(ctx context.Context, key string) (map[string]string, error) {
 	slog.Debug("Redis HGetAll", "key", key)
 	return s.Client.HGetAll(ctx, key).Result()
+}
+
+// Expire sets a timeout on key.
+func (s *RedisService) Expire(ctx context.Context, key string, expiration time.Duration) error {
+	slog.Debug("Redis Expire", "key", key, "expiration", expiration)
+	return s.Client.Expire(ctx, key, expiration).Err()
 }
 
 func (s *RedisService) Close() {
