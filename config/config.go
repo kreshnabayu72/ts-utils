@@ -29,6 +29,10 @@ type ConfigOptions struct {
 	SSH_USER     string
 	SSH_PASSWORD string
 
+	REDIS_HOST     string
+	REDIS_PORT     string
+	REDIS_PASSWORD string
+
 	// Mailer specific configurations.
 	MAILER_USER     string
 	MAILER_PASSWORD string
@@ -87,6 +91,15 @@ func LoadConfig(filenames ...string) ConfigOptions {
 	config.SSH_HOST = os.Getenv("SSH_HOST")
 	config.SSH_USER = os.Getenv("SSH_USER")
 	config.SSH_PASSWORD = os.Getenv("SSH_PASSWORD")
+
+	if config.REDIS_HOST = os.Getenv("REDIS_HOST"); config.REDIS_HOST == "" {
+		config.REDIS_HOST = "localhost"
+	}
+	if config.REDIS_PORT = os.Getenv("REDIS_PORT"); config.REDIS_PORT == "" {
+		config.REDIS_PORT = "6379"
+	}
+
+	config.REDIS_PASSWORD = os.Getenv("REDIS_PASSWORD")
 
 	config.MAILER_USER = os.Getenv("MAILER_USER")
 	config.MAILER_PASSWORD = os.Getenv("MAILER_PASSWORD")

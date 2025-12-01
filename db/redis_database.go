@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"os"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -21,9 +22,9 @@ func ConnectRedis(options ...RedisServiceOptions) *redis.Client {
 	slog.Debug("Connecting to Redis...")
 
 	opts := RedisServiceOptions{
-		Host:     "localhost",
-		Port:     "6379",
-		Password: "",
+		Host:     os.Getenv("REDIS_HOST"),
+		Port:     os.Getenv("REDIS_PORT"),
+		Password: os.Getenv("REDIS_PASSWORD"),
 		DB:       0,
 		Timeout:  5 * time.Second,
 	}
