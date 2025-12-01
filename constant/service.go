@@ -1,5 +1,6 @@
 package constant
 
 const (
-	IAM_SERVICE_NAME = "iam-service"
+	API_GATEWAY_SERVICE_NAME = "api-gateway-service"
+	IAM_SERVICE_NAME         = "iam-service"
 )
