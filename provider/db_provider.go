@@ -12,6 +12,7 @@ type DBProviderer interface {
 	Init()
 	MakeMongoDBService(dbName db.DBName, collection string) service.MongoDBServicer
 	MakePostgreSQLService(dbName db.DBName, options ...db.PostgreSQLServiceOptions) service.PostgreSQLServicer
+	MakeRedisService(options ...db.RedisServiceOptions) service.RedisServicer
 	Close()
 }
 
@@ -30,6 +31,11 @@ func (dp *DBProvider) MakeMongoDBService(dbName db.DBName, collection string) se
 // MakePostgreSQLService creates a postgresql service
 func (dp *DBProvider) MakePostgreSQLService(dbName db.DBName, options ...db.PostgreSQLServiceOptions) service.PostgreSQLServicer {
 	return service.MakePostgreSQLService(dbName, options...)
+}
+
+// MakeRedisService creates a redis service
+func (dp *DBProvider) MakeRedisService(options ...db.RedisServiceOptions) service.RedisServicer {
+	return service.MakeRedisService(options...)
 }
 
 func (dp *DBProvider) Close() {

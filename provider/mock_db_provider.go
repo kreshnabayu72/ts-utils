@@ -27,6 +27,11 @@ func (m *MockDBProvider) MakePostgreSQLService(dbName db.DBName, options ...db.P
 	return args.Get(0).(service.PostgreSQLServicer)
 }
 
+func (m *MockDBProvider) MakeRedisService(options ...db.RedisServiceOptions) service.RedisServicer {
+	args := m.Called(options)
+	return args.Get(0).(service.RedisServicer)
+}
+
 func (m *MockDBProvider) Close() {
 	// Pass
 }
