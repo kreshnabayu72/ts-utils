@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-# Get the highest tag number
-VERSION=`git describe --abbrev=0 --tags`
+# Get the highest tag number across ALL branches (not just current commit history)
+VERSION=`git tag --sort=-version:refname | head -1`
 VERSION=${VERSION:-'0.0.0'}
 
 # Get number parts
