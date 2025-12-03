@@ -25,4 +25,8 @@ const (
 	AnalyticsReportingCreateSystemLogActivity     AnalyticsReportingActivityType = "CreateSystemLogActivity"
 	AnalyticsReportingCreateUserActionLogActivity AnalyticsReportingActivityType = "CreateUserActionLogActivity"
 	AnalyticsReportingCreateSessionLogActivity    AnalyticsReportingActivityType = "CreateSessionLogActivity"
+	AnalyticsReportingDeleteChangeLogActivity     AnalyticsReportingActivityType = "DeleteChangeLogActivity"
+	AnalyticsReportingDeleteSystemLogActivity     AnalyticsReportingActivityType = "DeleteSystemLogActivity"
+	AnalyticsReportingDeleteUserActionLogActivity AnalyticsReportingActivityType = "DeleteUserActionLogActivity"
+	AnalyticsReportingDeleteSessionLogActivity    AnalyticsReportingActivityType = "DeleteSessionLogActivity"
 )
