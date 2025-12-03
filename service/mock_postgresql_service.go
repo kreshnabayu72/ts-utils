@@ -155,7 +155,7 @@ func (m *MockPostgreSQLService) UpdateOneWithData(
 	ctx context.Context,
 	tableName string,
 	query map[string]sql_query.SQLCondition,
-	body any,
+	body sql_query.UpdateQuery,
 	returnOption ...ReturningConfig,
 ) (any, error) {
 	var arg mock.Arguments
@@ -180,7 +180,7 @@ func (m *MockPostgreSQLService) UpdateManyWithData(
 	ctx context.Context,
 	tableName string,
 	query map[string]sql_query.SQLCondition,
-	body any,
+	body sql_query.UpdateQuery,
 	returnOption ...ReturningConfig,
 ) (int64, error) {
 	var arg mock.Arguments
