@@ -29,12 +29,12 @@ func NewSQLDeleteBuilder(tableName string, alias ...string) DeleteStarter {
 	}
 }
 
-func (s *DeleteBuilder) Where(filters map[string]SQLCondition) Deleter {
+func (s *DeleteBuilder) Where(filters WhereQuery) Deleter {
 	s.SQLEloquentQuery.sharedWhereAndQuery(filters)
 	return s
 }
 
-func (s *DeleteBuilder) WhereOr(filters ...map[string]SQLCondition) Deleter {
+func (s *DeleteBuilder) WhereOr(filters ...WhereQuery) Deleter {
 	s.SQLEloquentQuery.sharedWhereOrQuery(filters...)
 	return s
 }

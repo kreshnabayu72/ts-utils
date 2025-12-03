@@ -60,7 +60,7 @@ func (m *MockPostgreSQLService) Count(
 func (m *MockPostgreSQLService) CountWithFilter(
 	ctx context.Context,
 	tableName string,
-	filter map[string]sql_query.SQLCondition,
+	filter sql_query.WhereQuery,
 ) (int, error) {
 	arg := m.Called(ctx, tableName, filter)
 	return arg.Get(0).(int), arg.Error(1)
@@ -154,7 +154,7 @@ func (m *MockPostgreSQLService) UpdateOne(
 func (m *MockPostgreSQLService) UpdateOneWithData(
 	ctx context.Context,
 	tableName string,
-	query map[string]sql_query.SQLCondition,
+	query sql_query.WhereQuery,
 	body sql_query.UpdateQuery,
 	returnOption ...ReturningConfig,
 ) (any, error) {
@@ -179,7 +179,7 @@ func (m *MockPostgreSQLService) UpdateMany(
 func (m *MockPostgreSQLService) UpdateManyWithData(
 	ctx context.Context,
 	tableName string,
-	query map[string]sql_query.SQLCondition,
+	query sql_query.WhereQuery,
 	body sql_query.UpdateQuery,
 	returnOption ...ReturningConfig,
 ) (int64, error) {
@@ -197,7 +197,7 @@ func (m *MockPostgreSQLService) UpdateEachWithData(
 	ctx context.Context,
 	tableName string,
 	rowIdentifier string,
-	query map[string]sql_query.SQLCondition,
+	query sql_query.WhereQuery,
 	body any,
 ) (int64, error) {
 	arg := m.Called(ctx, tableName, rowIdentifier, query, body)
@@ -207,7 +207,7 @@ func (m *MockPostgreSQLService) UpdateEachWithData(
 func (m *MockPostgreSQLService) SoftDeleteOne(
 	ctx context.Context,
 	tableName string,
-	filter map[string]sql_query.SQLCondition,
+	filter sql_query.WhereQuery,
 	returnOption ...ReturningConfig,
 ) (any, error) {
 	var arg mock.Arguments
@@ -224,7 +224,7 @@ func (m *MockPostgreSQLService) SoftDeleteOne(
 func (m *MockPostgreSQLService) SoftDeleteMany(
 	ctx context.Context,
 	tableName string,
-	filter map[string]sql_query.SQLCondition,
+	filter sql_query.WhereQuery,
 	returnOption ...ReturningConfig,
 ) (int64, error) {
 	var arg mock.Arguments
@@ -249,7 +249,7 @@ func (m *MockPostgreSQLService) DeleteOne(
 func (m *MockPostgreSQLService) DeleteOneWithFilter(
 	ctx context.Context,
 	tableName string,
-	filter map[string]sql_query.SQLCondition,
+	filter sql_query.WhereQuery,
 ) (any, error) {
 	arg := m.Called(ctx, tableName, filter)
 	return arg.Get(0), arg.Error(1)
@@ -267,7 +267,7 @@ func (m *MockPostgreSQLService) DeleteMany(
 func (m *MockPostgreSQLService) DeleteManyWithFilter(
 	ctx context.Context,
 	tableName string,
-	filter map[string]sql_query.SQLCondition,
+	filter sql_query.WhereQuery,
 ) (int64, error) {
 	arg := m.Called(ctx, tableName, filter)
 	return arg.Get(0).(int64), arg.Error(1)

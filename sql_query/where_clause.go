@@ -6,6 +6,8 @@ import (
 	"strings"
 )
 
+type WhereQuery map[string]SQLCondition
+
 func (s *SQLEloquentQuery) sharedWhereJsonArray(column string, each SQLCondition) string {
 	var sb strings.Builder
 
@@ -216,14 +218,14 @@ func (s *SQLEloquentQuery) sharedWhereJsonArray(column string, each SQLCondition
 //
 // Example:
 //
-//	filters := map[string]sql_query.SQLCondition{
+//	filters := sql_query.WhereQuery{
 //	    "age": {Operator: ">", Value: 18},
 //	    "status": {Operator: "IN", Value: []string{"active", "pending"}},
 //	}
 //	builder.sharedWhereAndQuery(filters)
 //	// Produces: "age" > $1 AND "status" IN ($2, $3)
 func (s *SQLEloquentQuery) sharedWhereAndQuery(
-	filters map[string]SQLCondition,
+	filters WhereQuery,
 	v ...*[]string,
 ) {
 	var dest []string
@@ -471,18 +473,18 @@ func (s *SQLEloquentQuery) sharedWhereAndQuery(
 // Example:
 //
 //	builder.sharedWhereOrQuery(
-//	    map[string]SQLCondition{"role": {Operator: "=", Value: "admin"}},
-//	    map[string]SQLCondition{"role": {Operator: "=", Value: "editor"}},
+//	    WhereQuery{"role": {Operator: "=", Value: "admin"}},
+//	    WhereQuery{"role": {Operator: "=", Value: "editor"}},
 //	)
 //	// Produces: (("role" = $1) OR ("role" = $2))
-func (s *SQLEloquentQuery) sharedWhereOrQuery(filters ...map[string]SQLCondition) {
+func (s *SQLEloquentQuery) sharedWhereOrQuery(filters ...WhereQuery) {
 	s.whereOrDestination(filters)
 }
 
 // Core function of `Where Or` query.
 // WHERE filters for table won't be generated if you provide destination in params (pointer of slice string), but this function will assign value to the destination instead.
 func (s *SQLEloquentQuery) whereOrDestination(
-	filters []map[string]SQLCondition,
+	filters []WhereQuery,
 	v ...*[]string,
 ) {
 	var dest []string

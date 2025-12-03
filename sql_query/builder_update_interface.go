@@ -28,7 +28,7 @@ type UpdateCases interface {
 	//
 	// Example:
 	//   c.Case(MultiFilterCondition{
-	//     And: map[string]SQLCondition{
+	//     And: WhereQuery{
 	//       "status":       {Operator: SQLOperatorEqual, Value: "Not Paired Yet"},
 	//       body.TagType:   {SourceIsValue: true, Operator: SQLOperatorEqual, Value: "Non TAG"},
 	//     },
@@ -170,22 +170,22 @@ type Updater interface {
 	// → ON CONFLICT (id) DO NOTHING
 	Conflict(constraint, do string) Updater
 	// Where implements Updater. (Accumulates previous value if called again)
-	Where(filters map[string]SQLCondition) Updater
+	Where(filters WhereQuery) Updater
 	// WhereOr implements Updater. (Accumulates previous value if called again)
-	WhereOr(filters ...map[string]SQLCondition) Updater
+	WhereOr(filters ...WhereQuery) Updater
 
 	// Join adds an INNER JOIN clause with the specified ON condition.
 	//
 	// Example:
 	//
 	//	builder.Join("roles r", "r.id = u.role_id")
-	Join(table string, onCondition string, additionalConditions ...map[string]SQLCondition) Updater
+	Join(table string, onCondition string, additionalConditions ...WhereQuery) Updater
 	// LeftJoin adds a LEFT JOIN clause with the specified ON condition.
 	//
 	// Example:
 	//
 	//	builder.LeftJoin("roles r", "r.id = u.role_id")
-	LeftJoin(table string, onCondition string, additionalConditions ...map[string]SQLCondition) Updater
+	LeftJoin(table string, onCondition string, additionalConditions ...WhereQuery) Updater
 
 	// WithCTEBuilder adds a Common Table Expression (CTE) to the query.
 	// It adjusts argument placeholders to avoid conflicts.

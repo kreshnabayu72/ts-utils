@@ -8,7 +8,7 @@ import (
 
 func UpdateBuilder(
 	tableName string,
-	query map[string]sql_query.SQLCondition,
+	query sql_query.WhereQuery,
 	body sql_query.UpdateQuery,
 	returningColumn ...string,
 ) (string, []any) {

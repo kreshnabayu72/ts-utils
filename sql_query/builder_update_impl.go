@@ -33,17 +33,17 @@ func NewSQLUpdateBuilder(tableName string, alias ...string) UpdateStarter {
 	}
 }
 
-func (s *UpdateBuilder) Where(filters map[string]SQLCondition) Updater {
+func (s *UpdateBuilder) Where(filters WhereQuery) Updater {
 	s.SQLEloquentQuery.sharedWhereAndQuery(filters)
 	return s
 }
 
-func (s *UpdateBuilder) WhereOr(filters ...map[string]SQLCondition) Updater {
+func (s *UpdateBuilder) WhereOr(filters ...WhereQuery) Updater {
 	s.SQLEloquentQuery.sharedWhereOrQuery(filters...)
 	return s
 }
 
-func (s *UpdateBuilder) Join(table string, onCondition string, additionalConditions ...map[string]SQLCondition) Updater {
+func (s *UpdateBuilder) Join(table string, onCondition string, additionalConditions ...WhereQuery) Updater {
 	if table == "" {
 		return s
 	}
@@ -63,7 +63,7 @@ func (s *UpdateBuilder) Join(table string, onCondition string, additionalConditi
 	return s
 }
 
-func (s *UpdateBuilder) LeftJoin(table string, mainCondition string, additionalConditions ...map[string]SQLCondition) Updater {
+func (s *UpdateBuilder) LeftJoin(table string, mainCondition string, additionalConditions ...WhereQuery) Updater {
 	if table == "" {
 		return s
 	}

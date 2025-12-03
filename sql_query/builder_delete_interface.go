@@ -22,9 +22,9 @@ type DeleteStarter interface {
 // e.g. .Delete(...).Using(...).Where(...).Build()
 type Deleter interface {
 	// Where implements Deleter. (Accumulates previous value if called again)
-	Where(filters map[string]SQLCondition) Deleter
+	Where(filters WhereQuery) Deleter
 	// WhereOr implements Deleter. (Accumulates previous value if called again)
-	WhereOr(filters ...map[string]SQLCondition) Deleter
+	WhereOr(filters ...WhereQuery) Deleter
 
 	// Using implements Deleter. (Overrides previous value if called again)
 	// Using adds a USING clause to the DELETE statement.

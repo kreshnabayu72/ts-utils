@@ -196,9 +196,9 @@ type Selector interface {
 	SelectJSONAggregateFunc(alias string, fn func(builder *SelectBuilder)) Selector
 
 	// Where implements Selector. (Accumulates previous value if called again)
-	Where(filters map[string]SQLCondition) Selector
+	Where(filters WhereQuery) Selector
 	// WhereOr implements Selector. (Accumulates previous value if called again)
-	WhereOr(filters ...map[string]SQLCondition) Selector
+	WhereOr(filters ...WhereQuery) Selector
 
 	// Search implements Selector and accumulates conditions if called multiple times.
 	// Adds a case-insensitive ILIKE condition across multiple fields, combined with OR.
@@ -225,13 +225,13 @@ type Selector interface {
 	// Example:
 	//
 	//	builder.Join("roles r", "r.id = u.role_id")
-	Join(table string, onCondition string, additionalConditions ...map[string]SQLCondition) Selector
+	Join(table string, onCondition string, additionalConditions ...WhereQuery) Selector
 	// LeftJoin adds a LEFT JOIN clause with the specified ON condition.
 	//
 	// Example:
 	//
 	//	builder.LeftJoin("roles r", "r.id = u.role_id")
-	LeftJoin(table string, onCondition string, additionalConditions ...map[string]SQLCondition) Selector
+	LeftJoin(table string, onCondition string, additionalConditions ...WhereQuery) Selector
 
 	// Example:
 	//
@@ -242,7 +242,7 @@ type Selector interface {
 	// 	LEFT JOIN LATERAL (
 	//     `Sql queries here`
 	//   ) `alias` ON `condition`
-	LeftJoinLateralWithQuery(joinName string, joinQueryBuilder *SQLEloquentQuery, mainCondition string, additionalConditions ...map[string]SQLCondition) Selector
+	LeftJoinLateralWithQuery(joinName string, joinQueryBuilder *SQLEloquentQuery, mainCondition string, additionalConditions ...WhereQuery) Selector
 
 	// Paginate implements Selector. (Overrides previous value if called again).
 	// Paginate applies LIMIT, OFFSET, and ORDER BY using a Pagination struct.
@@ -271,10 +271,10 @@ type Selector interface {
 	//
 	// Example:
 	//
-	//	builder.GroupBy("role").Having(map[string]SQLCondition{
+	//	builder.GroupBy("role").Having(WhereQuery{
 	//	    "count(*)": {Op: ">", Value: 5},
 	//	})
-	Having(havingClauses map[string]SQLCondition) Selector
+	Having(havingClauses WhereQuery) Selector
 
 	// WithCTEBuilder adds a Common Table Expression (CTE) to the query.
 	// It adjusts argument placeholders to avoid conflicts.

@@ -73,12 +73,12 @@ func NewSQLCountBuilder(tableName string, alias ...string) Selector {
 	}
 }
 
-func (s *SelectBuilder) Where(filters map[string]SQLCondition) Selector {
+func (s *SelectBuilder) Where(filters WhereQuery) Selector {
 	s.SQLEloquentQuery.sharedWhereAndQuery(filters)
 	return s
 }
 
-func (s *SelectBuilder) WhereOr(filters ...map[string]SQLCondition) Selector {
+func (s *SelectBuilder) WhereOr(filters ...WhereQuery) Selector {
 	s.SQLEloquentQuery.sharedWhereOrQuery(filters...)
 	return s
 }
@@ -382,7 +382,7 @@ func (s *SelectBuilder) SelectMultiCaseWhen(parts []CaseWhenPart, elseExpr, alia
 	return s
 }
 
-func (s *SelectBuilder) Join(table string, onCondition string, additionalConditions ...map[string]SQLCondition) Selector {
+func (s *SelectBuilder) Join(table string, onCondition string, additionalConditions ...WhereQuery) Selector {
 	if table == "" {
 		return s
 	}
@@ -402,7 +402,7 @@ func (s *SelectBuilder) Join(table string, onCondition string, additionalConditi
 	return s
 }
 
-func (s *SelectBuilder) LeftJoin(table string, mainCondition string, additionalConditions ...map[string]SQLCondition) Selector {
+func (s *SelectBuilder) LeftJoin(table string, mainCondition string, additionalConditions ...WhereQuery) Selector {
 	if table == "" {
 		return s
 	}
@@ -422,7 +422,7 @@ func (s *SelectBuilder) LeftJoin(table string, mainCondition string, additionalC
 	return s
 }
 
-func (s *SelectBuilder) LeftJoinLateralWithQuery(joinName string, joinQueryBuilder *SQLEloquentQuery, mainCondition string, additionalConditions ...map[string]SQLCondition) Selector {
+func (s *SelectBuilder) LeftJoinLateralWithQuery(joinName string, joinQueryBuilder *SQLEloquentQuery, mainCondition string, additionalConditions ...WhereQuery) Selector {
 	joinQuery, joinArgs, err := joinQueryBuilder.Build()
 	if err != nil {
 		s.LastError = err
@@ -458,7 +458,7 @@ func (s *SelectBuilder) GroupBy(groupBy ...string) Selector {
 	return s
 }
 
-func (s *SelectBuilder) Having(havingClause map[string]SQLCondition) Selector {
+func (s *SelectBuilder) Having(havingClause WhereQuery) Selector {
 	s.useHaving = true
 	s.SQLEloquentQuery.sharedWhereAndQuery(havingClause)
 	return s

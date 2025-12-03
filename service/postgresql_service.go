@@ -51,7 +51,7 @@ type PostgreSQLServicer interface {
 	Count(ctx context.Context, queryString string, args ...any) (int, error)
 	// CountWithFilter builds a COUNT query using SQLCondition filters
 	// and executes it.
-	CountWithFilter(ctx context.Context, tableName string, filter map[string]sql_query.SQLCondition) (int, error)
+	CountWithFilter(ctx context.Context, tableName string, filter sql_query.WhereQuery) (int, error)
 
 	// Execute executes a query that wont return any value
 	// Useful for defining temporary function and tables/views, so that the overall query is cleaner
@@ -156,7 +156,7 @@ type PostgreSQLServicer interface {
 	UpdateOneWithData(
 		ctx context.Context,
 		tableName string,
-		query map[string]sql_query.SQLCondition,
+		query sql_query.WhereQuery,
 		body sql_query.UpdateQuery,
 		returnOption ...ReturningConfig,
 	) (any, error)
@@ -188,7 +188,7 @@ type PostgreSQLServicer interface {
 	UpdateManyWithData(
 		ctx context.Context,
 		tableName string,
-		query map[string]sql_query.SQLCondition,
+		query sql_query.WhereQuery,
 		body sql_query.UpdateQuery,
 		returnOption ...ReturningConfig,
 	) (int64, error)
@@ -198,7 +198,7 @@ type PostgreSQLServicer interface {
 		ctx context.Context,
 		tableName string,
 		rowIdentifier string,
-		query map[string]sql_query.SQLCondition,
+		query sql_query.WhereQuery,
 		body any,
 	) (int64, error)
 
@@ -208,7 +208,7 @@ type PostgreSQLServicer interface {
 	SoftDeleteOne(
 		ctx context.Context,
 		tableName string,
-		filter map[string]sql_query.SQLCondition,
+		filter sql_query.WhereQuery,
 		returnOption ...ReturningConfig,
 	) (any, error)
 	// SoftDeleteMany builds and executes a UPDATE soft delete query for multiple rows
@@ -217,7 +217,7 @@ type PostgreSQLServicer interface {
 	SoftDeleteMany(
 		ctx context.Context,
 		tableName string,
-		filter map[string]sql_query.SQLCondition,
+		filter sql_query.WhereQuery,
 		returnOption ...ReturningConfig,
 	) (int64, error)
 
@@ -229,7 +229,7 @@ type PostgreSQLServicer interface {
 	DeleteOneWithFilter(
 		ctx context.Context,
 		tableName string,
-		filter map[string]sql_query.SQLCondition,
+		filter sql_query.WhereQuery,
 	) (any, error)
 	// DeleteMany executes a DELETE query that may affect multiple rows
 	// and returns the number of rows deleted.
@@ -239,7 +239,7 @@ type PostgreSQLServicer interface {
 	DeleteManyWithFilter(
 		ctx context.Context,
 		tableName string,
-		filter map[string]sql_query.SQLCondition,
+		filter sql_query.WhereQuery,
 	) (int64, error)
 	Close()
 }
@@ -355,7 +355,7 @@ func (s *PostgreSQLService) Execute(
 func (s *PostgreSQLService) CountWithFilter(
 	ctx context.Context,
 	tableName string,
-	filter map[string]sql_query.SQLCondition,
+	filter sql_query.WhereQuery,
 ) (int, error) {
 	queryString, args := common_builders.CountBuilder(tableName, filter)
 
@@ -544,7 +544,7 @@ func (s *PostgreSQLService) UpdateOne(
 func (s *PostgreSQLService) UpdateOneWithData(
 	ctx context.Context,
 	tableName string,
-	query map[string]sql_query.SQLCondition,
+	query sql_query.WhereQuery,
 	body sql_query.UpdateQuery,
 	returnOption ...ReturningConfig,
 ) (any, error) {
@@ -576,7 +576,7 @@ func (s *PostgreSQLService) UpdateMany(
 func (s *PostgreSQLService) UpdateManyWithData(
 	ctx context.Context,
 	tableName string,
-	query map[string]sql_query.SQLCondition,
+	query sql_query.WhereQuery,
 	body sql_query.UpdateQuery,
 	returnOption ...ReturningConfig,
 ) (int64, error) {
@@ -604,7 +604,7 @@ func (s *PostgreSQLService) UpdateEachWithData(
 	ctx context.Context,
 	tableName string,
 	rowIdentifier string,
-	query map[string]sql_query.SQLCondition,
+	query sql_query.WhereQuery,
 	body any,
 ) (int64, error) {
 	queryString, args := common_builders.UpdateEachBuilder(tableName,
@@ -619,7 +619,7 @@ func (s *PostgreSQLService) UpdateEachWithData(
 func (s *PostgreSQLService) SoftDeleteOne(
 	ctx context.Context,
 	tableName string,
-	filter map[string]sql_query.SQLCondition,
+	filter sql_query.WhereQuery,
 	returnOption ...ReturningConfig,
 ) (any, error) {
 	returnColumn := []string{}
@@ -647,7 +647,7 @@ func (s *PostgreSQLService) SoftDeleteOne(
 func (s *PostgreSQLService) SoftDeleteMany(
 	ctx context.Context,
 	tableName string,
-	filter map[string]sql_query.SQLCondition,
+	filter sql_query.WhereQuery,
 	returnOption ...ReturningConfig,
 ) (int64, error) {
 	returnColumn := []string{}
@@ -689,7 +689,7 @@ func (s *PostgreSQLService) DeleteOne(
 func (s *PostgreSQLService) DeleteOneWithFilter(
 	ctx context.Context,
 	tableName string,
-	filter map[string]sql_query.SQLCondition,
+	filter sql_query.WhereQuery,
 ) (any, error) {
 	queryString, args := common_builders.DeleteBuilder(tableName, filter)
 
@@ -707,7 +707,7 @@ func (s *PostgreSQLService) DeleteMany(
 func (s *PostgreSQLService) DeleteManyWithFilter(
 	ctx context.Context,
 	tableName string,
-	filter map[string]sql_query.SQLCondition,
+	filter sql_query.WhereQuery,
 ) (int64, error) {
 	queryString, args := common_builders.DeleteBuilder(tableName, filter)
 

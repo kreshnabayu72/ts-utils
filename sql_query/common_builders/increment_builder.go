@@ -8,7 +8,7 @@ import (
 
 func IncrementBuilder(
 	tableName string,
-	query map[string]sql_query.SQLCondition,
+	query sql_query.WhereQuery,
 	body map[string]any,
 ) (string, []any) {
 	res, args, err := sql_query.NewSQLUpdateBuilder(tableName).
