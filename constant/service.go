@@ -17,3 +17,12 @@ const (
 	PLANNING_STRATEGY_SERVICE_NAME     = "planning-strategy-service"
 	RESOURCE_ALLOCATION_SERVICE_NAME   = "resource-allocation-service"
 )
+
+type AnalyticsReportingActivityType string
+
+const (
+	AnalyticsReportingCreateChangeLogActivity     AnalyticsReportingActivityType = "CreateChangeLogActivity"
+	AnalyticsReportingCreateSystemLogActivity     AnalyticsReportingActivityType = "CreateSystemLogActivity"
+	AnalyticsReportingCreateUserActionLogActivity AnalyticsReportingActivityType = "CreateUserActionLogActivity"
+	AnalyticsReportingCreateSessionLogActivity    AnalyticsReportingActivityType = "CreateSessionLogActivity"
+)
