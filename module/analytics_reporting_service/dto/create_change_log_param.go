@@ -7,3 +7,9 @@ type CreateChangeLogActivityParam struct {
 	ClientID   string
 	// Plan       string
 }
+
+type DeleteChangeLogActivityParam struct {
+	ChangeLogs []model.ChangeLog
+	ClientID   string
+	// Plan         string
+}

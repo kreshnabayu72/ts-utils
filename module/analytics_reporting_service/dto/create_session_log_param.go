@@ -7,3 +7,9 @@ type CreateSessionLogActivityParam struct {
 	ClientID    string
 	// Plan        string
 }
+
+type DeleteSessionLogActivityParam struct {
+	SessionLogs []model.SessionLog
+	ClientID    string
+	// Plan        string
+}
