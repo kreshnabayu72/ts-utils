@@ -237,6 +237,38 @@ func (m *MockPostgreSQLService) SoftDeleteMany(
 	return arg.Get(0).(int64), arg.Error(1)
 }
 
+func (m *MockPostgreSQLService) RestoreSoftDeleteOne(
+	ctx context.Context,
+	tableName string,
+	filter sql_query.WhereQuery,
+	returnOption ...ReturningConfig,
+) (any, error) {
+	var arg mock.Arguments
+
+	if len(returnOption) > 0 {
+		arg = m.Called(ctx, tableName, filter, returnOption)
+	} else {
+		arg = m.Called(ctx, tableName, filter)
+	}
+	return arg.Get(0), arg.Error(1)
+}
+
+func (m *MockPostgreSQLService) RestoreSoftDeleteMany(
+	ctx context.Context,
+	tableName string,
+	filter sql_query.WhereQuery,
+	returnOption ...ReturningConfig,
+) (int64, error) {
+	var arg mock.Arguments
+
+	if len(returnOption) > 0 {
+		arg = m.Called(ctx, tableName, filter, returnOption)
+	} else {
+		arg = m.Called(ctx, tableName, filter)
+	}
+	return arg.Get(0).(int64), arg.Error(1)
+}
+
 func (m *MockPostgreSQLService) DeleteOne(
 	ctx context.Context,
 	queryString string,

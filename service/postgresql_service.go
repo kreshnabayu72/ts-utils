@@ -220,6 +220,24 @@ type PostgreSQLServicer interface {
 		filter sql_query.WhereQuery,
 		returnOption ...ReturningConfig,
 	) (int64, error)
+	// RestoreSoftDeleteOne builds and executes a UPDATE soft delete query for a single row
+	// using SQLCondition filters and returns the deleted row ID.
+	// Table must have column is_deleted and deleted_at.
+	RestoreSoftDeleteOne(
+		ctx context.Context,
+		tableName string,
+		filter sql_query.WhereQuery,
+		returnOption ...ReturningConfig,
+	) (any, error)
+	// RestoreSoftDeleteMany builds and executes a UPDATE soft delete query for multiple rows
+	// using SQLCondition filters and returns the number of rows deleted.
+	// Table must has column is_deleted and deleted_at.
+	RestoreSoftDeleteMany(
+		ctx context.Context,
+		tableName string,
+		filter sql_query.WhereQuery,
+		returnOption ...ReturningConfig,
+	) (int64, error)
 
 	// DeleteOne executes a DELETE ... RETURNING id query
 	// and returns the deleted row ID.
@@ -660,6 +678,64 @@ func (s *PostgreSQLService) SoftDeleteMany(
 		sql_query.UpdateQuery{
 			"is_deleted": true,
 			"deleted_at": "NOW()",
+		},
+		returnColumn...,
+	)
+	shouldShowQuery(s.debugLevel, queryString, args...)
+
+	if len(returnOption) > 0 && returnOption[0].Destination != nil {
+		err := s.SelectMany(returnOption[0].Destination, ctx, queryString, args...)
+		val := reflect.ValueOf(returnOption[0].Destination)
+
+		return int64(val.Elem().Len()), err
+	}
+	return s.DeleteMany(ctx, queryString, args...)
+}
+
+func (s *PostgreSQLService) RestoreSoftDeleteOne(
+	ctx context.Context,
+	tableName string,
+	filter sql_query.WhereQuery,
+	returnOption ...ReturningConfig,
+) (any, error) {
+	returnColumn := []string{}
+
+	if len(returnOption) > 0 {
+		returnColumn = append(returnColumn, returnOption[0].Column...)
+	}
+	queryString, args := common_builders.UpdateBuilder(
+		tableName,
+		filter,
+		sql_query.UpdateQuery{
+			"is_deleted": false,
+			"deleted_at": nil,
+		},
+		returnColumn...,
+	)
+	shouldShowQuery(s.debugLevel, queryString, args...)
+
+	if len(returnOption) > 0 && returnOption[0].Destination != nil {
+		return nil, s.SelectOne(returnOption[0].Destination, ctx, queryString, args...)
+	}
+	return s.DeleteOne(ctx, queryString, args...)
+}
+
+func (s *PostgreSQLService) RestoreSoftDeleteMany(
+	ctx context.Context,
+	tableName string,
+	filter sql_query.WhereQuery,
+	returnOption ...ReturningConfig,
+) (int64, error) {
+	returnColumn := []string{}
+
+	if len(returnOption) > 0 {
+		returnColumn = append(returnColumn, returnOption[0].Column...)
+	}
+	queryString, args := common_builders.UpdateBuilder(tableName,
+		filter,
+		sql_query.UpdateQuery{
+			"is_deleted": false,
+			"deleted_at": nil,
 		},
 		returnColumn...,
 	)
