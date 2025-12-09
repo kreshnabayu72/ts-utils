@@ -13,8 +13,16 @@ const (
 	GlobalDBName      DBName = "tagsamurai_global"
 
 	// Used for v2
-	PlanningStrategyDBName DBName = "tagsamurai_planning_strategy"
-	IAMDBName              DBName = "tagsamurai_iam"
+	AnalyticsReportingDBName   DBName = "tagsamurai_analytics_reporting"
+	EnterpriseManagementDBName DBName = "tagsamurai_enterprise_management"
+	FileManagerDBName          DBName = "tagsamurai_file_manager"
+	HardwareTaggingDBName      DBName = "tagsamurai_hardware_tagging"
+	IAMDBName                  DBName = "tagsamurai_iam"
+	ImportDBName               DBName = "tagsamurai_import"
+	LanguageDBName             DBName = "tagsamurai_language"
+	NotificationDBName         DBName = "tagsamurai_notification"
+	PlanningStrategyDBName     DBName = "tagsamurai_planning_strategy"
+	ResourceAllocationDBName   DBName = "tagsamurai_resource_allocation"
 )
 
 func (dbName DBName) CompanyDBName(companyCode string) DBName {

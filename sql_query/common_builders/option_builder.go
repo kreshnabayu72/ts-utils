@@ -1,23 +1,25 @@
-package sql_query
+package common_builders
 
 import (
 	"fmt"
+
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/sql_query"
 )
 
 func GenerateCTEOption(
-	sourceBuilder *SelectBuilder,
-	mainBuilder *SelectBuilder,
+	sourceBuilder *sql_query.SelectBuilder,
+	mainBuilder *sql_query.SelectBuilder,
 	aliasName string,
 	refTable string,
 	optionsQuery bool,
 	labelKey string,
 	labelValue string,
-	customSort ...Sort,
+	customSort ...sql_query.Sort,
 ) {
 	if optionsQuery {
-		labelKey = escapeQuoteColumns(labelKey)
-		labelValue = escapeQuoteColumns(labelValue)
-		snakeAliasName := CamelToSnake(aliasName)
+		labelKey = sql_query.EscapeQuoteColumns(labelKey)
+		labelValue = sql_query.EscapeQuoteColumns(labelValue)
+		snakeAliasName := sql_query.CamelToSnake(aliasName)
 
 		cteBuilder := sourceBuilder.
 			ClearSelects().
@@ -30,7 +32,7 @@ func GenerateCTEOption(
 				fmt.Sprintf(`"%s"."id" AS "id"`, refTable),
 			)
 
-		mainBuilder.WithCTEBuilder(snakeAliasName, cteBuilder.(*SelectBuilder).SQLEloquentQuery)
+		mainBuilder.WithCTEBuilder(snakeAliasName, cteBuilder.(*sql_query.SelectBuilder).SQLEloquentQuery)
 		mainBuilder.LeftJoin(
 			snakeAliasName,
 			fmt.Sprintf(`"%s"."id" = "%s"."id"`, snakeAliasName, refTable),

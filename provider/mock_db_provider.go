@@ -1,8 +1,8 @@
 package provider
 
 import (
-	"gitea.qwertysystem.net/BETS/ts-utils/v2/db"
-	"gitea.qwertysystem.net/BETS/ts-utils/v2/service"
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/db"
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/service"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -25,6 +25,11 @@ func (m *MockDBProvider) MakeMongoDBService(dbName db.DBName, collection string)
 func (m *MockDBProvider) MakePostgreSQLService(dbName db.DBName, options ...db.PostgreSQLServiceOptions) service.PostgreSQLServicer {
 	args := m.Called(dbName, options)
 	return args.Get(0).(service.PostgreSQLServicer)
+}
+
+func (m *MockDBProvider) MakeRedisService(options ...db.RedisServiceOptions) service.RedisServicer {
+	args := m.Called(options)
+	return args.Get(0).(service.RedisServicer)
 }
 
 func (m *MockDBProvider) Close() {

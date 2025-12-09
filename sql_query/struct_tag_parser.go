@@ -3,6 +3,7 @@ package sql_query
 import (
 	"fmt"
 	"reflect"
+	"slices"
 	"strings"
 	"sync"
 )
@@ -61,7 +62,7 @@ func buildColumnsFromMeta(fieldMeta []FieldMeta) *[]string {
 
 	for i := range fieldMeta {
 		meta := fieldMeta[i]
-		if ArrayIncludes(skipped, meta.JSONTag) {
+		if slices.Contains(skipped, meta.JSONTag) {
 			continue
 		}
 
@@ -108,11 +109,11 @@ func traverseNestedStruct(parentField FieldMeta, nestedFieldMeta []FieldMeta) st
 		columnTag := nestedFieldMeta[i].ColumnTag
 
 		// Fast‑skip anything we don’t need to project.
-		if ArrayIncludes(skippedJsonTag, jsonTag) || columnTag == "" {
+		if slices.Contains(skippedJsonTag, jsonTag) || columnTag == "" {
 			continue
 		}
 
-		exprs = append(exprs, fmt.Sprintf(`'%s', %s`, jsonTag, escapeQuoteColumns(columnTag)))
+		exprs = append(exprs, fmt.Sprintf(`'%s', %s`, jsonTag, EscapeQuoteColumns(columnTag)))
 	}
 
 	if len(exprs) == 0 {

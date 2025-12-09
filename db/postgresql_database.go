@@ -91,7 +91,16 @@ func ConnectPostgres(dbName DBName, options ...PostgreSQLServiceOptions) *pgxpoo
 		sshUser = opt.SSHUser
 		sshPassword = opt.SSHPassword
 	} else {
-		postgresHost = os.Getenv("POSTGRES_HOST")
+		host := os.Getenv("POSTGRES_HOST")
+		if host == "" {
+			host = "localhost"
+		}
+		port := os.Getenv("POSTGRES_PORT")
+		if port == "" {
+			port = "5432"
+		}
+		postgresHost = fmt.Sprintf("%s:%s", host, port)
+
 		postgresUsername = os.Getenv("POSTGRES_USERNAME")
 		postgresPassword = os.Getenv("POSTGRES_PASSWORD")
 		postgresSslMode = os.Getenv("POSTGRES_SSLMODE")

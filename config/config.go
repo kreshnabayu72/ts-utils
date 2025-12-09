@@ -21,11 +21,17 @@ type ConfigOptions struct {
 
 	POSTGRES_USERNAME string
 	POSTGRES_PASSWORD string
+	POSTGRES_HOST     string
+	POSTGRES_PORT     string
 
 	// SSH_* is currently used exclusively for postgres connection.
 	SSH_HOST     string
 	SSH_USER     string
 	SSH_PASSWORD string
+
+	REDIS_HOST     string
+	REDIS_PORT     string
+	REDIS_PASSWORD string
 
 	// Mailer specific configurations.
 	MAILER_USER     string
@@ -74,9 +80,26 @@ func LoadConfig(filenames ...string) ConfigOptions {
 	config.POSTGRES_USERNAME = os.Getenv("POSTGRES_USERNAME")
 	config.POSTGRES_PASSWORD = os.Getenv("POSTGRES_PASSWORD")
 
+	if config.POSTGRES_HOST = os.Getenv("POSTGRES_HOST"); config.POSTGRES_HOST == "" {
+		config.POSTGRES_HOST = "localhost"
+	}
+
+	if config.POSTGRES_PORT = os.Getenv("POSTGRES_PORT"); config.POSTGRES_PORT == "" {
+		config.POSTGRES_PORT = "5432"
+	}
+
 	config.SSH_HOST = os.Getenv("SSH_HOST")
 	config.SSH_USER = os.Getenv("SSH_USER")
 	config.SSH_PASSWORD = os.Getenv("SSH_PASSWORD")
+
+	if config.REDIS_HOST = os.Getenv("REDIS_HOST"); config.REDIS_HOST == "" {
+		config.REDIS_HOST = "localhost"
+	}
+	if config.REDIS_PORT = os.Getenv("REDIS_PORT"); config.REDIS_PORT == "" {
+		config.REDIS_PORT = "6379"
+	}
+
+	config.REDIS_PASSWORD = os.Getenv("REDIS_PASSWORD")
 
 	config.MAILER_USER = os.Getenv("MAILER_USER")
 	config.MAILER_PASSWORD = os.Getenv("MAILER_PASSWORD")

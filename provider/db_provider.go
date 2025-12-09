@@ -1,8 +1,8 @@
 package provider
 
 import (
-	"gitea.qwertysystem.net/BETS/ts-utils/v2/db"
-	"gitea.qwertysystem.net/BETS/ts-utils/v2/service"
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/db"
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/service"
 )
 
 // DBProviderer provides a way to create database service for various supported databases.
@@ -12,6 +12,7 @@ type DBProviderer interface {
 	Init()
 	MakeMongoDBService(dbName db.DBName, collection string) service.MongoDBServicer
 	MakePostgreSQLService(dbName db.DBName, options ...db.PostgreSQLServiceOptions) service.PostgreSQLServicer
+	MakeRedisService(options ...db.RedisServiceOptions) service.RedisServicer
 	Close()
 }
 
@@ -30,6 +31,11 @@ func (dp *DBProvider) MakeMongoDBService(dbName db.DBName, collection string) se
 // MakePostgreSQLService creates a postgresql service
 func (dp *DBProvider) MakePostgreSQLService(dbName db.DBName, options ...db.PostgreSQLServiceOptions) service.PostgreSQLServicer {
 	return service.MakePostgreSQLService(dbName, options...)
+}
+
+// MakeRedisService creates a redis service
+func (dp *DBProvider) MakeRedisService(options ...db.RedisServiceOptions) service.RedisServicer {
+	return service.MakeRedisService(options...)
 }
 
 func (dp *DBProvider) Close() {

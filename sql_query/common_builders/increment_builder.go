@@ -3,12 +3,12 @@ package common_builders
 import (
 	"log"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/v2/sql_query"
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/sql_query"
 )
 
 func IncrementBuilder(
 	tableName string,
-	query map[string]sql_query.SQLCondition,
+	query sql_query.WhereQuery,
 	body map[string]any,
 ) (string, []any) {
 	res, args, err := sql_query.NewSQLUpdateBuilder(tableName).

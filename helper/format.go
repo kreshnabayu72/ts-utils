@@ -1,7 +1,7 @@
 package helper
 
 import (
-	"gitea.qwertysystem.net/BETS/ts-utils/v2/dto"
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/dto"
 )
 
 func FormatPaginationResult[T any](

@@ -1,6 +1,6 @@
 package dto
 
-import "gitea.qwertysystem.net/BETS/ts-utils/v2/module/fixedasset/model"
+import "gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/fixedasset/model"
 
 type ClientPlan struct {
 	PlanFixedAsset       model.PlanTypes `json:"planFixedAsset"       column:"plan_fixed_asset"`

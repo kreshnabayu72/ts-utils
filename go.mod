@@ -1,4 +1,4 @@
-module gitea.qwertysystem.net/BETS/ts-utils/v2
+module gitea.tagsamurai.local/BETS-V2/ts-utils/v2
 
 go 1.24.2
 
@@ -6,6 +6,7 @@ require (
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/eclipse/paho.mqtt.golang v1.5.1
 	github.com/go-playground/validator/v10 v10.28.0
+	github.com/go-redis/redis/v8 v8.11.5
 	github.com/goccy/go-json v0.10.3
 	github.com/gofiber/fiber/v2 v2.52.6
 	github.com/jackc/pgx/v5 v5.7.5
@@ -20,6 +21,8 @@ require (
 )
 
 require (
+	github.com/cespare/xxhash/v2 v2.3.0 // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/facebookgo/clock v0.0.0-20150410010913-600d898af40a // indirect
 	github.com/gabriel-vasile/mimetype v1.4.10 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect

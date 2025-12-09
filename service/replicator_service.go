@@ -12,7 +12,7 @@ import (
 
 	"github.com/goccy/go-json"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/v2/config"
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/config"
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/segmentio/kafka-go"
 )

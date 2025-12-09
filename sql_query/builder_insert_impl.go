@@ -4,78 +4,39 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"slices"
 	"strconv"
 	"strings"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/v2/db"
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/db"
 )
 
-// To ensure SQLInsertBuilder has its own initial methods
-// e.g. InsertBuilder(...).Insert()...Rest
-type SQLInsertInitBuilder interface {
-	// Insert implements SQLInsertChainBuilder. (Only able to be called once)
-	// Insert builds an INSERT query from either a single struct or a slice of structs.
-	// - For a single struct → generates one row.
-	// - For a slice → generates multiple rows.
-	//
-	// By default, it will RETURN the id::text column,
-	// but you can pass custom returning columns:
-	//
-	//	Insert(user, "id", "name")
-	//	Insert([]User{u1, u2})
-	Insert(values any, returningColumns ...string) SQLInsertChainBuilder
+// NewSQLInsertBuilder creates a new insert builder for a given table.
+// Example:
+//
+//	builder := NewSQLInsertBuilder("users","u")
+func NewSQLInsertBuilder(tableName string, alias ...string) InsertStarter {
+	if len(alias) > 0 {
+		tableName = fmt.Sprintf("%s %s", tableName, strings.TrimSpace(alias[0]))
+	}
 
-	// insertSingle handles the insert logic for a single struct.
-	// It auto-generates a Snowflake ID and builds the VALUES list
-	// based on struct field tags (using "column" or "json").
-	cachedInsertSingle(v reflect.Value) SQLInsertChainBuilder
-	// insertMany handles inserting multiple structs at once.
-	// It generates a Snowflake ID for each row, creates placeholders
-	// for every value, and builds the full VALUES (...), (...), ... list.
-	//
-	// Example Result:
-	//
-	//	INSERT INTO users (id, name, email)
-	//	VALUES ($1, $2, $3), ($4, $5, $6)
-	cachedInsertMany(slice reflect.Value) SQLInsertChainBuilder
-	// preBuild is a helper that assembles the final
-	// INSERT INTO ... (columns) VALUES ... statement
-	// after the columns and value placeholders have been prepared.
-	preBuild(columns, valuePlaceholders []string)
+	return &InsertBuilder{
+		&SQLEloquentQuery{
+			Table:       tableName,
+			Columns:     []string{},
+			CustomQuery: "",
+			Args:        nil,
+			Mode:        "insert",
+		},
+	}
 }
 
-// To ensure method .Insert() has its own chaining methods
-// e.g. .Insert(...).Build()
-type SQLInsertChainBuilder interface {
-	// By default, the Insert builder includes all fields, even if their values are zero or nil.
-	// Calling this method tells the builder to skip fields with zero values when generating the SET clause.
-	//
-	// Note: This option only affects single-row Insert operations.
-	// It has no effect on bulk INSERT, because all rows in those operations must have the same set of columns.
-	ExcludeEmpty() SQLInsertChainBuilder
-	// Insert implements SQLInsertChainBuilder. (Only able to be called once, will override previous call)
-	// Conflict adds an ON CONFLICT clause to the insert statement.
-	// Example:
-	//
-	//	.Conflict("(id)", "NOTHING")
-	//	-> INSERT ... ON CONFLICT (id) DO NOTHING
-	Conflict(constraint, do string) SQLInsertChainBuilder
-	// buildInsertQuery finalizes the insert query into SQL string + args.
-	// It prevents unsafe cases (like adding filters, joins, or pagination)
-	// and appends RETURNING and ON CONFLICT if defined.
-	Build() (string, []any, error)
-}
-
-type InsertBuilder struct {
-	*SQLEloquentQuery
-}
-
-func (s *InsertBuilder) ExcludeEmpty() SQLInsertChainBuilder {
+func (s *InsertBuilder) ExcludeEmpty() Inserter {
 	s.excludeEmptyValue = true
 	return s
 }
 
-func (s *InsertBuilder) Conflict(constraint, do string) SQLInsertChainBuilder {
+func (s *InsertBuilder) Conflict(constraint, do string) Inserter {
 	s.ConflictClause = fmt.Sprintf(" ON CONFLICT %s DO %s", constraint, do)
 	return s
 }
@@ -83,7 +44,7 @@ func (s *InsertBuilder) Conflict(constraint, do string) SQLInsertChainBuilder {
 func (s *InsertBuilder) Insert(
 	values any,
 	returningColumns ...string,
-) SQLInsertChainBuilder {
+) Inserter {
 	if len(returningColumns) > 0 {
 		s.Columns = returningColumns
 	} else {
@@ -117,26 +78,6 @@ func (s *InsertBuilder) Insert(
 	return s.cachedInsertSingle(v)
 }
 
-// NewSQLInsertBuilder creates a new insert builder for a given table.
-// Example:
-//
-//	builder := NewSQLInsertBuilder("users","u")
-func NewSQLInsertBuilder(tableName string, alias ...string) SQLInsertInitBuilder {
-	if len(alias) > 0 {
-		tableName = fmt.Sprintf("%s %s", tableName, strings.TrimSpace(alias[0]))
-	}
-
-	return &InsertBuilder{
-		&SQLEloquentQuery{
-			Table:       tableName,
-			Columns:     []string{},
-			CustomQuery: "",
-			Args:        nil,
-			Mode:        "insert",
-		},
-	}
-}
-
 func (s *SQLEloquentQuery) buildInsertQuery() (string, []any, error) {
 	if s.LastError != nil {
 		return "", nil, errors.New(s.LastError.Error())
@@ -159,7 +100,7 @@ func (s *SQLEloquentQuery) buildInsertQuery() (string, []any, error) {
 	return s.CustomQuery, s.Args, nil
 }
 
-func (s *InsertBuilder) cachedInsertSingle(v reflect.Value) SQLInsertChainBuilder {
+func (s *InsertBuilder) cachedInsertSingle(v reflect.Value) Inserter {
 	t := v.Type()
 	typeName := t.PkgPath() + "." + t.Name()
 
@@ -187,11 +128,11 @@ func (s *InsertBuilder) cachedInsertSingle(v reflect.Value) SQLInsertChainBuilde
 				continue
 			}
 
-			if ArrayIncludes([]string{"_id", "id"}, meta.JSONTag) || meta.ColumnTag == "id" {
+			if slices.Contains([]string{"_id", "id"}, meta.JSONTag) || meta.ColumnTag == "id" {
 				continue
 			}
-			if ArrayIncludes([]string{"", "-"}, meta.JSONTag) &&
-				ArrayIncludes([]string{"", "-"}, meta.ColumnTag) {
+			if slices.Contains([]string{"", "-"}, meta.JSONTag) &&
+				slices.Contains([]string{"", "-"}, meta.ColumnTag) {
 				continue
 			}
 
@@ -205,7 +146,7 @@ func (s *InsertBuilder) cachedInsertSingle(v reflect.Value) SQLInsertChainBuilde
 				}
 			}
 
-			if ArrayIncludes([]string{"updated_at", "created_at"}, setTag) {
+			if slices.Contains([]string{"updated_at", "created_at"}, setTag) {
 				continue
 			}
 
@@ -263,7 +204,7 @@ func (s *InsertBuilder) cachedInsertSingle(v reflect.Value) SQLInsertChainBuilde
 	return s
 }
 
-func (s *InsertBuilder) insertSingle(v reflect.Value) SQLInsertChainBuilder {
+func (s *InsertBuilder) insertSingle(v reflect.Value) Inserter {
 	var args []any
 	var columns []string
 	var placeholders []string
@@ -286,12 +227,12 @@ func (s *InsertBuilder) insertSingle(v reflect.Value) SQLInsertChainBuilder {
 		jsonTag := field.Tag.Get("json")
 		columnTag := field.Tag.Get("column")
 
-		if ArrayIncludes([]string{"_id", "id"}, jsonTag) || columnTag == "id" {
+		if slices.Contains([]string{"_id", "id"}, jsonTag) || columnTag == "id" {
 			continue
 		}
 
-		if ArrayIncludes([]string{"", "-"}, jsonTag) &&
-			ArrayIncludes([]string{"", "-"}, columnTag) {
+		if slices.Contains([]string{"", "-"}, jsonTag) &&
+			slices.Contains([]string{"", "-"}, columnTag) {
 			continue
 		}
 
@@ -302,7 +243,7 @@ func (s *InsertBuilder) insertSingle(v reflect.Value) SQLInsertChainBuilder {
 
 		columns = append(columns, `"`+setTag+`"`)
 
-		if ArrayIncludes([]string{"updated_at", "created_at"}, setTag) {
+		if slices.Contains([]string{"updated_at", "created_at"}, setTag) {
 			placeholders = append(placeholders, "NOW()")
 			continue
 		}
@@ -317,7 +258,7 @@ func (s *InsertBuilder) insertSingle(v reflect.Value) SQLInsertChainBuilder {
 	return s
 }
 
-func (s *InsertBuilder) cachedInsertMany(slice reflect.Value) SQLInsertChainBuilder {
+func (s *InsertBuilder) cachedInsertMany(slice reflect.Value) Inserter {
 	db.InitSnowflake()
 	firstElem := slice.Index(0)
 	t := firstElem.Type()
@@ -350,11 +291,11 @@ func (s *InsertBuilder) cachedInsertMany(slice reflect.Value) SQLInsertChainBuil
 				continue
 			}
 
-			if ArrayIncludes([]string{"_id", "id"}, meta.JSONTag) || meta.ColumnTag == "id" {
+			if slices.Contains([]string{"_id", "id"}, meta.JSONTag) || meta.ColumnTag == "id" {
 				continue
 			}
-			if ArrayIncludes([]string{"", "-"}, meta.JSONTag) &&
-				ArrayIncludes([]string{"", "-"}, meta.ColumnTag) {
+			if slices.Contains([]string{"", "-"}, meta.JSONTag) &&
+				slices.Contains([]string{"", "-"}, meta.ColumnTag) {
 				continue
 			}
 
@@ -367,7 +308,7 @@ func (s *InsertBuilder) cachedInsertMany(slice reflect.Value) SQLInsertChainBuil
 					setTag = meta.ColumnTag
 				}
 			}
-			if ArrayIncludes([]string{"updated_at", "created_at"}, setTag) {
+			if slices.Contains([]string{"updated_at", "created_at"}, setTag) {
 				continue
 			}
 
@@ -438,7 +379,7 @@ func (s *InsertBuilder) cachedInsertMany(slice reflect.Value) SQLInsertChainBuil
 	return s
 }
 
-func (s *InsertBuilder) insertMany(slice reflect.Value) SQLInsertChainBuilder {
+func (s *InsertBuilder) insertMany(slice reflect.Value) Inserter {
 	var args []any
 	var columns []string
 	var valuePlaceholders []string
@@ -457,12 +398,12 @@ func (s *InsertBuilder) insertMany(slice reflect.Value) SQLInsertChainBuilder {
 				jsonTag := field.Tag.Get("json")
 				columnTag := field.Tag.Get("column")
 
-				if ArrayIncludes([]string{"_id", "id"}, jsonTag) || columnTag == "id" {
+				if slices.Contains([]string{"_id", "id"}, jsonTag) || columnTag == "id" {
 					continue
 				}
 
-				if ArrayIncludes([]string{"", "-"}, jsonTag) &&
-					ArrayIncludes([]string{"", "-"}, columnTag) {
+				if slices.Contains([]string{"", "-"}, jsonTag) &&
+					slices.Contains([]string{"", "-"}, columnTag) {
 					continue
 				}
 
@@ -492,16 +433,16 @@ func (s *InsertBuilder) insertMany(slice reflect.Value) SQLInsertChainBuilder {
 				setTag = columnTag
 			}
 
-			if ArrayIncludes([]string{"_id", "id"}, jsonTag) || columnTag == "id" {
+			if slices.Contains([]string{"_id", "id"}, jsonTag) || columnTag == "id" {
 				continue
 			}
 
-			if ArrayIncludes([]string{"", "-"}, jsonTag) &&
-				ArrayIncludes([]string{"", "-"}, columnTag) {
+			if slices.Contains([]string{"", "-"}, jsonTag) &&
+				slices.Contains([]string{"", "-"}, columnTag) {
 				continue
 			}
 
-			if ArrayIncludes([]string{"updated_at", "created_at"}, setTag) {
+			if slices.Contains([]string{"updated_at", "created_at"}, setTag) {
 				rowPlaceholders = append(rowPlaceholders, "NOW()")
 				continue
 			}
@@ -535,11 +476,11 @@ func BuildInsertTemplate(t reflect.Type) *InsertTemplate {
 	fieldIndexes = append(fieldIndexes, nil)
 
 	for _, m := range meta {
-		if ArrayIncludes([]string{"_id", "id"}, m.JSONTag) || m.ColumnTag == "id" {
+		if slices.Contains([]string{"_id", "id"}, m.JSONTag) || m.ColumnTag == "id" {
 			continue
 		}
-		if ArrayIncludes([]string{"", "-"}, m.JSONTag) &&
-			ArrayIncludes([]string{"", "-"}, m.ColumnTag) {
+		if slices.Contains([]string{"", "-"}, m.JSONTag) &&
+			slices.Contains([]string{"", "-"}, m.ColumnTag) {
 			continue
 		}
 

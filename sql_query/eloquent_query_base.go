@@ -26,8 +26,6 @@ type QueryBuilder interface {
 	buildDeleteQuery() (string, []any, error)
 }
 
-type SQLFilter map[string]SQLCondition
-
 type SQLCondition struct {
 	Operator      SQLOperators // e.g., '=', '>', '<=', 'LIKE', 'IN', 'IS NULL'
 	Key           string       // used for array of object json pointing to the key of the object. This option should only be used with IsArray
@@ -52,8 +50,8 @@ type UpdateCaseParam struct {
 // }
 
 type MultiFilterCondition struct {
-	And map[string]SQLCondition
-	Or  []map[string]SQLCondition
+	And WhereQuery
+	Or  []WhereQuery
 }
 
 // Used in SelectMultiCaseWhen

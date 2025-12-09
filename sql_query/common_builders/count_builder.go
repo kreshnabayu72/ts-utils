@@ -3,10 +3,10 @@ package common_builders
 import (
 	"log"
 
-	"gitea.qwertysystem.net/BETS/ts-utils/v2/sql_query"
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/sql_query"
 )
 
-func CountBuilder(tableName string, query map[string]sql_query.SQLCondition) (string, []any) {
+func CountBuilder(tableName string, query sql_query.WhereQuery) (string, []any) {
 	res, args, err := sql_query.NewSQLCountBuilder(tableName).
 		Where(query).
 		Build()
