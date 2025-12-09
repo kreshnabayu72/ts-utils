@@ -27,20 +27,25 @@ type WorkflowErrorWrapperParams struct {
 }
 
 func WorkflowErrorWrapper(params WorkflowErrorWrapperParams) error {
+	var details []interface{}
+	if params.Data != nil {
+		details = append(details, params.Data)
+	}
+
 	// If NonRetryable is explicitly set to true, use NewNonRetryableApplicationError instead.
 	if params.NonRetryable {
 		return temporal.NewNonRetryableApplicationError(
 			params.ErrMessage,
 			params.ErrType,
 			nil, // cause (not used?)
-			params.Data,
+			details...,
 		)
 	}
 
 	return temporal.NewApplicationError(
 		params.ErrMessage,
 		params.ErrType,
-		params.Data,
+		details...,
 	)
 }
 
@@ -51,7 +56,7 @@ func WrapHttpError(err *HttpError, nonRetryable ...bool) error {
 	}
 
 	// Map HttpError code to appropriate string type
-	// This allows ParseWorkflowError to fallback to type checking if details are lost
+	// This allows ParseWorkflowError to extract HttpError from ApplicationError
 	errType := ErrInternalServerError
 	switch err.Code {
 	case 400:
@@ -73,7 +78,7 @@ func WrapHttpError(err *HttpError, nonRetryable ...bool) error {
 	return WorkflowErrorWrapper(WorkflowErrorWrapperParams{
 		ErrMessage:   err.Message,
 		ErrType:      errType,
-		Data:         err,
+		Data:         err.Data,
 		NonRetryable: nonRetryable[0],
 	})
 }
@@ -108,46 +113,28 @@ func WorkflowInternalServerError(message string, nonRetryable ...bool) error {
 	return WrapHttpError(InternalServerError(message), nonRetryable...)
 }
 
-// ParseWorkflowError extracts user-friendly error messages from Temporal workflow errors
+// ParseWorkflowError extracts user-friendly error messages from Temporal workflow errors.
+// Usage in controller as error catch when getting workflow result
 func ParseWorkflowError(workflowName string, err error) *HttpError {
 	if err == nil {
 		return nil
 	}
 
-	var httpErr HttpError
-
-	// Handle direct HttpError returns (when not wrapped in Temporal errors)
-	if directHttpErr, ok := err.(*HttpError); ok {
-		slog.Error("Error", "workflowName", workflowName, "error", directHttpErr.Message, "httpCode", directHttpErr.Code)
-		return directHttpErr
-	}
-
 	// Try to extract ApplicationError details from Temporal-wrapped errors
+	var extractedData any
 	var appErr *temporal.ApplicationError
 	if errors.As(err, &appErr) {
 		// Check if the ApplicationError has details
 		if appErr.HasDetails() {
-			// Try to get HttpError from details (4th parameter)
-			if err := appErr.Details(&httpErr); err == nil {
-				// Validate that we got actual data, not zero values
-				if httpErr.Code != 0 || httpErr.Message != "" {
-					errorStr := appErr.Error()
-					activityName := extractActivityName(errorStr)
-
-					slog.Error("Error", "workflowName", workflowName, "activityName", activityName, "error", httpErr.Message, "httpCode", httpErr.Code)
-					return &httpErr
-				}
-			} else {
-				slog.Warn("Failed to extract HttpError from details", "error", err)
+			// Try to get HttpError from ApplicationError details
+			if err := appErr.Details(&extractedData); err != nil {
+				slog.Warn("Failed to extract details from ApplicationError", "error", err)
 			}
 		}
-	} else {
-		// Not a Temporal ApplicationError and not an HttpError - convert generic error
-		slog.Error("Converting generic error to HttpError", "error", err)
-		return ToHttpError(err)
 	}
 
-	// Fallback: Check ApplicationError Type if we failed to extract details
+	var httpErr HttpError
+	// If we have an ApplicationError, try to map it to a HttpError
 	if appErr != nil {
 		switch appErr.Type() {
 		case ErrForbidden:
@@ -164,14 +151,20 @@ func ParseWorkflowError(workflowName string, err error) *HttpError {
 			httpErr = *InternalServerError(appErr.Message())
 		}
 
+		if extractedData != nil {
+			httpErr.Data = extractedData
+		}
+
 		// If we successfully mapped the type, return it
 		if httpErr.Code != 0 {
-			slog.Error("Error", "workflowName", workflowName, "type", appErr.Type(), "message", appErr.Message(), "httpCode", httpErr.Code)
+			activityName := extractActivityName(err.Error())
+			// Logging for detailed error information
+			slog.Error("Error", "workflowName", workflowName, "activityName", activityName, "error", httpErr.Message, "httpCode", httpErr.Code)
 			return &httpErr
 		}
 	}
 
-	// Final Fallback if everything else fails
+	// Final fallback if everything else fails (since workflow's error is not HttpError, status code is most likely 500 as the final fallback)
 	return ToHttpError(err)
 }
 
