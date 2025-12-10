@@ -2,7 +2,6 @@ package temporal_helper
 
 import (
 	"fmt"
-	"time"
 
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/entity"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/helper"
@@ -10,7 +9,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/temporal"
-	"go.temporal.io/sdk/workflow"
 )
 
 type ExecuteWorkflowConfig struct {
@@ -113,34 +111,35 @@ func ExecuteWorkflowWithDefaults[T any](
 	return helper.SendResponse(ctx, config.SuccessCode, result, config.SuccessMessage, nil)
 }
 
-// WorkflowRunner wraps workflow logic with panic recovery and standard activity options.
+// WorkflowRunner wraps workflow logic with panic recovery.
 // This helper ensures that panics within workflows are converted to non-retryable errors,
 // allowing for fast failure detection and preventing unnecessary retry loops.
 //
 // Parameters:
-//   - fn: func(ao workflow.ActivityOptions) (any, error) – the workflow logic function that receives
-//     pre-configured activity options and returns a result and error
-//   - customOptions: ...workflow.ActivityOptions (optional) – override default activity options if provided
+//   - fn: func() (any, error) – the workflow logic function that returns a result and error
 //
 // Returns:
 //   - res: any – the result returned by the workflow logic function
 //   - runnerErr: error – any error from the function or a NonRetryableApplicationError if panic occurred
 //
 // Behavior:
-//   - Provides standard ActivityOptions with:
-//   - StartToCloseTimeout: 1 minute
-//   - RetryPolicy: MaximumAttempts of 2
 //   - Catches panics using defer/recover and converts them to NonRetryableApplicationError
 //     with error type "WORKFLOW_PANIC"
 //   - Ensures workflows fail fast on panic rather than retrying indefinitely
-//   - If customOptions is provided, it completely replaces the default activity options
 //
 // Example:
 //
-//	func CreateUserWorkflow(ctx workflow.Context, input model.CreateUserInput) (*model.CreateUserOutput, error) {
-//	    res, err := temporal_helper.WorkflowRunner(func(ao workflow.ActivityOptions) (any, error) {
-//	        ctx = workflow.WithActivityOptions(ctx, ao)
+//	func CreateUserWorkflow(ctx workflow.Context, input model.CreateUserInput) (res any, err error) {
+//	    ctx = workflow.WithActivityOptions(ctx, ao)
 //
+//		defer func() {
+//			if err != nil {
+//				disconnectCtx, _ := workflow.NewDisconnectedContext(ctx)
+//				// Compensate here
+//			}
+//		}()
+//
+//	    return temporal_helper.WorkflowRunner(func() (any, error) {
 //	        // Execute activities with the provided options
 //	        var userID int
 //	        if err := workflow.ExecuteActivity(ctx, CreateUserDataActivity, input).Get(ctx, &userID); err != nil {
@@ -149,13 +148,10 @@ func ExecuteWorkflowWithDefaults[T any](
 //
 //	        return &model.CreateUserOutput{UserID: userID}, nil
 //	    })
-//
-//	    if err != nil {
-//	        return nil, err
-//	    }
-//	    return res.(*model.CreateUserOutput), nil
 //	}
-func WorkflowRunner(fn func(ao workflow.ActivityOptions) (any, err error), customOptions ...workflow.ActivityOptions) (res any, runnerErr error) {
+func SafeRunner(
+	fn func() (res any, err error),
+) (res any, runnerErr error) {
 	defer func() {
 		if r := recover(); r != nil {
 			// Convert panic to a NonRetryableApplicationError
@@ -167,17 +163,6 @@ func WorkflowRunner(fn func(ao workflow.ActivityOptions) (any, err error), custo
 		}
 	}()
 
-	ao := workflow.ActivityOptions{
-		StartToCloseTimeout: 1 * time.Minute,
-		RetryPolicy: &temporal.RetryPolicy{
-			MaximumAttempts: 2,
-		},
-	}
-
-	if len(customOptions) > 0 {
-		ao = customOptions[0]
-	}
-
-	res, runnerErr = fn(ao)
+	res, runnerErr = fn()
 	return res, runnerErr
 }
