@@ -1,6 +1,7 @@
 package temporal_helper
 
 import (
+	"errors"
 	"fmt"
 
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/entity"
@@ -164,5 +165,55 @@ func SafeRunner(
 	}()
 
 	res, runnerErr = fn()
+	runnerErr = StopWorkflowRetryOnNonRetryable(runnerErr)
 	return res, runnerErr
+}
+
+// StopWorkflowRetryOnNonRetryable inspects an error returned from an activity (or any nested error)
+// and, if it contains a NonRetryable ApplicationError, converts it into a top-level
+// NonRetryableApplicationError so that the WORKFLOW retry policy will not retry the whole workflow.
+//
+// Why this is needed:
+//   - Activity non-retryable errors stop ACTIVITY retries, but the workflow may still be retried
+//     if the workflow has a retry policy, because the top-level failure is an ActivityFailure.
+//   - By returning a NonRetryableApplicationError at the WORKFLOW level, we signal Temporal to stop
+//     retrying the entire workflow execution as well.
+//
+// Usage inside a workflow:
+//
+//	var out SomeResult
+//	if err := workflow.ExecuteActivity(ctx, DoSomething, arg).Get(ctx, &out); err != nil {
+//	    return nil, temporal_helper.StopWorkflowRetryOnNonRetryable(err)
+//	}
+//
+// If the incoming error is not (or does not contain) a non-retryable ApplicationError,
+// it is returned unchanged.
+func StopWorkflowRetryOnNonRetryable(err error) error {
+	if err == nil {
+		return nil
+	}
+
+	// Try to locate an ApplicationError anywhere in the chain
+	var appErr *temporal.ApplicationError
+	if errors.As(err, &appErr) && appErr != nil && appErr.NonRetryable() {
+		// Try to preserve details if present
+		var details []interface{}
+		if appErr.HasDetails() {
+			var d any
+			if derr := appErr.Details(&d); derr == nil {
+				details = append(details, d)
+			}
+		}
+
+		// Return a new top-level non-retryable application error so that workflow retry stops
+		return temporal.NewNonRetryableApplicationError(
+			appErr.Message(),
+			appErr.Type(),
+			err, // keep original error as cause for observability
+			details...,
+		)
+	}
+
+	// Not a non-retryable application error -> return as-is
+	return err
 }
