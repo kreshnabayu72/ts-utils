@@ -177,11 +177,6 @@ func (s *ScheduleClient) CreateSchedule(
 //
 // This allows updating only the schedule time or only the workflow parameters.
 func (s *ScheduleClient) UpdateSchedule(ctx context.Context, scheduleID string, options ScheduleOptions) error {
-	taskQueue := s.ts.TaskQueue
-	if options.WorkflowActivity.TaskQueue != nil {
-		taskQueue = *options.WorkflowActivity.TaskQueue
-	}
-
 	// Generate new schedule spec
 	newScheduleSpec, err := s.generateScheduleSpec(options)
 	if err != nil {
@@ -216,6 +211,10 @@ func (s *ScheduleClient) UpdateSchedule(ctx context.Context, scheduleID string, 
 			if options.WorkflowActivity != nil {
 				if options.WorkflowActivity.Args == nil {
 					return nil, errors.New("workflow activity args is nil")
+				}
+				taskQueue := s.ts.TaskQueue
+				if options.WorkflowActivity.TaskQueue != nil {
+					taskQueue = *options.WorkflowActivity.TaskQueue
 				}
 				schedule.Action = &client.ScheduleWorkflowAction{
 					Workflow:  options.WorkflowActivity.WorkflowName,
