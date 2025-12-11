@@ -27,22 +27,19 @@ const (
 	ScheduleIntervalCustom ScheduleInterval = "custom"
 )
 
-// ScheduleIntervalUnit defines the time unit for custom intervals.
-type ScheduleIntervalUnit string
-
 const (
 	// ScheduleIntervalUnitSecond represents intervals in seconds.
-	ScheduleIntervalUnitSecond ScheduleIntervalUnit = "second"
+	ScheduleIntervalUnitSecond time.Duration = time.Second
 	// ScheduleIntervalUnitMinute represents intervals in minutes.
-	ScheduleIntervalUnitMinute ScheduleIntervalUnit = "minute"
+	ScheduleIntervalUnitMinute time.Duration = time.Minute
 	// ScheduleIntervalUnitHour represents intervals in hours.
-	ScheduleIntervalUnitHour ScheduleIntervalUnit = "hour"
+	ScheduleIntervalUnitHour time.Duration = time.Hour
 	// ScheduleIntervalUnitDay represents intervals in days.
-	ScheduleIntervalUnitDay ScheduleIntervalUnit = "day"
+	ScheduleIntervalUnitDay time.Duration = time.Hour * 24
 	// ScheduleIntervalUnitMonth represents intervals in months.
-	ScheduleIntervalUnitMonth ScheduleIntervalUnit = "month"
+	ScheduleIntervalUnitMonth time.Duration = time.Hour * 24 * 30
 	// ScheduleIntervalUnitYear represents intervals in years.
-	ScheduleIntervalUnitYear ScheduleIntervalUnit = "year"
+	ScheduleIntervalUnitYear time.Duration = time.Hour * 24 * 365
 )
 
 // ScheduleCustomInterval defines a custom recurring interval.
@@ -50,7 +47,7 @@ type ScheduleCustomInterval struct {
 	// Value is the numeric value of the interval.
 	Value int
 	// Unit is the time unit for the interval.
-	Unit ScheduleIntervalUnit
+	Unit time.Duration
 }
 
 // WorkflowActivity defines the workflow to be executed by a schedule.
@@ -253,7 +250,8 @@ func (s *ScheduleClient) generateScheduleSpec(options ScheduleOptions) (*client.
 		return nil, nil
 	}
 
-	scheduledAt := time.Now().Add(options.NextSchedule)
+	// Temporal uses UTC time for schedules
+	scheduledAt := time.Now().UTC().Add(options.NextSchedule)
 
 	scheduleSpec := client.ScheduleSpec{}
 
@@ -281,7 +279,7 @@ func (s *ScheduleClient) generateScheduleSpec(options ScheduleOptions) (*client.
 				return &client.ScheduleSpec{}, errors.New("custom interval is nil")
 			}
 			intervalSpec = client.ScheduleIntervalSpec{
-				Every: time.Duration(options.CustomInterval.Value) * time.Minute,
+				Every: time.Duration(options.CustomInterval.Value) * options.CustomInterval.Unit,
 			}
 		}
 
