@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"time"
 
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/db"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/service"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/temporal"
@@ -64,11 +65,12 @@ type WorkflowActivity struct {
 // ScheduleOptions defines configuration for creating or updating a schedule.
 type ScheduleOptions struct {
 	// NextSchedule is the delay before first execution (for one-time schedules).
-	// If zero, the schedule is assumed to be recurring only.
+	//  - For one-time schedules: this must be > 0.
+	//  - For recurring schedules: this can be used to delay the first run, if not set or zero, the schedule starts immediately.
 	NextSchedule time.Duration
 	// Interval defines a recurring schedule interval.
-	// If nil, creates a one-time schedule.
-	Interval *ScheduleInterval
+	// If empty, creates a one-time schedule.
+	Interval ScheduleInterval
 	// CustomInterval defines a custom recurring interval.
 	// Only used when Interval is ScheduleIntervalCustom.
 	CustomInterval *ScheduleCustomInterval
@@ -98,19 +100,16 @@ type ScheduleProvider interface {
 
 // NewScheduleClient creates a new Scheduler instance.
 func NewScheduleClient(ts *service.TemporalService) ScheduleProvider {
+	db.InitSnowflake()
 	return &ScheduleClient{
 		ts: ts,
 	}
 }
 
-// Init implements Scheduler interface for ServiceManager compatibility.
-// ScheduleClient has no initialization logic.
 func (s *ScheduleClient) Init() {
 	// No initialization needed
 }
 
-// Close implements Scheduler interface for ServiceManager compatibility.
-// ScheduleClient has no cleanup logic.
 func (s *ScheduleClient) Close() {
 	// No cleanup needed
 }
@@ -119,11 +118,11 @@ func (s *ScheduleClient) Close() {
 //
 // For one-time schedules:
 //   - Set NextSchedule to the delay before execution
-//   - Leave Interval as nil
+//   - Leave Interval empty
 //
 // For recurring schedules:
 //   - Set Interval to a predefined interval (daily, weekly, etc.)
-//   - Or use ScheduleIntervalCustom with CustomInterval
+//   - Or use ScheduleIntervalCustom with CustomInterval defined
 //
 // TaskQueue defaults to the current service's queue unless overridden in WorkflowActivity.
 func (s *ScheduleClient) CreateSchedule(
@@ -134,12 +133,12 @@ func (s *ScheduleClient) CreateSchedule(
 		return errors.New("workflow activity is nil")
 	}
 
-	if options.WorkflowActivity.Args == nil {
-		return errors.New("workflow activity args is nil")
+	if options.WorkflowActivity.WorkflowName == "" {
+		return errors.New("workflow name is required")
 	}
 
-	if options.NextSchedule == 0 {
-		return errors.New("next schedule is zero")
+	if options.Interval == "" && options.NextSchedule == 0 {
+		return errors.New("next schedule should not be zero for one-time schedule")
 	}
 
 	taskQueue := s.ts.TaskQueue
@@ -153,13 +152,15 @@ func (s *ScheduleClient) CreateSchedule(
 	}
 
 	_, err = s.ts.Client.ScheduleClient().Create(ctx, client.ScheduleOptions{
+		ID:   db.Node.Generate().Base36(),
 		Spec: *scheduleSpec,
 		Action: &client.ScheduleWorkflowAction{
 			Workflow:  options.WorkflowActivity.WorkflowName,
 			TaskQueue: taskQueue,
 			Args:      options.WorkflowActivity.Args,
 			RetryPolicy: &temporal.RetryPolicy{
-				MaximumAttempts: 2,
+				MaximumAttempts:        2,
+				NonRetryableErrorTypes: []string{"WORKFLOW_PANIC"},
 			},
 		},
 	})
@@ -174,7 +175,7 @@ func (s *ScheduleClient) CreateSchedule(
 //
 // This allows updating only the schedule time or only the workflow parameters.
 func (s *ScheduleClient) UpdateSchedule(ctx context.Context, scheduleID string, options ScheduleOptions) error {
-	// Generate new schedule spec
+	// Generate new schedule spec (may be nil to indicate no schedule change)
 	newScheduleSpec, err := s.generateScheduleSpec(options)
 	if err != nil {
 		return err
@@ -182,9 +183,17 @@ func (s *ScheduleClient) UpdateSchedule(ctx context.Context, scheduleID string, 
 
 	// Get schedule handle
 	handle := s.ts.Client.ScheduleClient().GetHandle(ctx, scheduleID)
-	_, err = handle.Describe(ctx) // Temporal will throw error if schedule not found
+	desc, err := handle.Describe(ctx) // Temporal will throw error if schedule not found
 	if err != nil {
 		return errors.New("schedule not found")
+	}
+
+	// Guard: if caller appears to convert an interval schedule to one-time (Interval == empty)
+	// but provides no NextSchedule, reject to avoid creating an undeliverable one-time schedule.
+	if options.Interval == "" && options.NextSchedule == 0 {
+		if len(desc.Schedule.Spec.Intervals) > 0 {
+			return errors.New("next schedule is required when updating to one-time schedule")
+		}
 	}
 
 	// Update the schedule
@@ -206,19 +215,20 @@ func (s *ScheduleClient) UpdateSchedule(ctx context.Context, scheduleID string, 
 
 			// Update the action (what to run), only if it is not nil
 			if options.WorkflowActivity != nil {
-				if options.WorkflowActivity.Args == nil {
-					return nil, errors.New("workflow activity args is nil")
-				}
 				taskQueue := s.ts.TaskQueue
 				if options.WorkflowActivity.TaskQueue != nil {
 					taskQueue = *options.WorkflowActivity.TaskQueue
+				}
+				if options.WorkflowActivity.WorkflowName == "" {
+					return nil, errors.New("workflow name is required for updating workflow activity")
 				}
 				schedule.Action = &client.ScheduleWorkflowAction{
 					Workflow:  options.WorkflowActivity.WorkflowName,
 					TaskQueue: taskQueue,
 					Args:      options.WorkflowActivity.Args,
 					RetryPolicy: &temporal.RetryPolicy{
-						MaximumAttempts: 2,
+						MaximumAttempts:        2,
+						NonRetryableErrorTypes: []string{"WORKFLOW_PANIC"},
 					},
 				}
 			}
@@ -244,9 +254,9 @@ func (s *ScheduleClient) DeleteSchedule(ctx context.Context, scheduleID string) 
 }
 
 // generateScheduleSpec creates a Temporal schedule specification from options.
-// Returns nil if NextSchedule is 0 (indicating no schedule time update needed).
+// Returns nil if NextSchedule is 0 and schedule is one-time schedule (indicating no schedule time update needed).
 func (s *ScheduleClient) generateScheduleSpec(options ScheduleOptions) (*client.ScheduleSpec, error) {
-	if options.NextSchedule == 0 {
+	if options.NextSchedule == 0 && options.Interval == "" {
 		return nil, nil
 	}
 
@@ -255,9 +265,9 @@ func (s *ScheduleClient) generateScheduleSpec(options ScheduleOptions) (*client.
 
 	scheduleSpec := client.ScheduleSpec{}
 
-	if options.Interval != nil {
+	if options.Interval != "" { // Recurring schedule
 		intervalSpec := client.ScheduleIntervalSpec{}
-		switch *options.Interval {
+		switch options.Interval {
 		case ScheduleIntervalDaily:
 			intervalSpec = client.ScheduleIntervalSpec{
 				Every: time.Hour * 24,
@@ -278,13 +288,21 @@ func (s *ScheduleClient) generateScheduleSpec(options ScheduleOptions) (*client.
 			if options.CustomInterval == nil {
 				return &client.ScheduleSpec{}, errors.New("custom interval is nil")
 			}
+			if options.CustomInterval.Value <= 0 {
+				return &client.ScheduleSpec{}, errors.New("custom interval value must be greater than zero")
+			}
 			intervalSpec = client.ScheduleIntervalSpec{
 				Every: time.Duration(options.CustomInterval.Value) * options.CustomInterval.Unit,
 			}
 		}
 
 		scheduleSpec.Intervals = append(scheduleSpec.Intervals, intervalSpec)
-	} else {
+		// For recurring schedules, when NextSchedule is provided, delay the first run.
+		// If NextSchedule is zero, the schedule starts immediately.
+		if options.NextSchedule > 0 {
+			scheduleSpec.StartAt = scheduledAt
+		}
+	} else { // One-time schedule
 		scheduleSpec.Calendars = []client.ScheduleCalendarSpec{
 			{
 				Second:     []client.ScheduleRange{{Start: scheduledAt.Second()}},
