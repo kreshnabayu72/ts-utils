@@ -91,7 +91,7 @@ type ScheduleProvider interface {
 	// Close cleans up scheduler resources (required for ServiceManager compatibility).
 	Close()
 	// CreateSchedule creates a new Temporal schedule.
-	CreateSchedule(ctx context.Context, options ScheduleOptions) error
+	CreateSchedule(ctx context.Context, options ScheduleOptions) (string, error)
 	// UpdateSchedule modifies an existing schedule.
 	UpdateSchedule(ctx context.Context, scheduleID string, options ScheduleOptions) error
 	// DeleteSchedule removes a schedule.
@@ -128,17 +128,17 @@ func (s *ScheduleClient) Close() {
 func (s *ScheduleClient) CreateSchedule(
 	ctx context.Context,
 	options ScheduleOptions,
-) error {
+) (string, error) {
 	if options.WorkflowActivity == nil {
-		return errors.New("workflow activity is nil")
+		return "", errors.New("workflow activity is nil")
 	}
 
 	if options.WorkflowActivity.WorkflowName == "" {
-		return errors.New("workflow name is required")
+		return "", errors.New("workflow name is required")
 	}
 
 	if options.Interval == "" && options.NextSchedule == 0 {
-		return errors.New("next schedule should not be zero for one-time schedule")
+		return "", errors.New("next schedule should not be zero for one-time schedule")
 	}
 
 	taskQueue := s.ts.TaskQueue
@@ -148,10 +148,10 @@ func (s *ScheduleClient) CreateSchedule(
 
 	scheduleSpec, err := s.generateScheduleSpec(options)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	_, err = s.ts.Client.ScheduleClient().Create(ctx, client.ScheduleOptions{
+	h, err := s.ts.Client.ScheduleClient().Create(ctx, client.ScheduleOptions{
 		ID:   db.Node.Generate().Base36(),
 		Spec: *scheduleSpec,
 		Action: &client.ScheduleWorkflowAction{
@@ -164,7 +164,11 @@ func (s *ScheduleClient) CreateSchedule(
 			},
 		},
 	})
-	return err
+	if err != nil {
+		return "", err
+	}
+
+	return h.GetID(), nil
 }
 
 // UpdateSchedule modifies an existing Temporal schedule.
