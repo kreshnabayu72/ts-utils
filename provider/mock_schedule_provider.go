@@ -14,9 +14,9 @@ func (m *MockScheduleProvider) Init() {}
 
 func (m *MockScheduleProvider) Close() {}
 
-func (m *MockScheduleProvider) CreateSchedule(ctx context.Context, options ScheduleOptions) error {
+func (m *MockScheduleProvider) CreateSchedule(ctx context.Context, options ScheduleOptions) (string, error) {
 	args := m.Called(ctx, options)
-	return args.Error(0)
+	return args.String(0), args.Error(1)
 }
 
 func (m *MockScheduleProvider) UpdateSchedule(ctx context.Context, scheduleID string, options ScheduleOptions) error {

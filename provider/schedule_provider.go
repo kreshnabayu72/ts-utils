@@ -67,7 +67,7 @@ type ScheduleOptions struct {
 	// NextSchedule is the delay before first execution (for one-time schedules).
 	//  - For one-time schedules: this must be > 0.
 	//  - For recurring schedules: this can be used to delay the first run, if not set or zero, the schedule starts immediately.
-	NextSchedule time.Duration
+	NextSchedule time.Time
 	// Interval defines a recurring schedule interval.
 	// If empty, creates a one-time schedule.
 	Interval ScheduleInterval
@@ -137,7 +137,7 @@ func (s *ScheduleClient) CreateSchedule(
 		return "", errors.New("workflow name is required")
 	}
 
-	if options.Interval == "" && options.NextSchedule == 0 {
+	if options.Interval == "" && options.NextSchedule.IsZero() {
 		return "", errors.New("next schedule should not be zero for one-time schedule")
 	}
 
@@ -194,7 +194,7 @@ func (s *ScheduleClient) UpdateSchedule(ctx context.Context, scheduleID string, 
 
 	// Guard: if caller appears to convert an interval schedule to one-time (Interval == empty)
 	// but provides no NextSchedule, reject to avoid creating an undeliverable one-time schedule.
-	if options.Interval == "" && options.NextSchedule == 0 {
+	if options.Interval == "" && options.NextSchedule.IsZero() {
 		if len(desc.Schedule.Spec.Intervals) > 0 {
 			return errors.New("next schedule is required when updating to one-time schedule")
 		}
@@ -260,12 +260,13 @@ func (s *ScheduleClient) DeleteSchedule(ctx context.Context, scheduleID string) 
 // generateScheduleSpec creates a Temporal schedule specification from options.
 // Returns nil if NextSchedule is 0 and schedule is one-time schedule (indicating no schedule time update needed).
 func (s *ScheduleClient) generateScheduleSpec(options ScheduleOptions) (*client.ScheduleSpec, error) {
-	if options.NextSchedule == 0 && options.Interval == "" {
+	if options.NextSchedule.IsZero() && options.Interval == "" {
 		return nil, nil
 	}
 
 	// Temporal uses UTC time for schedules
-	scheduledAt := time.Now().UTC().Add(options.NextSchedule)
+	scheduledAt := options.NextSchedule.UTC()
+	slog.Info("Scheduled at", "scheduledAt", scheduledAt)
 
 	scheduleSpec := client.ScheduleSpec{}
 
@@ -303,7 +304,7 @@ func (s *ScheduleClient) generateScheduleSpec(options ScheduleOptions) (*client.
 		scheduleSpec.Intervals = append(scheduleSpec.Intervals, intervalSpec)
 		// For recurring schedules, when NextSchedule is provided, delay the first run.
 		// If NextSchedule is zero, the schedule starts immediately.
-		if options.NextSchedule > 0 {
+		if !options.NextSchedule.IsZero() {
 			scheduleSpec.StartAt = scheduledAt
 		}
 	} else { // One-time schedule
