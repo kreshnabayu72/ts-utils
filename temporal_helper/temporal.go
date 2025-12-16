@@ -73,7 +73,7 @@ type ExecuteWorkflowConfig struct {
 func ExecuteWorkflowWithDefaults[T any](
 	ctx *fiber.Ctx,
 	config ExecuteWorkflowConfig,
-	result *T,
+	result T,
 	customOptions ...client.StartWorkflowOptions,
 ) error {
 	wo := client.StartWorkflowOptions{
