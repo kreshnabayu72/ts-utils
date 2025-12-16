@@ -23,28 +23,22 @@ const (
 	RESOURCE_ALLOCATION_SERVICE_NAME   = "resource-allocation-service"
 )
 
-type AnalyticsReportingActivityType string
-
 const (
-	AnalyticsReportingCreateChangeLogActivity     AnalyticsReportingActivityType = "CreateChangeLogActivity"
-	AnalyticsReportingCreateSystemLogActivity     AnalyticsReportingActivityType = "CreateSystemLogActivity"
-	AnalyticsReportingCreateUserActionLogActivity AnalyticsReportingActivityType = "CreateUserActionLogActivity"
-	AnalyticsReportingCreateSessionLogActivity    AnalyticsReportingActivityType = "CreateSessionLogActivity"
-	AnalyticsReportingDeleteChangeLogActivity     AnalyticsReportingActivityType = "DeleteChangeLogActivity"
-	AnalyticsReportingDeleteSystemLogActivity     AnalyticsReportingActivityType = "DeleteSystemLogActivity"
-	AnalyticsReportingDeleteUserActionLogActivity AnalyticsReportingActivityType = "DeleteUserActionLogActivity"
-	AnalyticsReportingDeleteSessionLogActivity    AnalyticsReportingActivityType = "DeleteSessionLogActivity"
+	AnalyticsReportingCreateChangeLogActivity     = "CreateChangeLogActivity"
+	AnalyticsReportingCreateSystemLogActivity     = "CreateSystemLogActivity"
+	AnalyticsReportingCreateUserActionLogActivity = "CreateUserActionLogActivity"
+	AnalyticsReportingCreateSessionLogActivity    = "CreateSessionLogActivity"
+	AnalyticsReportingDeleteChangeLogActivity     = "DeleteChangeLogActivity"
+	AnalyticsReportingDeleteSystemLogActivity     = "DeleteSystemLogActivity"
+	AnalyticsReportingDeleteUserActionLogActivity = "DeleteUserActionLogActivity"
+	AnalyticsReportingDeleteSessionLogActivity    = "DeleteSessionLogActivity"
 )
 
-type AssetTransactionActivityType string
-
 const (
-	AssetTransactionGetUsersBorrowedAssetCount AssetTransactionActivityType = "GetUsersBorrowedAssetCount"
-	AssetTransactionGetUsersAssignedAssetCount AssetTransactionActivityType = "GetUsersAssignedAssetCount"
+	AssetTransactionGetUsersBorrowedAssetCount = "GetUsersBorrowedAssetCount"
+	AssetTransactionGetUsersAssignedAssetCount = "GetUsersAssignedAssetCount"
 )
 
-type ApprovalActivityType string
-
 const (
-	ApprovalGetUsersPendingApprovalCount ApprovalActivityType = "GetUsersPendingApprovalCount"
+	ApprovalGetUsersPendingApprovalCount = "GetUsersPendingApprovalCount"
 )
