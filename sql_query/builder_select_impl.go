@@ -422,6 +422,26 @@ func (s *SelectBuilder) LeftJoin(table string, mainCondition string, additionalC
 	return s
 }
 
+func (s *SelectBuilder) FullJoin(table string, mainCondition string, additionalConditions ...WhereQuery) Selector {
+	if table == "" {
+		return s
+	}
+
+	var filterSb strings.Builder
+	if len(additionalConditions) > 0 {
+		var filters []string
+		s.sharedWhereAndQuery(additionalConditions[0], &filters)
+
+		for i := range filters {
+			filterSb.WriteString(" AND ")
+			filterSb.WriteString(filters[i])
+		}
+	}
+
+	s.OtherTables = append(s.OtherTables, fmt.Sprintf("FULL JOIN %s ON %s%s", table, mainCondition, filterSb.String()))
+	return s
+}
+
 func (s *SelectBuilder) LeftJoinLateralWithQuery(joinName string, joinQueryBuilder *SQLEloquentQuery, mainCondition string, additionalConditions ...WhereQuery) Selector {
 	joinQuery, joinArgs, err := joinQueryBuilder.Build()
 	if err != nil {

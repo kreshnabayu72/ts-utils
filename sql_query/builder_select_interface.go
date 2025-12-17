@@ -232,6 +232,12 @@ type Selector interface {
 	//
 	//	builder.LeftJoin("roles r", "r.id = u.role_id")
 	LeftJoin(table string, onCondition string, additionalConditions ...WhereQuery) Selector
+	// FullJoin adds a FULL JOIN clause with the specified ON condition.
+	//
+	// Example:
+	//
+	// builder.FullJoin("rfids r", "r.id = u.rfid_id")
+	FullJoin(table string, onCondition string, additionalConditions ...WhereQuery) Selector
 
 	// Example:
 	//
