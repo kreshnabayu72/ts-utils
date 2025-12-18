@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"reflect"
 	"runtime/debug"
@@ -948,13 +949,18 @@ func UseTransactions[T any](
 	return result, nil
 }
 
+// shouldShowQuery prints SQL queries for debugging purposes.
+// Uses fmt.Printf instead of slog because:
+// - slog escapes \n and \t as literal strings, making SQL unreadable
+// - fmt.Printf preserves actual newlines and formatting for better readability
+// - This is development debug logging, not production structured logging
 func shouldShowQuery(level int, query string, args ...any) {
 	switch level {
 	case 1:
-		log.Println("query", query)
+		fmt.Printf("\n=== SQL Query ===\n%s\n", query)
 	case 2:
-		log.Println("query and args", query, args)
+		fmt.Printf("\n=== SQL Query ===\n%s\nArgs: %v\n", query, args)
 	case 3:
-		log.Println("query with args", sql_query.InterpolateQuery(query, args...))
+		fmt.Printf("\n=== SQL Query ===\n%s\n", sql_query.InterpolateQuery(query, args...))
 	}
 }
