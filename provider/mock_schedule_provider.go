@@ -14,17 +14,22 @@ func (m *MockScheduleProvider) Init() {}
 
 func (m *MockScheduleProvider) Close() {}
 
-func (m *MockScheduleProvider) CreateSchedule(ctx context.Context, options ScheduleOptions) (string, error) {
-	args := m.Called(ctx, options)
+func (m *MockScheduleProvider) CreateSchedule(ctx context.Context, scheduleIdentifier string, options ScheduleOptions) (string, error) {
+	args := m.Called(ctx, scheduleIdentifier, options)
 	return args.String(0), args.Error(1)
 }
 
-func (m *MockScheduleProvider) UpdateSchedule(ctx context.Context, scheduleID string, options ScheduleOptions) error {
-	args := m.Called(ctx, scheduleID, options)
+func (m *MockScheduleProvider) CreateOrUpdateSchedule(ctx context.Context, scheduleIdentifier string, options ScheduleOptions) (string, error) {
+	args := m.Called(ctx, scheduleIdentifier, options)
+	return args.String(0), args.Error(1)
+}
+
+func (m *MockScheduleProvider) UpdateSchedule(ctx context.Context, scheduleIdentifier string, options ScheduleOptions) error {
+	args := m.Called(ctx, scheduleIdentifier, options)
 	return args.Error(0)
 }
 
-func (m *MockScheduleProvider) DeleteSchedule(ctx context.Context, scheduleID string) error {
-	args := m.Called(ctx, scheduleID)
+func (m *MockScheduleProvider) DeleteSchedule(ctx context.Context, scheduleIdentifier string) error {
+	args := m.Called(ctx, scheduleIdentifier)
 	return args.Error(0)
 }

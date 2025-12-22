@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 	"time"
 
@@ -90,12 +91,14 @@ type ScheduleProvider interface {
 	Init()
 	// Close cleans up scheduler resources (required for ServiceManager compatibility).
 	Close()
-	// CreateSchedule creates a new Temporal schedule.
-	CreateSchedule(ctx context.Context, options ScheduleOptions) (string, error)
-	// UpdateSchedule modifies an existing schedule.
-	UpdateSchedule(ctx context.Context, scheduleID string, options ScheduleOptions) error
+	// CreateSchedule creates a new Temporal schedule. Fails if schedule already exists.
+	CreateSchedule(ctx context.Context, scheduleIdentifier string, options ScheduleOptions) (string, error)
+	// CreateOrUpdateSchedule creates a new schedule or updates an existing one (upsert).
+	CreateOrUpdateSchedule(ctx context.Context, scheduleIdentifier string, options ScheduleOptions) (string, error)
+	// UpdateSchedule modifies an existing schedule. Fails if schedule doesn't exist.
+	UpdateSchedule(ctx context.Context, scheduleIdentifier string, options ScheduleOptions) error
 	// DeleteSchedule removes a schedule.
-	DeleteSchedule(ctx context.Context, scheduleID string) error
+	DeleteSchedule(ctx context.Context, scheduleIdentifier string) error
 }
 
 // NewScheduleClient creates a new Scheduler instance.
@@ -115,6 +118,7 @@ func (s *ScheduleClient) Close() {
 }
 
 // CreateSchedule creates a new Temporal schedule.
+// Use CreateOrUpdateSchedule if you want upsert behavior.
 //
 // For one-time schedules:
 //   - Set NextSchedule to the delay before execution
@@ -127,8 +131,13 @@ func (s *ScheduleClient) Close() {
 // TaskQueue defaults to the current service's queue unless overridden in WorkflowActivity.
 func (s *ScheduleClient) CreateSchedule(
 	ctx context.Context,
+	scheduleIdentifier string,
 	options ScheduleOptions,
 ) (string, error) {
+	if scheduleIdentifier == "" {
+		return "", errors.New("schedule identifier is required")
+	}
+
 	if options.WorkflowActivity == nil {
 		return "", errors.New("workflow activity is nil")
 	}
@@ -152,7 +161,7 @@ func (s *ScheduleClient) CreateSchedule(
 	}
 
 	h, err := s.ts.Client.ScheduleClient().Create(ctx, client.ScheduleOptions{
-		ID:   db.Node.Generate().Base36(),
+		ID:   s.generateScheduleID(scheduleIdentifier, options.WorkflowActivity),
 		Spec: *scheduleSpec,
 		Action: &client.ScheduleWorkflowAction{
 			Workflow:  options.WorkflowActivity.WorkflowName,
@@ -171,6 +180,24 @@ func (s *ScheduleClient) CreateSchedule(
 	return h.GetID(), nil
 }
 
+// CreateOrUpdateSchedule creates a new schedule or updates an existing one.
+// This is the recommended method when you want upsert behavior (e.g., updating user expiry dates).
+func (s *ScheduleClient) CreateOrUpdateSchedule(
+	ctx context.Context,
+	scheduleIdentifier string,
+	options ScheduleOptions,
+) (string, error) {
+	// Try to update first
+	err := s.UpdateSchedule(ctx, scheduleIdentifier, options)
+	if err == nil {
+		// Successfully updated, return the schedule ID
+		return s.generateScheduleID(scheduleIdentifier, options.WorkflowActivity), nil
+	}
+
+	// Schedule doesn't exist, create new one
+	return s.CreateSchedule(ctx, scheduleIdentifier, options)
+}
+
 // UpdateSchedule modifies an existing Temporal schedule.
 //
 // Supports partial updates:
@@ -178,12 +205,14 @@ func (s *ScheduleClient) CreateSchedule(
 //   - If WorkflowActivity is nil, workflow action is not updated
 //
 // This allows updating only the schedule time or only the workflow parameters.
-func (s *ScheduleClient) UpdateSchedule(ctx context.Context, scheduleID string, options ScheduleOptions) error {
+func (s *ScheduleClient) UpdateSchedule(ctx context.Context, scheduleIdentifier string, options ScheduleOptions) error {
 	// Generate new schedule spec (may be nil to indicate no schedule change)
 	newScheduleSpec, err := s.generateScheduleSpec(options)
 	if err != nil {
 		return err
 	}
+
+	scheduleID := s.generateScheduleID(scheduleIdentifier, options.WorkflowActivity)
 
 	// Get schedule handle
 	handle := s.ts.Client.ScheduleClient().GetHandle(ctx, scheduleID)
@@ -248,7 +277,8 @@ func (s *ScheduleClient) UpdateSchedule(ctx context.Context, scheduleID string, 
 
 // DeleteSchedule removes a Temporal schedule.
 // The schedule will stop executing and be removed from the Temporal server.
-func (s *ScheduleClient) DeleteSchedule(ctx context.Context, scheduleID string) error {
+func (s *ScheduleClient) DeleteSchedule(ctx context.Context, scheduleIdentifier string) error {
+	scheduleID := s.generateScheduleID(scheduleIdentifier, nil)
 	handle := s.ts.Client.ScheduleClient().GetHandle(ctx, scheduleID)
 	_, err := handle.Describe(ctx) // Temporal will throw error if schedule not found
 	if err != nil {
@@ -321,4 +351,18 @@ func (s *ScheduleClient) generateScheduleSpec(options ScheduleOptions) (*client.
 	}
 
 	return &scheduleSpec, nil
+}
+
+func (s *ScheduleClient) generateScheduleID(scheduleIdentifier string, workflowActivity *WorkflowActivity) string {
+	taskQueue := s.ts.TaskQueue
+	workflowName := "unknown"
+
+	if workflowActivity != nil {
+		if workflowActivity.TaskQueue != nil {
+			taskQueue = *workflowActivity.TaskQueue
+		}
+		workflowName = workflowActivity.WorkflowName
+	}
+
+	return fmt.Sprintf("%s-%s:%s", taskQueue, workflowName, scheduleIdentifier)
 }
