@@ -93,7 +93,7 @@ const (
 	// IOTReaderTableName                        = "iot_readers"
 	// IOTReaderGateReceivingGroupTableName      = "iot_reader_gate_receiving_groups"
 	// IOTReaderPortTableName                    = "iot_reader_ports"
-	// HandheldReaderTableName                   = "handheld_readers"
+	HandheldReaderTableName = "handheld_readers"
 	// MeasurementTableName                      = "measurements"
 	// MissingReportTableName                    = "missing_reports"
 	// MissingReportHistoryTableName             = "missing_report_histories"
