@@ -24,6 +24,8 @@ const (
 )
 
 const (
+	GetLoggedInUserActivity = "GetLoggedInUserActivity"
+
 	AnalyticsReportingCreateChangeLogActivity     = "CreateChangeLogActivity"
 	AnalyticsReportingCreateSystemLogActivity     = "CreateSystemLogActivity"
 	AnalyticsReportingCreateUserActionLogActivity = "CreateUserActionLogActivity"
@@ -32,13 +34,9 @@ const (
 	AnalyticsReportingDeleteSystemLogActivity     = "DeleteSystemLogActivity"
 	AnalyticsReportingDeleteUserActionLogActivity = "DeleteUserActionLogActivity"
 	AnalyticsReportingDeleteSessionLogActivity    = "DeleteSessionLogActivity"
-)
 
-const (
 	AssetTransactionGetUsersBorrowedAssetCount = "GetUsersBorrowedAssetCount"
 	AssetTransactionGetUsersAssignedAssetCount = "GetUsersAssignedAssetCount"
-)
 
-const (
 	ApprovalGetUsersPendingApprovalCount = "GetUsersPendingApprovalCount"
 )
