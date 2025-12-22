@@ -1,10 +1,10 @@
 package dto
 
-import "gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/fixedasset/model"
+import "gitea.tagsamurai.local/BETS-V2/ts-utils/v2/enum"
 
 type ClientPlan struct {
-	PlanFixedAsset       model.PlanTypes `json:"planFixedAsset"       column:"plan_fixed_asset"`
-	PlanSupplyAsset      model.PlanTypes `json:"planSupplyAsset"      column:"plan_supply_asset"`
-	PlanInventoryAsset   model.PlanTypes `json:"planInventoryAsset"   column:"plan_inventory_asset"`
-	PlanProcurementAsset model.PlanTypes `json:"planProcurementAsset" column:"plan_procurement_asset"`
+	PlanFixedAsset       enum.PlanTypes `json:"planFixedAsset"       column:"plan_fixed_asset"`
+	PlanSupplyAsset      enum.PlanTypes `json:"planSupplyAsset"      column:"plan_supply_asset"`
+	PlanInventoryAsset   enum.PlanTypes `json:"planInventoryAsset"   column:"plan_inventory_asset"`
+	PlanProcurementAsset enum.PlanTypes `json:"planProcurementAsset" column:"plan_procurement_asset"`
 }

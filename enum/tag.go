@@ -5,6 +5,7 @@ type TagStatus string
 const (
 	TagStatusAvailable     TagStatus = "Available"
 	TagStatusPaired        TagStatus = "Paired"
+	TagStatusReported      TagStatus = "Reported"
 	TagStatusDamageMissing TagStatus = "Damage / Missing"
 	TagStatusToBeReturned  TagStatus = "To Be Returned"
 )
@@ -19,6 +20,7 @@ const (
 type TagType string
 
 const (
+	TagTypeNonTag          TagType = "Non TAG"
 	TagTypeRFID            TagType = "RFID"
 	TagTypeQR              TagType = "QR"
 	TagTypeNFC             TagType = "NFC"
