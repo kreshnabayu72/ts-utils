@@ -1,5 +1,7 @@
 package model
 
+/*
+
 import (
 	"time"
 )
@@ -53,3 +55,4 @@ type UserAttribute struct {
 	IsReadOnly     bool   `json:"isReadOnly"             column:"users.is_read_only"                                                   special:"generated"`
 	IsTotalControl bool   `json:"isTotalControl"         column:"users.is_total_control"                                               special:"generated"`
 }
+*/

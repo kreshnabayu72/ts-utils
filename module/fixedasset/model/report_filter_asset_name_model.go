@@ -1,5 +1,7 @@
 package model
 
+/*
+
 import "time"
 
 type ReportAssetNameFilter struct {
@@ -9,3 +11,4 @@ type ReportAssetNameFilter struct {
 	CreatedAt   time.Time `json:"createdAt"            column:"reports_filter_asset_name.created_at"`
 	UpdatedAt   time.Time `json:"updatedAt"            column:"reports_filter_asset_name.updated_at"`
 }
+*/

@@ -1,5 +1,7 @@
 package model
 
+/*
+
 import (
 	"time"
 )
@@ -11,3 +13,4 @@ type BorrowingPrelistRequest struct {
 	CreatedAt time.Time `json:"createdAt" column:"borrowing_prelist_requests.created_at"`
 	UpdatedAt time.Time `json:"updatedAt" column:"borrowing_prelist_requests.updated_at"`
 }
+*/

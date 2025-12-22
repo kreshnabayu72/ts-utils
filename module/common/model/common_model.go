@@ -28,19 +28,6 @@ type NameEmbedded struct {
 	NameNumber       *int   `bson:"nameNumber"       json:"nameNumber"`
 }
 
-type TagType string
-
-const (
-	TagTypeNonTag    TagType = "Non TAG"
-	TagTypeRFID      TagType = "RFID"
-	TagTypeQR        TagType = "QR"
-	TagTypeNFC       TagType = "NFC"
-	TagTypeRFIDQR    TagType = "RFID & QR"
-	TagTypeNFCQR     TagType = "NFC & QR"
-	TagTypeRFIDNFC   TagType = "RFID & NFC"
-	TagTypeRFIDNFCQR TagType = "RFID & NFC & QR"
-)
-
 type Tag struct {
 	QRCode        *string `json:"qrCode"        bson:"qrCode"`
 	ShortQRCode   *string `json:"shortQRCode"   bson:"shortQRCode"`
@@ -49,13 +36,6 @@ type Tag struct {
 	NFCCode       *string `json:"nfcCode"       bson:"nfcCode"`
 	ShortNFCCode  *string `json:"shortNFCCode"  bson:"shortNFCCode"`
 }
-
-type AppModule string
-
-const (
-	FixedAssetModule  AppModule = "Fixed Asset"
-	SupplyAssetModule AppModule = "Supply Asset"
-)
 
 // JSONBArrayString is a custom type for handling a Go []string that is stored as
 // a JSONB array of strings in a PostgreSQL database.

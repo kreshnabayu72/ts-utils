@@ -1,5 +1,7 @@
 package model
 
+/*
+
 import (
 	"time"
 )
@@ -18,3 +20,4 @@ type RoutineScheduleIndicator struct {
 	CreatedAt           time.Time         `json:"createdAt"           column:"routine_schedule_indicators.created_at"`
 	UpdatedAt           time.Time         `json:"updatedAt"           column:"routine_schedule_indicators.updated_at"`
 }
+*/

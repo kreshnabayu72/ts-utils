@@ -1,5 +1,7 @@
 package model
 
+/*
+
 import (
 	"time"
 )
@@ -11,3 +13,4 @@ type CustomFieldCategory struct {
 	CreatedAt     time.Time `json:"createdAt"     column:"custom_field_categories.created_at"`
 	UpdatedAt     time.Time `json:"updatedAt"     column:"custom_field_categories.updated_at"`
 }
+*/

@@ -1,5 +1,7 @@
 package model
 
+/*
+
 import (
 	"time"
 )
@@ -26,3 +28,4 @@ type ImportFixedAsset struct {
 	CreatedAt          time.Time  `json:"createdAt"          column:"import_assets.created_at"`
 	UpdatedAt          time.Time  `json:"updatedAt"          column:"import_assets.updated_at"`
 }
+*/

@@ -1,5 +1,7 @@
 package model
 
+/*
+
 import (
 	"time"
 )
@@ -21,3 +23,4 @@ type AuditApprovalHistory struct {
 	Address       *string    `json:"address"         column:"audit_approval_histories.address"`
 	Coordinate    *string    `json:"coordinate"      column:"audit_approval_histories.coordinate"`
 }
+*/

@@ -1,5 +1,7 @@
 package model
 
+/*
+
 import (
 	"time"
 )
@@ -15,3 +17,4 @@ type DisposalReport struct {
 	CreatedAt     time.Time             `json:"createdAt"     column:"disposal_reports.created_at"`
 	UpdatedAt     time.Time             `json:"updatedAt"     column:"disposal_reports.updated_at"`
 }
+*/

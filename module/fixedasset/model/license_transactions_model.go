@@ -1,5 +1,7 @@
 package model
 
+/*
+
 import (
 	"time"
 )
@@ -17,3 +19,4 @@ type LicenseTransaction struct {
 	CreatedAt     time.Time           `json:"createdAt"     column:"license_transactions.created_at"`
 	UpdatedAt     time.Time           `json:"updatedAt"     column:"license_transactions.updated_at"`
 }
+*/

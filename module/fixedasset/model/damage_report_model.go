@@ -1,5 +1,7 @@
 package model
 
+/*
+
 import (
 	"time"
 )
@@ -17,3 +19,4 @@ type DamageReport struct {
 	CreatedAt      time.Time          `json:"createdAt"      column:"damage_reports.created_at"`
 	UpdatedAt      time.Time          `json:"updatedAt"      column:"damage_reports.updated_at"`
 }
+*/

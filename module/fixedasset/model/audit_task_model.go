@@ -1,7 +1,11 @@
 package model
 
+/*
+
 import (
 	"time"
+
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/enum"
 )
 
 type AuditTask struct {
@@ -10,7 +14,7 @@ type AuditTask struct {
 	GroupID       int             `json:"groupId"     column:"audit_tasks.group_id"`
 	TransactionId string          `json:"transaction_id" column:"audit_tasks.transaction_id"`
 	Name          string          `json:"name" column:"audit_tasks.name"`
-	TagType       TagType         `json:"tagType"        column:"audit_tasks.tag_type"`
+	TagType       enum.TagType    `json:"tagType"        column:"audit_tasks.tag_type"`
 	AuditType     AuditType       `json:"auditType"      column:"audit_tasks.audit_type"`
 	Status        AuditTaskStatus `json:"status"         column:"audit_tasks.status"`
 	Duration      int             `json:"duration"       column:"audit_tasks.duration"`
@@ -22,3 +26,4 @@ type AuditTask struct {
 	CreatedAt     time.Time       `json:"createdAt"      column:"audit_tasks.created_at"`
 	UpdatedAt     time.Time       `json:"updatedAt"      column:"audit_tasks.updated_at"`
 }
+*/

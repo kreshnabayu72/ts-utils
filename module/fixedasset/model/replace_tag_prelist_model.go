@@ -1,5 +1,7 @@
 package model
 
+/*
+
 import (
 	"time"
 )
@@ -11,3 +13,4 @@ type ReplaceTagPrelist struct {
 	CreatedAt time.Time             `json:"createdAt" column:"replace_tag_prelists.created_at"`
 	UpdatedAt time.Time             `json:"updatedAt" column:"replace_tag_prelists.updated_at"`
 }
+*/

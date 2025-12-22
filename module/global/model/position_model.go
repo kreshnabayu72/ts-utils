@@ -1,5 +1,7 @@
 package model
 
+/*
+
 import (
 	"time"
 )
@@ -10,3 +12,4 @@ type Position struct {
 	CreatedAt time.Time `json:"createdAt" column:"positions.created_at"`
 	UpdatedAt time.Time `json:"updatedAt" column:"positions.updated_at"`
 }
+*/

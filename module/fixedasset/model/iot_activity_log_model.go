@@ -1,5 +1,7 @@
 package model
 
+/*
+
 import (
 	"time"
 
@@ -22,3 +24,4 @@ type IotActivityLog struct {
 	CreatedAt     time.Time           `bson:"createdAt"               json:"createdAt"`
 	UpdatedAt     time.Time           `bson:"updatedAt"               json:"updatedAt"`
 }
+*/

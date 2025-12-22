@@ -1,5 +1,7 @@
 package model
 
+/*
+
 type IotReaderPort struct {
 	ID          int  `json:"_id"         column:"iot_reader_ports.id"`
 	IotReaderID int  `json:"iotReaderId" column:"iot_reader_ports.iot_reader_id"`
@@ -7,3 +9,4 @@ type IotReaderPort struct {
 	GroupID     *int `json:"groupId"     column:"iot_reader_ports.group_id"`
 	IsActive    bool `json:"isActive"    column:"iot_reader_ports.is_active"`
 }
+*/

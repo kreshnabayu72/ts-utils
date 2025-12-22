@@ -1,5 +1,7 @@
 package model
 
+/*
+
 import (
 	"time"
 )
@@ -11,3 +13,4 @@ type IotReaderGateReceivingGroup struct {
 	CreatedAt   time.Time `json:"createdAt"   column:"iot_reader_gate_receiving_groups.created_at"`
 	UpdatedAt   time.Time `json:"updatedAt"   column:"iot_reader_gate_receiving_groups.updated_at"`
 }
+*/

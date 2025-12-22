@@ -1,5 +1,7 @@
 package model
 
+/*
+
 import (
 	"time"
 )
@@ -11,3 +13,4 @@ type ServiceCenterCategory struct {
 	CreatedAt       time.Time `json:"createdAt"       column:"service_center_categories.created_at"`
 	UpdatedAt       time.Time `json:"updatedAt"       column:"service_center_categories.updated_at"`
 }
+*/

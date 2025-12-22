@@ -1,16 +1,20 @@
 package model
 
+/*
+
 import (
 	"time"
+
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/enum"
 )
 
 type BorrowingRequestHistory struct {
 	ID               int                    `json:"id"               column:"borrowing_request_histories.id"`
 	ParentID         *int                   `json:"parentId"         column:"borrowing_request_histories.parent_id"`
-	TagType          TagType                `json:"tagType"          column:"borrowing_request_histories.tag_type"`
+	TagType          enum.TagType           `json:"tagType"          column:"borrowing_request_histories.tag_type"`
 	Asset            int                    `json:"asset"            column:"borrowing_request_histories.asset"`
 	AssetID          string                 `json:"assetId"          column:"borrowing_request_histories.asset_id"`
-	AliasCode        *string                `json:"aliasCode"                column:"borrowing_request_histories.alias_code"`
+	AliasCode        *string                `json:"aliasCode"        column:"borrowing_request_histories.alias_code"`
 	Name             string                 `json:"name"             column:"borrowing_request_histories.name"`
 	Brand            string                 `json:"brand"            column:"borrowing_request_histories.brand"`
 	Model            string                 `json:"model"            column:"borrowing_request_histories.model"`
@@ -19,11 +23,11 @@ type BorrowingRequestHistory struct {
 	Image            *string                `json:"image"            column:"borrowing_request_histories.image"`
 	Group            string                 `json:"group"            column:"borrowing_request_histories.group"`
 	GroupID          int                    `json:"groupId"          column:"borrowing_request_histories.group_id"`
-	TransactionID    string                 `json:"transactionId"              column:"borrowing_request_histories.transaction_id"`
+	TransactionID    string                 `json:"transactionId"    column:"borrowing_request_histories.transaction_id"`
 	Transaction      *int                   `json:"transaction"      column:"borrowing_request_histories.transaction"`
 	Status           BorrowingRequestStatus `json:"status"           column:"borrowing_request_histories.status"`
 	Notes            string                 `json:"notes"            column:"borrowing_request_histories.notes"`
-	BorrowerId       int                    `json:"borrowerId"   column:"borrowing_request_histories.borrower_id"`
+	BorrowerId       int                    `json:"borrowerId"       column:"borrowing_request_histories.borrower_id"`
 	Borrower         string                 `json:"borrower"         column:"borrowing_request_histories.borrower"`
 	Manager          string                 `json:"manager"          column:"borrowing_request_histories.manager"`
 	Duration         int                    `json:"duration"         column:"borrowing_request_histories.duration"`
@@ -33,3 +37,4 @@ type BorrowingRequestHistory struct {
 	CreatedAt        time.Time              `json:"createdAt"        column:"borrowing_request_histories.created_at"`
 	UpdatedAt        time.Time              `json:"updatedAt"        column:"borrowing_request_histories.updated_at"`
 }
+*/

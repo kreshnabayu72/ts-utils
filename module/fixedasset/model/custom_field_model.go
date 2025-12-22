@@ -1,5 +1,7 @@
 package model
 
+/*
+
 import (
 	"time"
 )
@@ -18,3 +20,4 @@ type CustomField struct {
 	CreatedAt     time.Time           `json:"createdAt"     column:"custom_fields.created_at"`
 	UpdatedAt     time.Time           `json:"updatedAt"     column:"custom_fields.updated_at"`
 }
+*/

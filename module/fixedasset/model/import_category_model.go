@@ -1,5 +1,7 @@
 package model
 
+/*
+
 import (
 	"time"
 )
@@ -12,3 +14,4 @@ type ImportCategory struct {
 	CreatedAt    time.Time `json:"createdAt"    column:"import_categories.created_at"`
 	UpdatedAt    time.Time `json:"updatedAt"    column:"import_categories.updated_at"`
 }
+*/

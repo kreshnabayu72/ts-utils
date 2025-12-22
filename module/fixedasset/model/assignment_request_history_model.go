@@ -1,14 +1,18 @@
 package model
 
+/*
+
 import (
 	"time"
+
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/enum"
 )
 
 // AssignmentRequestHistory represents the assignment_request_histories table in the database.
 type AssignmentRequestHistory struct {
 	ID               int                     `json:"id"               column:"assignment_request_histories.id"`
 	ParentID         *int                    `json:"parentId"         column:"assignment_request_histories.parent_id"`
-	TagType          TagType                 `json:"tagType"          column:"assignment_request_histories.tag_type"`
+	TagType          enum.TagType            `json:"tagType"          column:"assignment_request_histories.tag_type"`
 	Asset            int                     `json:"asset"            column:"assignment_request_histories.asset"`
 	AssetID          string                  `json:"assetId"          column:"assignment_request_histories.asset_id"`
 	AliasCode        *string                 `json:"aliasCode"                column:"assignment_request_histories.alias_code"`
@@ -30,3 +34,4 @@ type AssignmentRequestHistory struct {
 	CreatedAt        time.Time               `json:"createdAt"        column:"assignment_request_histories.created_at"`
 	UpdatedAt        time.Time               `json:"updatedAt"        column:"assignment_request_histories.updated_at"`
 }
+*/

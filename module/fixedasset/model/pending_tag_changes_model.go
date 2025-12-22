@@ -1,5 +1,7 @@
 package model
 
+/*
+
 import (
 	"time"
 )
@@ -11,3 +13,4 @@ type PendingTagChange struct {
 	CreatedAt time.Time `json:"createdAt"     column:"pending_tag_changes.created_at"`
 	UpdatedAt time.Time `json:"updatedAt"     column:"pending_tag_changes.updated_at"`
 }
+*/

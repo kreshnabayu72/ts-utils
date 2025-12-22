@@ -1,5 +1,7 @@
 package model
 
+/*
+
 import (
 	"time"
 )
@@ -13,3 +15,4 @@ type BrandCategory struct {
 	IsDeleted  bool       `json:"isDeleted"  column:"brand_categories.is_deleted"`
 	DeletedAt  *time.Time `json:"deletedAt"  column:"brand_categories.deleted_at"`
 }
+*/

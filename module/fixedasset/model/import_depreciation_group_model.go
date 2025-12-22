@@ -1,5 +1,7 @@
 package model
 
+/*
+
 import (
 	"time"
 )
@@ -12,3 +14,4 @@ type ImportDepreciationGroup struct {
 	CreatedAt  time.Time `json:"createdAt"  column:"import_depreciation_groups.created_at"`
 	UpdatedAt  time.Time `json:"updatedAt"  column:"import_depreciation_groups.updated_at"`
 }
+*/

@@ -1,5 +1,7 @@
 package model
 
+/*
+
 import (
 	"time"
 )
@@ -23,3 +25,4 @@ type AuditTaskAssets struct {
 	CreatedAt              time.Time                        `json:"createdAt"    column:"audit_task_assets.created_at"`
 	UpdatedAt              time.Time                        `json:"updatedAt"    column:"audit_task_assets.updated_at"`
 }
+*/

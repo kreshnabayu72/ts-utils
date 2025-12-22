@@ -1,5 +1,7 @@
 package model
 
+/*
+
 import (
 	"time"
 )
@@ -21,3 +23,4 @@ type FileInStorage struct {
 	CreatedAt            time.Time `json:"createdAt"            column:"file_in_storage.created_at"`
 	UpdatedAt            time.Time `json:"updatedAt"            column:"file_in_storage.updated_at"`
 }
+*/

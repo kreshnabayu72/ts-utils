@@ -1,5 +1,7 @@
 package model
 
+/*
+
 import (
 	"time"
 )
@@ -12,3 +14,4 @@ type QrRfidPair struct {
 	CreatedAt  time.Time  `json:"createdAt"  column:"qr_rfid_pairs.created_at"`
 	UpdatedAt  time.Time  `json:"updatedAt"  column:"qr_rfid_pairs.updated_at"`
 }
+*/

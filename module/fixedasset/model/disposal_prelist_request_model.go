@@ -1,5 +1,7 @@
 package model
 
+/*
+
 import (
 	"time"
 )
@@ -13,3 +15,4 @@ type DisposalPrelistRequest struct {
 	CreatedAt time.Time `json:"createdAt" column:"disposal_prelist_requests.created_at"`
 	UpdatedAt time.Time `json:"updatedAt" column:"disposal_prelist_requests.updated_at"`
 }
+*/

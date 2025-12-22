@@ -1,16 +1,20 @@
 package model
 
+/*
+
 import (
 	"time"
+
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/enum"
 )
 
 type TrackingHistory struct {
 	ID                    int               `json:"_id"                   column:"tracking_histories.id"`
 	Asset                 int               `json:"asset"                 column:"tracking_histories.asset"`
-	TagType               TagType           `json:"tagType"               column:"tracking_histories.tag_type"`
+	TagType               enum.TagType      `json:"tagType"               column:"tracking_histories.tag_type"`
 	ReportedByFullName    string            `json:"reportedByFullName"    column:"tracking_histories.reported_by_full_name"`
 	AssetNameWithSequence string            `json:"assetNameWithSequence" column:"tracking_histories.asset_name_with_sequence"`
-	AssetID               string            `json:"assetId"             column:"tracking_histories.asset_id"`
+	AssetID               string            `json:"assetId"               column:"tracking_histories.asset_id"`
 	AssetAliasCode        *string           `json:"assetAliasCode"        column:"tracking_histories.asset_alias_code"`
 	AssetBrand            string            `json:"assetBrand"            column:"tracking_histories.asset_brand"`
 	AssetModel            string            `json:"assetModel"            column:"tracking_histories.asset_model"`
@@ -35,3 +39,4 @@ type TrackingHistory struct {
 	CreatedAt             time.Time         `json:"createdAt"             column:"tracking_histories.created_at"`
 	UpdatedAt             time.Time         `json:"updatedAt"             column:"tracking_histories.updated_at"`
 }
+*/

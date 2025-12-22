@@ -1,5 +1,7 @@
 package model
 
+/*
+
 import (
 	"time"
 )
@@ -12,3 +14,4 @@ type ImportAccountCode struct {
 	CreatedAt time.Time `json:"createdAt" column:"import_account_codes.created_at"`
 	UpdatedAt time.Time `json:"updatedAt" column:"import_account_codes.updated_at"`
 }
+*/

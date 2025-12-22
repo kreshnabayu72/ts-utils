@@ -1,5 +1,6 @@
 package migration
 
+/*
 // Note: Method of reading sql file doesnt work on server, so this strings were created
 
 var AssignmentApprovalPostQuery string = `DO $$
@@ -34,7 +35,7 @@ var CategoryPostQuery string = `DO $$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM categories) THEN
     INSERT INTO categories (id, name, code, parent_id,key)
-    VALUES (0, 'All', '', NULL,-1),(1,'Default','0000', 0, 1); --ID needs to be 0 
+    VALUES (0, 'All', '', NULL,-1),(1,'Default','0000', 0, 1); --ID needs to be 0
   END IF;
 END
 $$;`
@@ -167,3 +168,4 @@ INSERT INTO user_transaction_roles (
   (9, 1, 'damagedRole', 'Damaged', 'Manager', 1, 'Or'),
   (10, 1, 'missingRole', 'Missing', 'Manager', 1, 'Or');
 `
+*/

@@ -1,5 +1,7 @@
 package model
 
+/*
+
 import (
 	"time"
 )
@@ -12,3 +14,4 @@ type Measurement struct {
 	CreatedAt time.Time  `json:"createdAt" column:"measurements.created_at"`
 	UpdatedAt time.Time  `json:"updatedAt" column:"measurements.updated_at"`
 }
+*/

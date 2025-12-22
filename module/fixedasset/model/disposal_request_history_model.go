@@ -1,7 +1,11 @@
 package model
 
+/*
+
 import (
 	"time"
+
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/enum"
 )
 
 // DisposalRequestHistory represents the disposal_request_histories table in the database.
@@ -10,7 +14,7 @@ type DisposalRequestHistory struct {
 	Asset                     int                   `json:"asset"                     column:"disposal_request_histories.asset"`
 	AssetID                   string                `json:"assetId"                   column:"disposal_request_histories.asset_id"`
 	AliasCode                 *string               `json:"aliasCode"                 column:"disposal_request_histories.alias_code"`
-	TagType                   *TagType              `json:"tagType"                   column:"disposal_request_histories.tag_type"`
+	TagType                   *enum.TagType         `json:"tagType"                   column:"disposal_request_histories.tag_type"`
 	Name                      string                `json:"name"                      column:"disposal_request_histories.name"`
 	Brand                     string                `json:"brand"                     column:"disposal_request_histories.brand"`
 	Model                     string                `json:"model"                     column:"disposal_request_histories.model"`
@@ -37,3 +41,4 @@ type DisposalRequestHistory struct {
 	CreatedAt                 time.Time             `json:"createdAt"                 column:"disposal_request_histories.created_at"`
 	UpdatedAt                 time.Time             `json:"updatedAt"                 column:"disposal_request_histories.updated_at"`
 }
+*/

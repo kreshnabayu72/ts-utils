@@ -1,5 +1,7 @@
 package model
 
+/*
+
 import (
 	"time"
 )
@@ -21,3 +23,4 @@ type RoutineSchedule struct {
 	CreatedAt            time.Time                `json:"createdAt"            column:"routine_schedules.created_at"`
 	UpdatedAt            time.Time                `json:"updatedAt"            column:"routine_schedules.updated_at"`
 }
+*/

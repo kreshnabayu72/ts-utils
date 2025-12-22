@@ -1,5 +1,7 @@
 package model
 
+/*
+
 import (
 	"time"
 )
@@ -52,3 +54,4 @@ type GroupApprovalType struct {
 	CreatedAt    time.Time            `json:"createdAt"    column:"created_at"`
 	UpdatedAt    time.Time            `json:"updatedAt"    column:"updated_at"`
 }
+*/

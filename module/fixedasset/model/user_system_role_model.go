@@ -1,5 +1,7 @@
 package model
 
+/*
+
 import (
 	"time"
 )
@@ -19,3 +21,4 @@ type UserSystemRole struct {
 	CreatedAt        *time.Time          `json:"createdAt"        column:"user_system_roles.created_at"`
 	UpdatedAt        *time.Time          `json:"updatedAt"        column:"user_system_roles.updated_at"`
 }
+*/

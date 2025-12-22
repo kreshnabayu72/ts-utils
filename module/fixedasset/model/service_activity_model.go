@@ -1,5 +1,7 @@
 package model
 
+/*
+
 import (
 	"time"
 )
@@ -22,3 +24,4 @@ type ServiceActivity struct {
 	CreatedAt             time.Time  `json:"createdAt"              column:"service_activities.created_at"`
 	UpdatedAt             time.Time  `json:"updatedAt"              column:"service_activities.updated_at"`
 }
+*/

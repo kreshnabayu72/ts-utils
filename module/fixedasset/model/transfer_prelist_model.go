@@ -1,5 +1,7 @@
 package model
 
+/*
+
 import (
 	"time"
 )
@@ -12,3 +14,4 @@ type TransferPrelist struct {
 	CreatedAt          time.Time `json:"createdAt"          column:"transfer_prelists.created_at"`
 	UpdatedAt          time.Time `json:"updatedAt"          column:"transfer_prelists.updated_at"`
 }
+*/
