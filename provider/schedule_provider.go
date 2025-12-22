@@ -276,13 +276,14 @@ func (s *ScheduleClient) UpdateSchedule(ctx context.Context, scheduleIdentifier 
 }
 
 // DeleteSchedule removes a Temporal schedule.
-// The schedule will stop executing and be removed from the Temporal server.
+// This operation is idempotent - if the schedule doesn't exist, it returns nil.
 func (s *ScheduleClient) DeleteSchedule(ctx context.Context, scheduleIdentifier string) error {
 	scheduleID := s.generateScheduleID(scheduleIdentifier, nil)
 	handle := s.ts.Client.ScheduleClient().GetHandle(ctx, scheduleID)
-	_, err := handle.Describe(ctx) // Temporal will throw error if schedule not found
+	_, err := handle.Describe(ctx)
 	if err != nil {
-		return errors.New("schedule not found")
+		// Schedule doesn't exist - idempotent delete, return success
+		return nil
 	}
 	return handle.Delete(ctx)
 }
