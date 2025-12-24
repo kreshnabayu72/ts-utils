@@ -7,3 +7,11 @@ const (
 	ReaderStatusDamaged   = ReaderStatus("Damaged")
 	ReaderStatusMissing   = ReaderStatus("Missing")
 )
+
+type HardwareType string
+
+const (
+	HardwareTypeHardwareHandheld         = HardwareType("Hardware Handheld")
+	HardwareTypeHardwareSmartFixedReader = HardwareType("Hardware Smart Fixed Reader")
+	HardwareTypeTablet                   = HardwareType("Tablet")
+)
