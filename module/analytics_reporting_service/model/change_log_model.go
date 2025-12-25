@@ -3,6 +3,7 @@ package model
 import (
 	"time"
 
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/enum"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -21,7 +22,7 @@ type ChangeLog struct {
 	GroupID                *string            `json:"groupId" bson:"groupId"`
 	SystemRoleKeys         []string           `json:"systemRoleKeys" bson:"systemRoleKeys"`
 	TransactionRoleKeys    []string           `json:"transactionRoleKeys" bson:"transactionRoleKeys"`
-	Module                 string             `json:"module" bson:"module"`
+	Module                 enum.ModuleAccess  `json:"module" bson:"module"`
 	CreatedAt              time.Time          `json:"createdAt" bson:"createdAt"`
 	UpdatedAt              time.Time          `json:"updatedAt" bson:"updatedAt"`
 }
