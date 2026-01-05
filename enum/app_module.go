@@ -16,6 +16,13 @@ var ModuleAccessEnum = map[string]ModuleAccess{
 	"Supply Asset":    ModuleAccessSupplyAsset,
 }
 
+var ModuleAccessKey = map[ModuleAccess]string{
+	ModuleAccessFixedAsset:     "fixed-asset",
+	ModuleAccessGlobalSettings: "global-settings",
+	ModuleAccessAdminConsole:   "admin-console",
+	ModuleAccessSupplyAsset:    "supply-asset",
+}
+
 type PlanTypes string
 
 const (

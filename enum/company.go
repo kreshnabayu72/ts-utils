@@ -45,3 +45,25 @@ const (
 	LicensePurchaseTypePurchase LicensePurchaseType = "Purchase"
 	LicensePurchaseTypeTrial    LicensePurchaseType = "Trial"
 )
+
+type AddOn string
+
+const (
+	AddOnAudit           AddOn = "Audit"
+	AddOnAssetControl    AddOn = "Asset Control"
+	AddOnMaintenance     AddOn = "Maintenance"
+	AddOnRepairTicketing AddOn = "Repair Ticketing"
+	AddOnTracking        AddOn = "Tracking"
+	AddOnStockOpname     AddOn = "Stock Opname"
+)
+
+type AddOnAttribute string
+
+const (
+	AddOnAttributeAudit           AddOnAttribute = "audit"
+	AddOnAttributeAssetControl    AddOnAttribute = "assetControl"
+	AddOnAttributeMaintenance     AddOnAttribute = "maintenance"
+	AddOnAttributeRepairTicketing AddOnAttribute = "repairTicketing"
+	AddOnAttributeTracking        AddOnAttribute = "tracking"
+	AddOnAttributeStockOpname     AddOnAttribute = "stockOpname"
+)
