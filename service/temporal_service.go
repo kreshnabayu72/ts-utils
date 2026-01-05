@@ -2,11 +2,14 @@ package service
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"log/slog"
+	"os"
 
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/config"
 	"go.temporal.io/sdk/client"
+	"go.temporal.io/sdk/converter"
 	"go.temporal.io/sdk/worker"
 )
 
@@ -38,9 +41,49 @@ func MakeTemporalService(taskQueue string, config ...config.ConfigOptions) (*Tem
 		ts.Config = config[0]
 	}
 
+	// Configure data converter with encryption if key is provided
+	var dataConverter converter.DataConverter
+	encryptionKeyEnv := os.Getenv("TEMPORAL_ENCRYPTION_KEY")
+	encryptionKeyID := os.Getenv("TEMPORAL_ENCRYPTION_KEY_ID")
+
+	if encryptionKeyEnv != "" {
+		slog.Info("Encryption key found, initializing encrypted data converter")
+
+		// Decode base64 key
+		encryptionKey, err := base64.StdEncoding.DecodeString(encryptionKeyEnv)
+		if err != nil {
+			return nil, fmt.Errorf("failed to decode TEMPORAL_ENCRYPTION_KEY: %w", err)
+		}
+
+		// Use default key ID if not specified
+		if encryptionKeyID == "" {
+			encryptionKeyID = "default"
+			slog.Warn("TEMPORAL_ENCRYPTION_KEY_ID not set, using 'default'")
+		}
+
+		// Create encryption codec
+		encryptionCodec, err := NewEncryptionCodec(encryptionKeyID, encryptionKey)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create encryption codec: %w", err)
+		}
+
+		// Wrap default converter with codec
+		dataConverter = converter.NewCodecDataConverter(
+			converter.GetDefaultDataConverter(),
+			encryptionCodec,
+		)
+
+		slog.Info("Temporal data converter configured with encryption",
+			"key-id", encryptionKeyID)
+	} else {
+		slog.Warn("TEMPORAL_ENCRYPTION_KEY not set, using unencrypted data converter")
+		dataConverter = converter.GetDefaultDataConverter()
+	}
+
 	clientOptions := client.Options{
-		Logger:   slog.Default(),
-		HostPort: ts.getHostPort(),
+		Logger:        slog.Default(),
+		HostPort:      ts.getHostPort(),
+		DataConverter: dataConverter,
 	}
 
 	slog.Debug("Dialing temporal server...")
