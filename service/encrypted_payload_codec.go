@@ -13,6 +13,8 @@ import (
 const (
 	// MetadataEncodingEncrypted is the metadata key for encrypted payloads
 	MetadataEncodingEncrypted = "binary/encrypted"
+	// MetadataEncodingJSON is the metadata key for JSON payloads
+	MetadataEncodingJSON = "json/plain"
 	// MetadataEncryptionKeyID is the metadata key for encryption key identifier
 	MetadataEncryptionKeyID = "encryption-key-id"
 )
@@ -95,8 +97,14 @@ func (ec *EncryptionCodec) Decode(payloads []*commonpb.Payload) ([]*commonpb.Pay
 			return nil, fmt.Errorf("failed to decrypt payload %d: %w", i, err)
 		}
 
-		// Return decrypted payload (remove encryption metadata)
+		// The decrypted data is the original serialized payload (with metadata).
+		// We need to unmarshal it to restore the original payload structure.
+		// However, our encrypt() only encrypts payload.Data, not the full payload.
+		// So we just return the decrypted data with default JSON encoding.
 		result[i] = &commonpb.Payload{
+			Metadata: map[string][]byte{
+				"encoding": []byte(MetadataEncodingJSON),
+			},
 			Data: decryptedData,
 		}
 	}
