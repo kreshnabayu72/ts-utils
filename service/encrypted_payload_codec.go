@@ -7,14 +7,13 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/gogo/protobuf/proto"
 	commonpb "go.temporal.io/api/common/v1"
 )
 
 const (
 	// MetadataEncodingEncrypted is the metadata key for encrypted payloads
 	MetadataEncodingEncrypted = "binary/encrypted"
-	// MetadataEncodingJSON is the metadata key for JSON payloads
-	MetadataEncodingJSON = "json/plain"
 	// MetadataEncryptionKeyID is the metadata key for encryption key identifier
 	MetadataEncryptionKeyID = "encryption-key-id"
 )
@@ -45,6 +44,7 @@ func NewEncryptionCodec(keyID string, encryptionKey []byte) (*EncryptionCodec, e
 }
 
 // Encode encrypts all payloads using AES-256-GCM.
+// The entire payload (including metadata) is serialized and encrypted.
 func (ec *EncryptionCodec) Encode(payloads []*commonpb.Payload) ([]*commonpb.Payload, error) {
 	result := make([]*commonpb.Payload, len(payloads))
 
@@ -55,8 +55,14 @@ func (ec *EncryptionCodec) Encode(payloads []*commonpb.Payload) ([]*commonpb.Pay
 			continue
 		}
 
-		// Encrypt the payload data
-		encryptedData, err := ec.encrypt(payload.Data)
+		// Serialize the entire payload (including metadata) to bytes
+		serialized, err := proto.Marshal(payload)
+		if err != nil {
+			return nil, fmt.Errorf("failed to serialize payload %d: %w", i, err)
+		}
+
+		// Encrypt the serialized payload
+		encryptedData, err := ec.encrypt(serialized)
 		if err != nil {
 			return nil, fmt.Errorf("failed to encrypt payload %d: %w", i, err)
 		}
@@ -75,6 +81,7 @@ func (ec *EncryptionCodec) Encode(payloads []*commonpb.Payload) ([]*commonpb.Pay
 }
 
 // Decode decrypts all encrypted payloads.
+// The decrypted data is deserialized to restore the original payload.
 func (ec *EncryptionCodec) Decode(payloads []*commonpb.Payload) ([]*commonpb.Payload, error) {
 	result := make([]*commonpb.Payload, len(payloads))
 
@@ -97,16 +104,13 @@ func (ec *EncryptionCodec) Decode(payloads []*commonpb.Payload) ([]*commonpb.Pay
 			return nil, fmt.Errorf("failed to decrypt payload %d: %w", i, err)
 		}
 
-		// The decrypted data is the original serialized payload (with metadata).
-		// We need to unmarshal it to restore the original payload structure.
-		// However, our encrypt() only encrypts payload.Data, not the full payload.
-		// So we just return the decrypted data with default JSON encoding.
-		result[i] = &commonpb.Payload{
-			Metadata: map[string][]byte{
-				"encoding": []byte(MetadataEncodingJSON),
-			},
-			Data: decryptedData,
+		// Deserialize to restore the original payload (with original metadata)
+		originalPayload := &commonpb.Payload{}
+		if err := proto.Unmarshal(decryptedData, originalPayload); err != nil {
+			return nil, fmt.Errorf("failed to deserialize payload %d: %w", i, err)
 		}
+
+		result[i] = originalPayload
 	}
 
 	return result, nil
