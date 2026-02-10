@@ -17,7 +17,7 @@ type HandheldReaderUsageLog struct {
 	TransactionID string             `json:"transactionId"             bson:"transactionId"`
 	Borrower      string             `json:"borrower" bson:"borrower"`
 	Origin        string             `json:"origin" bson:"origin"`
-	Destination   string             `json:"destination" bson:"nadestination"`
+	Destination   string             `json:"destination" bson:"destination"`
 	ReportedBy    string             `json:"reportedBy" bson:"reportedBy"`
 	Group         string             `json:"group" bson:"group"`
 	AuditType     string             `json:"auditType"        bson:"auditType"`
