@@ -43,5 +43,5 @@ type LoggedInUser struct {
 	Access                     []string   `json:"access"                     column:"users.access"`
 	IsDeleted                  bool       `json:"isDeleted"                  column:"users.is_deleted"`
 	CreatedAt                  time.Time  `json:"createdAt"                  column:"users.created_at"`
-	UpdatedAt                  time.Time  `json:"updatedAt"                                                                                    bson:"updatedAt"`
+	UpdatedAt                  time.Time  `json:"updatedAt"                  column:"users.updated_at"`
 }
