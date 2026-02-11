@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Fetch remote tags
+git fetch --tags
+
 # Get the highest tag number across ALL branches (not just current commit history)
 VERSION=`git tag --sort=-version:refname | head -1`
 VERSION=${VERSION:-'0.0.0'}
