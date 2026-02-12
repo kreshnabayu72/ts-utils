@@ -150,9 +150,9 @@ func ExecuteWorkflowWithDefaults[T any](
 //	        return &model.CreateUserOutput{UserID: userID}, nil
 //	    })
 //	}
-func SafeRunner(
-	fn func() (res any, err error),
-) (res any, runnerErr error) {
+func SafeRunner[T any](
+	fn func() (res T, err error),
+) (res T, runnerErr error) {
 	defer func() {
 		if r := recover(); r != nil {
 			// Convert panic to a NonRetryableApplicationError
