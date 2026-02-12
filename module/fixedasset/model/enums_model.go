@@ -116,25 +116,29 @@ package model
 // 	CustomFieldTypeAudit              = CustomFieldType("Audit")
 // )
 
-// type CustomFieldDataType string
+*/
 
-// const (
-// 	CustomFieldDataTypeText          = CustomFieldDataType("Text")
-// 	CustomFieldDataTypeTextarea      = CustomFieldDataType("Textarea")
-// 	CustomFieldDataTypeDropdown      = CustomFieldDataType("Dropdown")
-// 	CustomFieldDataTypeMultiDropdown = CustomFieldDataType("MultiDropdown")
-// 	CustomFieldDataTypeRadioButton   = CustomFieldDataType("Radio button")
-// 	CustomFieldDataTypeCheckbox      = CustomFieldDataType("Checkbox")
-// 	CustomFieldDataTypeDate          = CustomFieldDataType("Date")
-// 	CustomFieldDataTypeDatetime      = CustomFieldDataType("Datetime")
-// 	CustomFieldDataTypeCurrency      = CustomFieldDataType("Currency")
-// 	CustomFieldDataTypeNumeric       = CustomFieldDataType("Numeric")
-// 	CustomFieldDataTypePhone         = CustomFieldDataType("Phone")
-// 	CustomFieldDataTypePercentage    = CustomFieldDataType("Percentage")
-// 	CustomFieldDataTypeEmail         = CustomFieldDataType("Email")
-// 	CustomFieldDataTypeURL           = CustomFieldDataType("URL")
-// 	CustomFieldDataTypeDocument      = CustomFieldDataType("Document")
-// )
+type CustomFieldDataType string
+
+const (
+	CustomFieldDataTypeText          = CustomFieldDataType("Text")
+	CustomFieldDataTypeTextarea      = CustomFieldDataType("Textarea")
+	CustomFieldDataTypeDropdown      = CustomFieldDataType("Dropdown")
+	CustomFieldDataTypeMultiDropdown = CustomFieldDataType("MultiDropdown")
+	CustomFieldDataTypeRadioButton   = CustomFieldDataType("Radio button")
+	CustomFieldDataTypeCheckbox      = CustomFieldDataType("Checkbox")
+	CustomFieldDataTypeDate          = CustomFieldDataType("Date")
+	CustomFieldDataTypeDatetime      = CustomFieldDataType("Datetime")
+	CustomFieldDataTypeCurrency      = CustomFieldDataType("Currency")
+	CustomFieldDataTypeNumeric       = CustomFieldDataType("Numeric")
+	CustomFieldDataTypePhone         = CustomFieldDataType("Phone")
+	CustomFieldDataTypePercentage    = CustomFieldDataType("Percentage")
+	CustomFieldDataTypeEmail         = CustomFieldDataType("Email")
+	CustomFieldDataTypeURL           = CustomFieldDataType("URL")
+	CustomFieldDataTypeDocument      = CustomFieldDataType("Document")
+)
+
+/*
 
 // type GroupQuotaType string
 
