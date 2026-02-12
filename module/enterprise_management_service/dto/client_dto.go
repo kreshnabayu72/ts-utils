@@ -1,5 +1,5 @@
 package dto
 
-type GetClientActivityParam struct {
+type GetClientParam struct {
 	ClientID string
 }
