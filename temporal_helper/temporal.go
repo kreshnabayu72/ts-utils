@@ -87,7 +87,7 @@ func ExecuteWorkflowWithDefaults[T any](
 	}
 
 	if len(customOptions) > 0 {
-		wo = customOptions[0]
+		mergeStartWorkflowOptions(&wo, customOptions[0])
 	}
 
 	wr, executionErr := config.TemporalService.Client.ExecuteWorkflow(
@@ -110,6 +110,42 @@ func ExecuteWorkflowWithDefaults[T any](
 	}
 
 	return helper.SendResponse(ctx, config.SuccessCode, result, config.SuccessMessage, nil)
+}
+
+func mergeStartWorkflowOptions(base *client.StartWorkflowOptions, custom client.StartWorkflowOptions) {
+	if custom.ID != "" {
+		base.ID = custom.ID
+	}
+	if custom.TaskQueue != "" {
+		base.TaskQueue = custom.TaskQueue
+	}
+	if custom.WorkflowExecutionTimeout != 0 {
+		base.WorkflowExecutionTimeout = custom.WorkflowExecutionTimeout
+	}
+	if custom.WorkflowRunTimeout != 0 {
+		base.WorkflowRunTimeout = custom.WorkflowRunTimeout
+	}
+	if custom.WorkflowTaskTimeout != 0 {
+		base.WorkflowTaskTimeout = custom.WorkflowTaskTimeout
+	}
+	if custom.RetryPolicy != nil {
+		base.RetryPolicy = custom.RetryPolicy
+	}
+	if custom.CronSchedule != "" {
+		base.CronSchedule = custom.CronSchedule
+	}
+	if custom.Memo != nil {
+		base.Memo = custom.Memo
+	}
+	if !helper.IsZeroValue(custom.TypedSearchAttributes) {
+		base.TypedSearchAttributes = custom.TypedSearchAttributes
+	}
+	if custom.WorkflowIDReusePolicy != 0 {
+		base.WorkflowIDReusePolicy = custom.WorkflowIDReusePolicy
+	}
+	if custom.WorkflowIDConflictPolicy != 0 {
+		base.WorkflowIDConflictPolicy = custom.WorkflowIDConflictPolicy
+	}
 }
 
 // WorkflowRunner wraps workflow logic with panic recovery.
