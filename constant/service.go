@@ -42,6 +42,8 @@ const (
 
 const (
 	GetLoggedInUserActivity = "GetLoggedInUserActivity"
+	GetClientActivity       = "GetClientActivity"
+	GetClientsActivity      = "GetClientsActivity"
 
 	AnalyticsReportingCreateChangeLogActivity              = "CreateChangeLogActivity"
 	AnalyticsReportingDeleteChangeLogActivity              = "DeleteChangeLogActivity"
@@ -66,4 +68,9 @@ const (
 	AssetTransactionGetUsersAssignedAssetCountActivity = "GetUsersAssignedAssetCountActivity"
 
 	ApprovalGetUsersPendingApprovalCountActivity = "GetUsersPendingApprovalCountActivity"
+)
+
+const (
+	GetClientWorkflow  = "GetClientWorkflow"
+	GetClientsWorkflow = "GetClientsWorkflow"
 )
