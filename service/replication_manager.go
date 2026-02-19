@@ -23,30 +23,42 @@ type ReplicatedTable interface {
 	GetColumns() []string
 }
 
-var ReplicatedTables = map[string][]ReplicatedTable{
+var ReplicatedTables = map[string]map[string][]ReplicatedTable{
 	constant.IAM_SERVICE_NAME: {
-		&replica.Rfid{},
+		"tagsamurai_hardware_tagging": {
+			&replica.Rfid{},
+		},
 	},
 	constant.HARDWARE_TAGGING_SERVICE_NAME: {
-		// db.FixedAssetGroupTableName,
-		// db.HandheldStockTableName,
-		// db.SkuTableName,
-		// db.SmartFixedStockTableName,
-		// db.SupplyAssetGroupTableName,
-		// db.TabletStockTableName,
-		// db.UserTableName,
+		"tagsamurai_hardware_tagging_root": {
+			// db.HandheldStockTableName,
+			// db.SkuTableName,
+			// db.TabletStockTableName,
+		},
+		"tagsamurai_iam": {
+			// db.FixedAssetGroupTableName,
+			// db.SmartFixedStockTableName,
+			// db.SupplyAssetGroupTableName,
+			// db.UserTableName,
+		},
 	},
 	constant.ENTERPRISE_MANAGEMENT_SERVICE_NAME: nil,
 	constant.MASTER_ASSET_REGISTRY_SERVICE_NAME: nil,
 	constant.ANALYTICS_REPORTING_SERVICE_NAME:   nil,
 	constant.APPROVAL_SERVICE_NAME:              nil,
-	constant.FILE_MANAGER_SERVICE_NAME:          {
-		// db.AssetCustomFieldTableName,
-		// db.AssetTableName,
-		// db.CustomFieldTableName,
-		// db.FixedAssetDisposalTransactionTableName,
-		// db.FixedAssetGroupTableName,
-		// db.UserTableName,
+	constant.FILE_MANAGER_SERVICE_NAME: {
+		"tagsamurai_master_asset_registry": {
+			// db.AssetCustomFieldTableName,
+			// db.AssetTableName,
+			// db.CustomFieldTableName,
+		},
+		"tagsamurai_asset_transaction": {
+			// db.FixedAssetDisposalTransactionTableName,
+		},
+		"tagsamurai_iam": {
+			// db.FixedAssetGroupTableName,
+			// db.UserTableName,
+		},
 	},
 	constant.IMPORT_SERVICE_NAME:               nil,
 	constant.LANGUAGE_TRANSLATION_SERVICE_NAME: nil,
@@ -102,7 +114,11 @@ func (rm *ReplicationManager) StartReplication(
 		return nil
 	}
 
-	replicatedTables := ReplicatedTables[targetServiceName]
+	serviceSource := sourceDBSuffix
+	if !isTenantDependent {
+		serviceSource += "_root"
+	}
+	replicatedTables := ReplicatedTables[targetServiceName][serviceSource]
 	if len(replicatedTables) == 0 {
 		slog.Warn("No replicated tables found", "service_name", targetServiceName)
 		return nil
