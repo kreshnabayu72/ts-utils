@@ -11,6 +11,7 @@ import (
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/config"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/constant"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/enterprise_management_service/model"
+	hardware_tagging_replica "gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/hardware_tagging_service/replica"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/iam_service/replica"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/temporal"
@@ -31,15 +32,16 @@ var ReplicatedTables = map[string]map[string][]ReplicatedTable{
 	},
 	constant.HARDWARE_TAGGING_SERVICE_NAME: {
 		"tagsamurai_hardware_tagging_root": {
-			// db.HandheldStockTableName,
-			// db.SkuTableName,
-			// db.TabletStockTableName,
-			// db.SmartFixedStockTableName,
+			&hardware_tagging_replica.DeviceName{},
+			&hardware_tagging_replica.HandheldStock{},
+			&hardware_tagging_replica.Sku{},
+			&hardware_tagging_replica.TabletStock{},
+			&hardware_tagging_replica.SmartFixedStock{},
 		},
 		"tagsamurai_iam": {
-			// db.FixedAssetGroupTableName,
-			// db.SupplyAssetGroupTableName,
-			// db.UserTableName,
+			&hardware_tagging_replica.FixedAssetGroup{},
+			&hardware_tagging_replica.SupplyAssetGroup{},
+			&hardware_tagging_replica.User{},
 		},
 	},
 	constant.ENTERPRISE_MANAGEMENT_SERVICE_NAME: nil,
