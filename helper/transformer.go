@@ -1,6 +1,8 @@
 package helper
 
 import (
+	"fmt"
+	"reflect"
 	"regexp"
 	"slices"
 	"strconv"
@@ -13,7 +15,18 @@ var regexOnlyFloat = regexp.MustCompile(`-?[0-9]*\.?[0-9]+`)
 
 // IntoString transforms anything into string.
 func IntoString(v any) string {
-	s, _ := v.(string)
+	if v == nil {
+		return ""
+	}
+
+	if reflect.ValueOf(v).Kind() == reflect.Pointer {
+		if reflect.ValueOf(v).IsNil() {
+			return ""
+		}
+		v = reflect.ValueOf(v).Elem().Interface()
+	}
+
+	s := fmt.Sprintf("%v", v)
 	s = strings.TrimSpace(s)
 
 	return s
