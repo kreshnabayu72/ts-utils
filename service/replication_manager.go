@@ -34,10 +34,10 @@ var ReplicatedTables = map[string]map[string][]ReplicatedTable{
 			// db.HandheldStockTableName,
 			// db.SkuTableName,
 			// db.TabletStockTableName,
+			// db.SmartFixedStockTableName,
 		},
 		"tagsamurai_iam": {
 			// db.FixedAssetGroupTableName,
-			// db.SmartFixedStockTableName,
 			// db.SupplyAssetGroupTableName,
 			// db.UserTableName,
 		},
