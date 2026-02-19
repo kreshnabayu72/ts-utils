@@ -10,7 +10,10 @@ import (
 
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/config"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/constant"
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/enterprise_management_service/model"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/iam_service/replica"
+	"go.temporal.io/sdk/client"
+	"go.temporal.io/sdk/temporal"
 )
 
 type ReplicatedTable interface {
@@ -60,21 +63,24 @@ var ReplicatedTables = map[string][]ReplicatedTable{
 
 // ReplicationManager manages CDC replicators for multiple tenants.
 type ReplicationManager struct {
-	replicators []CDCReplicatorInterface
-	cfg         config.ConfigOptions
-	dbFactory   func(string) PostgreSQLServicer
+	replicators     []CDCReplicatorInterface
+	cfg             config.ConfigOptions
+	dbFactory       func(string) PostgreSQLServicer
+	temporalService *TemporalService
 }
 
 // NewReplicationManager creates a new ReplicationManager.
 // dbFactory is a function that returns a PostgreSQLServicer for a given tenant.
 func NewReplicationManager(
 	cfg config.ConfigOptions,
+	temporalService *TemporalService,
 	dbFactory func(string) PostgreSQLServicer,
 ) *ReplicationManager {
 	return &ReplicationManager{
-		replicators: make([]CDCReplicatorInterface, 0),
-		cfg:         cfg,
-		dbFactory:   dbFactory,
+		replicators:     make([]CDCReplicatorInterface, 0),
+		cfg:             cfg,
+		dbFactory:       dbFactory,
+		temporalService: temporalService,
 	}
 }
 
@@ -83,11 +89,19 @@ func NewReplicationManager(
 // sourceDBSuffix: The suffix of the source database (e.g., "tagsamurai_hardware_tagging").
 // isTenantDependent: Whether the source database is tenant-dependent.
 func (rm *ReplicationManager) StartReplication(
-	tenants []string,
 	targetServiceName string,
 	sourceDBSuffix string,
 	isTenantDependent bool,
 ) error {
+	slog.Debug("Entering StartReplication", "target_service", targetServiceName)
+	clients := rm.GetClients()
+	slog.Debug("GetClients returned", "clients_count", len(clients))
+
+	if len(clients) == 0 {
+		slog.Warn("No clients found", "service_name", targetServiceName)
+		return nil
+	}
+
 	replicatedTables := ReplicatedTables[targetServiceName]
 	if len(replicatedTables) == 0 {
 		slog.Warn("No replicated tables found", "service_name", targetServiceName)
@@ -104,7 +118,7 @@ func (rm *ReplicationManager) StartReplication(
 		}
 	}
 
-	for _, tenantID := range tenants {
+	for _, tenantID := range clients {
 		// Create PostgreSQL service for the tenant
 		pgService := rm.dbFactory(tenantID)
 
@@ -163,4 +177,42 @@ func (rm *ReplicationManager) StopReplication() {
 	case <-time.After(5 * time.Second):
 		slog.Warn("Timeout waiting for replicators to stop")
 	}
+}
+
+func (rm *ReplicationManager) GetClients() []string {
+	wo := client.StartWorkflowOptions{
+		TaskQueue: "enterprise-management-service",
+		RetryPolicy: &temporal.RetryPolicy{
+			MaximumAttempts: 1,
+			NonRetryableErrorTypes: []string{
+				"WORKFLOW_PANIC",
+			},
+		},
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	wr, executionErr := rm.temporalService.Client.ExecuteWorkflow(
+		ctx,
+		wo,
+		constant.GetClientsWorkflow,
+	)
+	if executionErr != nil {
+		slog.Error("Failed to execute GetClientsWorkflow", "error", executionErr)
+		return []string{}
+	}
+
+	var clients []model.Client
+	if workflowErr := wr.Get(ctx, &clients); workflowErr != nil {
+		slog.Error("Failed to get result from GetClientsWorkflow", "error", workflowErr)
+		return []string{}
+	}
+
+	result := make([]string, 0, len(clients))
+	for _, c := range clients {
+		result = append(result, c.ClientID)
+	}
+
+	return result
 }
