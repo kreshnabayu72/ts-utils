@@ -67,7 +67,7 @@ type UpdateStarter interface {
 	//     })
 	//
 	// By default, it will automatically add `updated_at = NOW()` if not explicitly provided.
-	Update(values UpdateQuery) Updater
+	Update(values UpdateQuery, skipUpdatedAt ...bool) Updater
 	// UpdateEach updates multiple rows at once using VALUES() with a slice of structs.
 	// Matches rows using the given rowIdentifier (e.g., "id").
 	//

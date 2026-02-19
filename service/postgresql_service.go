@@ -648,15 +648,17 @@ func (s *PostgreSQLService) SoftDeleteOne(
 	if len(returnOption) > 0 {
 		returnColumn = append(returnColumn, returnOption[0].Column...)
 	}
-	queryString, args := common_builders.UpdateBuilder(
-		tableName,
-		filter,
-		sql_query.UpdateQuery{
+	queryString, args, err := sql_query.NewSQLUpdateBuilder(tableName).
+		Update(sql_query.UpdateQuery{
 			"is_deleted": true,
 			"deleted_at": "NOW()",
-		},
-		returnColumn...,
-	)
+		}, true).
+		Return(returnColumn...).
+		Where(filter).
+		Build()
+	if err != nil {
+		log.Println(err)
+	}
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	if len(returnOption) > 0 && returnOption[0].Destination != nil {
@@ -676,14 +678,17 @@ func (s *PostgreSQLService) SoftDeleteMany(
 	if len(returnOption) > 0 {
 		returnColumn = append(returnColumn, returnOption[0].Column...)
 	}
-	queryString, args := common_builders.UpdateBuilder(tableName,
-		filter,
-		sql_query.UpdateQuery{
+	queryString, args, err := sql_query.NewSQLUpdateBuilder(tableName).
+		Update(sql_query.UpdateQuery{
 			"is_deleted": true,
 			"deleted_at": "NOW()",
-		},
-		returnColumn...,
-	)
+		}, true).
+		Return(returnColumn...).
+		Where(filter).
+		Build()
+	if err != nil {
+		log.Println(err)
+	}
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	if len(returnOption) > 0 && returnOption[0].Destination != nil {
@@ -706,15 +711,16 @@ func (s *PostgreSQLService) RestoreSoftDeleteOne(
 	if len(returnOption) > 0 {
 		returnColumn = append(returnColumn, returnOption[0].Column...)
 	}
-	queryString, args := common_builders.UpdateBuilder(
-		tableName,
-		filter,
-		sql_query.UpdateQuery{
-			"is_deleted": false,
-			"deleted_at": nil,
-		},
-		returnColumn...,
-	)
+	queryString, args, err := sql_query.NewSQLUpdateBuilder(tableName).Update(sql_query.UpdateQuery{
+		"is_deleted": false,
+		"deleted_at": nil,
+	}, true).
+		Return(returnColumn...).
+		Where(filter).
+		Build()
+	if err != nil {
+		log.Println(err)
+	}
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	if len(returnOption) > 0 && returnOption[0].Destination != nil {
@@ -734,14 +740,16 @@ func (s *PostgreSQLService) RestoreSoftDeleteMany(
 	if len(returnOption) > 0 {
 		returnColumn = append(returnColumn, returnOption[0].Column...)
 	}
-	queryString, args := common_builders.UpdateBuilder(tableName,
-		filter,
-		sql_query.UpdateQuery{
-			"is_deleted": false,
-			"deleted_at": nil,
-		},
-		returnColumn...,
-	)
+	queryString, args, err := sql_query.NewSQLUpdateBuilder(tableName).Update(sql_query.UpdateQuery{
+		"is_deleted": false,
+		"deleted_at": nil,
+	}, true).
+		Return(returnColumn...).
+		Where(filter).
+		Build()
+	if err != nil {
+		log.Println(err)
+	}
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	if len(returnOption) > 0 && returnOption[0].Destination != nil {

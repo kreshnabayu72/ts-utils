@@ -196,11 +196,11 @@ func (s *UpdateBuilder) Else(value any, isRef bool) {
 	)
 }
 
-func (s *UpdateBuilder) Update(values UpdateQuery) Updater {
+func (s *UpdateBuilder) Update(values UpdateQuery, skipUpdatedAt ...bool) Updater {
 	// Directly call extractUpdateFieldsMap since UpdateQuery is map[string]any
 	setClauses, hasUpdatedAt := s.extractUpdateFieldsMap(values)
 
-	if !hasUpdatedAt {
+	if !hasUpdatedAt && (len(skipUpdatedAt) == 0 || !skipUpdatedAt[0]) {
 		setClauses = append(setClauses, `"updated_at" = NOW()`)
 	}
 
