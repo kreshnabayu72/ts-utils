@@ -996,8 +996,9 @@ func (s *PostgreSQLService) validateTableOperation(query string) error {
 	}
 
 	// Check if service has any replicated tables
-	replicatedTables, ok := ReplicatedTables[serviceName]
-	if !ok || len(replicatedTables) == 0 {
+	// ReplicatedTables is defined in replication_manager.go
+	replicatedSources, ok := ReplicatedTables[serviceName]
+	if !ok || len(replicatedSources) == 0 {
 		return nil
 	}
 
@@ -1006,9 +1007,11 @@ func (s *PostgreSQLService) validateTableOperation(query string) error {
 		return nil
 	}
 
-	for _, replicatedTable := range replicatedTables {
-		if replicatedTable.GetTableName() == tableName {
-			return fmt.Errorf("CUD operation on replicated table '%s' is prohibited for service '%s'", tableName, serviceName)
+	for _, tables := range replicatedSources {
+		for _, table := range tables {
+			if table.GetTableName() == tableName {
+				return fmt.Errorf("CUD operation on replicated table '%s' is prohibited for service '%s'", tableName, serviceName)
+			}
 		}
 	}
 
