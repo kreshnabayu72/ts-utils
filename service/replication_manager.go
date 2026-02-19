@@ -11,6 +11,7 @@ import (
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/config"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/constant"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/enterprise_management_service/model"
+	file_manager_service "gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/file_manager_service/replica"
 	hardware_tagging_replica "gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/hardware_tagging_service/replica"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/iam_service/replica"
 	"go.temporal.io/sdk/client"
@@ -50,16 +51,16 @@ var ReplicatedTables = map[string]map[string][]ReplicatedTable{
 	constant.APPROVAL_SERVICE_NAME:              nil,
 	constant.FILE_MANAGER_SERVICE_NAME: {
 		"tagsamurai_master_asset_registry": {
-			// db.AssetCustomFieldTableName,
-			// db.AssetTableName,
-			// db.CustomFieldTableName,
+			&file_manager_service.AssetCustomField{},
+			&file_manager_service.Asset{},
+			&file_manager_service.CustomField{},
 		},
 		"tagsamurai_asset_transaction": {
-			// db.FixedAssetDisposalTransactionTableName,
+			&file_manager_service.FixedAssetDisposalTransaction{},
 		},
 		"tagsamurai_iam": {
-			// db.FixedAssetGroupTableName,
-			// db.UserTableName,
+			&file_manager_service.FixedAssetGroup{},
+			&file_manager_service.User{},
 		},
 	},
 	constant.IMPORT_SERVICE_NAME:               nil,
