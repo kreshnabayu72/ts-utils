@@ -44,6 +44,7 @@ type ReplicationConfig struct {
 type TargetTableMapping struct {
 	PrimaryKey      string
 	Columns         []string
+	ColumnTypes     map[string]string
 	TargetTableName string
 	Transform       func(map[string]any) map[string]any // Optional transformation function. If nil, no transformation is applied.
 }
@@ -76,8 +77,8 @@ type CDCReplicatorInterface interface {
 	getMappedTopics() []string
 	processMessage(topic string, value []byte) error
 	parseTopic(topic string) (tenantID string, source string, err error)
-	upsertRecord(mapping TargetTableMapping, data map[string]any) error
-	deleteRecord(mapping TargetTableMapping, data map[string]any) error
+	upsertRecord(mapping TargetTableMapping, data map[string]any, isTenantDependent bool) error
+	deleteRecord(mapping TargetTableMapping, data map[string]any, isTenantDependent bool) error
 }
 
 // CDCReplicator struct handles CDC replication from Kafka to Postgres.
@@ -211,14 +212,47 @@ func (r *CDCReplicator) getMappedTopics() []string {
 	for source := range tenantCfg.TableMappings {
 		topic := fmt.Sprintf("%s.%s", tenantCfg.SourceDBName, source)
 		topics = append(topics, topic)
+
+		r.ensureTableExists(tenantCfg.TableMappings[source])
 	}
 	return topics
+}
+
+func (r *CDCReplicator) ensureTableExists(mapping TargetTableMapping) error {
+	if len(mapping.ColumnTypes) == 0 {
+		return nil // Skip if no type info provided
+	}
+
+	var definitions []string
+
+	// Iterate over Columns to ensure order
+	for _, col := range mapping.Columns {
+		sqlType, ok := mapping.ColumnTypes[col]
+		if !ok {
+			sqlType = "TEXT" // Fallback default
+		}
+
+		def := fmt.Sprintf("%s %s", col, sqlType)
+		if col == mapping.PrimaryKey {
+			def += " PRIMARY KEY"
+		}
+		definitions = append(definitions, def)
+	}
+
+	query := fmt.Sprintf(
+		"CREATE TABLE IF NOT EXISTS %s (%s)",
+		mapping.TargetTableName,
+		strings.Join(definitions, ", "),
+	)
+
+	_, err := r.pool.Exec(r.ctx, query)
+	return err
 }
 
 // processMessage processes a single CDC message.
 func (r *CDCReplicator) processMessage(topic string, value []byte) error {
 	// Parse topic to get source table name (ignore tenant parsing)
-	_, source, err := r.parseTopic(topic)
+	tenantID, source, err := r.parseTopic(topic)
 	if err != nil {
 		return err
 	}
@@ -238,9 +272,9 @@ func (r *CDCReplicator) processMessage(topic string, value []byte) error {
 
 	switch msg.Kind {
 	case "insert", "update":
-		return r.upsertRecord(tableMap, msg.New)
+		return r.upsertRecord(tableMap, msg.New, tenantID != "")
 	case "delete":
-		return r.deleteRecord(tableMap, msg.Old)
+		return r.deleteRecord(tableMap, msg.Old, tenantID != "")
 	default:
 		log.Debug("Unknown kind: %s", msg.Kind)
 	}
@@ -266,13 +300,18 @@ func (r *CDCReplicator) parseTopic(topic string) (tenantID string, source string
 	if len(dbParts) >= 2 {
 		tenantID = dbParts[0]
 	} else {
-		return "", "", fmt.Errorf("cannot extract tenant ID from: %s", dbName)
+		// If tenant ID is not found, it's not a tenant-specific topic
+		tenantID = ""
 	}
 
 	return tenantID, source, nil
 }
 
-func (r *CDCReplicator) upsertRecord(mapping TargetTableMapping, data map[string]any) error {
+func (r *CDCReplicator) upsertRecord(
+	mapping TargetTableMapping,
+	data map[string]any,
+	isTenantDependent bool,
+) error {
 	var row map[string]any
 
 	// Apply transformation if provided, otherwise use data as is
@@ -284,6 +323,12 @@ func (r *CDCReplicator) upsertRecord(mapping TargetTableMapping, data map[string
 			if val, ok := data[col]; ok {
 				row[col] = val
 			}
+		}
+	}
+
+	if _, ok := row["client_id"]; ok {
+		if !isTenantDependent && row["client_id"] != r.replicationConfig.TenantID {
+			return nil
 		}
 	}
 
@@ -364,8 +409,18 @@ func (r *CDCReplicator) upsertRecord(mapping TargetTableMapping, data map[string
 }
 
 // deleteRecord deletes a record based on the primary key.
-func (r *CDCReplicator) deleteRecord(mapping TargetTableMapping, data map[string]any) error {
+func (r *CDCReplicator) deleteRecord(
+	mapping TargetTableMapping,
+	data map[string]any,
+	isTenantDependent bool,
+) error {
 	primaryKey := mapping.primaryKeyOrDefault()
+	if _, ok := data["client_id"]; ok {
+		if !isTenantDependent && data["client_id"] != r.replicationConfig.TenantID {
+			return nil
+		}
+	}
+
 	pkValue, ok := data[primaryKey]
 	if !ok {
 		return fmt.Errorf("primary key %s not found", primaryKey)
