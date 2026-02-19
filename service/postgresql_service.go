@@ -5,7 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"os"
 	"reflect"
+	"regexp"
 	"runtime/debug"
 	"slices"
 	"time"
@@ -351,7 +353,7 @@ func (s *PostgreSQLService) Count(
 	args ...any,
 ) (int, error) {
 	var count int
-	if err := s.executeQueryRow(ctx, queryString, args, &count); err != nil {
+	if err := s.executeQueryRow(ctx, queryString, args, &count, true); err != nil {
 		log.Println("Count query failed:", err)
 		return 0, err
 	}
@@ -811,8 +813,16 @@ func (s *PostgreSQLService) executeQueryRow(
 	queryString string,
 	args []any,
 	dest any,
+	isCount ...bool,
 ) error {
 	shouldShowQuery(s.debugLevel, queryString, args...)
+
+	if len(isCount) == 0 || !isCount[0] {
+		// Check for replicated table restrictions
+		if err := s.validateTableOperation(queryString); err != nil {
+			return err
+		}
+	}
 
 	if s.Transaction != nil {
 		return s.Transaction.QueryRow(ctx, queryString, args...).Scan(dest)
@@ -837,6 +847,11 @@ func (s *PostgreSQLService) executeExec(
 	args []any,
 ) (int64, error) {
 	shouldShowQuery(s.debugLevel, queryString, args...)
+
+	// Check for replicated table restrictions
+	if err := s.validateTableOperation(queryString); err != nil {
+		return 0, err
+	}
 
 	var commandTag pgconn.CommandTag
 	var err error
@@ -963,4 +978,48 @@ func shouldShowQuery(level int, query string, args ...any) {
 	case 3:
 		fmt.Printf("\n=== SQL Query ===\n%s\n", sql_query.InterpolateQuery(query, args...))
 	}
+}
+
+// validateTableOperation checks if the query corresponds to a CUD operation on a replicated table
+func (s *PostgreSQLService) validateTableOperation(query string) error {
+	serviceName := os.Getenv("SERVICE_NAME")
+	if serviceName == "" {
+		return nil
+	}
+
+	// Check if service has any replicated tables
+	replicatedTables, ok := ReplicatedTables[serviceName]
+	if !ok || len(replicatedTables) == 0 {
+		return nil
+	}
+
+	tableName := extractTableName(query)
+	if tableName == "" {
+		return nil
+	}
+
+	for _, replicatedTable := range replicatedTables {
+		if replicatedTable.GetTableName() == tableName {
+			return fmt.Errorf("CUD operation on replicated table '%s' is prohibited for service '%s'", tableName, serviceName)
+		}
+	}
+
+	return nil
+}
+
+// extractTableName attempts to extract the table name from INSERT, UPDATE, DELETE queries
+func extractTableName(query string) string {
+	// Pattern to match:
+	// - Command: INSERT INTO, UPDATE, DELETE FROM (case insensitive)
+	// - Optional schema and quotes
+	// - Capture table name
+	const pattern = `(?i)\b(?:INSERT\s+INTO|UPDATE|DELETE\s+FROM)\s+(?:["` + "`" + `]?(?:[\w]+\.)?([\w]+)["` + "`" + `]?)`
+	re := regexp.MustCompile(pattern)
+
+	matches := re.FindStringSubmatch(query)
+	if len(matches) > 1 {
+		return matches[1]
+	}
+
+	return ""
 }
