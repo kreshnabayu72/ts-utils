@@ -11,6 +11,8 @@ import (
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/config"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/constant"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/enterprise_management_service/model"
+	file_manager_service "gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/file_manager_service/replica"
+	hardware_tagging_replica "gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/hardware_tagging_service/replica"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/iam_service/replica"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/temporal"
@@ -23,30 +25,43 @@ type ReplicatedTable interface {
 	GetColumns() []string
 }
 
-var ReplicatedTables = map[string][]ReplicatedTable{
+var ReplicatedTables = map[string]map[string][]ReplicatedTable{
 	constant.IAM_SERVICE_NAME: {
-		&replica.Rfid{},
+		"tagsamurai_hardware_tagging": {
+			&replica.Rfid{},
+		},
 	},
 	constant.HARDWARE_TAGGING_SERVICE_NAME: {
-		// db.FixedAssetGroupTableName,
-		// db.HandheldStockTableName,
-		// db.SkuTableName,
-		// db.SmartFixedStockTableName,
-		// db.SupplyAssetGroupTableName,
-		// db.TabletStockTableName,
-		// db.UserTableName,
+		"tagsamurai_hardware_tagging_root": {
+			&hardware_tagging_replica.DeviceName{},
+			&hardware_tagging_replica.HandheldStock{},
+			&hardware_tagging_replica.Sku{},
+			&hardware_tagging_replica.TabletStock{},
+			&hardware_tagging_replica.SmartFixedStock{},
+		},
+		"tagsamurai_iam": {
+			&hardware_tagging_replica.FixedAssetGroup{},
+			&hardware_tagging_replica.SupplyAssetGroup{},
+			&hardware_tagging_replica.User{},
+		},
 	},
 	constant.ENTERPRISE_MANAGEMENT_SERVICE_NAME: nil,
 	constant.MASTER_ASSET_REGISTRY_SERVICE_NAME: nil,
 	constant.ANALYTICS_REPORTING_SERVICE_NAME:   nil,
 	constant.APPROVAL_SERVICE_NAME:              nil,
-	constant.FILE_MANAGER_SERVICE_NAME:          {
-		// db.AssetCustomFieldTableName,
-		// db.AssetTableName,
-		// db.CustomFieldTableName,
-		// db.FixedAssetDisposalTransactionTableName,
-		// db.FixedAssetGroupTableName,
-		// db.UserTableName,
+	constant.FILE_MANAGER_SERVICE_NAME: {
+		"tagsamurai_master_asset_registry": {
+			&file_manager_service.AssetCustomField{},
+			&file_manager_service.Asset{},
+			&file_manager_service.CustomField{},
+		},
+		"tagsamurai_asset_transaction": {
+			&file_manager_service.FixedAssetDisposalTransaction{},
+		},
+		"tagsamurai_iam": {
+			&file_manager_service.FixedAssetGroup{},
+			&file_manager_service.User{},
+		},
 	},
 	constant.IMPORT_SERVICE_NAME:               nil,
 	constant.LANGUAGE_TRANSLATION_SERVICE_NAME: nil,
@@ -102,7 +117,11 @@ func (rm *ReplicationManager) StartReplication(
 		return nil
 	}
 
-	replicatedTables := ReplicatedTables[targetServiceName]
+	serviceSource := sourceDBSuffix
+	if !isTenantDependent {
+		serviceSource += "_root"
+	}
+	replicatedTables := ReplicatedTables[targetServiceName][serviceSource]
 	if len(replicatedTables) == 0 {
 		slog.Warn("No replicated tables found", "service_name", targetServiceName)
 		return nil
@@ -127,7 +146,9 @@ func (rm *ReplicationManager) StartReplication(
 			sourceDBName = tenantID + "_" + sourceDBSuffix
 		}
 		// Replace hyphens with underscores for consumer group name consistency
-		consumerGroup := fmt.Sprintf("%s_replicator", strings.ReplaceAll(targetServiceName, "-", "_"))
+		sanitizedTarget := strings.ReplaceAll(targetServiceName, "-", "_")
+		sanitizedSource := strings.ReplaceAll(sourceDBSuffix, "-", "_")
+		consumerGroup := fmt.Sprintf("%s_%s_replicator", sanitizedTarget, sanitizedSource)
 
 		replicator := NewCDCReplicator(
 			context.Background(),

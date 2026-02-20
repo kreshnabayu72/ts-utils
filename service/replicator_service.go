@@ -326,9 +326,18 @@ func (r *CDCReplicator) upsertRecord(
 		}
 	}
 
-	if _, ok := row["client_id"]; ok {
-		if !isTenantDependent && row["client_id"] != r.replicationConfig.TenantID {
-			return nil
+	// For non-tenant-dependent sources, filter by client_id when present.
+	// If client_id is missing or null, the record is shared and should be replicated to all tenants.
+	// Only skip when client_id exists, is non-nil, and doesn't match this tenant.
+	//
+	// Example replicating from non-tenant hardware tagging that contains all stocks all of tenants.
+	// If column client_id is present (table handheld_stocks), it should be skipped if it doesn't match this tenant (tenant-dependent rows).
+	// If column client_id is missing (table device_names), it should be replicated to all tenants (non-tenant-dependent rows).
+	if !isTenantDependent {
+		if clientID, exists := data["client_id"]; exists && clientID != nil {
+			if fmt.Sprintf("%v", clientID) != r.replicationConfig.TenantID {
+				return nil
+			}
 		}
 	}
 
@@ -415,9 +424,12 @@ func (r *CDCReplicator) deleteRecord(
 	isTenantDependent bool,
 ) error {
 	primaryKey := mapping.primaryKeyOrDefault()
-	if _, ok := data["client_id"]; ok {
-		if !isTenantDependent && data["client_id"] != r.replicationConfig.TenantID {
-			return nil
+	// For non-tenant-dependent sources, filter by client_id when present.
+	if !isTenantDependent {
+		if clientID, exists := data["client_id"]; exists && clientID != nil {
+			if fmt.Sprintf("%v", clientID) != r.replicationConfig.TenantID {
+				return nil
+			}
 		}
 	}
 
