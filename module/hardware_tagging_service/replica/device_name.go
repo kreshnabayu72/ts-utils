@@ -3,12 +3,12 @@ package replica
 import "time"
 
 type DeviceName struct {
-	ID        int       `json:"_id" column:"device_names.id" sqlType:"BIGINT"`
-	Name      string    `json:"name" column:"device_names.name" sqlType:"VARCHAR"`
-	IsDeleted bool      `json:"isDeleted" column:"device_names.is_deleted" sqlType:"BOOL"`
-	DeletedAt time.Time `json:"deletedAt" column:"device_names.deleted_at" sqlType:"TIMESTAMPTZ"`
-	CreatedAt time.Time `json:"createdAt" column:"device_names.created_at" sqlType:"TIMESTAMPTZ"`
-	UpdatedAt time.Time `json:"updatedAt" column:"device_names.updated_at" sqlType:"TIMESTAMPTZ"`
+	ID        int        `json:"_id" column:"device_names.id"`
+	Name      string     `json:"name" column:"device_names.name"`
+	IsDeleted bool       `json:"isDeleted" column:"device_names.is_deleted"`
+	DeletedAt *time.Time `json:"deletedAt" column:"device_names.deleted_at"`
+	CreatedAt time.Time  `json:"createdAt" column:"device_names.created_at"`
+	UpdatedAt time.Time  `json:"updatedAt" column:"device_names.updated_at"`
 }
 
 func (r *DeviceName) GetTableName() string {

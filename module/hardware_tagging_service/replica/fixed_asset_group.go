@@ -3,19 +3,16 @@ package replica
 import "time"
 
 type FixedAssetGroup struct {
-	ID                  int       `json:"_id" column:"fixed_asset_groups.id" sqlType:"BIGINT"`
-	Name                string    `json:"name" column:"fixed_asset_groups.name" sqlType:"VARCHAR"`
-	Code                string    `json:"code" column:"fixed_asset_groups.code" sqlType:"VARCHAR"`
-	Level               int       `json:"level" column:"fixed_asset_groups.level" sqlType:"INT"`
-	IsDisposable        bool      `json:"isDisposable" column:"fixed_asset_groups.is_disposable" sqlType:"BOOL"`
-	ParentId            int       `json:"parentId" column:"fixed_asset_groups.parent_id" sqlType:"BIGINT"`
-	AncestorId          int       `json:"ancestorId" column:"fixed_asset_groups.ancestor_id" sqlType:"BIGINT"`
-	ParentQuotaSourceId int       `json:"parentQuotaSourceId" column:"fixed_asset_groups.parent_quota_source_id" sqlType:"BIGINT"`
-	FullPath            string    `json:"fullPath" column:"fixed_asset_groups.full_path" sqlType:"VARCHAR"`
-	IsDeleted           bool      `json:"isDeleted" column:"fixed_asset_groups.is_deleted" sqlType:"BOOL"`
-	DeletedAt           time.Time `json:"deletedAt" column:"fixed_asset_groups.deleted_at" sqlType:"TIMESTAMPTZ"`
-	CreatedAt           time.Time `json:"createdAt" column:"supply_asset_groups.created_at" sqlType:"TIMESTAMPTZ"`
-	UpdatedAt           time.Time `json:"updatedAt" column:"supply_asset_groups.updated_at" sqlType:"TIMESTAMPTZ"`
+	ID                  int        `json:"_id" column:"fixed_asset_groups.id"`
+	Name                string     `json:"name" column:"fixed_asset_groups.name"`
+	Code                string     `json:"code" column:"fixed_asset_groups.code"`
+	Level               int        `json:"level" column:"fixed_asset_groups.level"`
+	ParentId            *int       `json:"parentId" column:"fixed_asset_groups.parent_id"`
+	AncestorId          *int       `json:"ancestorId" column:"fixed_asset_groups.ancestor_id"`
+	ParentQuotaSourceId int        `json:"parentQuotaSourceId" column:"fixed_asset_groups.parent_quota_source_id"`
+	FullPath            string     `json:"fullPath" column:"fixed_asset_groups.full_path"`
+	IsDeleted           bool       `json:"isDeleted" column:"fixed_asset_groups.is_deleted"`
+	DeletedAt           *time.Time `json:"deletedAt" column:"fixed_asset_groups.deleted_at"`
 }
 
 func (r *FixedAssetGroup) GetTableName() string {

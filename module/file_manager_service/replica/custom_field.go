@@ -1,19 +1,23 @@
 package replica
 
-import "time"
+import (
+	"time"
+
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/fixedasset/model"
+)
 
 type CustomField struct {
-	ID          int       `json:"_id"         column:"custom_fields.id"           sqlType:"BIGINT"`
-	Name        string    `json:"name"        column:"custom_fields.name"         sqlType:"VARCHAR"`
-	Type        string    `json:"type"        column:"custom_fields.type"         sqlType:"VARCHAR"`
-	DataType    string    `json:"dataType"    column:"custom_fields.data_type"    sqlType:"VARCHAR"`
-	IsRequired  bool      `json:"isRequired"  column:"custom_fields.is_required"  sqlType:"BOOLEAN"`
-	OptionValue string    `json:"optionValue" column:"custom_fields.option_value" sqlType:"TEXT[]"`
-	IsActive    bool      `json:"isActive"    column:"custom_fields.is_active"    sqlType:"BOOLEAN"`
-	IsDeleted   bool      `json:"isDeleted"   column:"custom_fields.is_deleted"   sqlType:"BOOLEAN"`
-	DeletedAt   time.Time `json:"deletedAt"   column:"custom_fields.deleted_at"   sqlType:"TIMESTAMPTZ"`
-	CreatedAt   time.Time `json:"createdAt"   column:"custom_fields.created_at"   sqlType:"TIMESTAMPTZ"`
-	UpdatedAt   time.Time `json:"updatedAt"   column:"custom_fields.updated_at"   sqlType:"TIMESTAMPTZ"`
+	ID          int                       `json:"_id"         column:"custom_fields.id"`
+	Name        string                    `json:"name"        column:"custom_fields.name"`
+	Type        model.CustomFieldType     `json:"type"        column:"custom_fields.type"`
+	DataType    model.CustomFieldDataType `json:"dataType"    column:"custom_fields.data_type"`
+	IsRequired  bool                      `json:"isRequired"  column:"custom_fields.is_required"`
+	OptionValue []string                  `json:"optionValue" column:"custom_fields.option_value"`
+	IsActive    bool                      `json:"isActive"    column:"custom_fields.is_active"`
+	IsDeleted   bool                      `json:"isDeleted"   column:"custom_fields.is_deleted"`
+	DeletedAt   *time.Time                `json:"deletedAt"   column:"custom_fields.deleted_at"`
+	CreatedAt   time.Time                 `json:"createdAt"   column:"custom_fields.created_at"`
+	UpdatedAt   time.Time                 `json:"updatedAt"   column:"custom_fields.updated_at"`
 }
 
 func (c *CustomField) GetTableName() string {

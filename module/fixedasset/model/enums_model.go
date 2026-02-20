@@ -9,26 +9,30 @@ package model
 // 	AssetDefaultImageSecondImage = AssetDefaultImage("secondImage")
 // )
 
-// type AssetStatus string
+*/
 
-// const (
-// 	AssetStatusNonTransactional   AssetStatus = "Non-Transactional"
-// 	AssetStatusAvailable          AssetStatus = "Available"
-// 	AssetStatusAssigned           AssetStatus = "Assigned"
-// 	AssetStatusBorrowed           AssetStatus = "Borrowed"
-// 	AssetStatusDisposed           AssetStatus = "Disposed"
-// 	AssetStatusDamaged            AssetStatus = "Damaged"
-// 	AssetStatusMissing            AssetStatus = "Missing"
-// 	AssetStatusOnAssignProcess    AssetStatus = "On Assign Process"
-// 	AssetStatusOnBorrowingProcess AssetStatus = "On Borrowing Process"
-// 	AssetStatusOnDisposalProcess  AssetStatus = "On Disposal Process"
-// 	AssetStatusReportedDisposal   AssetStatus = "Reported Disposal"
-// 	AssetStatusOnTransfer         AssetStatus = "On Transfer"
-// 	AssetStatusExpiredLicense     AssetStatus = "Expired License"
-// 	AssetStatusTAGReported        AssetStatus = "TAG Reported"
-// 	AssetStatusTAGNotSet          AssetStatus = "TAG Not Set"
-// 	AssetStatusNotPairedYet       AssetStatus = "Not Paired Yet"
-// )
+type AssetStatus string
+
+const (
+	AssetStatusNonTransactional   AssetStatus = "Non-Transactional"
+	AssetStatusAvailable          AssetStatus = "Available"
+	AssetStatusAssigned           AssetStatus = "Assigned"
+	AssetStatusBorrowed           AssetStatus = "Borrowed"
+	AssetStatusDisposed           AssetStatus = "Disposed"
+	AssetStatusDamaged            AssetStatus = "Damaged"
+	AssetStatusMissing            AssetStatus = "Missing"
+	AssetStatusOnAssignProcess    AssetStatus = "On Assign Process"
+	AssetStatusOnBorrowingProcess AssetStatus = "On Borrowing Process"
+	AssetStatusOnDisposalProcess  AssetStatus = "On Disposal Process"
+	AssetStatusReportedDisposal   AssetStatus = "Reported Disposal"
+	AssetStatusOnTransfer         AssetStatus = "On Transfer"
+	AssetStatusExpiredLicense     AssetStatus = "Expired License"
+	AssetStatusTAGReported        AssetStatus = "TAG Reported"
+	AssetStatusTAGNotSet          AssetStatus = "TAG Not Set"
+	AssetStatusNotPairedYet       AssetStatus = "Not Paired Yet"
+)
+
+/*
 
 // type AssetLicenseStatus string
 
@@ -106,17 +110,17 @@ package model
 // 	AuditOtherTransactionTAGChange AuditOtherTransaction = "TAG Change"
 // )
 
-// type CustomFieldType string
-
-// const (
-// 	CustomFieldTypeGeneralInformation = CustomFieldType("General Information")
-// 	CustomFieldTypePurchase           = CustomFieldType("Purchase")
-// 	CustomFieldTypeAccounting         = CustomFieldType("Accounting")
-// 	CustomFieldTypeMaintenanceRoutine = CustomFieldType("Maintenance Routine")
-// 	CustomFieldTypeAudit              = CustomFieldType("Audit")
-// )
-
 */
+
+type CustomFieldType string
+
+const (
+	CustomFieldTypeGeneralInformation = CustomFieldType("General Information")
+	CustomFieldTypePurchase           = CustomFieldType("Purchase")
+	CustomFieldTypeAccounting         = CustomFieldType("Accounting")
+	CustomFieldTypeMaintenanceRoutine = CustomFieldType("Maintenance Routine")
+	CustomFieldTypeAudit              = CustomFieldType("Audit")
+)
 
 type CustomFieldDataType string
 

@@ -3,15 +3,15 @@ package replica
 import "time"
 
 type TabletStock struct {
-	ID                 int       `json:"_id" column:"tablet_stocks.id" sqlType:"BIGINT"`
-	DeviceID           string    `json:"deviceId" column:"tablet_stocks.device_id" sqlType:"VARCHAR"`
-	DeviceNameID       int       `json:"deviceNameId" column:"tablet_stocks.device_name_id" sqlType:"BIGINT"`
-	DeviceNameSequence int       `json:"deviceNameSequence" column:"tablet_stocks.device_name_sequence" sqlType:"INT"`
-	ClientID           string    `json:"clientId" column:"tablet_stocks.client_id" sqlType:"VARCHAR"`
-	IsDeleted          bool      `json:"isDeleted" column:"tablet_stocks.is_deleted" sqlType:"BOOL"`
-	DeletedAt          time.Time `json:"deletedAt" column:"tablet_stocks.deleted_at" sqlType:"TIMESTAMPTZ"`
-	CreatedAt          time.Time `json:"createdAt" column:"tablet_stocks.created_at" sqlType:"TIMESTAMPTZ"`
-	UpdatedAt          time.Time `json:"updatedAt" column:"tablet_stocks.updated_at" sqlType:"TIMESTAMPTZ"`
+	ID                 int        `json:"_id" column:"tablet_stocks.id" sqlType:"BIGINT"`
+	DeviceID           string     `json:"deviceId" column:"tablet_stocks.device_id" sqlType:"VARCHAR"`
+	DeviceNameID       int        `json:"deviceNameId" column:"tablet_stocks.device_name_id" sqlType:"BIGINT"`
+	DeviceNameSequence int        `json:"deviceNameSequence" column:"tablet_stocks.device_name_sequence" sqlType:"INT"`
+	ClientID           *string    `json:"clientId" column:"tablet_stocks.client_id" sqlType:"VARCHAR"`
+	IsDeleted          bool       `json:"isDeleted" column:"tablet_stocks.is_deleted" sqlType:"BOOL"`
+	DeletedAt          *time.Time `json:"deletedAt" column:"tablet_stocks.deleted_at" sqlType:"TIMESTAMPTZ"`
+	CreatedAt          time.Time  `json:"createdAt" column:"tablet_stocks.created_at" sqlType:"TIMESTAMPTZ"`
+	UpdatedAt          time.Time  `json:"updatedAt" column:"tablet_stocks.updated_at" sqlType:"TIMESTAMPTZ"`
 }
 
 func (r *TabletStock) GetTableName() string {

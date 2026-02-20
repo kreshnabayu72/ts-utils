@@ -146,7 +146,9 @@ func (rm *ReplicationManager) StartReplication(
 			sourceDBName = tenantID + "_" + sourceDBSuffix
 		}
 		// Replace hyphens with underscores for consumer group name consistency
-		consumerGroup := fmt.Sprintf("%s_replicator", strings.ReplaceAll(targetServiceName, "-", "_"))
+		sanitizedTarget := strings.ReplaceAll(targetServiceName, "-", "_")
+		sanitizedSource := strings.ReplaceAll(sourceDBSuffix, "-", "_")
+		consumerGroup := fmt.Sprintf("%s_%s_replicator", sanitizedTarget, sanitizedSource)
 
 		replicator := NewCDCReplicator(
 			context.Background(),

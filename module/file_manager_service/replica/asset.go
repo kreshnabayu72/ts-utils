@@ -1,15 +1,19 @@
 package replica
 
-import "time"
+import (
+	"time"
+
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/fixedasset/model"
+)
 
 type Asset struct {
-	ID               int       `json:"_id"             column:"assets.id"                 sqlType:"BIGINT"`
-	NameWithSequence string    `json:"nameWithSequence" column:"assets.name_with_sequence" sqlType:"VARCHAR"`
-	Status           string    `json:"status"           column:"assets.status"             sqlType:"VARCHAR"`
-	IsDeleted        bool      `json:"isDeleted"        column:"assets.is_deleted"         sqlType:"BOOLEAN"`
-	DeletedAt        time.Time `json:"deletedAt"        column:"assets.deleted_at"         sqlType:"TIMESTAMPTZ"`
-	CreatedAt        time.Time `json:"createdAt"        column:"assets.created_at"         sqlType:"TIMESTAMPTZ"`
-	UpdatedAt        time.Time `json:"updatedAt"        column:"assets.updated_at"         sqlType:"TIMESTAMPTZ"`
+	ID               int               `json:"_id"             column:"assets.id"`
+	NameWithSequence string            `json:"nameWithSequence" column:"assets.name_with_sequence"`
+	Status           model.AssetStatus `json:"status"           column:"assets.status"`
+	IsDeleted        bool              `json:"isDeleted"        column:"assets.is_deleted"`
+	DeletedAt        *time.Time        `json:"deletedAt"        column:"assets.deleted_at"`
+	CreatedAt        time.Time         `json:"createdAt"        column:"assets.created_at"`
+	UpdatedAt        time.Time         `json:"updatedAt"        column:"assets.updated_at"`
 }
 
 func (a *Asset) GetTableName() string {

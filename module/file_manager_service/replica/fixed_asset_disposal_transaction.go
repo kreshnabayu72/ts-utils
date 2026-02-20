@@ -1,9 +1,9 @@
 package replica
 
 type FixedAssetDisposalTransaction struct {
-	ID                 int    `json:"_id"                 column:"fixed_asset_disposal_transactions.id"                   sqlType:"BIGINT"`
-	TransactionID      string `json:"transactionId"       column:"fixed_asset_disposal_transactions.transaction_id"        sqlType:"VARCHAR"`
-	DocumentationPhoto string `json:"documentationPhoto"  column:"fixed_asset_disposal_transactions.documentation_photo"  sqlType:"VARCHAR"`
+	ID                 int    `json:"_id"                 column:"fixed_asset_disposal_transactions.id"`
+	TransactionID      string `json:"transactionId"       column:"fixed_asset_disposal_transactions.transaction_id"`
+	DocumentationPhoto string `json:"documentationPhoto"  column:"fixed_asset_disposal_transactions.documentation_photo"`
 }
 
 func (f *FixedAssetDisposalTransaction) GetTableName() string {
