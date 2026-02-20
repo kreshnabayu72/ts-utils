@@ -35,10 +35,11 @@ type CDCMessage struct {
 
 // ReplicationConfig holds configuration for a single tenant replication.
 type ReplicationConfig struct {
-	TenantID      string                        // company code (e.g., "0001")
-	SourceDBName  string                        // source database name (e.g., "0001_global_settings_service")
-	TableMappings map[string]TargetTableMapping // key: source table name (e.g., "public.users")
-	ConsumerGroup string
+	TenantID          string                        // company code (e.g., "qtera")
+	SourceDBName      string                        // source database name (e.g., "qtera_tagsamurai_iam")
+	TableMappings     map[string]TargetTableMapping // key: source table name (e.g., "public.users")
+	ConsumerGroup     string
+	IsTenantDependent bool // whether the source database is tenant-specific (has tenant prefix in db name)
 }
 
 type TargetTableMapping struct {
@@ -76,7 +77,7 @@ type CDCReplicatorInterface interface {
 
 	getMappedTopics() []string
 	processMessage(topic string, value []byte) error
-	parseTopic(topic string) (tenantID string, source string, err error)
+	parseTopic(topic string) (source string, err error)
 	upsertRecord(mapping TargetTableMapping, data map[string]any, isTenantDependent bool) error
 	deleteRecord(mapping TargetTableMapping, data map[string]any, isTenantDependent bool) error
 }
@@ -251,8 +252,8 @@ func (r *CDCReplicator) ensureTableExists(mapping TargetTableMapping) error {
 
 // processMessage processes a single CDC message.
 func (r *CDCReplicator) processMessage(topic string, value []byte) error {
-	// Parse topic to get source table name (ignore tenant parsing)
-	tenantID, source, err := r.parseTopic(topic)
+	// Parse topic to get source table name
+	source, err := r.parseTopic(topic)
 	if err != nil {
 		return err
 	}
@@ -272,9 +273,9 @@ func (r *CDCReplicator) processMessage(topic string, value []byte) error {
 
 	switch msg.Kind {
 	case "insert", "update":
-		return r.upsertRecord(tableMap, msg.New, tenantID != "")
+		return r.upsertRecord(tableMap, msg.New, r.replicationConfig.IsTenantDependent)
 	case "delete":
-		return r.deleteRecord(tableMap, msg.Old, tenantID != "")
+		return r.deleteRecord(tableMap, msg.Old, r.replicationConfig.IsTenantDependent)
 	default:
 		log.Debug("Unknown kind: %s", msg.Kind)
 	}
@@ -282,29 +283,16 @@ func (r *CDCReplicator) processMessage(topic string, value []byte) error {
 	return nil
 }
 
-func (r *CDCReplicator) parseTopic(topic string) (tenantID string, source string, err error) {
-	// Expect format: 0001_dbname.public.table_name into [0001_dbname, public.table_name]
-	parts := strings.SplitN(
-		topic,
-		".",
-		2,
-	)
+// parseTopic extracts the source table identifier from a topic.
+// Topic format: {dbName}.{schema}.{table} → returns "{schema}.{table}"
+func (r *CDCReplicator) parseTopic(topic string) (source string, err error) {
+	// Expect format: dbname.public.table_name → split into [dbname, public.table_name]
+	parts := strings.SplitN(topic, ".", 2)
 	if len(parts) != 2 {
-		return "", "", fmt.Errorf("invalid topic format: %s", topic)
+		return "", fmt.Errorf("invalid topic format: %s", topic)
 	}
 
-	dbName := parts[0]
-	source = parts[1]
-
-	dbParts := strings.Split(dbName, "_")
-	if len(dbParts) >= 2 {
-		tenantID = dbParts[0]
-	} else {
-		// If tenant ID is not found, it's not a tenant-specific topic
-		tenantID = ""
-	}
-
-	return tenantID, source, nil
+	return parts[1], nil
 }
 
 func (r *CDCReplicator) upsertRecord(
@@ -334,7 +322,7 @@ func (r *CDCReplicator) upsertRecord(
 	// If column client_id is present (table handheld_stocks), it should be skipped if it doesn't match this tenant (tenant-dependent rows).
 	// If column client_id is missing (table device_names), it should be replicated to all tenants (non-tenant-dependent rows).
 	if !isTenantDependent {
-		if clientID, exists := data["client_id"]; exists && clientID != nil {
+		if clientID, exists := data["client_id"]; exists {
 			if fmt.Sprintf("%v", clientID) != r.replicationConfig.TenantID {
 				return nil
 			}
@@ -426,7 +414,7 @@ func (r *CDCReplicator) deleteRecord(
 	primaryKey := mapping.primaryKeyOrDefault()
 	// For non-tenant-dependent sources, filter by client_id when present.
 	if !isTenantDependent {
-		if clientID, exists := data["client_id"]; exists && clientID != nil {
+		if clientID, exists := data["client_id"]; exists {
 			if fmt.Sprintf("%v", clientID) != r.replicationConfig.TenantID {
 				return nil
 			}

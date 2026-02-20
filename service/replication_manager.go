@@ -155,10 +155,11 @@ func (rm *ReplicationManager) StartReplication(
 			pgService,
 			rm.cfg.KAFKA_BROKERS,
 			&ReplicationConfig{
-				TenantID:      tenantID,
-				ConsumerGroup: consumerGroup,
-				SourceDBName:  sourceDBName,
-				TableMappings: tableMappings,
+				TenantID:          tenantID,
+				ConsumerGroup:     consumerGroup,
+				SourceDBName:      sourceDBName,
+				TableMappings:     tableMappings,
+				IsTenantDependent: isTenantDependent,
 			},
 		)
 
