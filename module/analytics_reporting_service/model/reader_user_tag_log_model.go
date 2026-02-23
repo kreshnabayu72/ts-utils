@@ -8,6 +8,7 @@ import (
 
 type ReaderUserTagLog struct {
 	ID           primitive.ObjectID `json:"_id"                    bson:"_id"`
+	Activity     string             `json:"activity"               bson:"activity"`
 	UserID       string             `json:"userId"                 bson:"userId"`
 	User         string             `json:"user"                   bson:"user"`
 	ModifiedByID string             `json:"modifiedById"           bson:"modifiedById"`
