@@ -10,6 +10,7 @@ import (
 	"regexp"
 	"runtime/debug"
 	"slices"
+	"strings"
 	"time"
 
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/db"
@@ -286,16 +287,25 @@ type PgxPoolInterface interface {
 type PostgreSQLService struct {
 	Pool        PgxPoolInterface
 	Transaction pgx.Tx
+	schemaName  string
 	// debugLevel debug level set for logging query.
 	debugLevel int
 }
 
 // MakePostgreSQLService creates a new PostgreSQLServicer instance.
-func MakePostgreSQLService(dbName db.DBName, options ...db.PostgreSQLServiceOptions) *PostgreSQLService {
-	pool := db.ConnectPostgres(dbName, options...)
+func MakePostgreSQLService(dbNameWithSchema db.DBName, options ...db.PostgreSQLServiceOptions) *PostgreSQLService {
+	splitted := strings.Split(string(dbNameWithSchema), ":")
+	if len(splitted) < 2 {
+		// If schema is not specified, use public as default
+		splitted = []string{"public", string(dbNameWithSchema)}
+	}
+
+	// Pass actual database name to ConnectPostgres
+	pool := db.ConnectPostgres(db.DBName(splitted[1]), options...)
 
 	return &PostgreSQLService{
-		Pool: pool,
+		Pool:       pool,
+		schemaName: splitted[0],
 	}
 }
 
@@ -805,6 +815,10 @@ func (s *PostgreSQLService) Close() {
 	s.Pool.Close()
 }
 
+func (s *PostgreSQLService) setSchema(queryString string) string {
+	return fmt.Sprintf("SET LOCAL search_path TO '%s'; %s", s.schemaName, queryString)
+}
+
 // executeQueryRow handles transaction/pool selection for QueryRow operations.
 // It automatically calls shouldShowQuery for debug logging.
 //
@@ -823,6 +837,7 @@ func (s *PostgreSQLService) executeQueryRow(
 	dest any,
 	isCount ...bool,
 ) error {
+	queryString = s.setSchema(queryString)
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	if len(isCount) == 0 || !isCount[0] {
@@ -854,6 +869,7 @@ func (s *PostgreSQLService) executeExec(
 	queryString string,
 	args []any,
 ) (int64, error) {
+	queryString = s.setSchema(queryString)
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	// Check for replicated table restrictions
@@ -893,6 +909,7 @@ func (s *PostgreSQLService) executeQuery(
 	queryString string,
 	args []any,
 ) (pgx.Rows, error) {
+	queryString = s.setSchema(queryString)
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	if s.Transaction != nil {

@@ -29,6 +29,9 @@ const (
 	AssetAddonDBName           DBName = "tagsamurai_asset_addon"
 )
 
+// CompanyDBName returns the database name with company code prefix.
+// Resulting format: <company_code>:<database_name>
 func (dbName DBName) CompanyDBName(companyCode string) DBName {
-	return DBName(fmt.Sprintf("%s_%s", companyCode, dbName))
+	// Since now company code no longer used in database name, we use it as a prefix for easy split later for schema name
+	return DBName(fmt.Sprintf("%s:%s", companyCode, dbName))
 }
