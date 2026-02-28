@@ -52,10 +52,6 @@ func (r *User) GetTableName() string {
 	return "users"
 }
 
-func (r *User) GetTableNameWithSchema() string {
-	return "public.users"
-}
-
 func (r *User) GetColumnTypes() map[string]string {
 	return map[string]string{
 		"id":                             "BIGINT",

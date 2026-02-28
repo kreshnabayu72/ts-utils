@@ -24,10 +24,6 @@ func (c *CustomField) GetTableName() string {
 	return "custom_fields"
 }
 
-func (c *CustomField) GetTableNameWithSchema() string {
-	return "public.custom_fields"
-}
-
 func (c *CustomField) GetColumnTypes() map[string]string {
 	return map[string]string{
 		"id":           "BIGINT",

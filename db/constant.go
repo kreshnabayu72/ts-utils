@@ -23,6 +23,10 @@ const (
 	NotificationDBName         DBName = "tagsamurai_notification"
 	PlanningStrategyDBName     DBName = "tagsamurai_planning_strategy"
 	ResourceAllocationDBName   DBName = "tagsamurai_resource_allocation"
+	MasterAssetRegistryDBName  DBName = "tagsamurai_master_asset_registry"
+	AssetTransactionDBName     DBName = "tagsamurai_asset_transaction"
+	ApprovalDBName             DBName = "tagsamurai_approval"
+	AssetAddonDBName           DBName = "tagsamurai_asset_addon"
 )
 
 func (dbName DBName) CompanyDBName(companyCode string) DBName {

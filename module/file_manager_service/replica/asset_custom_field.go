@@ -15,10 +15,6 @@ func (a *AssetCustomField) GetTableName() string {
 	return "asset_custom_fields"
 }
 
-func (a *AssetCustomField) GetTableNameWithSchema() string {
-	return "public.asset_custom_fields"
-}
-
 func (a *AssetCustomField) GetColumnTypes() map[string]string {
 	return map[string]string{
 		"id":              "BIGINT",

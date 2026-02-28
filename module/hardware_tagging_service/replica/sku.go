@@ -18,10 +18,6 @@ func (r *Sku) GetTableName() string {
 	return "skus"
 }
 
-func (r *Sku) GetTableNameWithSchema() string {
-	return "public.skus"
-}
-
 func (r *Sku) GetColumnTypes() map[string]string {
 	return map[string]string{
 		"id":          "BIGINT",

@@ -18,9 +18,6 @@ func (r *TabletStock) GetTableName() string {
 	return "tablet_stocks"
 }
 
-func (r *TabletStock) GetTableNameWithSchema() string {
-	return "public.tablet_stocks"
-}
 
 func (r *TabletStock) GetColumnTypes() map[string]string {
 	return map[string]string{

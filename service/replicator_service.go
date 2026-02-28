@@ -35,11 +35,9 @@ type CDCMessage struct {
 
 // ReplicationConfig holds configuration for a single tenant replication.
 type ReplicationConfig struct {
-	TenantID          string                        // company code (e.g., "qtera")
-	SourceDBName      string                        // source database name (e.g., "qtera_tagsamurai_iam")
-	TableMappings     map[string]TargetTableMapping // key: source table name (e.g., "public.users")
-	ConsumerGroup     string
-	IsTenantDependent bool // whether the source database is tenant-specific (has tenant prefix in db name)
+	SourceDBName  string                        // source database name (e.g., "tagsamurai_iam")
+	TableMappings map[string]TargetTableMapping // key: source table name (e.g., "users")
+	ConsumerGroup string
 }
 
 type TargetTableMapping struct {
@@ -78,8 +76,8 @@ type CDCReplicatorInterface interface {
 	getMappedTopics() []string
 	processMessage(topic string, value []byte) error
 	parseTopic(topic string) (source string, err error)
-	upsertRecord(mapping TargetTableMapping, data map[string]any, isTenantDependent bool) error
-	deleteRecord(mapping TargetTableMapping, data map[string]any, isTenantDependent bool) error
+	upsertRecord(mapping TargetTableMapping, data map[string]any, tenantID string) error
+	deleteRecord(mapping TargetTableMapping, data map[string]any, tenantID string) error
 }
 
 // CDCReplicator struct handles CDC replication from Kafka to Postgres.
@@ -101,8 +99,8 @@ func NewCDCReplicator(
 	configOptions ...config.ConfigOptions,
 ) CDCReplicatorInterface {
 	slog.Info(
-		"Initializing CDC Replicator for tenant",
-		slog.String("tenant_id", replicationConfig.TenantID),
+		"Initializing CDC Replicator for service",
+		slog.String("service_name", replicationConfig.SourceDBName),
 	)
 
 	ctx, cancel := context.WithCancel(parentCtx)
@@ -196,8 +194,8 @@ func (r *CDCReplicator) Start() error {
 // Stop stops the CDC replication process.
 func (r *CDCReplicator) Stop() {
 	slog.Info(
-		"Stopping CDC Replicator for tenant",
-		slog.String("tenant_id", r.replicationConfig.TenantID),
+		"Stopping CDC Replicator for service",
+		slog.String("service_name", r.replicationConfig.SourceDBName),
 	)
 	// Currently, there's no explicit stop logic as readers will stop when context is cancelled.
 	// Just cancel the context.
@@ -207,7 +205,7 @@ func (r *CDCReplicator) Stop() {
 }
 
 func (r *CDCReplicator) getMappedTopics() []string {
-	slog.Debug("Getting all topics for tenant:", slog.String("tenant_id", r.replicationConfig.TenantID))
+	slog.Debug("Getting all topics for service:", slog.String("service_name", r.replicationConfig.SourceDBName))
 	topics := []string{}
 	tenantCfg := r.replicationConfig
 	for source := range tenantCfg.TableMappings {
@@ -269,13 +267,16 @@ func (r *CDCReplicator) processMessage(topic string, value []byte) error {
 		return fmt.Errorf("parse failed: %w", err)
 	}
 
+	schemaSource := msg.Source
+	splitSource := strings.Split(schemaSource, ".")
+
 	slog.Debug("Processing CDC message for table:", slog.String("table", source), slog.Any("message", msg))
 
 	switch msg.Kind {
 	case "insert", "update":
-		return r.upsertRecord(tableMap, msg.New, r.replicationConfig.IsTenantDependent)
+		return r.upsertRecord(tableMap, msg.New, splitSource[0])
 	case "delete":
-		return r.deleteRecord(tableMap, msg.Old, r.replicationConfig.IsTenantDependent)
+		return r.deleteRecord(tableMap, msg.Old, splitSource[0])
 	default:
 		log.Debug("Unknown kind: %s", msg.Kind)
 	}
@@ -286,7 +287,7 @@ func (r *CDCReplicator) processMessage(topic string, value []byte) error {
 // parseTopic extracts the source table identifier from a topic.
 // Topic format: {dbName}.{schema}.{table} → returns "{schema}.{table}"
 func (r *CDCReplicator) parseTopic(topic string) (source string, err error) {
-	// Expect format: dbname.public.table_name → split into [dbname, public.table_name]
+	// Expect format: service_name.table_name → split into [service_name, table_name]
 	parts := strings.SplitN(topic, ".", 2)
 	if len(parts) != 2 {
 		return "", fmt.Errorf("invalid topic format: %s", topic)
@@ -298,7 +299,7 @@ func (r *CDCReplicator) parseTopic(topic string) (source string, err error) {
 func (r *CDCReplicator) upsertRecord(
 	mapping TargetTableMapping,
 	data map[string]any,
-	isTenantDependent bool,
+	tenantID string,
 ) error {
 	var row map[string]any
 
@@ -321,9 +322,9 @@ func (r *CDCReplicator) upsertRecord(
 	// Example replicating from non-tenant hardware tagging that contains all stocks all of tenants.
 	// If column client_id is present (table handheld_stocks), it should be skipped if it doesn't match this tenant (tenant-dependent rows).
 	// If column client_id is missing (table device_names), it should be replicated to all tenants (non-tenant-dependent rows).
-	if !isTenantDependent {
+	if tenantID != "" {
 		if clientID, exists := data["client_id"]; exists {
-			if fmt.Sprintf("%v", clientID) != r.replicationConfig.TenantID {
+			if fmt.Sprintf("%v", clientID) != tenantID {
 				return nil
 			}
 		}
@@ -409,13 +410,13 @@ func (r *CDCReplicator) upsertRecord(
 func (r *CDCReplicator) deleteRecord(
 	mapping TargetTableMapping,
 	data map[string]any,
-	isTenantDependent bool,
+	tenantID string,
 ) error {
 	primaryKey := mapping.primaryKeyOrDefault()
 	// For non-tenant-dependent sources, filter by client_id when present.
-	if !isTenantDependent {
+	if tenantID != "" {
 		if clientID, exists := data["client_id"]; exists {
-			if fmt.Sprintf("%v", clientID) != r.replicationConfig.TenantID {
+			if fmt.Sprintf("%v", clientID) != tenantID {
 				return nil
 			}
 		}

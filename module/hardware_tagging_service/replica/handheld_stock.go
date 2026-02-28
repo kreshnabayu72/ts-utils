@@ -22,10 +22,6 @@ func (r *HandheldStock) GetTableName() string {
 	return "handheld_stocks"
 }
 
-func (r *HandheldStock) GetTableNameWithSchema() string {
-	return "public.handheld_stocks"
-}
-
 func (r *HandheldStock) GetColumnTypes() map[string]string {
 	return map[string]string{
 		"id":                   "BIGINT",

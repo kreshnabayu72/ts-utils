@@ -10,10 +10,6 @@ func (f *FixedAssetDisposalTransaction) GetTableName() string {
 	return "fixed_asset_disposal_transactions"
 }
 
-func (f *FixedAssetDisposalTransaction) GetTableNameWithSchema() string {
-	return "public.fixed_asset_disposal_transactions"
-}
-
 func (f *FixedAssetDisposalTransaction) GetColumnTypes() map[string]string {
 	return map[string]string{
 		"id":                  "BIGINT",

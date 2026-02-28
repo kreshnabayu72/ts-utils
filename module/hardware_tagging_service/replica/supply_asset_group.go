@@ -15,10 +15,6 @@ func (r *SupplyAssetGroup) GetTableName() string {
 	return "supply_asset_groups"
 }
 
-func (r *SupplyAssetGroup) GetTableNameWithSchema() string {
-	return "public.supply_asset_groups"
-}
-
 func (r *SupplyAssetGroup) GetColumnTypes() map[string]string {
 	return map[string]string{
 		"id":         "BIGINT",

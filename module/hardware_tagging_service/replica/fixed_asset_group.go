@@ -19,10 +19,6 @@ func (r *FixedAssetGroup) GetTableName() string {
 	return "fixed_asset_groups"
 }
 
-func (r *FixedAssetGroup) GetTableNameWithSchema() string {
-	return "public.fixed_asset_groups"
-}
-
 func (r *FixedAssetGroup) GetColumnTypes() map[string]string {
 	return map[string]string{
 		"id":                     "BIGINT",

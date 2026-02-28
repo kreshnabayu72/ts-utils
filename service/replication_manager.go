@@ -10,6 +10,7 @@ import (
 
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/config"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/constant"
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/db"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/enterprise_management_service/model"
 	file_manager_service "gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/file_manager_service/replica"
 	hardware_tagging_replica "gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/hardware_tagging_service/replica"
@@ -20,26 +21,26 @@ import (
 
 type ReplicatedTable interface {
 	GetTableName() string
-	GetTableNameWithSchema() string
 	GetColumnTypes() map[string]string
 	GetColumns() []string
 }
 
+// ReplicatedTables - db name with prefix `true` means to use tenant-specific schema, otherwise use public schema
 var ReplicatedTables = map[string]map[string][]ReplicatedTable{
-	constant.IAM_SERVICE_NAME: {
-		"tagsamurai_hardware_tagging": {
+	constant.IAM_SERVICE_NAME: { // Listener/Consumer
+		fmt.Sprintf("%v.%s", true, db.HardwareTaggingDBName): { // Publisher
 			&replica.Rfid{},
 		},
 	},
-	constant.HARDWARE_TAGGING_SERVICE_NAME: {
-		"tagsamurai_hardware_tagging_root": {
+	constant.HARDWARE_TAGGING_SERVICE_NAME: { // Listener/Consumer
+		fmt.Sprintf("%v.%s", false, db.HardwareTaggingDBName): { // Publisher
 			&hardware_tagging_replica.DeviceName{},
 			&hardware_tagging_replica.HandheldStock{},
 			&hardware_tagging_replica.Sku{},
 			&hardware_tagging_replica.TabletStock{},
 			&hardware_tagging_replica.SmartFixedStock{},
 		},
-		"tagsamurai_iam": {
+		fmt.Sprintf("%v.%s", true, db.IAMDBName): { // Publisher
 			&hardware_tagging_replica.FixedAssetGroup{},
 			&hardware_tagging_replica.SupplyAssetGroup{},
 			&hardware_tagging_replica.User{},
@@ -49,16 +50,16 @@ var ReplicatedTables = map[string]map[string][]ReplicatedTable{
 	constant.MASTER_ASSET_REGISTRY_SERVICE_NAME: nil,
 	constant.ANALYTICS_REPORTING_SERVICE_NAME:   nil,
 	constant.APPROVAL_SERVICE_NAME:              nil,
-	constant.FILE_MANAGER_SERVICE_NAME: {
-		"tagsamurai_master_asset_registry": {
+	constant.FILE_MANAGER_SERVICE_NAME: { // Listener/Consumer
+		fmt.Sprintf("%v.%s", true, db.MasterAssetRegistryDBName): { // Publisher
 			&file_manager_service.AssetCustomField{},
 			&file_manager_service.Asset{},
 			&file_manager_service.CustomField{},
 		},
-		"tagsamurai_asset_transaction": {
+		fmt.Sprintf("%v.%s", true, db.AssetTransactionDBName): { // Publisher
 			&file_manager_service.FixedAssetDisposalTransaction{},
 		},
-		"tagsamurai_iam": {
+		fmt.Sprintf("%v.%s", true, db.IAMDBName): { // Publisher
 			&file_manager_service.FixedAssetGroup{},
 			&file_manager_service.User{},
 		},
@@ -80,7 +81,7 @@ var ReplicatedTables = map[string]map[string][]ReplicatedTable{
 type ReplicationManager struct {
 	replicators     []CDCReplicatorInterface
 	cfg             config.ConfigOptions
-	dbFactory       func(string) PostgreSQLServicer
+	dbSvc           PostgreSQLServicer
 	temporalService *TemporalService
 }
 
@@ -89,12 +90,12 @@ type ReplicationManager struct {
 func NewReplicationManager(
 	cfg config.ConfigOptions,
 	temporalService *TemporalService,
-	dbFactory func(string) PostgreSQLServicer,
+	dbSvc PostgreSQLServicer,
 ) *ReplicationManager {
 	return &ReplicationManager{
 		replicators:     make([]CDCReplicatorInterface, 0),
 		cfg:             cfg,
-		dbFactory:       dbFactory,
+		dbSvc:           dbSvc,
 		temporalService: temporalService,
 	}
 }
@@ -105,7 +106,7 @@ func NewReplicationManager(
 // isTenantDependent: Whether the source database is tenant-dependent.
 func (rm *ReplicationManager) StartReplication(
 	targetServiceName string,
-	sourceDBSuffix string,
+	sourceDBSuffix db.DBName,
 	isTenantDependent bool,
 ) error {
 	slog.Debug("Entering StartReplication", "target_service", targetServiceName)
@@ -117,11 +118,7 @@ func (rm *ReplicationManager) StartReplication(
 		return nil
 	}
 
-	serviceSource := sourceDBSuffix
-	if !isTenantDependent {
-		serviceSource += "_root"
-	}
-	replicatedTables := ReplicatedTables[targetServiceName][serviceSource]
+	replicatedTables := ReplicatedTables[targetServiceName][fmt.Sprintf("%v.%s", isTenantDependent, sourceDBSuffix)]
 	if len(replicatedTables) == 0 {
 		slog.Warn("No replicated tables found", "service_name", targetServiceName)
 		return nil
@@ -129,7 +126,7 @@ func (rm *ReplicationManager) StartReplication(
 
 	tableMappings := make(map[string]TargetTableMapping, len(replicatedTables))
 	for _, table := range replicatedTables {
-		tableMappings[table.GetTableNameWithSchema()] = TargetTableMapping{
+		tableMappings[table.GetTableName()] = TargetTableMapping{
 			PrimaryKey:      "id",
 			Columns:         table.GetColumns(),
 			TargetTableName: table.GetTableName(),
@@ -137,41 +134,30 @@ func (rm *ReplicationManager) StartReplication(
 		}
 	}
 
-	for _, tenantID := range clients {
-		// Create PostgreSQL service for the tenant
-		pgService := rm.dbFactory(tenantID)
+	// Replace hyphens with underscores for consumer group name consistency
+	sanitizedTarget := strings.ReplaceAll(targetServiceName, "-", "_")
+	sanitizedSource := strings.ReplaceAll(string(sourceDBSuffix), "-", "_")
+	consumerGroup := fmt.Sprintf("%s_%s_replicator", sanitizedTarget, sanitizedSource)
 
-		sourceDBName := sourceDBSuffix
-		if isTenantDependent {
-			sourceDBName = tenantID + "_" + sourceDBSuffix
+	replicator := NewCDCReplicator(
+		context.Background(),
+		rm.dbSvc,
+		rm.cfg.KAFKA_BROKERS,
+		&ReplicationConfig{
+			ConsumerGroup: consumerGroup,
+			SourceDBName:  string(sourceDBSuffix),
+			TableMappings: tableMappings,
+		},
+	)
+
+	rm.replicators = append(rm.replicators, replicator)
+
+	go func(r CDCReplicatorInterface) {
+		slog.Info("Starting replicator service")
+		if err := r.Start(); err != nil {
+			slog.Error("Error starting replicator", "error", err)
 		}
-		// Replace hyphens with underscores for consumer group name consistency
-		sanitizedTarget := strings.ReplaceAll(targetServiceName, "-", "_")
-		sanitizedSource := strings.ReplaceAll(sourceDBSuffix, "-", "_")
-		consumerGroup := fmt.Sprintf("%s_%s_replicator", sanitizedTarget, sanitizedSource)
-
-		replicator := NewCDCReplicator(
-			context.Background(),
-			pgService,
-			rm.cfg.KAFKA_BROKERS,
-			&ReplicationConfig{
-				TenantID:          tenantID,
-				ConsumerGroup:     consumerGroup,
-				SourceDBName:      sourceDBName,
-				TableMappings:     tableMappings,
-				IsTenantDependent: isTenantDependent,
-			},
-		)
-
-		rm.replicators = append(rm.replicators, replicator)
-
-		go func(id string, r CDCReplicatorInterface) {
-			slog.Info("Starting replicator service", "tenant_id", id)
-			if err := r.Start(); err != nil {
-				slog.Error("Error starting replicator", "tenant_id", id, "error", err)
-			}
-		}(tenantID, replicator)
-	}
+	}(replicator)
 
 	return nil
 }

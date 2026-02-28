@@ -20,9 +20,6 @@ func (a *Asset) GetTableName() string {
 	return "assets"
 }
 
-func (a *Asset) GetTableNameWithSchema() string {
-	return "public.assets"
-}
 
 func (a *Asset) GetColumnTypes() map[string]string {
 	return map[string]string{

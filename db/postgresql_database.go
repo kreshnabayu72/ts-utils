@@ -154,6 +154,10 @@ func ConnectPostgres(dbName DBName, options ...PostgreSQLServiceOptions) *pgxpoo
 	}
 
 	// 4. Apply health check settings to the config. This is always a good practice.
+	// Old max conn is 4 or runtime.NumCPU() (default by pgx itself). For DB-level tenant this is fine, but for schema-level tenant this is bad (lower concurrency); adjust to 30 as a safe bet.
+	config.MaxConns = 30
+	// Keep 5 for warm up
+	config.MinConns = 5
 	config.MaxConnIdleTime = 5 * time.Minute
 	config.MaxConnLifetime = 2 * time.Hour
 	config.HealthCheckPeriod = 1 * time.Minute

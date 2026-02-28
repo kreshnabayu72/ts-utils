@@ -15,10 +15,6 @@ func (r *DeviceName) GetTableName() string {
 	return "device_names"
 }
 
-func (r *DeviceName) GetTableNameWithSchema() string {
-	return "public.device_names"
-}
-
 func (r *DeviceName) GetColumnTypes() map[string]string {
 	return map[string]string{
 		"id":         "BIGINT",

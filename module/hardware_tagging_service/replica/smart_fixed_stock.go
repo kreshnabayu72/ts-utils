@@ -22,10 +22,6 @@ func (r *SmartFixedStock) GetTableName() string {
 	return "smart_fixed_stocks"
 }
 
-func (r *SmartFixedStock) GetTableNameWithSchema() string {
-	return "public.smart_fixed_stocks"
-}
-
 func (r *SmartFixedStock) GetColumnTypes() map[string]string {
 	return map[string]string{
 		"id":                   "BIGINT",

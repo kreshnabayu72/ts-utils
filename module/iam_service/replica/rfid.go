@@ -14,10 +14,6 @@ func (r *Rfid) GetTableName() string {
 	return "rfids"
 }
 
-func (r *Rfid) GetTableNameWithSchema() string {
-	return "public.rfids"
-}
-
 func (r *Rfid) GetColumnTypes() map[string]string {
 	return map[string]string{
 		"id":         "BIGINT",
