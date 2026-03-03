@@ -3,7 +3,7 @@ package replica
 import (
 	"time"
 
-	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/fixedasset/model"
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/common/model"
 )
 
 type Asset struct {
@@ -19,7 +19,6 @@ type Asset struct {
 func (a *Asset) GetTableName() string {
 	return "assets"
 }
-
 
 func (a *Asset) GetColumnTypes() map[string]string {
 	return map[string]string{
