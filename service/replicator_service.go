@@ -269,14 +269,20 @@ func (r *CDCReplicator) processMessage(topic string, value []byte) error {
 
 	schemaSource := msg.Source
 	splitSource := strings.Split(schemaSource, ".")
+	var schemaName string
+	if splitSource[0] == "public" {
+		schemaName = ""
+	} else if splitSource[0] != "" {
+		schemaName = splitSource[0]
+	}
 
 	slog.Debug("Processing CDC message for table:", slog.String("table", source), slog.Any("message", msg))
 
 	switch msg.Kind {
 	case "insert", "update":
-		return r.upsertRecord(tableMap, msg.New, splitSource[0])
+		return r.upsertRecord(tableMap, msg.New, schemaName)
 	case "delete":
-		return r.deleteRecord(tableMap, msg.Old, splitSource[0])
+		return r.deleteRecord(tableMap, msg.Old, schemaName)
 	default:
 		log.Debug("Unknown kind: %s", msg.Kind)
 	}
@@ -393,10 +399,23 @@ func (r *CDCReplicator) upsertRecord(
 	}
 
 	slog.Debug("Pool: ", slog.Any("pool", r.pool))
-	_, err := r.pool.Exec(r.ctx, query, vals...)
+	tx, err := r.pool.Begin(r.ctx)
+	if err != nil {
+		return fmt.Errorf("begin transaction failed: %w", err)
+	}
+	defer tx.Rollback(r.ctx)
+	if tenantID == "" {
+		tenantID = "public"
+	}
+	_, err = tx.Exec(r.ctx, fmt.Sprintf("SET LOCAL search_path = %s", tenantID))
+	if err != nil {
+		return fmt.Errorf("set session search path failed: %w", err)
+	}
+	_, err = tx.Exec(r.ctx, query, vals...)
 	if err != nil {
 		return fmt.Errorf("upsert failed: %w", err)
 	}
+	tx.Commit(r.ctx)
 
 	slog.Debug(
 		"Upserted record into table:",
@@ -428,10 +447,23 @@ func (r *CDCReplicator) deleteRecord(
 	}
 
 	query := fmt.Sprintf("DELETE FROM %s WHERE %s = $1", mapping.TargetTableName, primaryKey)
-	_, err := r.pool.Exec(r.ctx, query, pkValue)
+	tx, err := r.pool.Begin(r.ctx)
+	if err != nil {
+		return fmt.Errorf("begin transaction failed: %w", err)
+	}
+	defer tx.Rollback(r.ctx)
+	if tenantID == "" {
+		tenantID = "public"
+	}
+	_, err = tx.Exec(r.ctx, fmt.Sprintf("SET LOCAL search_path = %s", tenantID))
+	if err != nil {
+		return fmt.Errorf("set session search path failed: %w", err)
+	}
+	_, err = tx.Exec(r.ctx, query, pkValue)
 	if err != nil {
 		return fmt.Errorf("delete failed: %w", err)
 	}
+	tx.Commit(r.ctx)
 
 	slog.Debug(
 		"Deleted record from table:",
