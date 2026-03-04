@@ -3,7 +3,7 @@ package replica
 import (
 	"time"
 
-	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/common/model"
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/fixedasset/model"
 )
 
 type Asset struct {
