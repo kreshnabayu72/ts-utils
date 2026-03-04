@@ -405,7 +405,7 @@ func (s *PostgreSQLService) SelectOne(
 	}
 	defer rows.Close()
 
-	err = sql_query.ScanRowObject(v, rows)
+	err = sql_query.ScanRowObject(v, rows.Rows)
 	if err != nil {
 		log.Println(err)
 		return err
@@ -426,7 +426,7 @@ func (s *PostgreSQLService) SelectMany(
 	}
 	defer rows.Close()
 
-	err = sql_query.ScanRowsArray(v, rows)
+	err = sql_query.ScanRowsArray(v, rows.Rows)
 	if err != nil {
 		log.Println(err)
 		return err
@@ -815,8 +815,10 @@ func (s *PostgreSQLService) Close() {
 	s.Pool.Close()
 }
 
-func (s *PostgreSQLService) setSchema(queryString string) string {
-	return fmt.Sprintf("SET LOCAL search_path TO '%s'; %s", s.schemaName, queryString)
+// applySchema executes SET LOCAL search_path on the given transaction.
+func (s *PostgreSQLService) applySchema(ctx context.Context, tx pgx.Tx) error {
+	_, err := tx.Exec(ctx, fmt.Sprintf("SET LOCAL search_path TO '%s'", s.schemaName))
+	return err
 }
 
 // executeQueryRow handles transaction/pool selection for QueryRow operations.
@@ -837,7 +839,6 @@ func (s *PostgreSQLService) executeQueryRow(
 	dest any,
 	isCount ...bool,
 ) error {
-	queryString = s.setSchema(queryString)
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	if len(isCount) == 0 || !isCount[0] {
@@ -848,9 +849,26 @@ func (s *PostgreSQLService) executeQueryRow(
 	}
 
 	if s.Transaction != nil {
+		if err := s.applySchema(ctx, s.Transaction); err != nil {
+			return err
+		}
 		return s.Transaction.QueryRow(ctx, queryString, args...).Scan(dest)
 	}
-	return s.Pool.QueryRow(ctx, queryString, args...).Scan(dest)
+
+	tx, err := s.Pool.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
+
+	if err := s.applySchema(ctx, tx); err != nil {
+		return err
+	}
+	err = tx.QueryRow(ctx, queryString, args...).Scan(dest)
+	if err != nil {
+		return err
+	}
+	return tx.Commit(ctx)
 }
 
 // executeExec handles transaction/pool selection for Exec operations.
@@ -869,7 +887,6 @@ func (s *PostgreSQLService) executeExec(
 	queryString string,
 	args []any,
 ) (int64, error) {
-	queryString = s.setSchema(queryString)
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	// Check for replicated table restrictions
@@ -877,19 +894,43 @@ func (s *PostgreSQLService) executeExec(
 		return 0, err
 	}
 
-	var commandTag pgconn.CommandTag
-	var err error
-
 	if s.Transaction != nil {
-		commandTag, err = s.Transaction.Exec(ctx, queryString, args...)
-	} else {
-		commandTag, err = s.Pool.Exec(ctx, queryString, args...)
+		if err := s.applySchema(ctx, s.Transaction); err != nil {
+			return 0, err
+		}
+		commandTag, err := s.Transaction.Exec(ctx, queryString, args...)
+		if err != nil {
+			return 0, err
+		}
+		return commandTag.RowsAffected(), nil
 	}
 
+	tx, err := s.Pool.Begin(ctx)
 	if err != nil {
 		return 0, err
 	}
-	return commandTag.RowsAffected(), nil
+	defer tx.Rollback(ctx)
+
+	if err := s.applySchema(ctx, tx); err != nil {
+		return 0, err
+	}
+	commandTag, err := tx.Exec(ctx, queryString, args...)
+	if err != nil {
+		return 0, err
+	}
+	return commandTag.RowsAffected(), tx.Commit(ctx)
+}
+
+type txRows struct {
+	pgx.Rows
+	tx pgx.Tx
+}
+
+func (t *txRows) Close() {
+	t.Rows.Close()
+	if t.tx != nil {
+		t.tx.Rollback(context.Background())
+	}
 }
 
 // executeQuery handles transaction/pool selection for Query operations.
@@ -902,20 +943,45 @@ func (s *PostgreSQLService) executeExec(
 //   - args: query arguments
 //
 // Returns:
-//   - pgx.Rows: the result rows (must be closed by caller)
+//   - txRows: the result rows (must be closed by caller)
 //   - error: any error from Query
 func (s *PostgreSQLService) executeQuery(
 	ctx context.Context,
 	queryString string,
 	args []any,
-) (pgx.Rows, error) {
-	queryString = s.setSchema(queryString)
+) (txRows, error) {
 	shouldShowQuery(s.debugLevel, queryString, args...)
 
 	if s.Transaction != nil {
-		return s.Transaction.Query(ctx, queryString, args...)
+		if err := s.applySchema(ctx, s.Transaction); err != nil {
+			return txRows{}, err
+		}
+		rows, err := s.Transaction.Query(ctx, queryString, args...)
+		if err != nil {
+			return txRows{}, err
+		}
+		return txRows{Rows: rows, tx: nil}, nil
 	}
-	return s.Pool.Query(ctx, queryString, args...)
+
+	tx, err := s.Pool.Begin(ctx)
+	if err != nil {
+		return txRows{}, err
+	}
+
+	if err := s.applySchema(ctx, tx); err != nil {
+		tx.Rollback(ctx)
+		return txRows{}, err
+	}
+	rows, err := tx.Query(ctx, queryString, args...)
+	if err != nil {
+		tx.Rollback(ctx)
+		return txRows{}, err
+	}
+	// NOTE: tx is committed after rows are fully consumed.
+	// The caller closes rows via defer rows.Close(), and pgx auto-releases
+	// the tx connection when rows are closed. For read queries this is safe
+	// because SET LOCAL auto-resets when the tx ends.
+	return txRows{Rows: rows, tx: tx}, nil
 }
 
 // UseTransactions executes fn within a transaction.
