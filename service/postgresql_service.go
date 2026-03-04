@@ -669,7 +669,7 @@ func (s *PostgreSQLService) SoftDeleteOne(
 	if err != nil {
 		log.Println(err)
 	}
-	shouldShowQuery(s.debugLevel, queryString, args...)
+	shouldShowQuery(s.debugLevel, s.schemaName, queryString, args...)
 
 	if len(returnOption) > 0 && returnOption[0].Destination != nil {
 		return nil, s.SelectOne(returnOption[0].Destination, ctx, queryString, args...)
@@ -699,7 +699,7 @@ func (s *PostgreSQLService) SoftDeleteMany(
 	if err != nil {
 		log.Println(err)
 	}
-	shouldShowQuery(s.debugLevel, queryString, args...)
+	shouldShowQuery(s.debugLevel, s.schemaName, queryString, args...)
 
 	if len(returnOption) > 0 && returnOption[0].Destination != nil {
 		err := s.SelectMany(returnOption[0].Destination, ctx, queryString, args...)
@@ -731,7 +731,7 @@ func (s *PostgreSQLService) RestoreSoftDeleteOne(
 	if err != nil {
 		log.Println(err)
 	}
-	shouldShowQuery(s.debugLevel, queryString, args...)
+	shouldShowQuery(s.debugLevel, s.schemaName, queryString, args...)
 
 	if len(returnOption) > 0 && returnOption[0].Destination != nil {
 		return nil, s.SelectOne(returnOption[0].Destination, ctx, queryString, args...)
@@ -760,7 +760,7 @@ func (s *PostgreSQLService) RestoreSoftDeleteMany(
 	if err != nil {
 		log.Println(err)
 	}
-	shouldShowQuery(s.debugLevel, queryString, args...)
+	shouldShowQuery(s.debugLevel, s.schemaName, queryString, args...)
 
 	if len(returnOption) > 0 && returnOption[0].Destination != nil {
 		err := s.SelectMany(returnOption[0].Destination, ctx, queryString, args...)
@@ -839,7 +839,7 @@ func (s *PostgreSQLService) executeQueryRow(
 	dest any,
 	isCount ...bool,
 ) error {
-	shouldShowQuery(s.debugLevel, queryString, args...)
+	shouldShowQuery(s.debugLevel, s.schemaName, queryString, args...)
 
 	if len(isCount) == 0 || !isCount[0] {
 		// Check for replicated table restrictions
@@ -887,7 +887,7 @@ func (s *PostgreSQLService) executeExec(
 	queryString string,
 	args []any,
 ) (int64, error) {
-	shouldShowQuery(s.debugLevel, queryString, args...)
+	shouldShowQuery(s.debugLevel, s.schemaName, queryString, args...)
 
 	// Check for replicated table restrictions
 	if err := s.validateTableOperation(queryString); err != nil {
@@ -950,7 +950,7 @@ func (s *PostgreSQLService) executeQuery(
 	queryString string,
 	args []any,
 ) (txRows, error) {
-	shouldShowQuery(s.debugLevel, queryString, args...)
+	shouldShowQuery(s.debugLevel, s.schemaName, queryString, args...)
 
 	if s.Transaction != nil {
 		if err := s.applySchema(ctx, s.Transaction); err != nil {
@@ -1060,14 +1060,14 @@ func UseTransactions[T any](
 // - slog escapes \n and \t as literal strings, making SQL unreadable
 // - fmt.Printf preserves actual newlines and formatting for better readability
 // - This is development debug logging, not production structured logging
-func shouldShowQuery(level int, query string, args ...any) {
+func shouldShowQuery(level int, schema, query string, args ...any) {
 	switch level {
 	case 1:
-		fmt.Printf("\n=== SQL Query ===\n%s\n", query)
+		fmt.Printf("\n=== SQL Query for schema %s ===\n%s\n", schema, query)
 	case 2:
-		fmt.Printf("\n=== SQL Query ===\n%s\nArgs: %v\n", query, args)
+		fmt.Printf("\n=== SQL Query for schema %s ===\n%s\nArgs: %v\n", schema, query, args)
 	case 3:
-		fmt.Printf("\n=== SQL Query ===\n%s\n", sql_query.InterpolateQuery(query, args...))
+		fmt.Printf("\n=== SQL Query for schema %s ===\n%s\n", schema, sql_query.InterpolateQuery(query, args...))
 	}
 }
 
