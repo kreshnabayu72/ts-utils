@@ -41,10 +41,16 @@ const (
 )
 
 const (
+	// Source IAM Service
 	GetLoggedInUserActivity = "GetLoggedInUserActivity"
-	GetClientActivity       = "GetClientActivity"
-	GetClientsActivity      = "GetClientsActivity"
 
+	// Source Enterprise Management Service
+	GetClientActivity        = "GetClientActivity"
+	GetClientsActivity       = "GetClientsActivity"
+	UpdateClientActivity     = "UpdateClientActivity"
+	UndoUpdateClientActivity = "UndoUpdateClientActivity"
+
+	// Source Analytics Reporting Service
 	AnalyticsReportingCreateChangeLogActivity              = "CreateChangeLogActivity"
 	AnalyticsReportingDeleteChangeLogActivity              = "DeleteChangeLogActivity"
 	AnalyticsReportingCreateSessionLogActivity             = "CreateSessionLogActivity"
@@ -64,13 +70,16 @@ const (
 	AnalyticsReportingCreateTagEventLogAuditActivity       = "CreateTagEventLogAuditActivity"
 	AnalyticsReportingDeleteTagEventLogAuditActivity       = "DeleteTagEventLogAuditActivity"
 
+	// Source Asset Transaction Service
 	AssetTransactionGetUsersBorrowedAssetCountActivity = "GetUsersBorrowedAssetCountActivity"
 	AssetTransactionGetUsersAssignedAssetCountActivity = "GetUsersAssignedAssetCountActivity"
 
+	// Source Approval Service
 	ApprovalGetUsersPendingApprovalCountActivity = "GetUsersPendingApprovalCountActivity"
 )
 
 const (
+	// Source Enterprise Management Service
 	GetClientWorkflow  = "GetClientWorkflow"
 	GetClientsWorkflow = "GetClientsWorkflow"
 )
