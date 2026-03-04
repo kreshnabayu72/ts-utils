@@ -211,41 +211,8 @@ func (r *CDCReplicator) getMappedTopics() []string {
 	for source := range tenantCfg.TableMappings {
 		topic := fmt.Sprintf("%s.%s", tenantCfg.SourceDBName, source)
 		topics = append(topics, topic)
-
-		r.ensureTableExists(tenantCfg.TableMappings[source])
 	}
 	return topics
-}
-
-func (r *CDCReplicator) ensureTableExists(mapping TargetTableMapping) error {
-	if len(mapping.ColumnTypes) == 0 {
-		return nil // Skip if no type info provided
-	}
-
-	var definitions []string
-
-	// Iterate over Columns to ensure order
-	for _, col := range mapping.Columns {
-		sqlType, ok := mapping.ColumnTypes[col]
-		if !ok {
-			sqlType = "TEXT" // Fallback default
-		}
-
-		def := fmt.Sprintf("%s %s", col, sqlType)
-		if col == mapping.PrimaryKey {
-			def += " PRIMARY KEY"
-		}
-		definitions = append(definitions, def)
-	}
-
-	query := fmt.Sprintf(
-		"CREATE TABLE IF NOT EXISTS %s (%s)",
-		mapping.TargetTableName,
-		strings.Join(definitions, ", "),
-	)
-
-	_, err := r.pool.Exec(r.ctx, query)
-	return err
 }
 
 // processMessage processes a single CDC message.
