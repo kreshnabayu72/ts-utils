@@ -19,13 +19,40 @@ import (
 	"go.temporal.io/sdk/temporal"
 )
 
+// ReplicatedTable defines the contract for a table that can be replicated via CDC.
+// Each struct that implements this interface represents one database table
+// and describes its structure so the replicator knows which columns to read and write.
+//
+// These methods are used in two places:
+//  1. Here in the replicator - to build table mappings for CDC consumption (column selection, upsert queries)
+//  2. In ts-migrations - to validate that migration schemas match the expected replica table structure.
+//     The validator checks that columns and types defined here are consistent with the actual SQL migrations,
+//     ensuring schema integrity between the source and target databases.
 type ReplicatedTable interface {
-	GetTableName() string
-	GetColumnTypes() map[string]string
-	GetColumns() []string
+	GetTableName() string              // The SQL table name (e.g., "users", "rfids")
+	GetColumnTypes() map[string]string // Maps column name -> SQL type (e.g., "id" -> "BIGINT")
+	GetColumns() []string              // Ordered list of column names to replicate
 }
 
-// ReplicatedTables - db name with prefix `true` means to use tenant-specific schema, otherwise use public schema
+// ReplicatedTables is the central registry that declares which tables each service
+// needs to replicate (consume) from other services (publishers).
+//
+// Structure:  map[ConsumerServiceName] -> map["isTenantDependent.sourceDBName"] -> []ReplicatedTable
+//
+// The map key format "true.tagsamurai_iam" or "false.tagsamurai_hardware_tagging" encodes:
+//   - "true"  = tenant-dependent: data lives in tenant-specific schemas (e.g., "qtera.users")
+//   - "false" = non-tenant: data lives in the "public" schema of the source database
+//
+// Example: hardware-tagging-service needs to replicate:
+//   - From itself (non-tenant, public schema): device_names, handheld_stocks, skus, etc.
+//   - From IAM (tenant-dependent, per-tenant schema): users, fixed_asset_groups, supply_asset_groups
+//
+// How to add a new replicated table:
+//  1. Create a struct in the appropriate replica package (e.g., module/iam_service/replica/)
+//  2. Implement the ReplicatedTable interface (GetTableName, GetColumnTypes, GetColumns)
+//  3. Add it to the correct consumer -> source entry in this map
+//  4. Ensure the target database has the matching table in tenant schemas (via migrations),
+//     this is done by running the migration in the target database.
 var ReplicatedTables = map[string]map[string][]ReplicatedTable{
 	constant.IAM_SERVICE_NAME: { // Listener/Consumer
 		fmt.Sprintf("%v.%s", true, db.HardwareTaggingDBName): { // Publisher
@@ -77,16 +104,42 @@ var ReplicatedTables = map[string]map[string][]ReplicatedTable{
 	},
 }
 
-// ReplicationManager manages CDC replicators for multiple tenants.
+// ReplicationManager orchestrates CDC (Change Data Capture) replication for a service.
+//
+// It is the top-level coordinator that:
+//  1. Looks up which tables the current service needs to replicate (from ReplicatedTables)
+//  2. Creates CDCReplicator instances (one per source database) to consume Kafka messages
+//  3. Manages the lifecycle of all replicators (start/stop)
+//
+// Usage in a service's main.go:
+//
+//	replicationManager := service.NewReplicationManager(cfgOptions, temporalService, dbProvider.MakePostgreSQLService(db.MyDBName))
+//
+//	// Start consuming CDC events from IAM service (tenant-dependent tables)
+//	replicationManager.StartReplication(constant.MY_SERVICE_NAME, db.IAMDBName, true)
+//
+//	// Start consuming CDC events from own database (non-tenant tables)
+//	replicationManager.StartReplication(constant.MY_SERVICE_NAME, db.MyDBName, false)
+//
+//	// On shutdown:
+//	replicationManager.StopReplication()
 type ReplicationManager struct {
-	replicators     []CDCReplicatorInterface
-	cfg             config.ConfigOptions
-	dbSvc           PostgreSQLServicer
-	temporalService *TemporalService
+	replicators     []CDCReplicatorInterface // All active replicators managed by this manager
+	cfg             config.ConfigOptions     // Application config (contains KAFKA_BROKERS, etc.)
+	dbSvc           PostgreSQLServicer       // Target database connection - where replicated data is written to
+	temporalService *TemporalService         // Used to fetch the list of tenant client IDs via Temporal workflow
 }
 
 // NewReplicationManager creates a new ReplicationManager.
-// dbFactory is a function that returns a PostgreSQLServicer for a given tenant.
+//
+// Parameters:
+//   - cfg: Application config containing KAFKA_BROKERS and other settings
+//   - temporalService: Used to call GetClientsWorkflow to discover tenant client IDs
+//   - dbSvc: The PostgreSQL service for the TARGET database (where data will be written)
+//
+// Important: dbSvc should point to the current service's own database, NOT the source database.
+// For example, if hardware-tagging-service replicates from IAM, dbSvc should be
+// dbProvider.MakePostgreSQLService(db.HardwareTaggingDBName) - the replicator writes INTO `this` database.
 func NewReplicationManager(
 	cfg config.ConfigOptions,
 	temporalService *TemporalService,
@@ -100,13 +153,38 @@ func NewReplicationManager(
 	}
 }
 
-// StartReplication starts replication for the given tenants.
-// targetServiceName: The name of the current service (e.g., "iam-service"). Used to find replicated tables.
-// sourceDBSuffix: The suffix of the source database (e.g., "tagsamurai_hardware_tagging").
-// isTenantDependent: Whether the source database is tenant-dependent.
+// StartReplication starts CDC replication for a specific source database.
+//
+// This method does the following:
+//  1. Fetches the list of tenant clients (via Temporal workflow to enterprise-management-service)
+//  2. Looks up which tables need to be replicated using ReplicatedTables registry
+//  3. Creates a CDCReplicator that subscribes to Kafka topics for those tables
+//  4. Starts the replicator in a background goroutine
+//
+// Parameters:
+//   - targetServiceName: The current service's name (e.g., constant.HARDWARE_TAGGING_SERVICE_NAME).
+//     Used as the key to look up ReplicatedTables.
+//   - sourceDBName: The source database name (e.g., db.IAMDBName = "tagsamurai_iam").
+//     This determines which Kafka topics to subscribe to (topic = "sourceDBName.tableName").
+//   - isTenantDependent: Whether the source data is in tenant-specific schemas.
+//     true  = source data is in schemas like "qtera", "clientB", etc.
+//     false = source data is in the "public" schema.
+//
+// Consumer Group Naming:
+//
+//	The consumer group is named: "{target_service_name}_{source_db_name}_replicator" (with hyphens replaced by underscores).
+//	Example: "hardware_tagging_service_tagsamurai_iam_replicator"
+//	This ensures each (target_service_name, source_db_name) pair has its own consumer group,
+//	so multiple services can independently consume from the same topics.
+//
+// Call this method once per source database. For example, if hardware-tagging-service
+// needs data from both IAM and its own DB:
+//
+//	replicationManager.StartReplication(constant.HARDWARE_TAGGING_SERVICE_NAME, db.HardwareTaggingDBName, false)
+//	replicationManager.StartReplication(constant.HARDWARE_TAGGING_SERVICE_NAME, db.IAMDBName, true)
 func (rm *ReplicationManager) StartReplication(
 	targetServiceName string,
-	sourceDBSuffix db.DBName,
+	sourceDBName db.DBName,
 	isTenantDependent bool,
 ) error {
 	slog.Debug("Entering StartReplication", "target_service", targetServiceName)
@@ -118,12 +196,16 @@ func (rm *ReplicationManager) StartReplication(
 		return nil
 	}
 
-	replicatedTables := ReplicatedTables[targetServiceName][fmt.Sprintf("%v.%s", isTenantDependent, sourceDBSuffix)]
+	// Look up which tables this service needs to consume from the given source.
+	// The key format is "isTenantDependent.sourceDBName" (e.g., "true.tagsamurai_iam")
+	replicatedTables := ReplicatedTables[targetServiceName][fmt.Sprintf("%v.%s", isTenantDependent, sourceDBName)]
 	if len(replicatedTables) == 0 {
 		slog.Warn("No replicated tables found", "service_name", targetServiceName)
 		return nil
 	}
 
+	// Build table mappings from the ReplicatedTable interface implementations.
+	// Each mapping tells the replicator how to handle data for a specific table.
 	tableMappings := make(map[string]TargetTableMapping, len(replicatedTables))
 	for _, table := range replicatedTables {
 		tableMappings[table.GetTableName()] = TargetTableMapping{
@@ -131,13 +213,20 @@ func (rm *ReplicationManager) StartReplication(
 			Columns:         table.GetColumns(),
 			TargetTableName: table.GetTableName(),
 			ColumnTypes:     table.GetColumnTypes(),
+
+			// TODO: IDK what to do, FYI, currently in our app,
+			// whether replication flow is coming from tenant-dependent or non-tenant-dependent,
+			// the target table is always tenant-dependent.
+			//
+			// If in the future we need replication that target replication is non-tenant (public),
+			// we might need to change this into a configurable field.
 		}
 	}
 
-	// Replace hyphens with underscores for consumer group name consistency
+	// Build consumer group name: replace hyphens with underscores for Kafka compatibility.
 	sanitizedTarget := strings.ReplaceAll(targetServiceName, "-", "_")
-	sanitizedSource := strings.ReplaceAll(string(sourceDBSuffix), "-", "_")
-	consumerGroup := fmt.Sprintf("%s_%s_replicator", sanitizedTarget, sanitizedSource)
+	sanitizedSource := strings.ReplaceAll(string(sourceDBName), "-", "_")
+	consumerGroup := fmt.Sprintf("%s_%s_replicator_local", sanitizedTarget, sanitizedSource)
 
 	replicator := NewCDCReplicator(
 		context.Background(),
@@ -145,13 +234,17 @@ func (rm *ReplicationManager) StartReplication(
 		rm.cfg.KAFKA_BROKERS,
 		&ReplicationConfig{
 			ConsumerGroup: consumerGroup,
-			SourceDBName:  string(sourceDBSuffix),
+			SourceDBName:  string(sourceDBName),
 			TableMappings: tableMappings,
+			ValidClients:  clients,
 		},
 	)
 
 	rm.replicators = append(rm.replicators, replicator)
 
+	// Start the replicator in a background goroutine.
+	// r.Start() is a BLOCKING call - it runs an infinite loop reading from Kafka.
+	// It only returns when the context is cancelled (via StopReplication) or on fatal error.
 	go func(r CDCReplicatorInterface) {
 		slog.Info("Starting replicator service")
 		if err := r.Start(); err != nil {
@@ -162,7 +255,10 @@ func (rm *ReplicationManager) StartReplication(
 	return nil
 }
 
-// StopReplication stops all replicators gracefully.
+// StopReplication stops all active replicators gracefully.
+// It cancels the context of each replicator (which stops the Kafka readers),
+// then waits up to 5 seconds for all of them to finish.
+// This should be called during application shutdown (e.g., on SIGINT/SIGTERM).
 func (rm *ReplicationManager) StopReplication() {
 	var wg sync.WaitGroup
 	for _, r := range rm.replicators {
@@ -187,6 +283,12 @@ func (rm *ReplicationManager) StopReplication() {
 	}
 }
 
+// GetClients fetches the list of all tenant client IDs from enterprise-management-service
+// via a Temporal workflow call. This is needed at startup to know which tenants exist,
+// so the replicator can validate that there are tenants to replicate for.
+//
+// If no clients are returned (e.g., enterprise-management-service is not running),
+// replication will be skipped with a warning log.
 func (rm *ReplicationManager) GetClients() []string {
 	wo := client.StartWorkflowOptions{
 		TaskQueue: "enterprise-management-service",

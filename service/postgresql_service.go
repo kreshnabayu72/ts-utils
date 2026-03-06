@@ -1071,7 +1071,21 @@ func shouldShowQuery(level int, schema, query string, args ...any) {
 	}
 }
 
-// validateTableOperation checks if the query corresponds to a CUD operation on a replicated table
+// validateTableOperation acts as a safeguard to prevent downstream services from
+// modifying replicated data.
+//
+// In an event-driven replication architecture, data should only be modified at
+// the source of truth (e.g., IAM service for users). Consumer services (e.g.,
+// hardware-tagging) should treat replicated tables as READ-ONLY to avoid data
+// inconsistency and split-brain scenarios.
+//
+// This method extracts the table name from INSERT/UPDATE/DELETE queries and
+// checks if it exists in the ReplicatedTables registry for the current service.
+// If it does, an error is returned before the query even reaches the database.
+//
+// Exception: The CDCReplicator itself does not trigger this error because it
+// uses raw pgx connections (`r.pool.Begin()`) instead of this PostgreSQLService
+// wrapper for its UPSERT/DELETE operations.
 func (s *PostgreSQLService) validateTableOperation(query string) error {
 	serviceName := os.Getenv("SERVICE_NAME")
 	if serviceName == "" {
