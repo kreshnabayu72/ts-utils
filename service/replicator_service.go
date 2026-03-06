@@ -61,6 +61,10 @@ type ReplicationConfig struct {
 	TableMappings map[string]TargetTableMapping // Maps source table name (e.g., "users") -> how to replicate it
 	ConsumerGroup string                        // Kafka consumer group ID for offset tracking
 	ValidClients  []string                      // List of valid clients for this table.
+
+	// TODO: uncomment if in the future need replication from all tenant schemas to 1 "public" schema.
+	// Search global: "enable target public"
+	// TargetPublic bool // Whether the table should be replicated to the public schema
 }
 
 // TargetTableMapping describes how to replicate a single table.
@@ -336,15 +340,27 @@ func (r *CDCReplicator) processMessage(topic string, value []byte) error {
 
 	var targetSchema string
 	switch {
-	case isValidClients(tenantIdSource): // Scenario 1 (Tenant to Tenant)
+	case isValidClients(tenantIdSource): // Cover both scenario 1 & 3
+		// TODO: uncomment if in the future need replication from all tenant schemas to 1 "public" schema.
+		// Search global: "enable target public"
+		// if r.replicationConfig.TargetPublic {
+		// 	// Scenario 3 (Tenant to Non-Tenant)
+		// 	targetSchema = "public"
+		// } else {
+		// Scenario 1 (Tenant to Tenant)
 		targetSchema = tenantIdSource
-	case !isValidClients(tenantIdSource) && tenantIdSource == "public": // Schema for scenario 2
+		// }
+	case !isValidClients(tenantIdSource) && tenantIdSource == "public": // Cover both scenario 1 & 2
 		data := msg.New
 		if msg.Kind == CDCKindDelete {
 			data = msg.Old
 		}
 
 		clientId, exists := data["client_id"]
+
+		// TODO: uncomment if in the future need replication from all tenant schemas to 1 "public" schema.
+		// Search global: "enable target public"
+		// if !exists || replicationConfig.TargetPublic { // Scenario 1 (Non-tenant to Non-tenant)
 		if !exists { // Scenario 1 (Non-tenant to Non-tenant)
 			targetSchema = "public"
 		} else { // Scenario 2 (Non-tenant to Tenant)
@@ -359,7 +375,7 @@ func (r *CDCReplicator) processMessage(topic string, value []byte) error {
 			"Invalid source format",
 			slog.String("source", msg.Source),
 		)
-		return fmt.Errorf("invalid source format: %s", msg.Source)
+		return nil
 	}
 
 	switch msg.Kind {

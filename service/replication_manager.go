@@ -186,6 +186,10 @@ func (rm *ReplicationManager) StartReplication(
 	targetServiceName string,
 	sourceDBName db.DBName,
 	isTenantDependent bool,
+
+	// TODO: uncomment if in the future need replication from all tenant schemas to 1 "public" schema.
+	// Search global: "enable target public"
+	// isTargetPublic bool,
 ) error {
 	slog.Debug("Entering StartReplication", "target_service", targetServiceName)
 	clients := rm.GetClients()
@@ -237,6 +241,10 @@ func (rm *ReplicationManager) StartReplication(
 			SourceDBName:  string(sourceDBName),
 			TableMappings: tableMappings,
 			ValidClients:  clients,
+
+			// TODO: uncomment if in the future need replication from all tenant schemas to 1 "public" schema.
+			// Search global: "enable target public"
+			// TargetPublic:  isTargetPublic,
 		},
 	)
 
