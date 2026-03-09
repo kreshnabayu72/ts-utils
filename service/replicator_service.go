@@ -105,8 +105,8 @@ type CDCReplicatorInterface interface {
 	getMappedTopics() []string
 	processMessage(topic string, value []byte) error
 	parseTopic(topic string) (source string, err error)
-	upsertRecord(mapping TargetTableMapping, data map[string]any, schemaName string) error
-	deleteRecord(mapping TargetTableMapping, data map[string]any, schemaName string) error
+	upsertRecord(ctx context.Context, mapping TargetTableMapping, data map[string]any, schemaName string) error
+	deleteRecord(ctx context.Context, mapping TargetTableMapping, data map[string]any, schemaName string) error
 }
 
 // CDCReplicator consumes CDC messages from Kafka and replicates them into PostgreSQL.
@@ -141,6 +141,7 @@ type CDCReplicator struct {
 	brokers           string                 // Kafka brokers list (e.g., "redpanda:9092"). Comma-separated for multiple.
 	replicationConfig *ReplicationConfig     // Configuration: which topics to consume, how to map tables
 	configOptions     []config.ConfigOptions // Optional configuration options
+	sem               chan struct{}          // Semaphore to limit concurrent DB operations
 }
 
 // NewCDCReplicator creates a new CDCReplicator instance.
@@ -171,6 +172,7 @@ func NewCDCReplicator(
 		brokers:           brokers,
 		replicationConfig: replicationConfig,
 		configOptions:     configOptions,
+		sem:               make(chan struct{}, 10), // Limit total concurrent replications to 10
 	}
 }
 
@@ -339,57 +341,113 @@ func (r *CDCReplicator) processMessage(topic string, value []byte) error {
 		return slices.Contains(r.replicationConfig.ValidClients, clientId)
 	}
 
-	var targetSchema string
+	var targetSchemas []string
 	switch r.replicationConfig.ReplicationFlow {
 	case ReplicationFlowTenantToTenant:
 		if !isValidClients(tenantIdSource) {
 			return nil
 		}
+		targetSchemas = []string{tenantIdSource}
 
-		targetSchema = tenantIdSource
 	case ReplicationFlowNonTenantToNonTenant:
 		if tenantIdSource != "public" {
 			return nil
 		}
-		targetSchema = "public"
+		targetSchemas = []string{"public"}
+
 	case ReplicationFlowNonTenantToTenant:
 		data := msg.New
 		if msg.Kind == CDCKindDelete {
 			data = msg.Old
 		}
 
-		clientId, exists := data["client_id"]
-
+		clientIdVal, exists := data["client_id"]
 		if !exists {
-			return nil
-		} else {
-			targetSchema = fmt.Sprintf("%v", clientId)
-			if !isValidClients(targetSchema) {
-				slog.Debug("Skipping unmapped client_id", slog.String("client_id", targetSchema))
+			// Rule: No client_id field AND flow from non-tenant (public) -> Broadcast to all tenants
+			if tenantIdSource == "public" {
+				targetSchemas = r.replicationConfig.ValidClients
+			} else {
 				return nil
 			}
+		} else {
+			// Rule: client_id field exists but empty/null -> Skip this row
+			if clientIdVal == nil {
+				slog.Debug("Skipping row: client_id is null")
+				return nil
+			}
+			clientIdStr := fmt.Sprintf("%v", clientIdVal)
+			if clientIdStr == "" {
+				slog.Debug("Skipping row: client_id is empty")
+				return nil
+			}
+
+			// Rule: Valid value -> Route to specific tenant
+			if !isValidClients(clientIdStr) {
+				slog.Debug("Skipping unmapped client_id", slog.String("client_id", clientIdStr))
+				return nil
+			}
+			targetSchemas = []string{clientIdStr}
 		}
+
 	case ReplicationFlowTenantToNonTenant:
 		if !isValidClients(tenantIdSource) {
 			return nil
 		}
+		targetSchemas = []string{"public"}
 
-		targetSchema = "public"
 	default:
-		slog.Error(
-			"Invalid source format",
-			slog.String("source", msg.Source),
-		)
+		slog.Error("Unsupported replication flow", slog.String("flow", string(r.replicationConfig.ReplicationFlow)))
 		return nil
 	}
 
-	switch msg.Kind {
-	case "insert", "update":
-		return r.upsertRecord(tableMap, msg.New, targetSchema)
-	case "delete":
-		return r.deleteRecord(tableMap, msg.Old, targetSchema)
-	default:
-		slog.Debug("Unknown Kind", slog.String("kind", string(msg.Kind)))
+	var wg sync.WaitGroup
+	ctx, cancel := context.WithCancel(r.ctx)
+	defer cancel()
+
+	errCh := make(chan error, len(targetSchemas))
+
+	for _, schema := range targetSchemas {
+		wg.Add(1)
+		go func(s string) {
+			defer wg.Done()
+
+			// Acquire semaphore with context awareness
+			select {
+			case r.sem <- struct{}{}:
+				defer func() { <-r.sem }()
+			case <-ctx.Done():
+				return // Stop before starting if an error occurred elsewhere
+			}
+
+			var execErr error
+			switch msg.Kind {
+			case "insert", "update":
+				execErr = r.upsertRecord(ctx, tableMap, msg.New, s)
+			case "delete":
+				execErr = r.deleteRecord(ctx, tableMap, msg.Old, s)
+			default:
+				slog.Debug("Unknown CDC kind recorded", slog.String("kind", string(msg.Kind)))
+				return
+			}
+
+			if execErr != nil {
+				cancel() // Fail Fast: Cancel all other goroutines immediately
+				select {
+				case errCh <- fmt.Errorf("replication failed for schema %s: %w", s, execErr):
+				default:
+				}
+			}
+		}(schema)
+	}
+
+	wg.Wait()
+	close(errCh)
+
+	// Collect first error if any occurred
+	for e := range errCh {
+		if e != nil {
+			return e
+		}
 	}
 
 	return nil
@@ -423,6 +481,7 @@ func (r *CDCReplicator) parseTopic(topic string) (source string, err error) {
 //   - data: The row data from the CDC message (CDCMessage.New)
 //   - schemaName: The target schema name (e.g., "qtera" or "public")
 func (r *CDCReplicator) upsertRecord(
+	ctx context.Context,
 	mapping TargetTableMapping,
 	data map[string]any,
 	schemaName string,
@@ -508,23 +567,23 @@ func (r *CDCReplicator) upsertRecord(
 	// SET LOCAL search_path only affects the current transaction, so it's safe
 	// for concurrent use - other queries on the same connection pool are not affected.
 	slog.Debug("Pool: ", slog.Any("pool", r.pool))
-	tx, err := r.pool.Begin(r.ctx)
+	tx, err := r.pool.Begin(ctx)
 	if err != nil {
 		return fmt.Errorf("begin transaction failed: %w", err)
 	}
-	defer tx.Rollback(r.ctx)
+	defer tx.Rollback(ctx)
 
 	// Set search_path to the tenant schema.
 	// Since tenantID comes from the CDC source field (not user input), SQL injection isn't a concern here
-	_, err = tx.Exec(r.ctx, fmt.Sprintf("SET LOCAL search_path = %s", schemaName))
+	_, err = tx.Exec(ctx, fmt.Sprintf("SET LOCAL search_path = %s", schemaName))
 	if err != nil {
 		return fmt.Errorf("set session search path failed: %w", err)
 	}
-	_, err = tx.Exec(r.ctx, query, vals...)
+	_, err = tx.Exec(ctx, query, vals...)
 	if err != nil {
 		return fmt.Errorf("upsert failed: %w", err)
 	}
-	tx.Commit(r.ctx)
+	tx.Commit(ctx)
 
 	slog.Debug(
 		"Upserted record into table:",
@@ -545,6 +604,7 @@ func (r *CDCReplicator) upsertRecord(
 //   - data: The old row data from the CDC message (CDCMessage.Old)
 //   - schemaName: The target schema name (e.g., "qtera" or "public")
 func (r *CDCReplicator) deleteRecord(
+	ctx context.Context,
 	mapping TargetTableMapping,
 	data map[string]any,
 	schemaName string,
@@ -557,22 +617,22 @@ func (r *CDCReplicator) deleteRecord(
 	}
 
 	query := fmt.Sprintf("DELETE FROM %s WHERE %s = $1", mapping.TargetTableName, primaryKey)
-	tx, err := r.pool.Begin(r.ctx)
+	tx, err := r.pool.Begin(ctx)
 	if err != nil {
 		return fmt.Errorf("begin transaction failed: %w", err)
 	}
-	defer tx.Rollback(r.ctx)
+	defer tx.Rollback(ctx)
 
 	// Since tenantID comes from the CDC source field (not user input), SQL injection isn't a concern here
-	_, err = tx.Exec(r.ctx, fmt.Sprintf("SET LOCAL search_path = %s", schemaName))
+	_, err = tx.Exec(ctx, fmt.Sprintf("SET LOCAL search_path = %s", schemaName))
 	if err != nil {
 		return fmt.Errorf("set session search path failed: %w", err)
 	}
-	_, err = tx.Exec(r.ctx, query, pkValue)
+	_, err = tx.Exec(ctx, query, pkValue)
 	if err != nil {
 		return fmt.Errorf("delete failed: %w", err)
 	}
-	tx.Commit(r.ctx)
+	tx.Commit(ctx)
 
 	slog.Debug(
 		"Deleted record from table:",
