@@ -45,8 +45,8 @@ const (
 //   - New:  The new row data (present for insert and update)
 //   - Old:  The old row data (present for delete; contains the row before deletion)
 //   - Source: The schema-qualified table name in the source database (e.g., "qtera.users")
-//     The schema name ("qtera") tells us which tenant this data belongs to.
-//     If the schema is "public", the data is non-tenant-specific.
+//     The source schema part ("qtera" or "public") is used in combination with ReplicationFlow
+//     to determine the actual target schema.
 type CDCMessage struct {
 	Kind   CDCKind        `json:"kind"`
 	New    map[string]any `json:"new,omitempty"`
@@ -57,14 +57,11 @@ type CDCMessage struct {
 // ReplicationConfig holds configuration for a single CDC replication instance.
 // One CDCReplicator gets one ReplicationConfig.
 type ReplicationConfig struct {
-	SourceDBName  string                        // Source database name, used to build Kafka topic names (e.g., "tagsamurai_iam")
-	TableMappings map[string]TargetTableMapping // Maps source table name (e.g., "users") -> how to replicate it
-	ConsumerGroup string                        // Kafka consumer group ID for offset tracking
-	ValidClients  []string                      // List of valid clients for this table.
-
-	// TODO: uncomment if in the future need replication from all tenant schemas to 1 "public" schema.
-	// Search global: "enable target public"
-	// TargetPublic bool // Whether the table should be replicated to the public schema
+	SourceDBName    string                        // Source database name, used to build Kafka topic names (e.g., "tagsamurai_iam")
+	TableMappings   map[string]TargetTableMapping // Maps source table name (e.g., "users") -> how to replicate it
+	ConsumerGroup   string                        // Kafka consumer group ID for offset tracking
+	ValidClients    []string                      // List of valid clients for this table.
+	ReplicationFlow ReplicationFlow
 }
 
 // TargetTableMapping describes how to replicate a single table.
@@ -108,8 +105,8 @@ type CDCReplicatorInterface interface {
 	getMappedTopics() []string
 	processMessage(topic string, value []byte) error
 	parseTopic(topic string) (source string, err error)
-	upsertRecord(mapping TargetTableMapping, data map[string]any, tenantID string) error
-	deleteRecord(mapping TargetTableMapping, data map[string]any, tenantID string) error
+	upsertRecord(mapping TargetTableMapping, data map[string]any, schemaName string) error
+	deleteRecord(mapping TargetTableMapping, data map[string]any, schemaName string) error
 }
 
 // CDCReplicator consumes CDC messages from Kafka and replicates them into PostgreSQL.
@@ -123,14 +120,20 @@ type CDCReplicatorInterface interface {
 //  2. When a row is inserted/updated/deleted, PeerDB publishes a CDCMessage to a Kafka topic
 //  3. Topic naming: "{sourceDBName}.{tableName}" (e.g., "tagsamurai_iam.users")
 //  4. CDCReplicator subscribes to these topics via Kafka consumer groups
-//  5. For each message, it extracts the tenant schema from CDCMessage.Source
-//     (e.g., "qtera.users" -> schema is "qtera")
-//  6. It then runs SET LOCAL search_path = {schema} inside a transaction
-//  7. Finally, it executes an UPSERT or DELETE into the target database
+//  5. For each message, it extracts the source schema from CDCMessage.Source
+//     (e.g., "qtera.users" -> schema is "qtera", "public.users" -> schema is "public")
+//  6. Based on the configured ReplicationFlow, it determines the correct target schema.
+//  7. It then runs SET LOCAL search_path = {target_schema} inside a transaction
+//  8. Finally, it executes an UPSERT or DELETE into the target database
 //
 // Schema-aware routing (tenant isolation):
-//   - Tenant-dependent data: source field is like "qtera.users" -> writes to schema "qtera"
-//   - Non-tenant data: source field is like "public.device_names" -> writes to schema "public"
+//
+//	The replicator handles data routing based on the param ReplicationFlow:
+//	- ReplicationFlowTenantToTenant: Tenant to Tenant (e.g., source "qtera.users" -> writes to target schema "qtera").
+//	- ReplicationFlowNonTenantToNonTenant: Non-tenant to Non-tenant (e.g., source "public.clients" -> writes to target schema "public").
+//	- ReplicationFlowNonTenantToTenant: Non-tenant to Tenant (e.g., source "public.handheld_stocks" with payload `client_id="qtera"` -> writes to target schema "qtera").
+//	  If payload client_id is present but empty, it'll be skipped.
+//	- ReplicationFlowTenantToNonTenant: Tenant to Non-tenant (e.g., currently not in use).
 type CDCReplicator struct {
 	ctx               context.Context        // Context for managing lifecycle; cancelled on Stop()
 	cancel            context.CancelFunc     // Cancel function to stop the replicator
@@ -291,11 +294,14 @@ func (r *CDCReplicator) getMappedTopics() []string {
 //     Example: topic "tagsamurai_iam.users" -> table "users"
 //  2. Look up the TargetTableMapping for this table
 //  3. Parse the JSON message into a CDCMessage struct
-//  4. Extract the schema name from CDCMessage.Source
-//     Example: source "qtera.users" -> schema "qtera" (tenant-specific)
-//     Example: source "public.device_names" -> schema "" (public, non-tenant)
-//  5. Route to upsertRecord (for insert/update) or deleteRecord (for delete)
-//     with the extracted schema name, so data is written to the correct tenant schema
+//  4. Extract the source schema from CDCMessage.Source
+//     Example: source "qtera.users" -> schema "qtera"
+//     Example: source "public.device_names" -> schema "public"
+//  5. Determine the actual target schema using the configured ReplicationFlow.
+//     For example, ReplicationFlowNonTenantToTenant extracts a client_id from the record
+//     to route to a specific schema instead of using the source schema.
+//  6. Route to upsertRecord (for insert/update) or deleteRecord (for delete)
+//     with the target schema, so data is written to the correct location.
 func (r *CDCReplicator) processMessage(topic string, value []byte) error {
 	// Parse topic to get source table name
 	source, err := r.parseTopic(topic)
@@ -316,8 +322,8 @@ func (r *CDCReplicator) processMessage(topic string, value []byte) error {
 
 	// Extract schema name from the CDC message source field.
 	// PeerDB sets source to "{schema}.{table}" (e.g., "qtera.users" or "public.device_names").
-	// We use the schema name to set search_path before executing queries,
-	// so data goes into the correct tenant-specific schema in the target database.
+	// We use the source schema name with the ReplicationFlow to determine
+	// the actual target schema and set search_path before executing queries.
 	splitSource := strings.Split(msg.Source, ".")
 	var tenantIdSource string
 	if len(splitSource) == 2 && splitSource[0] != "" {
@@ -329,28 +335,24 @@ func (r *CDCReplicator) processMessage(topic string, value []byte) error {
 
 	slog.Debug("Processing CDC message for table:", slog.String("table", source), slog.Any("message", msg))
 
-	// Scenario is either:
-	// 1. Tenant to tenant (must same tenant) or Non-tenant(public) to Non-tenant(public)
-	// 2. Non-tenant to Tenant (schema public to any valid tenant)
-	// 3. Tenant to Non-tenant (hypothetical based on assumption, not implemented yet)
-
 	isValidClients := func(clientId string) bool {
 		return slices.Contains(r.replicationConfig.ValidClients, clientId)
 	}
 
 	var targetSchema string
-	switch {
-	case isValidClients(tenantIdSource): // Cover both scenario 1 & 3
-		// TODO: uncomment if in the future need replication from all tenant schemas to 1 "public" schema.
-		// Search global: "enable target public"
-		// if r.replicationConfig.TargetPublic {
-		// 	// Scenario 3 (Tenant to Non-Tenant)
-		// 	targetSchema = "public"
-		// } else {
-		// Scenario 1 (Tenant to Tenant)
+	switch r.replicationConfig.ReplicationFlow {
+	case ReplicationFlowTenantToTenant:
+		if !isValidClients(tenantIdSource) {
+			return nil
+		}
+
 		targetSchema = tenantIdSource
-		// }
-	case !isValidClients(tenantIdSource) && tenantIdSource == "public": // Cover both scenario 1 & 2
+	case ReplicationFlowNonTenantToNonTenant:
+		if tenantIdSource != "public" {
+			return nil
+		}
+		targetSchema = "public"
+	case ReplicationFlowNonTenantToTenant:
 		data := msg.New
 		if msg.Kind == CDCKindDelete {
 			data = msg.Old
@@ -358,18 +360,21 @@ func (r *CDCReplicator) processMessage(topic string, value []byte) error {
 
 		clientId, exists := data["client_id"]
 
-		// TODO: uncomment if in the future need replication from all tenant schemas to 1 "public" schema.
-		// Search global: "enable target public"
-		// if !exists || replicationConfig.TargetPublic { // Scenario 1 (Non-tenant to Non-tenant)
-		if !exists { // Scenario 1 (Non-tenant to Non-tenant)
-			targetSchema = "public"
-		} else { // Scenario 2 (Non-tenant to Tenant)
+		if !exists {
+			return nil
+		} else {
 			targetSchema = fmt.Sprintf("%v", clientId)
 			if !isValidClients(targetSchema) {
 				slog.Debug("Skipping unmapped client_id", slog.String("client_id", targetSchema))
 				return nil
 			}
 		}
+	case ReplicationFlowTenantToNonTenant:
+		if !isValidClients(tenantIdSource) {
+			return nil
+		}
+
+		targetSchema = "public"
 	default:
 		slog.Error(
 			"Invalid source format",
@@ -410,21 +415,13 @@ func (r *CDCReplicator) parseTopic(topic string) (source string, err error) {
 //
 // This method:
 //  1. Extracts only the columns defined in the TargetTableMapping from the CDC data
-//  2. Filters out records that don't belong to the current tenant (via client_id check)
-//  3. Builds an UPSERT query: INSERT ... ON CONFLICT (pk) DO UPDATE SET ...
-//  4. Executes within a transaction with SET LOCAL search_path for tenant isolation
+//  2. Builds an UPSERT query: INSERT ... ON CONFLICT (pk) DO UPDATE SET ...
+//  3. Executes within a transaction with SET LOCAL search_path for schema isolation
 //
 // Parameters:
 //   - mapping: Defines which columns to extract and the target table name
 //   - data: The row data from the CDC message (CDCMessage.New)
-//   - tenantID: The tenant schema name (e.g., "qtera"). Empty string means public schema.
-//
-// Tenant filtering (client_id check):
-//
-//	For non-tenant-dependent sources (e.g., hardware_tagging public schema), a single CDC topic
-//	may contain rows from ALL tenants. The client_id field is used to filter:
-//	- If client_id exists in data and doesn't match tenantID -> skip (not our tenant)
-//	- If client_id is missing -> replicate to all tenants (shared data like device_names)
+//   - schemaName: The target schema name (e.g., "qtera" or "public")
 func (r *CDCReplicator) upsertRecord(
 	mapping TargetTableMapping,
 	data map[string]any,
@@ -540,21 +537,19 @@ func (r *CDCReplicator) upsertRecord(
 // deleteRecord deletes a record from the target database based on the primary key.
 //
 // Similar to upsertRecord, this method:
-//  1. Filters by client_id for non-tenant-dependent sources
-//  2. Runs within a transaction with SET LOCAL search_path for tenant isolation
-//  3. Executes DELETE FROM {table} WHERE {pk} = $1
+//  1. Runs within a transaction with SET LOCAL search_path for schema isolation
+//  2. Executes DELETE FROM {table} WHERE {pk} = $1
 //
 // Parameters:
 //   - mapping: Defines the target table and primary key
 //   - data: The old row data from the CDC message (CDCMessage.Old)
-//   - tenantID: The tenant schema name. Empty string means public schema.
+//   - schemaName: The target schema name (e.g., "qtera" or "public")
 func (r *CDCReplicator) deleteRecord(
 	mapping TargetTableMapping,
 	data map[string]any,
 	schemaName string,
 ) error {
 	primaryKey := mapping.primaryKeyOrDefault()
-	// Tenant filtering: skip records that belong to a different tenant
 
 	pkValue, ok := data[primaryKey]
 	if !ok {

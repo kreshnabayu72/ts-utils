@@ -37,37 +37,37 @@ type ReplicatedTable interface {
 // ReplicatedTables is the central registry that declares which tables each service
 // needs to replicate (consume) from other services (publishers).
 //
-// Structure:  map[ConsumerServiceName] -> map["isTenantDependent.sourceDBName"] -> []ReplicatedTable
+// Structure:  map[ConsumerServiceName] -> map["ReplicationFlow.sourceDBName"] -> []ReplicatedTable
 //
-// The map key format "true.tagsamurai_iam" or "false.tagsamurai_hardware_tagging" encodes:
-//   - "true"  = tenant-dependent: data lives in tenant-specific schemas (e.g., "qtera.users")
-//   - "false" = non-tenant: data lives in the "public" schema of the source database
+// The map key format "Tenant to Tenant.tagsamurai_iam" or "Non-Tenant to Tenant.tagsamurai_hardware_tagging" encodes:
+//   - ReplicationFlow: The configured data routing flow for this replication
+//   - sourceDBName: The source database name (e.g., "tagsamurai_iam")
 //
 // Example: hardware-tagging-service needs to replicate:
-//   - From itself (non-tenant, public schema): device_names, handheld_stocks, skus, etc.
-//   - From IAM (tenant-dependent, per-tenant schema): users, fixed_asset_groups, supply_asset_groups
+//   - From itself in schema public (ReplicationFlowNonTenantToTenant): device_names, handheld_stocks, skus, etc.
+//   - From IAM in schema tenant (ReplicationFlowTenantToTenant): users, fixed_asset_groups, supply_asset_groups
 //
 // How to add a new replicated table:
 //  1. Create a struct in the appropriate replica package (e.g., module/iam_service/replica/)
 //  2. Implement the ReplicatedTable interface (GetTableName, GetColumnTypes, GetColumns)
 //  3. Add it to the correct consumer -> source entry in this map
-//  4. Ensure the target database has the matching table in tenant schemas (via migrations),
-//     this is done by running the migration in the target database.
+//  4. Ensure the target database has the matching table in the relevant target schemas
+//     (tenant or public) via migrations. This is done by running the migration in the target database.
 var ReplicatedTables = map[string]map[string][]ReplicatedTable{
 	constant.IAM_SERVICE_NAME: { // Listener/Consumer
-		fmt.Sprintf("%v.%s", true, db.HardwareTaggingDBName): { // Publisher
+		fmt.Sprintf("%v.%s", ReplicationFlowTenantToTenant, db.HardwareTaggingDBName): { // Publisher
 			&replica.Rfid{},
 		},
 	},
 	constant.HARDWARE_TAGGING_SERVICE_NAME: { // Listener/Consumer
-		fmt.Sprintf("%v.%s", false, db.HardwareTaggingDBName): { // Publisher
+		fmt.Sprintf("%v.%s", ReplicationFlowNonTenantToTenant, db.HardwareTaggingDBName): { // Publisher
 			&hardware_tagging_replica.DeviceName{},
 			&hardware_tagging_replica.HandheldStock{},
 			&hardware_tagging_replica.Sku{},
 			&hardware_tagging_replica.TabletStock{},
 			&hardware_tagging_replica.SmartFixedStock{},
 		},
-		fmt.Sprintf("%v.%s", true, db.IAMDBName): { // Publisher
+		fmt.Sprintf("%v.%s", ReplicationFlowTenantToTenant, db.IAMDBName): { // Publisher
 			&hardware_tagging_replica.FixedAssetGroup{},
 			&hardware_tagging_replica.SupplyAssetGroup{},
 			&hardware_tagging_replica.User{},
@@ -78,15 +78,15 @@ var ReplicatedTables = map[string]map[string][]ReplicatedTable{
 	constant.ANALYTICS_REPORTING_SERVICE_NAME:   nil,
 	constant.APPROVAL_SERVICE_NAME:              nil,
 	constant.FILE_MANAGER_SERVICE_NAME: { // Listener/Consumer
-		fmt.Sprintf("%v.%s", true, db.MasterAssetRegistryDBName): { // Publisher
+		fmt.Sprintf("%v.%s", ReplicationFlowTenantToTenant, db.MasterAssetRegistryDBName): { // Publisher
 			&file_manager_service.AssetCustomField{},
 			&file_manager_service.Asset{},
 			&file_manager_service.CustomField{},
 		},
-		fmt.Sprintf("%v.%s", true, db.AssetTransactionDBName): { // Publisher
+		fmt.Sprintf("%v.%s", ReplicationFlowTenantToTenant, db.AssetTransactionDBName): { // Publisher
 			&file_manager_service.FixedAssetDisposalTransaction{},
 		},
-		fmt.Sprintf("%v.%s", true, db.IAMDBName): { // Publisher
+		fmt.Sprintf("%v.%s", ReplicationFlowTenantToTenant, db.IAMDBName): { // Publisher
 			&file_manager_service.FixedAssetGroup{},
 			&file_manager_service.User{},
 		},
@@ -115,11 +115,11 @@ var ReplicatedTables = map[string]map[string][]ReplicatedTable{
 //
 //	replicationManager := service.NewReplicationManager(cfgOptions, temporalService, dbProvider.MakePostgreSQLService(db.MyDBName))
 //
-//	// Start consuming CDC events from IAM service (tenant-dependent tables)
-//	replicationManager.StartReplication(constant.MY_SERVICE_NAME, db.IAMDBName, true)
+//	// Start consuming CDC events from IAM service (e.g., ReplicationFlowTenantToTenant)
+//	replicationManager.StartReplication(constant.MY_SERVICE_NAME, db.IAMDBName, service.ReplicationFlowTenantToTenant)
 //
-//	// Start consuming CDC events from own database (non-tenant tables)
-//	replicationManager.StartReplication(constant.MY_SERVICE_NAME, db.MyDBName, false)
+//	// Start consuming CDC events from own database but public to tenant (e.g., ReplicationFlowNonTenantToTenant)
+//	replicationManager.StartReplication(constant.MY_SERVICE_NAME, db.MyDBName, service.ReplicationFlowNonTenantToTenant)
 //
 //	// On shutdown:
 //	replicationManager.StopReplication()
@@ -153,22 +153,31 @@ func NewReplicationManager(
 	}
 }
 
+type ReplicationFlow string
+
+const (
+	ReplicationFlowTenantToTenant       ReplicationFlow = "Tenant to Tenant"
+	ReplicationFlowNonTenantToTenant    ReplicationFlow = "Non-Tenant to Tenant"
+	ReplicationFlowNonTenantToNonTenant ReplicationFlow = "Non-Tenant to Non-Tenant"
+	ReplicationFlowTenantToNonTenant    ReplicationFlow = "Tenant to Non-Tenant"
+)
+
 // StartReplication starts CDC replication for a specific source database.
 //
 // This method does the following:
-//  1. Fetches the list of tenant clients (via Temporal workflow to enterprise-management-service)
-//  2. Looks up which tables need to be replicated using ReplicatedTables registry
-//  3. Creates a CDCReplicator that subscribes to Kafka topics for those tables
-//  4. Starts the replicator in a background goroutine
+//  1. Fetches the list of valid clients (via Temporal workflow to enterprise-management-service).
+//     This list is passed to the CDCReplicator to validate target schemas when evaluating ReplicationFlow rules.
+//  2. Looks up which tables need to be replicated using the ReplicatedTables registry.
+//  3. Creates a CDCReplicator that subscribes to Kafka topics for those tables.
+//  4. Starts the replicator in a background goroutine.
 //
 // Parameters:
 //   - targetServiceName: The current service's name (e.g., constant.HARDWARE_TAGGING_SERVICE_NAME).
 //     Used as the key to look up ReplicatedTables.
 //   - sourceDBName: The source database name (e.g., db.IAMDBName = "tagsamurai_iam").
 //     This determines which Kafka topics to subscribe to (topic = "sourceDBName.tableName").
-//   - isTenantDependent: Whether the source data is in tenant-specific schemas.
-//     true  = source data is in schemas like "qtera", "clientB", etc.
-//     false = source data is in the "public" schema.
+//   - replicationFlow: The configured data routing flow for this replication (e.g., ReplicationFlowTenantToTenant).
+//     This enum dictates both how tenant validation occurs and where data is safely routed.
 //
 // Consumer Group Naming:
 //
@@ -180,16 +189,12 @@ func NewReplicationManager(
 // Call this method once per source database. For example, if hardware-tagging-service
 // needs data from both IAM and its own DB:
 //
-//	replicationManager.StartReplication(constant.HARDWARE_TAGGING_SERVICE_NAME, db.HardwareTaggingDBName, false)
-//	replicationManager.StartReplication(constant.HARDWARE_TAGGING_SERVICE_NAME, db.IAMDBName, true)
+//	replicationManager.StartReplication(constant.HARDWARE_TAGGING_SERVICE_NAME, db.HardwareTaggingDBName, service.ReplicationFlowNonTenantToNonTenant)
+//	replicationManager.StartReplication(constant.HARDWARE_TAGGING_SERVICE_NAME, db.IAMDBName, service.ReplicationFlowTenantToTenant)
 func (rm *ReplicationManager) StartReplication(
 	targetServiceName string,
 	sourceDBName db.DBName,
-	isTenantDependent bool,
-
-	// TODO: uncomment if in the future need replication from all tenant schemas to 1 "public" schema.
-	// Search global: "enable target public"
-	// isTargetPublic bool,
+	replicationFlow ReplicationFlow,
 ) error {
 	slog.Debug("Entering StartReplication", "target_service", targetServiceName)
 	clients := rm.GetClients()
@@ -201,10 +206,10 @@ func (rm *ReplicationManager) StartReplication(
 	}
 
 	// Look up which tables this service needs to consume from the given source.
-	// The key format is "isTenantDependent.sourceDBName" (e.g., "true.tagsamurai_iam")
-	replicatedTables := ReplicatedTables[targetServiceName][fmt.Sprintf("%v.%s", isTenantDependent, sourceDBName)]
+	// The key format is "ReplicationFlow.sourceDBName" (e.g., "Tenant to Tenant.tagsamurai_iam")
+	replicatedTables := ReplicatedTables[targetServiceName][fmt.Sprintf("%v.%s", replicationFlow, sourceDBName)]
 	if len(replicatedTables) == 0 {
-		slog.Warn("No replicated tables found", "service_name", targetServiceName)
+		slog.Warn("No replicated tables found", "service_name", targetServiceName, "flow", replicationFlow)
 		return nil
 	}
 
@@ -217,13 +222,6 @@ func (rm *ReplicationManager) StartReplication(
 			Columns:         table.GetColumns(),
 			TargetTableName: table.GetTableName(),
 			ColumnTypes:     table.GetColumnTypes(),
-
-			// TODO: IDK what to do, FYI, currently in our app,
-			// whether replication flow is coming from tenant-dependent or non-tenant-dependent,
-			// the target table is always tenant-dependent.
-			//
-			// If in the future we need replication that target replication is non-tenant (public),
-			// we might need to change this into a configurable field.
 		}
 	}
 
@@ -237,10 +235,11 @@ func (rm *ReplicationManager) StartReplication(
 		rm.dbSvc,
 		rm.cfg.KAFKA_BROKERS,
 		&ReplicationConfig{
-			ConsumerGroup: consumerGroup,
-			SourceDBName:  string(sourceDBName),
-			TableMappings: tableMappings,
-			ValidClients:  clients,
+			ConsumerGroup:   consumerGroup,
+			SourceDBName:    string(sourceDBName),
+			TableMappings:   tableMappings,
+			ValidClients:    clients,
+			ReplicationFlow: replicationFlow,
 
 			// TODO: uncomment if in the future need replication from all tenant schemas to 1 "public" schema.
 			// Search global: "enable target public"
@@ -291,9 +290,9 @@ func (rm *ReplicationManager) StopReplication() {
 	}
 }
 
-// GetClients fetches the list of all tenant client IDs from enterprise-management-service
-// via a Temporal workflow call. This is needed at startup to know which tenants exist,
-// so the replicator can validate that there are tenants to replicate for.
+// GetClients fetches the list of all clients from enterprise-management-service
+// via a Temporal workflow call. This is needed at startup to know which clients exist,
+// so the replicator can validate destination schemas where required by the ReplicationFlow.
 //
 // If no clients are returned (e.g., enterprise-management-service is not running),
 // replication will be skipped with a warning log.
