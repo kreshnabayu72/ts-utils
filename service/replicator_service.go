@@ -23,6 +23,8 @@ const (
 	CDCKindInsert CDCKind = "insert" // A new row was inserted
 	CDCKindUpdate CDCKind = "update" // An existing row was modified
 	CDCKindDelete CDCKind = "delete" // A row was deleted
+
+	CDCCustomKindMove CDCKind = "move" // A row was moved from one schema to another
 )
 
 // CDCMessage represents a Change Data Capture message produced by PeerDB.
@@ -111,29 +113,39 @@ type CDCReplicatorInterface interface {
 
 // CDCReplicator consumes CDC messages from Kafka and replicates them into PostgreSQL.
 //
-// Data Flow Overview:
+// Simple Data Flow:
 //
-//	[Source DB] -> [PeerDB WAL Capture] -> [Kafka/Redpanda Topic] -> [CDCReplicator] -> [Target DB]
+//	[Database A] -> [PeerDB] -> [Kafka Topic] -> [CDC Replicator] -> [Database B]
 //
-// How it works step by step:
-//  1. PeerDB watches the source database's WAL (Write-Ahead Log) for changes
-//  2. When a row is inserted/updated/deleted, PeerDB publishes a CDCMessage to a Kafka topic
-//  3. Topic naming: "{sourceDBName}.{tableName}" (e.g., "tagsamurai_iam.users")
-//  4. CDCReplicator subscribes to these topics via Kafka consumer groups
-//  5. For each message, it extracts the source schema from CDCMessage.Source
-//     (e.g., "qtera.users" -> schema is "qtera", "public.users" -> schema is "public")
-//  6. Based on the configured ReplicationFlow, it determines the correct target schema.
-//  7. It then runs SET LOCAL search_path = {target_schema} inside a transaction
-//  8. Finally, it executes an UPSERT or DELETE into the target database
+// How it works (The Simple Version):
+//  1. PeerDB watches Database A for any changes (Insert, Update, Delete).
+//  2. PeerDB sends that change as a JSON message to a Kafka topic.
+//  3. CDC Replicator reads the message and looks at "where" it came from.
+//  4. Replicator picks the right folder (schema) in Database B to write to.
+//  5. Replicator runs the change (Upsert or Delete) in Database B.
 //
-// Schema-aware routing (tenant isolation):
+// Smart Routing (Where does the data go?):
 //
-//	The replicator handles data routing based on the param ReplicationFlow:
-//	- ReplicationFlowTenantToTenant: Tenant to Tenant (e.g., source "qtera.users" -> writes to target schema "qtera").
-//	- ReplicationFlowNonTenantToNonTenant: Non-tenant to Non-tenant (e.g., source "public.clients" -> writes to target schema "public").
-//	- ReplicationFlowNonTenantToTenant: Non-tenant to Tenant (e.g., source "public.handheld_stocks" with payload `client_id="qtera"` -> writes to target schema "qtera").
-//	  If payload client_id is present but empty, it'll be skipped.
-//	- ReplicationFlowTenantToNonTenant: Tenant to Non-tenant (e.g., currently not in use).
+//	This replicator is smart. It knows how to send data to the right tenant:
+//
+//	- Tenant to Tenant:
+//	  Data from "qtera.users" goes directly to folder "qtera" in the new DB.
+//
+//	- Global to All Tenants (Broadcast):
+//	  Data like "public.skus" (global items) has no specific owner (has no column/field client_id in data).
+//	  The replicator sends a copy to EVERY active tenant (from r.replicationConfig.ValidClients) automatically.
+//
+//	- Targeted Tenant (by Field):
+//	  Data like "public.stocks" has a "client_id" field in the data.
+//	  The replicator reads that field and sends the data to that specific tenant.
+//
+//	- Moving Tenants (The "Move" Kind):
+//	  If a record changes its "client_id" (e.g., from Apple to Google), the replicator:
+//	  1. Deletes the old record from the "Apple" folder.
+//	  2. Inserts the new record into the "Google" folder.
+//
+//	- Skip Rule:
+//	  If a record is supposed to have a client_id but the field is empty or null, it's ignored.
 type CDCReplicator struct {
 	ctx               context.Context        // Context for managing lifecycle; cancelled on Stop()
 	cancel            context.CancelFunc     // Cancel function to stop the replicator
@@ -289,6 +301,11 @@ func (r *CDCReplicator) getMappedTopics() []string {
 	return topics
 }
 
+type CDCSchemaPair struct {
+	oldSchema string
+	newSchema string
+}
+
 // processMessage handles a single CDC message from Kafka.
 //
 // Flow:
@@ -341,59 +358,97 @@ func (r *CDCReplicator) processMessage(topic string, value []byte) error {
 		return slices.Contains(r.replicationConfig.ValidClients, clientId)
 	}
 
-	var targetSchemas []string
+	var targetSchemas []CDCSchemaPair
 	switch r.replicationConfig.ReplicationFlow {
-	case ReplicationFlowTenantToTenant:
+	case ReplicationFlowTenantToTenant: // Target is same as source (tenant to tenant)
 		if !isValidClients(tenantIdSource) {
 			return nil
 		}
-		targetSchemas = []string{tenantIdSource}
+		// Ensure both oldSchema and newSchema assigned for upsert & delete
+		targetSchemas = []CDCSchemaPair{
+			{
+				oldSchema: tenantIdSource,
+				newSchema: tenantIdSource,
+			},
+		}
 
-	case ReplicationFlowNonTenantToNonTenant:
+	case ReplicationFlowNonTenantToNonTenant: // Source should be "public" since this is `from non-tenant` flow
 		if tenantIdSource != "public" {
 			return nil
 		}
-		targetSchemas = []string{"public"}
+		// Ensure both oldSchema and newSchema assigned for upsert & delete
+		targetSchemas = []CDCSchemaPair{
+			{
+				oldSchema: "public",
+				newSchema: "public",
+			},
+		}
 
 	case ReplicationFlowNonTenantToTenant:
-		data := msg.New
-		if msg.Kind == CDCKindDelete {
-			data = msg.Old
-		}
+		newData := msg.New
+		oldData := msg.Old
 
-		clientIdVal, exists := data["client_id"]
-		if !exists {
-			// Rule: No client_id field AND flow from non-tenant (public) -> Broadcast to all tenants
+		newClientIdVal, newExists := newData["client_id"]
+		oldClientIdVal, oldExists := oldData["client_id"]
+
+		if !newExists && !oldExists {
+			// Rule: No client_id field AND flow from non-tenant (public) -> Broadcast to all tenants (e.g., device_names & skus)
 			if tenantIdSource == "public" {
-				targetSchemas = r.replicationConfig.ValidClients
-			} else {
-				return nil
+				targetSchemas = make([]CDCSchemaPair, len(r.replicationConfig.ValidClients))
+				for i, v := range r.replicationConfig.ValidClients {
+					targetSchemas[i] = CDCSchemaPair{
+						oldSchema: v, // To handle deletion for this Rule (e.g., delete from schema "qtera")
+						newSchema: v, // To handle insertion for this Rule (e.g., insert into schema "qtera")
+					}
+				}
 			}
 		} else {
-			// Rule: client_id field exists but empty/null -> Skip this row
-			if clientIdVal == nil {
-				slog.Debug("Skipping row: client_id is null")
-				return nil
-			}
-			clientIdStr := fmt.Sprintf("%v", clientIdVal)
-			if clientIdStr == "" {
-				slog.Debug("Skipping row: client_id is empty")
-				return nil
-			}
+			// Rule: client_id field exists but empty/null -> Skip this row (skipped by if else conditioning)
+			newClientIdStr := fmt.Sprintf("%v", newClientIdVal)
+			oldClientIdStr := fmt.Sprintf("%v", oldClientIdVal)
 
-			// Rule: Valid value -> Route to specific tenant
-			if !isValidClients(clientIdStr) {
-				slog.Debug("Skipping unmapped client_id", slog.String("client_id", clientIdStr))
-				return nil
+			if msg.Kind == CDCKindDelete { // Pure Deletion, no need newSchema
+				if oldExists && !isValidClients(oldClientIdStr) {
+					return nil
+				}
+				targetSchemas = []CDCSchemaPair{
+					{
+						oldSchema: oldClientIdStr, // e.g., delete from schema "qtera"
+						newSchema: "",
+					},
+				}
+			} else if newExists && oldExists && newClientIdStr != oldClientIdStr { // Move, both field in new & old exist but value differ
+				if !isValidClients(newClientIdStr) || !isValidClients(oldClientIdStr) {
+					return nil
+				}
+				targetSchemas = []CDCSchemaPair{
+					{
+						oldSchema: oldClientIdStr, // e.g., delete from schema "qtera"
+						newSchema: newClientIdStr, // e.g., insert into schema "0001"
+					},
+				}
+				msg.Kind = CDCCustomKindMove
+			} else if newExists && isValidClients(newClientIdStr) { // Pure Insertion, no need oldSchema
+				targetSchemas = []CDCSchemaPair{
+					{
+						oldSchema: "",
+						newSchema: newClientIdStr, // e.g., insert into schema "0001"
+					},
+				}
 			}
-			targetSchemas = []string{clientIdStr}
 		}
 
-	case ReplicationFlowTenantToNonTenant:
+	case ReplicationFlowTenantToNonTenant: // Target is "public"
 		if !isValidClients(tenantIdSource) {
 			return nil
 		}
-		targetSchemas = []string{"public"}
+		// Ensure both oldSchema and newSchema assigned for upsert & delete
+		targetSchemas = []CDCSchemaPair{
+			{
+				newSchema: "public",
+				oldSchema: "public",
+			},
+		}
 
 	default:
 		slog.Error("Unsupported replication flow", slog.String("flow", string(r.replicationConfig.ReplicationFlow)))
@@ -406,9 +461,9 @@ func (r *CDCReplicator) processMessage(topic string, value []byte) error {
 
 	errCh := make(chan error, len(targetSchemas))
 
-	for _, schema := range targetSchemas {
+	for _, schemaPair := range targetSchemas {
 		wg.Add(1)
-		go func(s string) {
+		go func(sp CDCSchemaPair) {
 			defer wg.Done()
 
 			// Acquire semaphore with context awareness
@@ -421,10 +476,22 @@ func (r *CDCReplicator) processMessage(topic string, value []byte) error {
 
 			var execErr error
 			switch msg.Kind {
-			case "insert", "update":
-				execErr = r.upsertRecord(ctx, tableMap, msg.New, s)
-			case "delete":
-				execErr = r.deleteRecord(ctx, tableMap, msg.Old, s)
+			case CDCKindInsert, CDCKindUpdate:
+				if sp.newSchema != "" { // Just defensive programming, pretty sure newSchema assignment already handled above
+					execErr = r.upsertRecord(ctx, tableMap, msg.New, sp.newSchema)
+				}
+			case CDCKindDelete:
+				if sp.oldSchema != "" { // Just defensive programming, pretty sure oldSchema assignment already handled above
+					execErr = r.deleteRecord(ctx, tableMap, msg.Old, sp.oldSchema)
+				}
+			case CDCCustomKindMove:
+				// Validation empty string is just defensive programming, pretty sure both newSchema and oldSchema assignment already handled above
+				if sp.oldSchema != "" {
+					execErr = r.deleteRecord(ctx, tableMap, msg.Old, sp.oldSchema)
+				}
+				if execErr == nil && sp.newSchema != "" {
+					execErr = r.upsertRecord(ctx, tableMap, msg.New, sp.newSchema)
+				}
 			default:
 				slog.Debug("Unknown CDC kind recorded", slog.String("kind", string(msg.Kind)))
 				return
@@ -433,11 +500,11 @@ func (r *CDCReplicator) processMessage(topic string, value []byte) error {
 			if execErr != nil {
 				cancel() // Fail Fast: Cancel all other goroutines immediately
 				select {
-				case errCh <- fmt.Errorf("replication failed for schema %s: %w", s, execErr):
+				case errCh <- fmt.Errorf("replication failed for old schema %s & new schema %s: %w", sp.oldSchema, sp.newSchema, execErr):
 				default:
 				}
 			}
-		}(schema)
+		}(schemaPair)
 	}
 
 	wg.Wait()
