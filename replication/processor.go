@@ -45,6 +45,9 @@ func (r *CDCReplicator) processMessage(topic string, value []byte) error {
 	}
 
 	// Extract schema name from the CDC message source field.
+	// PeerDB sets source to "{schema}.{table}" (e.g., "qtera.users" or "public.device_names").
+	// We use the source schema name with the ReplicationFlow to determine
+	// the actual target schema and set search_path before executing queries.
 	splitSource := strings.Split(msg.Source, ".")
 	var tenantIdSource string
 	if len(splitSource) == 2 && splitSource[0] != "" {
@@ -62,16 +65,18 @@ func (r *CDCReplicator) processMessage(topic string, value []byte) error {
 
 	var targetSchemas []CDCSchemaPair
 	switch r.replicationConfig.ReplicationFlow {
-	case api.ReplicationFlowTenantToTenant:
+	case api.ReplicationFlowTenantToTenant: // Target is same as source (tenant to tenant)
 		if !isValidClients(tenantIdSource) {
 			return nil
 		}
+		// Ensure both oldSchema and newSchema assigned for upsert & delete
 		targetSchemas = []CDCSchemaPair{{oldSchema: tenantIdSource, newSchema: tenantIdSource}}
 
-	case api.ReplicationFlowNonTenantToNonTenant:
+	case api.ReplicationFlowNonTenantToNonTenant: // Source should be "public" since this is `from non-tenant` flow
 		if tenantIdSource != "public" {
 			return nil
 		}
+		// Ensure both oldSchema and newSchema assigned for upsert & delete
 		targetSchemas = []CDCSchemaPair{{oldSchema: "public", newSchema: "public"}}
 
 	case api.ReplicationFlowNonTenantToTenant:
@@ -82,13 +87,18 @@ func (r *CDCReplicator) processMessage(topic string, value []byte) error {
 		oldClientIdVal, oldExists := oldData["client_id"]
 
 		if !newExists && !oldExists {
+			// Rule: No client_id field AND flow from non-tenant (public) -> Broadcast to all tenants (e.g., device_names & skus)
 			if tenantIdSource == "public" {
 				targetSchemas = make([]CDCSchemaPair, len(r.replicationConfig.ValidClients))
 				for i, v := range r.replicationConfig.ValidClients {
-					targetSchemas[i] = CDCSchemaPair{oldSchema: v, newSchema: v}
+					targetSchemas[i] = CDCSchemaPair{
+						oldSchema: v, // To handle deletion for this Rule (e.g., delete from schema "qtera")
+						newSchema: v, // To handle insertion for this Rule (e.g., insert into schema "qtera")
+					}
 				}
 			}
 		} else {
+			// Rule: client_id field exists but empty/null -> Skip this row (skipped by if else conditioning)
 			var newClientIdStr, oldClientIdStr string
 			if newClientIdVal != nil {
 				newClientIdStr = fmt.Sprintf("%v", newClientIdVal)
@@ -97,24 +107,38 @@ func (r *CDCReplicator) processMessage(topic string, value []byte) error {
 				oldClientIdStr = fmt.Sprintf("%v", oldClientIdVal)
 			}
 
+			// Pure Deletion, no need newSchema.
+			// Update with no client_id, it means the record is deleted from target schema.
 			if msg.Kind == CDCKindDelete || (msg.Kind == CDCKindUpdate && !isValidClients(newClientIdStr)) {
 				if oldExists && !isValidClients(oldClientIdStr) {
 					return nil
 				}
-				targetSchemas = []CDCSchemaPair{{oldSchema: oldClientIdStr, newSchema: ""}}
+				targetSchemas = []CDCSchemaPair{{
+					oldSchema: oldClientIdStr, // e.g., delete from schema "qtera"
+					newSchema: "",
+				}}
 				msg.Kind = CDCKindDelete
 			} else if newExists && oldExists && isValidClients(oldClientIdStr) && isValidClients(newClientIdStr) && newClientIdStr != oldClientIdStr {
-				targetSchemas = []CDCSchemaPair{{oldSchema: oldClientIdStr, newSchema: newClientIdStr}}
+				// Move, both field in new & old exist but value differ
+				targetSchemas = []CDCSchemaPair{{
+					oldSchema: oldClientIdStr, // e.g., delete from schema "0001"
+					newSchema: newClientIdStr, // e.g., insert into schema "0002"
+				}}
 				msg.Kind = CDCCustomKindMove
 			} else if newExists && isValidClients(newClientIdStr) {
-				targetSchemas = []CDCSchemaPair{{oldSchema: "", newSchema: newClientIdStr}}
+				// Pure Insertion, no need oldSchema
+				targetSchemas = []CDCSchemaPair{{
+					oldSchema: "",
+					newSchema: newClientIdStr, // e.g., insert into schema "qtera"
+				}}
 			}
 		}
 
-	case api.ReplicationFlowTenantToNonTenant:
+	case api.ReplicationFlowTenantToNonTenant: // Target is "public"
 		if !isValidClients(tenantIdSource) {
 			return nil
 		}
+		// Ensure both oldSchema and newSchema assigned for upsert & delete
 		targetSchemas = []CDCSchemaPair{{newSchema: "public", oldSchema: "public"}}
 
 	default:

@@ -100,6 +100,7 @@ func (r *CDCReplicator) Start() error {
 	topics := r.getMappedTopics()
 	slog.Debug("Starting CDC Replicator", slog.Any("topics", topics))
 
+	// Use WaitGroup to manage multiple topic readers
 	var wg sync.WaitGroup
 	for _, topic := range topics {
 		wg.Add(1)
@@ -109,9 +110,11 @@ func (r *CDCReplicator) Start() error {
 				Brokers:        strings.Split(r.brokers, ","),
 				GroupID:        r.replicationConfig.ConsumerGroup,
 				Topic:          topic,
-				CommitInterval: 0,
+				CommitInterval: 0, // Disable auto-commit; we commit manually after successful processing
 				MinBytes:       1,
 				MaxBytes:       10e6,
+
+				// Custom logger, integrate with slog
 				Logger: kafka.LoggerFunc(
 					func(msg string, args ...any) {
 						if len(args) > 0 {
@@ -121,9 +124,10 @@ func (r *CDCReplicator) Start() error {
 					},
 				),
 			})
-			defer reader.Close()
+			defer reader.Close() // Ensure reader is closed when goroutine exits
 
 			for {
+				// Fetch message from Kafka (blocks until a message is available or context is cancelled)
 				m, err := reader.FetchMessage(r.ctx)
 				if err != nil {
 					if errors.Is(err, context.Canceled) {
@@ -143,6 +147,7 @@ func (r *CDCReplicator) Start() error {
 					continue
 				}
 
+				// Topic & Value extraction
 				if processErr := r.processMessage(m.Topic, m.Value); processErr != nil {
 					slog.Debug(
 						"Error processing message. Will NOT commit offset.",
@@ -150,6 +155,7 @@ func (r *CDCReplicator) Start() error {
 						slog.Any("error", processErr),
 					)
 				} else {
+					// Commit offset only if processing is successful
 					if commitErr := reader.CommitMessages(r.ctx, m); commitErr != nil {
 						slog.Debug("[%s] Error committing offset: %v", m.Topic, commitErr)
 					}
@@ -163,6 +169,8 @@ func (r *CDCReplicator) Start() error {
 }
 
 // Stop gracefully stops the CDC replication process.
+// It cancels the context, which causes all Kafka readers (in Start()) to exit
+// their FetchMessage loop with a context.Canceled error.
 func (r *CDCReplicator) Stop() {
 	slog.Info(
 		"Stopping CDC Replicator for service",
@@ -174,6 +182,8 @@ func (r *CDCReplicator) Stop() {
 }
 
 // getMappedTopics returns the list of Kafka topic names this replicator should subscribe to.
+// Topic format: "{sourceDBName}.{tableName}" (e.g., "tagsamurai_iam.users").
+// This matches the topic naming convention used by PeerDB when publishing CDC events.
 func (r *CDCReplicator) getMappedTopics() []string {
 	slog.Debug("Getting all topics for service:", slog.String("service_name", r.replicationConfig.SourceDBName))
 	topics := []string{}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"slices"
 	"strings"
 	"sync"
 )
@@ -26,20 +27,21 @@ func (r *CDCReplicator) executeReplication(targetSchemas []CDCSchemaPair, tableM
 			case r.sem <- struct{}{}:
 				defer func() { <-r.sem }()
 			case <-ctx.Done():
-				return
+				return // Stop before starting if an error occurred elsewhere
 			}
 
 			var execErr error
 			switch msg.Kind {
 			case CDCKindInsert, CDCKindUpdate:
-				if sp.newSchema != "" {
+				if sp.newSchema != "" { // Just defensive programming, pretty sure newSchema assignment already handled above
 					execErr = r.upsertRecord(ctx, tableMap, msg.New, sp.newSchema)
 				}
 			case CDCKindDelete:
-				if sp.oldSchema != "" {
+				if sp.oldSchema != "" { // Just defensive programming, pretty sure oldSchema assignment already handled above
 					execErr = r.deleteRecord(ctx, tableMap, msg.Old, sp.oldSchema)
 				}
 			case CDCCustomKindMove:
+				// Validation empty string is just defensive programming, pretty sure both newSchema and oldSchema assignment already handled above
 				if sp.oldSchema != "" {
 					execErr = r.deleteRecord(ctx, tableMap, msg.Old, sp.oldSchema)
 				}
@@ -52,7 +54,7 @@ func (r *CDCReplicator) executeReplication(targetSchemas []CDCSchemaPair, tableM
 			}
 
 			if execErr != nil {
-				cancel()
+				cancel() // Fail Fast: Cancel all other goroutines immediately
 				select {
 				case errCh <- fmt.Errorf("replication failed for old schema %s & new schema %s: %w", sp.oldSchema, sp.newSchema, execErr):
 				default:
@@ -64,6 +66,7 @@ func (r *CDCReplicator) executeReplication(targetSchemas []CDCSchemaPair, tableM
 	wg.Wait()
 	close(errCh)
 
+	// Collect first error if any occurred
 	for e := range errCh {
 		if e != nil {
 			return e
@@ -92,6 +95,7 @@ func (r *CDCReplicator) upsertRecord(
 ) error {
 	var row map[string]any
 
+	// Apply transformation if provided, otherwise extract only mapped columns
 	if mapping.Transform != nil {
 		row = mapping.Transform(data)
 	} else {
@@ -103,6 +107,7 @@ func (r *CDCReplicator) upsertRecord(
 		}
 	}
 
+	// Ensure primary key is always included in the row data
 	primaryKey := mapping.primaryKeyOrDefault()
 	if _, ok := row[primaryKey]; !ok {
 		if val, ok2 := data[primaryKey]; ok2 {
@@ -110,6 +115,7 @@ func (r *CDCReplicator) upsertRecord(
 		}
 	}
 
+	// Build the UPSERT query dynamically from the mapped columns
 	cols := []string{}
 	vals := []any{}
 	placeholders := []string{}
@@ -128,6 +134,7 @@ func (r *CDCReplicator) upsertRecord(
 		}
 	}
 
+	// Fallback: if Columns are not defined (empty), use all keys in row
 	if len(cols) == 0 {
 		i = 1
 		for col, val := range row {
@@ -141,6 +148,8 @@ func (r *CDCReplicator) upsertRecord(
 		}
 	}
 
+	// Build the final SQL query.
+	// If no update columns exist (only PK), use DO NOTHING to avoid syntax error.
 	var query string
 	if len(updates) == 0 {
 		query = fmt.Sprintf(
@@ -248,10 +257,8 @@ func (tm *TargetTableMapping) primaryKeyOrDefault() string {
 
 func (tm *TargetTableMapping) columnsWithPrimaryKey() []string {
 	pk := tm.primaryKeyOrDefault()
-	for _, col := range tm.Columns {
-		if col == pk {
-			return tm.Columns
-		}
+	if slices.Contains(tm.Columns, pk) {
+		return tm.Columns
 	}
 	colsWithPK := make([]string, 0, len(tm.Columns)+1)
 	colsWithPK = append(colsWithPK, tm.Columns...)
