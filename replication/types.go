@@ -19,6 +19,16 @@ const (
 	CDCCustomKindMove CDCKind = "move" // A row was moved from one schema to another
 )
 
+// ReplicationFlow is a type alias for api.ReplicationFlow
+type ReplicationFlow = api.ReplicationFlow
+
+const (
+	ReplicationFlowTenantToTenant       ReplicationFlow = api.ReplicationFlowTenantToTenant
+	ReplicationFlowNonTenantToTenant    ReplicationFlow = api.ReplicationFlowNonTenantToTenant
+	ReplicationFlowNonTenantToNonTenant ReplicationFlow = api.ReplicationFlowNonTenantToNonTenant
+	ReplicationFlowTenantToNonTenant    ReplicationFlow = api.ReplicationFlowTenantToNonTenant
+)
+
 // CDCMessage represents a Change Data Capture message produced by PeerDB.
 // PeerDB captures PostgreSQL WAL (Write-Ahead Log) changes and publishes them to Kafka.
 //
