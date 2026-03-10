@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/db"
+	replication_registry "gitea.tagsamurai.local/BETS-V2/ts-utils/v2/replication/registry"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/sql_query"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/sql_query/common_builders"
 	"github.com/jackc/pgx/v5"
@@ -1094,7 +1095,7 @@ func (s *PostgreSQLService) validateTableOperation(query string) error {
 
 	// Check if service has any replicated tables
 	// ReplicatedTables is defined in replication_manager.go
-	replicatedSources, ok := ReplicatedTables[serviceName]
+	replicatedSources, ok := replication_registry.ReplicatedTables[serviceName]
 	if !ok || len(replicatedSources) == 0 {
 		return nil
 	}
