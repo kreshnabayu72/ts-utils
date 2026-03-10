@@ -13,6 +13,7 @@ import (
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/db"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/enterprise_management_service/model"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/replication/api"
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/replication/registry"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/service"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/temporal"
@@ -45,7 +46,6 @@ func (rm *ReplicationManager) StartReplication(
 	targetServiceName string,
 	sourceDBName db.DBName,
 	replicationFlow api.ReplicationFlow,
-	replicatedTables []api.ReplicatedTable,
 ) error {
 	slog.Debug("Entering StartReplication", "target_service", targetServiceName)
 	clients := rm.GetClients()
@@ -55,6 +55,9 @@ func (rm *ReplicationManager) StartReplication(
 		slog.Warn("No clients found", "service_name", targetServiceName)
 		return nil
 	}
+
+	// Internal lookup from Registry
+	replicatedTables := registry.ReplicatedTables[targetServiceName][fmt.Sprintf("%v.%s", replicationFlow, sourceDBName)]
 
 	if len(replicatedTables) == 0 {
 		slog.Warn("No replicated tables provided", "service_name", targetServiceName, "flow", replicationFlow)
