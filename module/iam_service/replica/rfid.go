@@ -3,11 +3,11 @@ package replica
 import "time"
 
 type Rfid struct {
-	ID        int       `json:"_id"       column:"rfids.id" sqlType:"BIGINT"`
-	ShortCode string    `json:"shortCode" column:"rfids.short_code" sqlType:"VARCHAR"`
-	Code      string    `json:"code"      column:"rfids.code" sqlType:"VARCHAR"`
-	CreatedAt time.Time `json:"createdAt" column:"rfids.created_at" sqlType:"TIMESTAMPTZ"`
-	UpdatedAt time.Time `json:"updatedAt" column:"rfids.updated_at" sqlType:"TIMESTAMPTZ"`
+	ID        int       `json:"_id"       column:"rfids.id"`
+	ShortCode string    `json:"shortCode" column:"rfids.short_code"`
+	Code      string    `json:"code"      column:"rfids.code"`
+	CreatedAt time.Time `json:"createdAt" column:"rfids.created_at"`
+	UpdatedAt time.Time `json:"updatedAt" column:"rfids.updated_at"`
 }
 
 func (r *Rfid) GetTableName() string {
