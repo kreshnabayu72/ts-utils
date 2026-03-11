@@ -6,7 +6,7 @@ type User struct {
 	ID             int        `json:"_id"            column:"users.id"`
 	FirstName      string     `json:"firstName"      column:"users.first_name"`
 	LastName       string     `json:"lastName"       column:"users.last_name"`
-	FullName       string     `json:"fullName"       column:"users.full_name"`
+	FullName       string     `json:"fullName"       column:"users.full_name" special:"generated"`
 	Email          string     `json:"email"          column:"users.email"`
 	ProfilePicture *string    `json:"profilePicture" column:"users.profile_picture"`
 	IsDeleted      bool       `json:"isDeleted"      column:"users.is_deleted"`
