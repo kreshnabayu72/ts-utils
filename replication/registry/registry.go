@@ -1,8 +1,6 @@
 package registry
 
 import (
-	"fmt"
-
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/constant"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/db"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/file_manager_service/replica"
@@ -13,14 +11,14 @@ import (
 
 // ReplicatedTables is the central registry that declares which tables each service
 // needs to replicate (consume) from other services (publishers).
-var ReplicatedTables = map[string]map[string][]api.ReplicatedTable{
+var ReplicatedTables = map[string]map[api.ReplicationKey][]api.ReplicatedTable{
 	constant.IAM_SERVICE_NAME: { // Listener/Consumer
-		fmt.Sprintf("%v.%s", api.ReplicationFlowTenantToTenant, db.HardwareTaggingDBName): { // Publisher
+		api.ReplicationKey{Flow: api.ReplicationFlowTenantToTenant, SourceDBName: db.HardwareTaggingDBName}: { // Publisher
 			&iam_replica.Rfid{},
 		},
 	},
 	constant.HARDWARE_TAGGING_SERVICE_NAME: { // Listener/Consumer
-		fmt.Sprintf("%v.%s", api.ReplicationFlowNonTenantToTenant, db.HardwareTaggingDBName): { // Publisher
+		api.ReplicationKey{Flow: api.ReplicationFlowNonTenantToTenant, SourceDBName: db.HardwareTaggingDBName}: { // Publisher
 			&hardware_tagging_replica.DeviceName{},
 			&hardware_tagging_replica.HandheldStock{},
 			&hardware_tagging_replica.Sku{},
@@ -29,7 +27,7 @@ var ReplicatedTables = map[string]map[string][]api.ReplicatedTable{
 			&hardware_tagging_replica.RfidStock{},
 			&hardware_tagging_replica.NfcStock{},
 		},
-		fmt.Sprintf("%v.%s", api.ReplicationFlowTenantToTenant, db.IAMDBName): { // Publisher
+		api.ReplicationKey{Flow: api.ReplicationFlowTenantToTenant, SourceDBName: db.IAMDBName}: { // Publisher
 			&hardware_tagging_replica.FixedAssetGroup{},
 			&hardware_tagging_replica.SupplyAssetGroup{},
 			&hardware_tagging_replica.User{},
@@ -40,15 +38,15 @@ var ReplicatedTables = map[string]map[string][]api.ReplicatedTable{
 	constant.ANALYTICS_REPORTING_SERVICE_NAME:   nil,
 	constant.APPROVAL_SERVICE_NAME:              nil,
 	constant.FILE_MANAGER_SERVICE_NAME: { // Listener/Consumer
-		fmt.Sprintf("%v.%s", api.ReplicationFlowTenantToTenant, db.MasterAssetRegistryDBName): { // Publisher
+		api.ReplicationKey{Flow: api.ReplicationFlowTenantToTenant, SourceDBName: db.MasterAssetRegistryDBName}: { // Publisher
 			&replica.AssetCustomField{},
 			&replica.Asset{},
 			&replica.CustomField{},
 		},
-		fmt.Sprintf("%v.%s", api.ReplicationFlowTenantToTenant, db.AssetTransactionDBName): { // Publisher
+		api.ReplicationKey{Flow: api.ReplicationFlowTenantToTenant, SourceDBName: db.AssetTransactionDBName}: { // Publisher
 			&replica.FixedAssetDisposalTransaction{},
 		},
-		fmt.Sprintf("%v.%s", api.ReplicationFlowTenantToTenant, db.IAMDBName): { // Publisher
+		api.ReplicationKey{Flow: api.ReplicationFlowTenantToTenant, SourceDBName: db.IAMDBName}: { // Publisher
 			&replica.FixedAssetGroup{},
 			&replica.User{},
 		},

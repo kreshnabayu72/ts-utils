@@ -57,7 +57,10 @@ func (rm *ReplicationManager) StartReplication(
 	}
 
 	// Internal lookup from Registry
-	replicatedTables := registry.ReplicatedTables[targetServiceName][fmt.Sprintf("%v.%s", replicationFlow, sourceDBName)]
+	replicatedTables := registry.ReplicatedTables[targetServiceName][api.ReplicationKey{
+		Flow:         replicationFlow,
+		SourceDBName: sourceDBName,
+	}]
 
 	if len(replicatedTables) == 0 {
 		slog.Warn("No replicated tables provided", "service_name", targetServiceName, "flow", replicationFlow)

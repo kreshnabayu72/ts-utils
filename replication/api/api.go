@@ -2,6 +2,13 @@
 // These types are shared between ts-utils (the replicator) and ts-migrations (the schema validator).
 package api
 
+import "gitea.tagsamurai.local/BETS-V2/ts-utils/v2/db"
+
+type ReplicationKey struct {
+	Flow         ReplicationFlow
+	SourceDBName db.DBName
+}
+
 // ReplicatedTable defines the contract for a table that can be replicated via CDC.
 // Each struct that implements this interface represents one database table
 // and describes its structure so the replicator knows which columns to read and write.
