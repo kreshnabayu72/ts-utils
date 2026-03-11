@@ -16,7 +16,22 @@ const (
 	CDCKindUpdate CDCKind = "update" // An existing row was modified
 	CDCKindDelete CDCKind = "delete" // A row was deleted
 
-	CDCCustomKindMove CDCKind = "move" // A row was moved from one schema to another
+	// CDCCustomKindMove is a synthetic CDC kind, NOT produced by PeerDB directly.
+	// It is derived internally by the processor when it detects that an "update" event
+	// has changed the `client_id` field between `msg.Old` and `msg.New`, meaning the
+	// record has been reassigned from one tenant to another.
+	//
+	// REQUIREMENT: Tables that can trigger a Move event MUST have:
+	//
+	//	ALTER TABLE IF EXISTS <name> REPLICA IDENTITY FULL;
+	//
+	// Without this, PostgreSQL omits `OLD` row data from WAL `UPDATE` events.
+	// PeerDB will then send `msg.Old = {}`, and the processor cannot determine
+	// which old tenant schema to delete from - causing ghost records.
+	//
+	// Tables that qualify: any table with `ReplicationFlowNonTenantToTenant` AND a `client_id` column.
+	// See README.md in this package for the full explanation.
+	CDCCustomKindMove CDCKind = "move" // A row was moved from one tenant schema to another
 )
 
 // ReplicationFlow is a type alias for api.ReplicationFlow
@@ -60,6 +75,9 @@ type CDCMessage struct {
 
 // ReplicationConfig holds configuration for a single CDC replication instance.
 // One CDCReplicator gets one ReplicationConfig.
+//
+// See README.md in this package for guidance on which ReplicationFlow to use and
+// when REPLICA IDENTITY FULL is required on the source tables.
 type ReplicationConfig struct {
 	SourceDBName    string                        // Source database name, used to build Kafka topic names (e.g., "tagsamurai_iam")
 	TableMappings   map[string]TargetTableMapping // Maps source table name (e.g., "users") -> how to replicate it

@@ -7,6 +7,8 @@ import (
 	"slices"
 	"strings"
 	"sync"
+
+	"github.com/jackc/pgx/v5"
 )
 
 // executeReplication handles the parallel execution of replication tasks across target schemas.
@@ -30,33 +32,56 @@ func (r *CDCReplicator) executeReplication(targetSchemas []CDCSchemaPair, tableM
 				return // Stop before starting if an error occurred elsewhere
 			}
 
-			var execErr error
+			// Execute within a transaction with tenant-specific search_path.
+			// SET LOCAL search_path only affects the current transaction, so it's safe
+			// for concurrent use - other queries on the same connection pool are not affected.
+			tx, err := r.pool.Begin(ctx)
+			if err != nil {
+				cancel() // Fail Fast: Cancel all other goroutines immediately
+				select {
+				case errCh <- fmt.Errorf("replication failed for old schema %s & new schema %s: %w", sp.oldSchema, sp.newSchema, err):
+				default:
+				}
+				return
+			}
+
 			switch msg.Kind {
 			case CDCKindInsert, CDCKindUpdate:
 				if sp.newSchema != "" { // Just defensive programming, pretty sure newSchema assignment already handled above
-					execErr = r.upsertRecord(ctx, tableMap, msg.New, sp.newSchema)
+					err = r.upsertRecord(ctx, tx, tableMap, msg.New, sp.newSchema)
 				}
 			case CDCKindDelete:
 				if sp.oldSchema != "" { // Just defensive programming, pretty sure oldSchema assignment already handled above
-					execErr = r.deleteRecord(ctx, tableMap, msg.Old, sp.oldSchema)
+					err = r.deleteRecord(ctx, tx, tableMap, msg.Old, sp.oldSchema)
 				}
 			case CDCCustomKindMove:
 				// Validation empty string is just defensive programming, pretty sure both newSchema and oldSchema assignment already handled above
 				if sp.oldSchema != "" {
-					execErr = r.deleteRecord(ctx, tableMap, msg.Old, sp.oldSchema)
+					err = r.deleteRecord(ctx, tx, tableMap, msg.Old, sp.oldSchema)
 				}
-				if execErr == nil && sp.newSchema != "" {
-					execErr = r.upsertRecord(ctx, tableMap, msg.New, sp.newSchema)
+				if err == nil && sp.newSchema != "" {
+					err = r.upsertRecord(ctx, tx, tableMap, msg.New, sp.newSchema)
 				}
 			default:
 				slog.Debug("Unknown CDC kind recorded", slog.String("kind", string(msg.Kind)))
 				return
 			}
 
-			if execErr != nil {
+			if err != nil {
+				tx.Rollback(ctx)
 				cancel() // Fail Fast: Cancel all other goroutines immediately
 				select {
-				case errCh <- fmt.Errorf("replication failed for old schema %s & new schema %s: %w", sp.oldSchema, sp.newSchema, execErr):
+				case errCh <- fmt.Errorf("replication failed for old schema %s & new schema %s: %w", sp.oldSchema, sp.newSchema, err):
+				default:
+				}
+				return
+			}
+
+			err = tx.Commit(ctx)
+			if err != nil {
+				cancel() // Fail Fast: Cancel all other goroutines immediately
+				select {
+				case errCh <- fmt.Errorf("replication failed for old schema %s & new schema %s: %w", sp.oldSchema, sp.newSchema, err):
 				default:
 				}
 			}
@@ -89,6 +114,7 @@ func (r *CDCReplicator) executeReplication(targetSchemas []CDCSchemaPair, tableM
 //   - schemaName: The target schema name (e.g., "qtera" or "public")
 func (r *CDCReplicator) upsertRecord(
 	ctx context.Context,
+	tx pgx.Tx,
 	mapping TargetTableMapping,
 	data map[string]any,
 	schemaName string,
@@ -170,18 +196,9 @@ func (r *CDCReplicator) upsertRecord(
 		)
 	}
 
-	// Execute within a transaction with tenant-specific search_path.
-	// SET LOCAL search_path only affects the current transaction, so it's safe
-	// for concurrent use - other queries on the same connection pool are not affected.
-	tx, err := r.pool.Begin(ctx)
-	if err != nil {
-		return fmt.Errorf("begin transaction failed: %w", err)
-	}
-	defer tx.Rollback(ctx)
-
 	// Set search_path to the tenant schema.
 	// Since tenantID comes from the CDC source field (not user input), SQL injection isn't a concern here
-	_, err = tx.Exec(ctx, fmt.Sprintf("SET LOCAL search_path = %s", schemaName))
+	_, err := tx.Exec(ctx, fmt.Sprintf("SET LOCAL search_path = %s", schemaName))
 	if err != nil {
 		return fmt.Errorf("set session search path failed: %w", err)
 	}
@@ -189,7 +206,6 @@ func (r *CDCReplicator) upsertRecord(
 	if err != nil {
 		return fmt.Errorf("upsert failed: %w", err)
 	}
-	tx.Commit(ctx)
 
 	slog.Debug(
 		"Upserted record into table:",
@@ -211,6 +227,7 @@ func (r *CDCReplicator) upsertRecord(
 //   - schemaName: The target schema name (e.g., "qtera" or "public")
 func (r *CDCReplicator) deleteRecord(
 	ctx context.Context,
+	tx pgx.Tx,
 	mapping TargetTableMapping,
 	data map[string]any,
 	schemaName string,
@@ -223,14 +240,9 @@ func (r *CDCReplicator) deleteRecord(
 	}
 
 	query := fmt.Sprintf("DELETE FROM %s WHERE %s = $1", mapping.TargetTableName, primaryKey)
-	tx, err := r.pool.Begin(ctx)
-	if err != nil {
-		return fmt.Errorf("begin transaction failed: %w", err)
-	}
-	defer tx.Rollback(ctx)
 
 	// Since tenantID comes from the CDC source field (not user input), SQL injection isn't a concern here
-	_, err = tx.Exec(ctx, fmt.Sprintf("SET LOCAL search_path = %s", schemaName))
+	_, err := tx.Exec(ctx, fmt.Sprintf("SET LOCAL search_path = %s", schemaName))
 	if err != nil {
 		return fmt.Errorf("set session search path failed: %w", err)
 	}
@@ -238,7 +250,6 @@ func (r *CDCReplicator) deleteRecord(
 	if err != nil {
 		return fmt.Errorf("delete failed: %w", err)
 	}
-	tx.Commit(ctx)
 
 	slog.Debug(
 		"Deleted record from table:",
