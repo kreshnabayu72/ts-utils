@@ -26,6 +26,8 @@ var ReplicatedTables = map[string]map[string][]api.ReplicatedTable{
 			&hardware_tagging_replica.Sku{},
 			&hardware_tagging_replica.TabletStock{},
 			&hardware_tagging_replica.SmartFixedStock{},
+			&hardware_tagging_replica.RfidStock{},
+			&hardware_tagging_replica.NfcStock{},
 		},
 		fmt.Sprintf("%v.%s", api.ReplicationFlowTenantToTenant, db.IAMDBName): { // Publisher
 			&hardware_tagging_replica.FixedAssetGroup{},
