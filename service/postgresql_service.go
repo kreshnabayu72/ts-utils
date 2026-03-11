@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/db"
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/replication/api"
 	replication_registry "gitea.tagsamurai.local/BETS-V2/ts-utils/v2/replication/registry"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/sql_query"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/sql_query/common_builders"
@@ -288,6 +289,7 @@ type PgxPoolInterface interface {
 type PostgreSQLService struct {
 	Pool        PgxPoolInterface
 	Transaction pgx.Tx
+	dbName      db.DBName
 	schemaName  string
 	// debugLevel debug level set for logging query.
 	debugLevel int
@@ -306,6 +308,7 @@ func MakePostgreSQLService(dbNameWithSchema db.DBName, options ...db.PostgreSQLS
 
 	return &PostgreSQLService{
 		Pool:       pool,
+		dbName:     db.DBName(splitted[1]),
 		schemaName: splitted[0],
 	}
 }
@@ -1105,7 +1108,25 @@ func (s *PostgreSQLService) validateTableOperation(query string) error {
 		return nil
 	}
 
-	for _, tables := range replicatedSources {
+	for key, tables := range replicatedSources {
+		// Only allow CUD if we are currently operating as the PUBLISHER.
+		if key.SourceDBName == s.dbName {
+			isSourcePublic := key.Flow == api.ReplicationFlowNonTenantToTenant || key.Flow == api.ReplicationFlowNonTenantToNonTenant
+
+			isPublisherSchema := false
+			if isSourcePublic && s.schemaName == "public" {
+				isPublisherSchema = true
+			} else if !isSourcePublic && s.schemaName != "public" {
+				isPublisherSchema = true
+			}
+
+			if isPublisherSchema {
+				// We are the publisher for this group of tables, so skip checking
+				// them because we are allowed to write to them.
+				continue
+			}
+		}
+
 		for _, table := range tables {
 			if table.GetTableName() == tableName {
 				return fmt.Errorf("CUD operation on replicated table '%s' is prohibited for service '%s'", tableName, serviceName)
