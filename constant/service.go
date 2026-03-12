@@ -83,3 +83,10 @@ const (
 	GetClientWorkflow  = "GetClientWorkflow"
 	GetClientsWorkflow = "GetClientsWorkflow"
 )
+
+const (
+	// PeerDBKafkaPeerName is the name of the single shared Kafka peer in PeerDB.
+	// It is the fan-out destination peer for all CDC mirrors across all services.
+	PeerDBKafkaPeerName = "kafka_peer"
+)
+

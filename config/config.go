@@ -26,6 +26,7 @@ type ConfigOptions struct {
 
 	// SSH_* is currently used exclusively for postgres connection.
 	SSH_HOST     string
+	SSH_PORT     string
 	SSH_USER     string
 	SSH_PASSWORD string
 
@@ -48,6 +49,26 @@ type ConfigOptions struct {
 	TEMPORAL_CLIENT_HOST string
 	// TEMPORAL_CLIENT_PORT is the temporal server port. Defaults to "7233"
 	TEMPORAL_CLIENT_PORT string
+
+	// PeerDB configurations.
+	// PEERDB_BASE_URL is the base URL of the PeerDB HTTP API (e.g. "http://peerdb-server:8085").
+	PEERDB_BASE_URL string
+	// PEERDB_HOST is the Postgres host PeerDB uses to reach service databases.
+	PEERDB_HOST string
+	// PEERDB_USER is the Postgres user PeerDB connects with.
+	PEERDB_USER string
+	// PEERDB_PASSWORD is the Postgres password PeerDB uses.
+	PEERDB_PASSWORD string
+}
+
+// PeerSSHConfig holds SSH tunnel configuration for PeerDB Postgres peer creation.
+type PeerSSHConfig struct {
+	Host       string `json:"host"`
+	Port       uint32 `json:"port"`
+	User       string `json:"user"`
+	Password   string `json:"password"`
+	PrivateKey string `json:"privateKey"`
+	HostKey    string `json:"hostKey"`
 }
 
 // LoadConfig loads environment variables and returns as a struct.
@@ -89,6 +110,9 @@ func LoadConfig(filenames ...string) ConfigOptions {
 	}
 
 	config.SSH_HOST = os.Getenv("SSH_HOST")
+	if config.SSH_PORT = os.Getenv("SSH_PORT"); config.SSH_PORT == "" {
+		config.SSH_PORT = "22"
+	}
 	config.SSH_USER = os.Getenv("SSH_USER")
 	config.SSH_PASSWORD = os.Getenv("SSH_PASSWORD")
 
@@ -117,6 +141,16 @@ func LoadConfig(filenames ...string) ConfigOptions {
 	if config.TEMPORAL_CLIENT_PORT = os.Getenv("TEMPORAL_CLIENT_PORT"); config.TEMPORAL_CLIENT_PORT == "" {
 		config.TEMPORAL_CLIENT_PORT = "7233"
 	}
+
+	if config.PEERDB_BASE_URL = os.Getenv("PEERDB_BASE_URL"); config.PEERDB_BASE_URL == "" {
+		config.PEERDB_BASE_URL = "http://localhost:3001"
+	}
+
+	if config.PEERDB_HOST = os.Getenv("PEERDB_HOST"); config.PEERDB_HOST == "" {
+		config.PEERDB_HOST = "localhost"
+	}
+	config.PEERDB_USER = os.Getenv("PEERDB_USER")
+	config.PEERDB_PASSWORD = os.Getenv("PEERDB_PASSWORD")
 
 	return config
 }

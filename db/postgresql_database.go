@@ -106,6 +106,9 @@ func ConnectPostgres(dbName DBName, options ...PostgreSQLServiceOptions) *pgxpoo
 		postgresSslMode = os.Getenv("POSTGRES_SSLMODE")
 
 		sshHost = os.Getenv("SSH_HOST")
+		if port := os.Getenv("SSH_PORT"); port != "" {
+			sshPort = port
+		}
 		sshUser = os.Getenv("SSH_USER")
 		sshPassword = os.Getenv("SSH_PASSWORD")
 	}
@@ -131,7 +134,6 @@ func ConnectPostgres(dbName DBName, options ...PostgreSQLServiceOptions) *pgxpoo
 
 	// 3. Configure the SSH tunnel (if needed) and apply it to the config object.
 	if sshHost != "" {
-
 		sshConfig := &ssh.ClientConfig{
 			User:            sshUser,
 			Auth:            []ssh.AuthMethod{ssh.Password(sshPassword)},
@@ -139,7 +141,6 @@ func ConnectPostgres(dbName DBName, options ...PostgreSQLServiceOptions) *pgxpoo
 			Timeout:         5 * time.Second,
 		}
 
-		splittedHost := strings.Split(postgresHost, ":")
 		sshClient, err = ssh.Dial("tcp", net.JoinHostPort(sshHost, sshPort), sshConfig)
 		if err != nil {
 			log.Fatalf("Failed to dial SSH server: %v", err)
@@ -148,7 +149,7 @@ func ConnectPostgres(dbName DBName, options ...PostgreSQLServiceOptions) *pgxpoo
 		fmt.Println("✅ SSH connection established successfully!")
 
 		dialer := func(ctx context.Context, network, addr string) (net.Conn, error) {
-			return sshClient.Dial("tcp", net.JoinHostPort(splittedHost[0], splittedHost[1]))
+			return sshClient.Dial("tcp", addr)
 		}
 		config.ConnConfig.DialFunc = dialer
 	}
