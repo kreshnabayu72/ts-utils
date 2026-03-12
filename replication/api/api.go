@@ -18,6 +18,12 @@ type ReplicatedTable interface {
 	GetColumns() []string              // Ordered list of column names to replicate
 }
 
+// GetColumnsProvider is a simpler interface for structs that only provide a list of columns.
+// This is used for "Main Models" that represent the full source schema.
+type GetColumnsProvider interface {
+	GetColumns() []string
+}
+
 // CDCReplicatorInterface defines the contract for a CDC replicator.
 type CDCReplicatorInterface interface {
 	Start() error // Blocks and consumes messages until context is cancelled
