@@ -9,7 +9,7 @@ type UpdateClientActivityParam struct {
 	Email    string
 }
 
-type UndoUpdateClientActivityParam struct {
+type RollbackUpdateClientActivityParam struct {
 	ClientID string
 	Email    string
 }
