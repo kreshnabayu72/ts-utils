@@ -819,9 +819,51 @@ func (s *PostgreSQLService) Close() {
 	s.Pool.Close()
 }
 
-// applySchema executes SET LOCAL search_path on the given transaction.
+// applySchema tells PostgreSQL which schemas to look in for this transaction.
+//
+// # Why this exists
+//
+// Each tenant has its own schema (e.g. "0001"), and there is
+// also a shared "public" schema that holds reference tables used by all tenants
+// (e.g. handheld_stocks, device_names).
+//
+// By setting search_path to "<tenant>, public", PostgreSQL will automatically find
+// tables from both schemas. This means queries do not need to prefix every table
+// name with its schema:
+//
+//	-- Without search_path (verbose, error-prone):
+//	SELECT * FROM 0001.handheld_readers hr
+//	  JOIN public.handheld_stocks hs ON hs.id = hr.handheld_stock_id
+//
+//	-- With search_path set (clean):
+//	SELECT * FROM handheld_readers hr
+//	  JOIN handheld_stocks hs ON hs.id = hr.handheld_stock_id
+//
+// SET LOCAL means the search_path only applies inside this transaction and resets
+// automatically when the transaction ends. This makes it safe to reuse database
+// connections across different tenants.
+//
+// # WARNING: same table name in both schemas
+//
+// If a table with the same name exists in both the tenant schema and public,
+// PostgreSQL will silently use the tenant schema version and ignore the public one.
+// There will be no error, unless the two tables have different columns, in which
+// case the query may fail in a confusing way.
+//
+// This situation does not happen today by design: public only holds shared reference
+// tables, and tenant schemas only hold tenant-specific data.
+//
+// If you ever need a table with the same name in both schemas, do NOT rely on
+// search_path to pick the right one. Instead, always write the full name in your
+// query (e.g. "public.table_name" or "0001.table_name").
+// You should also add a schema override parameter or method to the query builder
+// so callers can specify which schema they mean explicitly.
 func (s *PostgreSQLService) applySchema(ctx context.Context, tx pgx.Tx) error {
-	_, err := tx.Exec(ctx, fmt.Sprintf("SET LOCAL search_path TO '%s'", s.schemaName))
+	searchPath := s.schemaName
+	if s.schemaName != "public" {
+		searchPath = fmt.Sprintf("%s, public", s.schemaName)
+	}
+	_, err := tx.Exec(ctx, fmt.Sprintf("SET LOCAL search_path TO %s", searchPath))
 	return err
 }
 
@@ -1111,7 +1153,8 @@ func (s *PostgreSQLService) validateTableOperation(query string) error {
 	for key, tables := range replicatedSources {
 		// Only allow CUD if we are currently operating as the PUBLISHER.
 		if key.SourceDBName == s.dbName {
-			isSourcePublic := key.Flow == api.ReplicationFlowNonTenantToTenant || key.Flow == api.ReplicationFlowNonTenantToNonTenant
+			isSourcePublic := key.Flow == api.ReplicationFlowNonTenantToTenant ||
+				key.Flow == api.ReplicationFlowNonTenantToNonTenant
 
 			isPublisherSchema := false
 			if isSourcePublic && s.schemaName == "public" {
@@ -1129,7 +1172,11 @@ func (s *PostgreSQLService) validateTableOperation(query string) error {
 
 		for _, table := range tables {
 			if table.GetTableName() == tableName {
-				return fmt.Errorf("CUD operation on replicated table '%s' is prohibited for service '%s'", tableName, serviceName)
+				return fmt.Errorf(
+					"CUD operation on replicated table '%s' is prohibited for service '%s'",
+					tableName,
+					serviceName,
+				)
 			}
 		}
 	}
