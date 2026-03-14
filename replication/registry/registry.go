@@ -68,15 +68,6 @@ var ReplicatedTables = map[string]map[api.ReplicationKey][]api.ReplicatedTable{
 		},
 	},
 	constant.HARDWARE_TAGGING_SERVICE_NAME: { // Listener/Consumer
-		api.ReplicationKey{Flow: api.ReplicationFlowNonTenantToTenant, SourceDBName: db.HardwareTaggingDBName}: { // Publisher
-			&hardware_tagging_replica.DeviceName{},
-			&hardware_tagging_replica.HandheldStock{},
-			&hardware_tagging_replica.Sku{},
-			&hardware_tagging_replica.TabletStock{},
-			&hardware_tagging_replica.SmartFixedStock{},
-			&hardware_tagging_replica.RfidStock{},
-			&hardware_tagging_replica.NfcStock{},
-		},
 		api.ReplicationKey{Flow: api.ReplicationFlowTenantToTenant, SourceDBName: db.IAMDBName}: { // Publisher
 			&hardware_tagging_replica.FixedAssetGroup{},
 			&hardware_tagging_replica.SupplyAssetGroup{},
