@@ -42,9 +42,13 @@ const (
 
 const (
 	// Source IAM Service
-	GetLoggedInUserActivity = "GetLoggedInUserActivity"
+	GetLoggedInUserActivity             = "GetLoggedInUserActivity"
+	DeleteAllUserAuthByClientIDActivity = "DeleteAllUserAuthByClientIDActivity"
 
 	// Source Enterprise Management Service
+	GetClientWorkflow  = "GetClientWorkflow"
+	GetClientsWorkflow = "GetClientsWorkflow"
+
 	GetClientActivity        = "GetClientActivity"
 	GetClientsActivity       = "GetClientsActivity"
 	UpdateClientActivity     = "UpdateClientActivity"
@@ -79,14 +83,7 @@ const (
 )
 
 const (
-	// Source Enterprise Management Service
-	GetClientWorkflow  = "GetClientWorkflow"
-	GetClientsWorkflow = "GetClientsWorkflow"
-)
-
-const (
 	// PeerDBKafkaPeerName is the name of the single shared Kafka peer in PeerDB.
 	// It is the fan-out destination peer for all CDC mirrors across all services.
 	PeerDBKafkaPeerName = "kafka_peer"
 )
-
