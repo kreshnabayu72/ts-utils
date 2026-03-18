@@ -188,7 +188,7 @@ func (r *CDCReplicator) getMappedTopics() []string {
 	slog.Debug("Getting all topics for service:", slog.String("service_name", r.replicationConfig.SourceDBName))
 	topics := []string{}
 	for source := range r.replicationConfig.TableMappings {
-		topic := fmt.Sprintf("%s.%s", r.replicationConfig.SourceDBName, source)
+		topic := fmt.Sprintf("%s_*.%s", r.replicationConfig.SourceDBName, source)
 		topics = append(topics, topic)
 	}
 	return topics
