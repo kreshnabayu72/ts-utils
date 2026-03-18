@@ -1153,8 +1153,7 @@ func (s *PostgreSQLService) validateTableOperation(query string) error {
 	for key, tables := range replicatedSources {
 		// Only allow CUD if we are currently operating as the PUBLISHER.
 		if key.SourceDBName == s.dbName {
-			isSourcePublic := key.Flow == api.ReplicationFlowNonTenantToTenant ||
-				key.Flow == api.ReplicationFlowNonTenantToNonTenant
+			isSourcePublic := key.Flow != api.ReplicationFlowTenantToTenant
 
 			isPublisherSchema := false
 			if isSourcePublic && s.schemaName == "public" {
