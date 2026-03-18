@@ -182,14 +182,28 @@ func (r *CDCReplicator) Stop() {
 }
 
 // getMappedTopics returns the list of Kafka topic names this replicator should subscribe to.
-// Topic format: "{sourceDBName}.{tableName}" (e.g., "tagsamurai_iam.users").
-// This matches the topic naming convention used by PeerDB when publishing CDC events.
+//
+// For TenantToTenant and NonTenantToTenant flow, each client gets its own topic per table:
+// "{sourceDBName}_{clientId}.{tableName}" (e.g., "tagsamurai_hardware_tagging_80000001.rfids").
+// One topic is generated per client per table, matching the per-client destination
+// naming used by PeerDB mirrors.
+//
+// For all other flows, a single shared topic per table is used:
+// "{sourceDBName}.{tableName}" (e.g., "tagsamurai_iam.users").
 func (r *CDCReplicator) getMappedTopics() []string {
 	slog.Debug("Getting all topics for service:", slog.String("service_name", r.replicationConfig.SourceDBName))
 	topics := []string{}
 	for source := range r.replicationConfig.TableMappings {
-		topic := fmt.Sprintf("%s_*.%s", r.replicationConfig.SourceDBName, source)
-		topics = append(topics, topic)
+		if r.replicationConfig.ReplicationFlow == ReplicationFlowTenantToTenant ||
+			r.replicationConfig.ReplicationFlow == ReplicationFlowNonTenantToTenant {
+			for _, clientId := range r.replicationConfig.ValidClients {
+				topic := fmt.Sprintf("%s_%s.%s", r.replicationConfig.SourceDBName, clientId, source)
+				topics = append(topics, topic)
+			}
+		} else {
+			topic := fmt.Sprintf("%s.%s", r.replicationConfig.SourceDBName, source)
+			topics = append(topics, topic)
+		}
 	}
 	return topics
 }
