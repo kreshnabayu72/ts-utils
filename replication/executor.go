@@ -12,12 +12,17 @@ import (
 )
 
 // executeReplication handles the parallel execution of replication tasks across target schemas.
-func (r *CDCReplicator) executeReplication(targetSchemas []CDCSchemaPair, tableMap TargetTableMapping, msg CDCMessage) error {
+func (r *CDCReplicator) executeReplication(
+	targetSchemas []CDCSchemaPair,
+	tableMap TargetTableMapping,
+	msg CDCMessage,
+) error {
 	var wg sync.WaitGroup
 	ctx, cancel := context.WithCancel(r.ctx)
 	defer cancel()
 
-	errCh := make(chan error, len(targetSchemas))
+	var mu sync.Mutex
+	errCollection := make([]error, 0)
 
 	for _, schemaPair := range targetSchemas {
 		wg.Add(1)
@@ -38,10 +43,17 @@ func (r *CDCReplicator) executeReplication(targetSchemas []CDCSchemaPair, tableM
 			tx, err := r.pool.Begin(ctx)
 			if err != nil {
 				cancel() // Fail Fast: Cancel all other goroutines immediately
-				select {
-				case errCh <- fmt.Errorf("replication failed for old schema %s & new schema %s: %w", sp.oldSchema, sp.newSchema, err):
-				default:
-				}
+				mu.Lock()
+				errCollection = append(
+					errCollection,
+					fmt.Errorf(
+						"replication failed for old schema %s & new schema %s: %w",
+						sp.oldSchema,
+						sp.newSchema,
+						err,
+					),
+				)
+				mu.Unlock()
 				return
 			}
 
@@ -54,14 +66,14 @@ func (r *CDCReplicator) executeReplication(targetSchemas []CDCSchemaPair, tableM
 				if sp.oldSchema != "" { // Just defensive programming, pretty sure oldSchema assignment already handled above
 					err = r.deleteRecord(ctx, tx, tableMap, msg.Old, sp.oldSchema)
 				}
-			case CDCCustomKindMove:
-				// Validation empty string is just defensive programming, pretty sure both newSchema and oldSchema assignment already handled above
-				if sp.oldSchema != "" {
-					err = r.deleteRecord(ctx, tx, tableMap, msg.Old, sp.oldSchema)
-				}
-				if err == nil && sp.newSchema != "" {
-					err = r.upsertRecord(ctx, tx, tableMap, msg.New, sp.newSchema)
-				}
+			// case CDCCustomKindMove:
+			// 	// Validation empty string is just defensive programming, pretty sure both newSchema and oldSchema assignment already handled above
+			// 	if sp.oldSchema != "" {
+			// 		err = r.deleteRecord(ctx, tx, tableMap, msg.Old, sp.oldSchema)
+			// 	}
+			// 	if err == nil && sp.newSchema != "" {
+			// 		err = r.upsertRecord(ctx, tx, tableMap, msg.New, sp.newSchema)
+			// 	}
 			default:
 				slog.Debug("Unknown CDC kind recorded", slog.String("kind", string(msg.Kind)))
 				return
@@ -70,31 +82,45 @@ func (r *CDCReplicator) executeReplication(targetSchemas []CDCSchemaPair, tableM
 			if err != nil {
 				tx.Rollback(ctx)
 				cancel() // Fail Fast: Cancel all other goroutines immediately
-				select {
-				case errCh <- fmt.Errorf("replication failed for old schema %s & new schema %s: %w", sp.oldSchema, sp.newSchema, err):
-				default:
-				}
+				mu.Lock()
+				errCollection = append(
+					errCollection,
+					fmt.Errorf(
+						"replication failed for old schema %s & new schema %s: %w",
+						sp.oldSchema,
+						sp.newSchema,
+						err,
+					),
+				)
+				mu.Unlock()
 				return
 			}
 
 			err = tx.Commit(ctx)
 			if err != nil {
 				cancel() // Fail Fast: Cancel all other goroutines immediately
-				select {
-				case errCh <- fmt.Errorf("replication failed for old schema %s & new schema %s: %w", sp.oldSchema, sp.newSchema, err):
-				default:
-				}
+
+				mu.Lock()
+				errCollection = append(
+					errCollection,
+					fmt.Errorf(
+						"replication failed for old schema %s & new schema %s: %w",
+						sp.oldSchema,
+						sp.newSchema,
+						err,
+					),
+				)
+				mu.Unlock()
 			}
 		}(schemaPair)
 	}
 
 	wg.Wait()
-	close(errCh)
 
 	// Collect first error if any occurred
-	for e := range errCh {
-		if e != nil {
-			return e
+	if len(errCollection) > 0 {
+		if errCollection[0] != nil {
+			return errCollection[0]
 		}
 	}
 
@@ -150,11 +176,11 @@ func (r *CDCReplicator) upsertRecord(
 
 	for _, col := range mapping.columnsWithPrimaryKey() {
 		if val, ok := row[col]; ok {
-			cols = append(cols, col)
+			cols = append(cols, pgIdentifier(col))
 			vals = append(vals, val)
 			placeholders = append(placeholders, fmt.Sprintf("$%d", i))
 			if col != primaryKey {
-				updates = append(updates, fmt.Sprintf("%s = EXCLUDED.%s", col, col))
+				updates = append(updates, fmt.Sprintf("%s = EXCLUDED.%s", pgIdentifier(col), pgIdentifier(col)))
 			}
 			i++
 		}
@@ -164,11 +190,11 @@ func (r *CDCReplicator) upsertRecord(
 	if len(cols) == 0 {
 		i = 1
 		for col, val := range row {
-			cols = append(cols, col)
+			cols = append(cols, pgIdentifier(col))
 			vals = append(vals, val)
 			placeholders = append(placeholders, fmt.Sprintf("$%d", i))
 			if col != primaryKey {
-				updates = append(updates, fmt.Sprintf("%s = EXCLUDED.%s", col, col))
+				updates = append(updates, fmt.Sprintf("%s = EXCLUDED.%s", pgIdentifier(col), pgIdentifier(col)))
 			}
 			i++
 		}
@@ -180,25 +206,26 @@ func (r *CDCReplicator) upsertRecord(
 	if len(updates) == 0 {
 		query = fmt.Sprintf(
 			"INSERT INTO %s (%s) VALUES (%s) ON CONFLICT (%s) DO NOTHING",
-			mapping.TargetTableName,
+			pgIdentifier(mapping.TargetTableName),
 			strings.Join(cols, ", "),
 			strings.Join(placeholders, ", "),
-			primaryKey,
+			pgIdentifier(primaryKey),
 		)
 	} else {
 		query = fmt.Sprintf(
 			"INSERT INTO %s (%s) VALUES (%s) ON CONFLICT (%s) DO UPDATE SET %s",
-			mapping.TargetTableName,
+			pgIdentifier(mapping.TargetTableName),
 			strings.Join(cols, ", "),
 			strings.Join(placeholders, ", "),
-			primaryKey,
+			pgIdentifier(primaryKey),
 			strings.Join(updates, ", "),
 		)
 	}
 
 	// Set search_path to the tenant schema.
-	// Since tenantID comes from the CDC source field (not user input), SQL injection isn't a concern here
-	_, err := tx.Exec(ctx, fmt.Sprintf("SET LOCAL search_path = %s", schemaName))
+	// Since tenantID comes from the CDC source field (not user input),
+	// SQL injection isn't a concern here, but add safety belt.
+	_, err := tx.Exec(ctx, fmt.Sprintf("SET LOCAL search_path = %s", pgIdentifier(schemaName)))
 	if err != nil {
 		return fmt.Errorf("set session search path failed: %w", err)
 	}
@@ -239,10 +266,15 @@ func (r *CDCReplicator) deleteRecord(
 		return fmt.Errorf("primary key %s not found", primaryKey)
 	}
 
-	query := fmt.Sprintf("DELETE FROM %s WHERE %s = $1", mapping.TargetTableName, primaryKey)
+	query := fmt.Sprintf(
+		"DELETE FROM %s WHERE %s = $1",
+		pgIdentifier(mapping.TargetTableName),
+		pgIdentifier(primaryKey),
+	)
 
-	// Since tenantID comes from the CDC source field (not user input), SQL injection isn't a concern here
-	_, err := tx.Exec(ctx, fmt.Sprintf("SET LOCAL search_path = %s", schemaName))
+	// Since tenantID comes from the CDC source field (not user input),
+	// SQL injection isn't a concern here, but add safety belt.
+	_, err := tx.Exec(ctx, fmt.Sprintf("SET LOCAL search_path = %s", pgIdentifier(schemaName)))
 	if err != nil {
 		return fmt.Errorf("set session search path failed: %w", err)
 	}
@@ -275,4 +307,8 @@ func (tm *TargetTableMapping) columnsWithPrimaryKey() []string {
 	colsWithPK = append(colsWithPK, tm.Columns...)
 	colsWithPK = append(colsWithPK, pk)
 	return colsWithPK
+}
+
+func pgIdentifier(identifierName string) string {
+	return pgx.Identifier{identifierName}.Sanitize()
 }

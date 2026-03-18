@@ -72,74 +72,74 @@ func (r *CDCReplicator) processMessage(topic string, value []byte) error {
 		// Ensure both oldSchema and newSchema assigned for upsert & delete
 		targetSchemas = []CDCSchemaPair{{oldSchema: tenantIdSource, newSchema: tenantIdSource}}
 
-	case api.ReplicationFlowNonTenantToNonTenant: // Source should be "public" since this is `from non-tenant` flow
-		if tenantIdSource != "public" {
-			return nil
-		}
-		// Ensure both oldSchema and newSchema assigned for upsert & delete
-		targetSchemas = []CDCSchemaPair{{oldSchema: "public", newSchema: "public"}}
+	// case api.ReplicationFlowNonTenantToNonTenant: // Source should be "public" since this is `from non-tenant` flow
+	// 	if tenantIdSource != "public" {
+	// 		return nil
+	// 	}
+	// 	// Ensure both oldSchema and newSchema assigned for upsert & delete
+	// 	targetSchemas = []CDCSchemaPair{{oldSchema: "public", newSchema: "public"}}
 
-	case api.ReplicationFlowNonTenantToTenant:
-		newData := msg.New
-		oldData := msg.Old
+	// case api.ReplicationFlowNonTenantToTenant:
+	// 	newData := msg.New
+	// 	oldData := msg.Old
 
-		newClientIdVal, newExists := newData["client_id"]
-		oldClientIdVal, oldExists := oldData["client_id"]
+	// 	newClientIdVal, newExists := newData["client_id"]
+	// 	oldClientIdVal, oldExists := oldData["client_id"]
 
-		if !newExists && !oldExists {
-			// Rule: No client_id field AND flow from non-tenant (public) -> Broadcast to all tenants (e.g., device_names & skus)
-			if tenantIdSource == "public" {
-				targetSchemas = make([]CDCSchemaPair, len(r.replicationConfig.ValidClients))
-				for i, v := range r.replicationConfig.ValidClients {
-					targetSchemas[i] = CDCSchemaPair{
-						oldSchema: v, // To handle deletion for this Rule (e.g., delete from schema "qtera")
-						newSchema: v, // To handle insertion for this Rule (e.g., insert into schema "qtera")
-					}
-				}
-			}
-		} else {
-			// Rule: client_id field exists but empty/null -> Skip this row (skipped by if else conditioning)
-			var newClientIdStr, oldClientIdStr string
-			if newClientIdVal != nil {
-				newClientIdStr = fmt.Sprintf("%v", newClientIdVal)
-			}
-			if oldClientIdVal != nil {
-				oldClientIdStr = fmt.Sprintf("%v", oldClientIdVal)
-			}
+	// 	if !newExists && !oldExists {
+	// 		// Rule: No client_id field AND flow from non-tenant (public) -> Broadcast to all tenants (e.g., device_names & skus)
+	// 		if tenantIdSource == "public" {
+	// 			targetSchemas = make([]CDCSchemaPair, len(r.replicationConfig.ValidClients))
+	// 			for i, v := range r.replicationConfig.ValidClients {
+	// 				targetSchemas[i] = CDCSchemaPair{
+	// 					oldSchema: v, // To handle deletion for this Rule (e.g., delete from schema "qtera")
+	// 					newSchema: v, // To handle insertion for this Rule (e.g., insert into schema "qtera")
+	// 				}
+	// 			}
+	// 		}
+	// 	} else {
+	// 		// Rule: client_id field exists but empty/null -> Skip this row (skipped by if else conditioning)
+	// 		var newClientIdStr, oldClientIdStr string
+	// 		if newClientIdVal != nil {
+	// 			newClientIdStr = fmt.Sprintf("%v", newClientIdVal)
+	// 		}
+	// 		if oldClientIdVal != nil {
+	// 			oldClientIdStr = fmt.Sprintf("%v", oldClientIdVal)
+	// 		}
 
-			// Pure Deletion, no need newSchema.
-			// Update with no client_id, it means the record is deleted from target schema.
-			if msg.Kind == CDCKindDelete || (msg.Kind == CDCKindUpdate && !isValidClients(newClientIdStr)) {
-				if oldExists && !isValidClients(oldClientIdStr) {
-					return nil
-				}
-				targetSchemas = []CDCSchemaPair{{
-					oldSchema: oldClientIdStr, // e.g., delete from schema "qtera"
-					newSchema: "",
-				}}
-				msg.Kind = CDCKindDelete
-			} else if newExists && oldExists && isValidClients(oldClientIdStr) && isValidClients(newClientIdStr) && newClientIdStr != oldClientIdStr {
-				// Move, both field in new & old exist but value differ
-				targetSchemas = []CDCSchemaPair{{
-					oldSchema: oldClientIdStr, // e.g., delete from schema "0001"
-					newSchema: newClientIdStr, // e.g., insert into schema "0002"
-				}}
-				msg.Kind = CDCCustomKindMove
-			} else if newExists && isValidClients(newClientIdStr) {
-				// Pure Insertion, no need oldSchema
-				targetSchemas = []CDCSchemaPair{{
-					oldSchema: "",
-					newSchema: newClientIdStr, // e.g., insert into schema "qtera"
-				}}
-			}
-		}
+	// 		// Pure Deletion, no need newSchema.
+	// 		// Update with no client_id, it means the record is deleted from target schema.
+	// 		if msg.Kind == CDCKindDelete || (msg.Kind == CDCKindUpdate && !isValidClients(newClientIdStr)) {
+	// 			if oldExists && !isValidClients(oldClientIdStr) {
+	// 				return nil
+	// 			}
+	// 			targetSchemas = []CDCSchemaPair{{
+	// 				oldSchema: oldClientIdStr, // e.g., delete from schema "qtera"
+	// 				newSchema: "",
+	// 			}}
+	// 			msg.Kind = CDCKindDelete
+	// 		} else if newExists && oldExists && isValidClients(oldClientIdStr) && isValidClients(newClientIdStr) && newClientIdStr != oldClientIdStr {
+	// 			// Move, both field in new & old exist but value differ
+	// 			targetSchemas = []CDCSchemaPair{{
+	// 				oldSchema: oldClientIdStr, // e.g., delete from schema "0001"
+	// 				newSchema: newClientIdStr, // e.g., insert into schema "0002"
+	// 			}}
+	// 			msg.Kind = CDCCustomKindMove
+	// 		} else if newExists && isValidClients(newClientIdStr) {
+	// 			// Pure Insertion, no need oldSchema
+	// 			targetSchemas = []CDCSchemaPair{{
+	// 				oldSchema: "",
+	// 				newSchema: newClientIdStr, // e.g., insert into schema "qtera"
+	// 			}}
+	// 		}
+	// 	}
 
-	case api.ReplicationFlowTenantToNonTenant: // Target is "public"
-		if !isValidClients(tenantIdSource) {
-			return nil
-		}
-		// Ensure both oldSchema and newSchema assigned for upsert & delete
-		targetSchemas = []CDCSchemaPair{{newSchema: "public", oldSchema: "public"}}
+	// case api.ReplicationFlowTenantToNonTenant: // Target is "public"
+	// 	if !isValidClients(tenantIdSource) {
+	// 		return nil
+	// 	}
+	// 	// Ensure both oldSchema and newSchema assigned for upsert & delete
+	// 	targetSchemas = []CDCSchemaPair{{newSchema: "public", oldSchema: "public"}}
 
 	default:
 		slog.Error("Unsupported replication flow", slog.String("flow", string(r.replicationConfig.ReplicationFlow)))

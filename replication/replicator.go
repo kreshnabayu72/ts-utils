@@ -102,6 +102,7 @@ func (r *CDCReplicator) Start() error {
 
 	// Use WaitGroup to manage multiple topic readers
 	var wg sync.WaitGroup
+
 	for _, topic := range topics {
 		wg.Add(1)
 		go func(topic string) {
@@ -156,8 +157,26 @@ func (r *CDCReplicator) Start() error {
 					)
 				} else {
 					// Commit offset only if processing is successful
-					if commitErr := reader.CommitMessages(r.ctx, m); commitErr != nil {
-						slog.Debug("[%s] Error committing offset: %v", m.Topic, commitErr)
+					backoff := time.Second
+					for {
+						if commitErr := reader.CommitMessages(r.ctx, m); commitErr != nil {
+							slog.Error("Error committing offset", "topic", m.Topic, "error", commitErr)
+
+							// retry with backoff (retry in: 1, 2, 4, 8, 16, 32; multiple by 2 with max interval)
+							time.Sleep(backoff)
+							if backoff <= 30*time.Second {
+								slog.Debug("Retrying...", "topic", m.Topic)
+								backoff *= 2
+							}
+
+							// Block forever just to retry commit whenever commit failed.
+							// Expected behaviour when replication fails,
+							// next message will be on hold until current message is commited.
+							continue
+						}
+
+						// done commit
+						break
 					}
 				}
 			}
@@ -172,6 +191,10 @@ func (r *CDCReplicator) Start() error {
 // It cancels the context, which causes all Kafka readers (in Start()) to exit
 // their FetchMessage loop with a context.Canceled error.
 func (r *CDCReplicator) Stop() {
+	var wg sync.WaitGroup
+	defer wg.Done()
+
+	wg.Add(1)
 	slog.Info(
 		"Stopping CDC Replicator for service",
 		slog.String("service_name", r.replicationConfig.SourceDBName),
@@ -179,6 +202,7 @@ func (r *CDCReplicator) Stop() {
 	if r.cancel != nil {
 		r.cancel()
 	}
+	wg.Wait()
 }
 
 // getMappedTopics returns the list of Kafka topic names this replicator should subscribe to.
@@ -194,8 +218,7 @@ func (r *CDCReplicator) getMappedTopics() []string {
 	slog.Debug("Getting all topics for service:", slog.String("service_name", r.replicationConfig.SourceDBName))
 	topics := []string{}
 	for source := range r.replicationConfig.TableMappings {
-		if r.replicationConfig.ReplicationFlow == ReplicationFlowTenantToTenant ||
-			r.replicationConfig.ReplicationFlow == ReplicationFlowNonTenantToTenant {
+		if r.replicationConfig.ReplicationFlow == ReplicationFlowTenantToTenant {
 			for _, clientId := range r.replicationConfig.ValidClients {
 				topic := fmt.Sprintf("%s_%s.%s", r.replicationConfig.SourceDBName, clientId, source)
 				topics = append(topics, topic)

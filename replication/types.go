@@ -15,33 +15,23 @@ const (
 	CDCKindInsert CDCKind = "insert" // A new row was inserted
 	CDCKindUpdate CDCKind = "update" // An existing row was modified
 	CDCKindDelete CDCKind = "delete" // A row was deleted
-
-	// CDCCustomKindMove is a synthetic CDC kind, NOT produced by PeerDB directly.
-	// It is derived internally by the processor when it detects that an "update" event
-	// has changed the `client_id` field between `msg.Old` and `msg.New`, meaning the
-	// record has been reassigned from one tenant to another.
-	//
-	// REQUIREMENT: Tables that can trigger a Move event MUST have:
-	//
-	//	ALTER TABLE IF EXISTS <name> REPLICA IDENTITY FULL;
-	//
-	// Without this, PostgreSQL omits `OLD` row data from WAL `UPDATE` events.
-	// PeerDB will then send `msg.Old = {}`, and the processor cannot determine
-	// which old tenant schema to delete from - causing ghost records.
-	//
-	// Tables that qualify: any table with `ReplicationFlowNonTenantToTenant` AND a `client_id` column.
-	// See README.md in this package for the full explanation.
-	CDCCustomKindMove CDCKind = "move" // A row was moved from one tenant schema to another
 )
 
 // ReplicationFlow is a type alias for api.ReplicationFlow
 type ReplicationFlow = api.ReplicationFlow
 
 const (
-	ReplicationFlowTenantToTenant       ReplicationFlow = api.ReplicationFlowTenantToTenant
-	ReplicationFlowNonTenantToTenant    ReplicationFlow = api.ReplicationFlowNonTenantToTenant
-	ReplicationFlowNonTenantToNonTenant ReplicationFlow = api.ReplicationFlowNonTenantToNonTenant
-	ReplicationFlowTenantToNonTenant    ReplicationFlow = api.ReplicationFlowTenantToNonTenant
+	ReplicationFlowTenantToTenant ReplicationFlow = api.ReplicationFlowTenantToTenant
+
+	// Currently not supported, due to:
+	// - not used in current app
+	// - complex handling (especially if non-tenant to tenant replication ever exist in the future,
+	// moving between old tenant to new tenant should be handled and this is need full replication identity to collect old messages;
+	// new message to insert into new tenant, old message to delete from old tenant)
+	//
+	// ReplicationFlowNonTenantToTenant    ReplicationFlow = api.ReplicationFlowNonTenantToTenant
+	// ReplicationFlowNonTenantToNonTenant ReplicationFlow = api.ReplicationFlowNonTenantToNonTenant
+	// ReplicationFlowTenantToNonTenant    ReplicationFlow = api.ReplicationFlowTenantToNonTenant
 )
 
 // CDCMessage represents a Change Data Capture message produced by PeerDB.

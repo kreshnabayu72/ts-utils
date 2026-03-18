@@ -41,6 +41,12 @@ const (
 	// Example: qtera.users (IAM DB) -> qtera.users (hardware-tagging DB)
 	ReplicationFlowTenantToTenant ReplicationFlow = "Tenant to Tenant"
 
+	// Currently not supported, due to:
+	// - not used in current app
+	// - complex handling (especially if non-tenant to tenant replication ever exist in the future,
+	// moving between old tenant to new tenant should be handled and this is need full replication identity to collect old messages;
+	// new message to insert into new tenant, old message to delete from old tenant)
+	//
 	// ReplicationFlowNonTenantToTenant: source is public schema, target is routed to tenant schema(s).
 	// There are two sub-cases depending on whether the table has a client_id column:
 	//   - WITH client_id: data is routed to the specific tenant schema matching client_id.
@@ -50,15 +56,15 @@ const (
 	//   - WITHOUT client_id: data is broadcast to ALL tenant schemas (ValidClients).
 	//     No REPLICA IDENTITY FULL needed since move is never triggered.
 	//     Example: public.device_names -> qtera.device_names, acme.device_names, ...
-	ReplicationFlowNonTenantToTenant ReplicationFlow = "Non-Tenant to Tenant"
-
+	// ReplicationFlowNonTenantToTenant ReplicationFlow = "Non-Tenant to Tenant"
+	//
 	// ReplicationFlowNonTenantToNonTenant: source is public schema, target is also public schema.
 	// Example: public.some_table -> public.some_table
 	// Currently supported by the replicator but not actively used.
-	ReplicationFlowNonTenantToNonTenant ReplicationFlow = "Non-Tenant to Non-Tenant"
-
+	// ReplicationFlowNonTenantToNonTenant ReplicationFlow = "Non-Tenant to Non-Tenant"
+	//
 	// ReplicationFlowTenantToNonTenant: source is a tenant schema, target is written to public schema.
 	// Example: qtera.some_table -> public.some_table
 	// Currently supported by the replicator but not actively used.
-	ReplicationFlowTenantToNonTenant ReplicationFlow = "Tenant to Non-Tenant"
+	// ReplicationFlowTenantToNonTenant ReplicationFlow = "Tenant to Non-Tenant"
 )

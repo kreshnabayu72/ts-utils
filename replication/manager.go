@@ -126,7 +126,7 @@ func (rm *ReplicationManager) StopReplication() {
 	select {
 	case <-done:
 		slog.Info("All replicators stopped gracefully")
-	case <-time.After(5 * time.Second):
+	case <-time.After(15 * time.Second):
 		slog.Warn("Timeout waiting for replicators to stop")
 	}
 }
@@ -136,10 +136,13 @@ func (rm *ReplicationManager) GetClients() []string {
 	wo := client.StartWorkflowOptions{
 		TaskQueue: "enterprise-management-service",
 		RetryPolicy: &temporal.RetryPolicy{
-			MaximumAttempts: 1,
+			MaximumAttempts: 3,
 			NonRetryableErrorTypes: []string{
 				"WORKFLOW_PANIC",
 			},
+			BackoffCoefficient: 2,
+			InitialInterval:    time.Second,
+			MaximumInterval:    time.Second,
 		},
 	}
 
