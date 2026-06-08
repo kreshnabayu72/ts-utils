@@ -1,4 +1,0 @@
-{
-  "userIds": "string,objectId[]",
-  "groupId": "string,objectId"
-}

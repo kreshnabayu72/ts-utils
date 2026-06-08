@@ -1,4 +1,0 @@
-{
-  "productionDate": "number,epoch,optional",
-  "expiredDate": "number,epoch,optional"
-}

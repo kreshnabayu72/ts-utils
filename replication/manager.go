@@ -8,13 +8,13 @@ import (
 	"sync"
 	"time"
 
-	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/config"
+	"gitea.qwertysystem.net/Wangsit-Developer/be-core-utils/config"
+	core_replication "gitea.qwertysystem.net/Wangsit-Developer/be-core-utils/replication"
+	"gitea.qwertysystem.net/Wangsit-Developer/be-core-utils/replication/api"
+	"gitea.qwertysystem.net/Wangsit-Developer/be-core-utils/service"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/constant"
-	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/db"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/enterprise_management_service/model"
-	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/replication/api"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/replication/registry"
-	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/service"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/temporal"
 )
@@ -44,7 +44,7 @@ func NewReplicationManager(
 // StartReplication starts CDC replication for a specific source database.
 func (rm *ReplicationManager) StartReplication(
 	targetServiceName string,
-	sourceDBName db.DBName,
+	sourceDBName string,
 	replicationFlow api.ReplicationFlow,
 ) error {
 	slog.Debug("Entering StartReplication", "target_service", targetServiceName)
@@ -67,9 +67,9 @@ func (rm *ReplicationManager) StartReplication(
 		return nil
 	}
 
-	tableMappings := make(map[string]TargetTableMapping, len(replicatedTables))
+	tableMappings := make(map[string]core_replication.TargetTableMapping, len(replicatedTables))
 	for _, table := range replicatedTables {
-		tableMappings[table.GetTableName()] = TargetTableMapping{
+		tableMappings[table.GetTableName()] = core_replication.TargetTableMapping{
 			PrimaryKey:      "id",
 			Columns:         table.GetColumns(),
 			TargetTableName: table.GetTableName(),
@@ -81,11 +81,11 @@ func (rm *ReplicationManager) StartReplication(
 	sanitizedSource := strings.ReplaceAll(string(sourceDBName), "-", "_")
 	consumerGroup := fmt.Sprintf("%s_%s_replicator", sanitizedTarget, sanitizedSource)
 
-	replicator := NewCDCReplicator(
+	replicator := core_replication.NewCDCReplicator(
 		context.Background(),
 		rm.dbSvc,
 		rm.cfg.KAFKA_BROKERS,
-		&ReplicationConfig{
+		&core_replication.ReplicationConfig{
 			ConsumerGroup:   consumerGroup,
 			SourceDBName:    string(sourceDBName),
 			TableMappings:   tableMappings,
