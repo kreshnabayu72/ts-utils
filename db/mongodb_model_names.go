@@ -1,4 +1,4 @@
-package constant
+package db
 
 const (
 	// AccountCodeModelName                      = "account_codes"

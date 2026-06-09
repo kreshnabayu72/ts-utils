@@ -3,6 +3,7 @@ package registry
 import (
 	"gitea.qwertysystem.net/Wangsit-Developer/be-core-utils/replication/api"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/constant"
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/db"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/asset_transaction_service/model"
 	ems_model "gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/enterprise_management_service/model"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/file_manager_service/replica"
@@ -16,8 +17,8 @@ import (
 // MainModels defines the source of truth for the full schema of each domain table.
 // This is used to calculate which columns to EXCLUDE in PeerDB CDC flows by taking
 // the set difference: Source (Main Model) - Consumer (Union of Replica Models).
-var MainModels = map[constant.DBName]map[string]api.GetColumnsProvider{
-	constant.IAMDBName: {
+var MainModels = map[db.DBName]map[string]api.GetColumnsProvider{
+	db.IAMDBName: {
 		"divisions":                          &iam_model.Division{},
 		"fixed_asset_groups":                 &iam_model.FixedAssetGroup{},
 		"fixed_asset_group_approval_types":   &iam_model.FixedAssetGroupApprovalType{},
@@ -30,7 +31,7 @@ var MainModels = map[constant.DBName]map[string]api.GetColumnsProvider{
 		"user_auths":                         &iam_model.UserAuth{},
 		"user_custom_fields":                 &iam_model.UserCustomField{},
 	},
-	constant.HardwareTaggingDBName: {
+	db.HardwareTaggingDBName: {
 		"device_names":       &hardware_tagging_model.DeviceName{},
 		"handheld_readers":   &hardware_tagging_model.HandheldReader{},
 		"handheld_stocks":    &hardware_tagging_model.HandheldStock{},
@@ -45,15 +46,15 @@ var MainModels = map[constant.DBName]map[string]api.GetColumnsProvider{
 		"tablet_stocks":      &hardware_tagging_model.TabletStock{},
 		"tag_pairs":          &hardware_tagging_model.TagPair{},
 	},
-	constant.MasterAssetRegistryDBName: {
+	db.MasterAssetRegistryDBName: {
 		"assets":              &master_asset_registry_model.Asset{},
 		"asset_custom_fields": &master_asset_registry_model.AssetCustomField{},
 		"custom_fields":       &master_asset_registry_model.CustomField{},
 	},
-	constant.AssetTransactionDBName: {
+	db.AssetTransactionDBName: {
 		"fixed_asset_disposal_transactions": &model.FixedAssetDisposalTransaction{},
 	},
-	constant.EnterpriseManagementDBName: {
+	db.EnterpriseManagementDBName: {
 		"clients": &ems_model.Client{},
 	},
 }
@@ -62,12 +63,12 @@ var MainModels = map[constant.DBName]map[string]api.GetColumnsProvider{
 // needs to replicate (consume) from other services (publishers).
 var ReplicatedTables = map[string]map[api.ReplicationKey][]api.ReplicatedTable{
 	constant.IAM_SERVICE_NAME: { // Listener/Consumer
-		api.ReplicationKey{Flow: api.ReplicationFlowTenantToTenant, SourceDBName: string(constant.HardwareTaggingDBName)}: { // Publisher
+		api.ReplicationKey{Flow: api.ReplicationFlowTenantToTenant, SourceDBName: string(db.HardwareTaggingDBName)}: { // Publisher
 			&iam_replica.Rfid{},
 		},
 	},
 	constant.HARDWARE_TAGGING_SERVICE_NAME: { // Listener/Consumer
-		api.ReplicationKey{Flow: api.ReplicationFlowTenantToTenant, SourceDBName: string(constant.IAMDBName)}: { // Publisher
+		api.ReplicationKey{Flow: api.ReplicationFlowTenantToTenant, SourceDBName: string(db.IAMDBName)}: { // Publisher
 			&hardware_tagging_replica.FixedAssetGroup{},
 			&hardware_tagging_replica.SupplyAssetGroup{},
 			&hardware_tagging_replica.User{},
@@ -78,15 +79,15 @@ var ReplicatedTables = map[string]map[api.ReplicationKey][]api.ReplicatedTable{
 	constant.ANALYTICS_REPORTING_SERVICE_NAME:   nil,
 	constant.APPROVAL_SERVICE_NAME:              nil,
 	constant.FILE_MANAGER_SERVICE_NAME: { // Listener/Consumer
-		api.ReplicationKey{Flow: api.ReplicationFlowTenantToTenant, SourceDBName: string(constant.MasterAssetRegistryDBName)}: { // Publisher
+		api.ReplicationKey{Flow: api.ReplicationFlowTenantToTenant, SourceDBName: string(db.MasterAssetRegistryDBName)}: { // Publisher
 			&replica.AssetCustomField{},
 			&replica.Asset{},
 			&replica.CustomField{},
 		},
-		api.ReplicationKey{Flow: api.ReplicationFlowTenantToTenant, SourceDBName: string(constant.AssetTransactionDBName)}: { // Publisher
+		api.ReplicationKey{Flow: api.ReplicationFlowTenantToTenant, SourceDBName: string(db.AssetTransactionDBName)}: { // Publisher
 			&replica.FixedAssetDisposalTransaction{},
 		},
-		api.ReplicationKey{Flow: api.ReplicationFlowTenantToTenant, SourceDBName: string(constant.IAMDBName)}: { // Publisher
+		api.ReplicationKey{Flow: api.ReplicationFlowTenantToTenant, SourceDBName: string(db.IAMDBName)}: { // Publisher
 			&replica.FixedAssetGroup{},
 			&replica.User{},
 		},

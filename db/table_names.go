@@ -1,4 +1,4 @@
-package constant
+package db
 
 const (
 	// AccountCodeTableName                      = "account_codes"
