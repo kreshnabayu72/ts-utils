@@ -78,7 +78,7 @@ func (rm *ReplicationManager) StartReplication(
 	}
 
 	sanitizedTarget := strings.ReplaceAll(targetServiceName, "-", "_")
-	sanitizedSource := strings.ReplaceAll(string(sourceDBName), "-", "_")
+	sanitizedSource := strings.ReplaceAll(sourceDBName, "-", "_")
 	consumerGroup := fmt.Sprintf("%s_%s_replicator", sanitizedTarget, sanitizedSource)
 
 	replicator := core_replication.NewCDCReplicator(
@@ -87,7 +87,7 @@ func (rm *ReplicationManager) StartReplication(
 		rm.cfg.KAFKA_BROKERS,
 		&core_replication.ReplicationConfig{
 			ConsumerGroup:   consumerGroup,
-			SourceDBName:    string(sourceDBName),
+			SourceDBName:    sourceDBName,
 			TableMappings:   tableMappings,
 			ValidClients:    clients,
 			ReplicationFlow: replicationFlow,
