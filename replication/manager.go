@@ -8,13 +8,13 @@ import (
 	"sync"
 	"time"
 
-	"gitea.qwertysystem.net/Wangsit-Developer/be-core-utils/config"
-	core_replication "gitea.qwertysystem.net/Wangsit-Developer/be-core-utils/replication"
-	"gitea.qwertysystem.net/Wangsit-Developer/be-core-utils/replication/api"
-	"gitea.qwertysystem.net/Wangsit-Developer/be-core-utils/service"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/constant"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/enterprise_management_service/model"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/replication/registry"
+	"gitea.tagsamurai.local/Wangsit-Developer/be-core-utils/config"
+	core_replication "gitea.tagsamurai.local/Wangsit-Developer/be-core-utils/replication"
+	"gitea.tagsamurai.local/Wangsit-Developer/be-core-utils/replication/api"
+	"gitea.tagsamurai.local/Wangsit-Developer/be-core-utils/service"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/temporal"
 )

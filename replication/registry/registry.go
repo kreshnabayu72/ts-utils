@@ -1,7 +1,6 @@
 package registry
 
 import (
-	"gitea.qwertysystem.net/Wangsit-Developer/be-core-utils/replication/api"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/constant"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/db"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/asset_transaction_service/model"
@@ -12,6 +11,7 @@ import (
 	iam_model "gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/iam_service/model"
 	iam_replica "gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/iam_service/replica"
 	master_asset_registry_model "gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/master_asset_registry_service/model"
+	"gitea.tagsamurai.local/Wangsit-Developer/be-core-utils/replication/api"
 )
 
 // MainModels defines the source of truth for the full schema of each domain table.

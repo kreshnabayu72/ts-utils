@@ -3,13 +3,11 @@ module gitea.tagsamurai.local/BETS-V2/ts-utils/v2
 go 1.25.8
 
 require (
-	gitea.qwertysystem.net/Wangsit-Developer/be-core-utils v0.0.0-20260608082243-878db0e8b04a
+	gitea.tagsamurai.local/Wangsit-Developer/be-core-utils v1.0.0-alpha
 	github.com/goccy/go-json v0.10.3
 	github.com/gofiber/fiber/v2 v2.52.6
 	go.mongodb.org/mongo-driver v1.17.3
 	go.temporal.io/sdk v1.38.0
-	google.golang.org/grpc v1.72.0
-	google.golang.org/protobuf v1.36.6
 )
 
 require (
@@ -36,7 +34,6 @@ require (
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/nexus-rpc/sdk-go v0.5.1 // indirect
 	github.com/pierrec/lz4/v4 v4.1.15 // indirect
-	github.com/rabbitmq/amqp091-go v1.11.0 // indirect
 	github.com/robfig/cron v1.2.0 // indirect
 	github.com/stretchr/testify v1.10.0 // indirect
 	github.com/valkey-io/valkey-go v1.0.75 // indirect
@@ -83,5 +80,7 @@ require (
 	golang.org/x/sync v0.20.0 // indirect
 	golang.org/x/sys v0.43.0 // indirect
 	golang.org/x/text v0.36.0 // indirect
+	google.golang.org/grpc v1.72.0 // indirect
+	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
