@@ -154,3 +154,109 @@ func TestStartReplication_Success(t *testing.T) {
 	assert.Equal(t, table.Cols, m.Columns)
 	assert.Equal(t, table.ColTypes, m.ColumnTypes)
 }
+
+// blockingReplicator blocks on Stop() until block chan is closed.
+type blockingReplicator struct {
+	mock.Mock
+	stopCalled chan struct{}
+	block      chan struct{}
+}
+
+func (b *blockingReplicator) Start() error {
+	args := b.Called()
+	return args.Error(0)
+}
+
+func (b *blockingReplicator) Stop() {
+	close(b.stopCalled)
+	<-b.block
+}
+
+// StopReplication test
+func TestStopReplication_NoReplicators(t *testing.T) {
+	rm := NewReplicationManager(config.ConfigOptions{}, nil, &service.MockPostgreSQLService{})
+	rm.StopReplication() // should not panic or hang
+}
+
+func TestStopReplication_OneReplicator(t *testing.T) {
+	rep := new(mocks.MockCDCReplicator)
+	rep.On("Stop").Return()
+
+	rm := NewReplicationManager(config.ConfigOptions{}, nil, &service.MockPostgreSQLService{})
+	rm.replicators = []api.CDCReplicatorInterface{rep}
+
+	rm.StopReplication()
+
+	rep.AssertCalled(t, "Stop")
+}
+
+func TestStopReplication_MultipleReplicators(t *testing.T) {
+	rep1, rep2, rep3 := new(mocks.MockCDCReplicator), new(mocks.MockCDCReplicator), new(mocks.MockCDCReplicator)
+	rep1.On("Stop").Return()
+	rep2.On("Stop").Return()
+	rep3.On("Stop").Return()
+
+	rm := NewReplicationManager(config.ConfigOptions{}, nil, &service.MockPostgreSQLService{})
+	rm.replicators = []api.CDCReplicatorInterface{rep1, rep2, rep3}
+
+	rm.StopReplication()
+
+	rep1.AssertCalled(t, "Stop")
+	rep2.AssertCalled(t, "Stop")
+	rep3.AssertCalled(t, "Stop")
+}
+
+func TestStopReplication_Timeout(t *testing.T) {
+	origTimeout := stopReplicationTimeout
+	stopReplicationTimeout = 50 * time.Millisecond
+	defer func() { stopReplicationTimeout = origTimeout }()
+
+	rep := &blockingReplicator{
+		stopCalled: make(chan struct{}),
+		block:      make(chan struct{}),
+	}
+
+	rm := NewReplicationManager(config.ConfigOptions{}, nil, &service.MockPostgreSQLService{})
+	rm.replicators = []api.CDCReplicatorInterface{rep}
+
+	start := time.Now()
+	rm.StopReplication()
+	elapsed := time.Since(start)
+
+	assert.Less(t, elapsed, 5*time.Second)
+	assert.GreaterOrEqual(t, elapsed, 45*time.Millisecond)
+}
+
+func TestStopReplication_MixFastAndSlow(t *testing.T) {
+	origTimeout := stopReplicationTimeout
+	stopReplicationTimeout = 100 * time.Millisecond
+	defer func() { stopReplicationTimeout = origTimeout }()
+
+	fast := new(mocks.MockCDCReplicator)
+	fast.On("Stop").Return()
+	slow := &blockingReplicator{
+		stopCalled: make(chan struct{}),
+		block:      make(chan struct{}),
+	}
+
+	rm := NewReplicationManager(config.ConfigOptions{}, nil, &service.MockPostgreSQLService{})
+	rm.replicators = []api.CDCReplicatorInterface{fast, slow}
+
+	start := time.Now()
+	rm.StopReplication()
+	elapsed := time.Since(start)
+
+	assert.Less(t, elapsed, 5*time.Second)
+	assert.GreaterOrEqual(t, elapsed, 90*time.Millisecond)
+	fast.AssertCalled(t, "Stop")
+	assert.True(t, isChannelClosed(slow.stopCalled))
+}
+
+func isChannelClosed(ch chan struct{}) bool {
+	select {
+	case <-ch:
+		return true
+	default:
+		return false
+	}
+}
