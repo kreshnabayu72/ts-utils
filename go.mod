@@ -3,7 +3,6 @@ module gitea.tagsamurai.local/BETS-V2/ts-utils/v2
 go 1.25.8
 
 require (
-	gitea.tagsamurai.local/Wangsit-Developer/be-core-utils v1.0.0-alpha
 	github.com/goccy/go-json v0.10.3
 	github.com/gofiber/fiber/v2 v2.52.6
 	go.mongodb.org/mongo-driver v1.17.3
@@ -28,14 +27,14 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.22.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
-	github.com/jackc/pgx/v5 v5.7.5 // indirect
+	github.com/jackc/pgx/v5 v5.7.5
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/nexus-rpc/sdk-go v0.5.1 // indirect
 	github.com/pierrec/lz4/v4 v4.1.15 // indirect
 	github.com/robfig/cron v1.2.0 // indirect
-	github.com/stretchr/testify v1.10.0 // indirect
+	github.com/stretchr/testify v1.10.0
 	github.com/valkey-io/valkey-go v1.0.75 // indirect
 	github.com/xuri/excelize/v2 v2.9.0 // indirect
 	go.opentelemetry.io/otel/metric v1.35.0 // indirect
@@ -50,6 +49,7 @@ require (
 )
 
 require (
+	gitea.tagsamurai.local/Wangsit-Developer/be-core-utils v1.0.1-alpha.0.20260611023018-16d4300d1faf // indirect
 	github.com/andybalholm/brotli v1.1.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/golang/snappy v1.0.0 // indirect
