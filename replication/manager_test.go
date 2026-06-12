@@ -260,3 +260,76 @@ func isChannelClosed(ch chan struct{}) bool {
 		return false
 	}
 }
+
+// GetClients test
+func TestGetClients_ExecuteWorkflowError(t *testing.T) {
+	temporalSvc := mocks.CreateTemporalService(nil, assert.AnError, nil)
+	rm := NewReplicationManager(config.ConfigOptions{}, temporalSvc, &service.MockPostgreSQLService{})
+
+	clients := rm.GetClients()
+
+	assert.Empty(t, clients)
+	mockClient := temporalSvc.Client.(*mocks.MockTemporalClient)
+	mockClient.AssertExpectations(t)
+}
+
+func TestGetClients_WorkflowGetError(t *testing.T) {
+	temporalSvc := mocks.CreateTemporalService(nil, nil, assert.AnError)
+	rm := NewReplicationManager(config.ConfigOptions{}, temporalSvc, &service.MockPostgreSQLService{})
+
+	clients := rm.GetClients()
+
+	assert.Empty(t, clients)
+	// verify ExecuteWorkflow was called
+	mockClient := temporalSvc.Client.(*mocks.MockTemporalClient)
+	mockClient.AssertExpectations(t)
+}
+
+func TestGetClients_Success(t *testing.T) {
+	testClients := []ems_model.Client{
+		{ClientID: "client-alpha"},
+		{ClientID: "client-beta"},
+	}
+	temporalSvc := mocks.CreateTemporalService(testClients, nil, nil)
+	rm := NewReplicationManager(config.ConfigOptions{}, temporalSvc, &service.MockPostgreSQLService{})
+
+	clients := rm.GetClients()
+
+	require.Len(t, clients, 2)
+	assert.Equal(t, "client-alpha", clients[0])
+	assert.Equal(t, "client-beta", clients[1])
+}
+
+func TestGetClients_EmptyList(t *testing.T) {
+	temporalSvc := mocks.CreateTemporalService([]ems_model.Client{}, nil, nil)
+	rm := NewReplicationManager(config.ConfigOptions{}, temporalSvc, &service.MockPostgreSQLService{})
+
+	clients := rm.GetClients()
+
+	assert.Empty(t, clients)
+}
+
+func TestGetClients_ContextTimeout(t *testing.T) {
+	// Verify that ExecuteWorkflow receives a context with a deadline (10s timeout).
+	mockClient := new(mocks.MockTemporalClient)
+	mockRun := new(mocks.MockWorkflowRun)
+
+	var capturedCtx context.Context
+	mockClient.On("ExecuteWorkflow", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+		Run(func(args mock.Arguments) {
+			capturedCtx = args.Get(0).(context.Context)
+		}).
+		Return(mockRun, nil)
+	mockRun.On("Get", mock.Anything, mock.Anything).
+		Return(nil)
+
+	temporalSvc := &service.TemporalService{Client: mockClient}
+	rm := NewReplicationManager(config.ConfigOptions{}, temporalSvc, &service.MockPostgreSQLService{})
+
+	rm.GetClients()
+
+	require.NotNil(t, capturedCtx)
+	deadline, ok := capturedCtx.Deadline()
+	assert.True(t, ok, "context should have a deadline (10s timeout)")
+	assert.WithinDuration(t, time.Now().Add(10*time.Second), deadline, 2*time.Second)
+}
