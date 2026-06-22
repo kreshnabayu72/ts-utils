@@ -19,6 +19,12 @@ import (
 	"go.temporal.io/sdk/temporal"
 )
 
+// newCDCReplicator is a package-level variable for dependency injection in tests.
+var newCDCReplicator = core_replication.NewCDCReplicator
+
+// stopReplicationTimeout is configurable for testing.
+var stopReplicationTimeout = 15 * time.Second
+
 // ReplicationManager orchestrates CDC (Change Data Capture) replication for a service.
 type ReplicationManager struct {
 	replicators     []api.CDCReplicatorInterface // All active replicators managed by this manager
@@ -81,7 +87,7 @@ func (rm *ReplicationManager) StartReplication(
 	sanitizedSource := strings.ReplaceAll(sourceDBName, "-", "_")
 	consumerGroup := fmt.Sprintf("%s_%s_replicator", sanitizedTarget, sanitizedSource)
 
-	replicator := core_replication.NewCDCReplicator(
+	replicator := newCDCReplicator(
 		context.Background(),
 		rm.dbSvc,
 		rm.cfg.KAFKA_BROKERS,
@@ -126,7 +132,7 @@ func (rm *ReplicationManager) StopReplication() {
 	select {
 	case <-done:
 		slog.Info("All replicators stopped gracefully")
-	case <-time.After(15 * time.Second):
+	case <-time.After(stopReplicationTimeout):
 		slog.Warn("Timeout waiting for replicators to stop")
 	}
 }
