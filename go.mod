@@ -3,10 +3,10 @@ module gitea.tagsamurai.local/BETS-V2/ts-utils/v2
 go 1.25.8
 
 require (
+	gitea.tagsamurai.local/Wangsit-Developer/be-core-utils v1.0.1-alpha.0.20260611023018-16d4300d1faf
 	github.com/goccy/go-json v0.10.3
 	github.com/gofiber/fiber/v2 v2.52.6
 	go.mongodb.org/mongo-driver v1.17.3
-	go.temporal.io/sdk v1.38.0
 )
 
 require (
@@ -27,12 +27,11 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.22.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
-	github.com/jackc/pgx/v5 v5.7.5
+	github.com/jackc/pgx/v5 v5.7.5 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/nexus-rpc/sdk-go v0.5.1 // indirect
-	github.com/pierrec/lz4/v4 v4.1.15 // indirect
 	github.com/robfig/cron v1.2.0 // indirect
 	github.com/stretchr/testify v1.10.0
 	github.com/valkey-io/valkey-go v1.0.75 // indirect
@@ -49,7 +48,6 @@ require (
 )
 
 require (
-	gitea.tagsamurai.local/Wangsit-Developer/be-core-utils v1.0.1-alpha.0.20260611023018-16d4300d1faf // indirect
 	github.com/andybalholm/brotli v1.1.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/golang/snappy v1.0.0 // indirect
@@ -64,7 +62,6 @@ require (
 	github.com/richardlehane/mscfb v1.0.4 // indirect
 	github.com/richardlehane/msoleps v1.0.4 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
-	github.com/segmentio/kafka-go v0.4.49 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.51.0 // indirect
@@ -75,6 +72,7 @@ require (
 	github.com/xuri/efp v0.0.0-20240408161823-9ad904a10d6d // indirect
 	github.com/xuri/nfp v0.0.0-20240318013403-ab9948c2c4a7 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 // indirect
+	go.temporal.io/sdk v1.38.0 // indirect
 	golang.org/x/crypto v0.50.0 // indirect
 	golang.org/x/net v0.53.0 // indirect
 	golang.org/x/sync v0.20.0 // indirect
