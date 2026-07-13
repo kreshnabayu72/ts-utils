@@ -101,6 +101,7 @@ const (
 	FixedAssetTransactionRoleTransactionKeyMaintenanceRoutineRole FixedAssetTransactionRoleTransactionKey = "maintenanceRoutineRole"
 	FixedAssetTransactionRoleTransactionKeyRepairTicketingRole    FixedAssetTransactionRoleTransactionKey = "repairTicketingRole"
 	FixedAssetTransactionRoleTransactionKeyTrackingRole           FixedAssetTransactionRoleTransactionKey = "trackingRole"
+	FixedAssetTransactionRoleTransactionKeyRegistrationRole       FixedAssetTransactionRoleTransactionKey = "registrationRole"
 )
 
 type FixedAssetTransactionRoleTransaction string
@@ -113,4 +114,5 @@ const (
 	FixedAssetTransactionRoleTransactionMaintenanceRoutine  FixedAssetTransactionRoleTransaction = "Maintenance Routine"
 	FixedAssetTransactionRoleTransactionRepairTicketing     FixedAssetTransactionRoleTransaction = "Repair Ticketing"
 	FixedAssetTransactionRoleTransactionTracking            FixedAssetTransactionRoleTransaction = "Tracking"
+	FixedAssetTransactionRoleTransactionRegistration        FixedAssetTransactionRoleTransaction = "Registration"
 )

@@ -11,4 +11,5 @@ const (
 	ReaderIdKey       ContextKey = "readerId"
 	FixedAssetPlanKey ContextKey = "fixedAssetPlan"
 	SupplyPlanKey     ContextKey = "supplyPlan"
+	UserRolesKey      ContextKey = "userFixedAssetRoles"
 )
