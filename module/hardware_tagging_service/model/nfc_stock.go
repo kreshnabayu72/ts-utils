@@ -14,16 +14,3 @@ type NfcStock struct {
 	UpdatedAt time.Time  `json:"updatedAt" column:"nfc_stocks.updated_at"`
 }
 
-func (r *NfcStock) GetColumns() []string {
-	return []string{
-		"id",
-		"short_code",
-		"code",
-		"client_id",
-		"usage_type",
-		"is_deleted",
-		"deleted_at",
-		"created_at",
-		"updated_at",
-	}
-}

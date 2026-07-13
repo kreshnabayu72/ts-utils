@@ -13,15 +13,3 @@ type UserAuth struct {
 	UpdatedAt time.Time  `json:"updatedAt" column:"user_auths.updated_at"`
 }
 
-func (r *UserAuth) GetColumns() []string {
-	return []string{
-		"id",
-		"email",
-		"client_id",
-		"password",
-		"is_deleted",
-		"deleted_at",
-		"created_at",
-		"updated_at",
-	}
-}

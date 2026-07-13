@@ -16,19 +16,4 @@ type HandheldReader struct {
 	CreatedAt          *time.Time `json:"createdAt" column:"handheld_readers.created_at"`
 	UpdatedAt          *time.Time `json:"updatedAt" column:"handheld_readers.updated_at"`
 }
-func (r *HandheldReader) GetColumns() []string {
-	return []string{
-		"id",
-		"alias_name",
-		"status",
-		"handheld_stock_id",
-		"fixed_asset_group_id",
-		"supply_asset_group_id",
-		"reported_by_id",
-		"reported_at",
-		"is_deleted",
-		"deleted_at",
-		"created_at",
-		"updated_at",
-	}
-}
+

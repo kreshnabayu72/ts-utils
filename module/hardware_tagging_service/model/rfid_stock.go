@@ -14,16 +14,3 @@ type RfidStock struct {
 	UpdatedAt time.Time  `json:"updatedAt" column:"rfid_stocks.updated_at"`
 }
 
-func (r *RfidStock) GetColumns() []string {
-	return []string{
-		"id",
-		"short_code",
-		"code",
-		"client_id",
-		"usage_type",
-		"is_deleted",
-		"deleted_at",
-		"created_at",
-		"updated_at",
-	}
-}

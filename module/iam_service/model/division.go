@@ -1,3 +1,4 @@
+// Package model defines the iam-service cross-service database row types.
 package model
 
 import "time"
@@ -8,11 +9,4 @@ type Division struct {
 	CreatedAt time.Time `json:"createdAt" column:"divisions.created_at"`
 	UpdatedAt time.Time `json:"updatedAt" column:"divisions.updated_at"`
 }
-func (r *Division) GetColumns() []string {
-	return []string{
-		"id",
-		"name",
-		"created_at",
-		"updated_at",
-	}
-}
+

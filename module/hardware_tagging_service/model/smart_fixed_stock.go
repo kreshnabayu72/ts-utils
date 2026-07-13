@@ -18,20 +18,3 @@ type SmartFixedStock struct {
 	UpdatedAt          time.Time  `json:"updatedAt" column:"smart_fixed_stocks.updated_at"`
 }
 
-func (r *SmartFixedStock) GetColumns() []string {
-	return []string{
-		"id",
-		"sku_id",
-		"serial_number",
-		"type",
-		"device_name_id",
-		"device_name_sequence",
-		"iot_code",
-		"license_key",
-		"client_id",
-		"is_deleted",
-		"deleted_at",
-		"created_at",
-		"updated_at",
-	}
-}

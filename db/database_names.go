@@ -1,3 +1,5 @@
+// Package db provides database and table name constants, Valkey service
+// constructors, and the shared PostgreSQL service interface.
 package db
 
 import "fmt"

@@ -1,3 +1,4 @@
+// Package dto defines the enterprise-management-service activity parameters.
 package dto
 
 type GetClientParam struct {

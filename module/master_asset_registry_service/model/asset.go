@@ -16,14 +16,3 @@ type Asset struct {
 	UpdatedAt        time.Time        `json:"updatedAt"        column:"assets.updated_at"`
 }
 
-func (a *Asset) GetColumns() []string {
-	return []string{
-		"id",
-		"name_with_sequence",
-		"status",
-		"is_deleted",
-		"deleted_at",
-		"created_at",
-		"updated_at",
-	}
-}

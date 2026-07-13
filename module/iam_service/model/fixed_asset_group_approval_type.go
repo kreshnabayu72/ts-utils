@@ -17,16 +17,4 @@ type FixedAssetGroupApprovalType struct {
 	CreatedAt      time.Time                                    `json:"createdAt"      column:"fixed_asset_group_approval_types.created_at"`
 	UpdatedAt      time.Time                                    `json:"updatedAt"      column:"fixed_asset_group_approval_types.updated_at"`
 }
-func (r *FixedAssetGroupApprovalType) GetColumns() []string {
-	return []string{
-		"id",
-		"level",
-		"transaction_key",
-		"group_id",
-		"approval_type",
-		"is_deleted",
-		"deleted_at",
-		"created_at",
-		"updated_at",
-	}
-}
+

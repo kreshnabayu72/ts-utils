@@ -1,3 +1,4 @@
+// Package model defines the file-manager-service database row types.
 package model
 
 import "time"
@@ -24,26 +25,3 @@ type FileManagerData struct {
 	UpdatedAt                       time.Time  `json:"updatedAt"                       column:"file_manager_data.updated_at"`
 }
 
-func (r *FileManagerData) GetColumns() []string {
-	return []string{
-		"id",
-		"type",
-		"fixed_asset_group_id",
-		"transaction_id",
-		"file_name",
-		"file_path",
-		"file_format",
-		"file_size",
-		"file_size_kb",
-		"user_id",
-		"attachment_id",
-		"asset_custom_field_id",
-		"fixed_asset_disposal_transaction_id",
-		"asset_id",
-		"modified_by_id",
-		"is_deleted",
-		"deleted_at",
-		"created_at",
-		"updated_at",
-	}
-}

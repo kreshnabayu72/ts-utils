@@ -20,18 +20,3 @@ type CustomField struct {
 	UpdatedAt   time.Time                `json:"updatedAt"   column:"custom_fields.updated_at"`
 }
 
-func (c *CustomField) GetColumns() []string {
-	return []string{
-		"id",
-		"name",
-		"type",
-		"data_type",
-		"is_required",
-		"option_value",
-		"is_active",
-		"is_deleted",
-		"deleted_at",
-		"created_at",
-		"updated_at",
-	}
-}

@@ -19,14 +19,4 @@ type TagPair struct {
 	CreatedAt time.Time `json:"createdAt" column:"tag_pairs.created_at"`
 	UpdatedAt time.Time `json:"updatedAt" column:"tag_pairs.updated_at"`
 }
-func (r *TagPair) GetColumns() []string {
-	return []string{
-		"id",
-		"rfid_id",
-		"nfc_id",
-		"qr_id",
-		"tag_type",
-		"created_at",
-		"updated_at",
-	}
-}
+

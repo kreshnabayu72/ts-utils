@@ -1,3 +1,6 @@
+// Package middleware provides Fiber middleware for authentication,
+// service-to-service auth, RBAC snapshot loading, and the shared
+// request-identity helpers (ClientID, CallerID, GetUserRoles).
 package middleware
 
 import (

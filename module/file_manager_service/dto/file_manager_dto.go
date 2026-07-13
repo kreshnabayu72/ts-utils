@@ -1,3 +1,4 @@
+// Package dto defines the file-manager-service activity parameters.
 package dto
 
 import "gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/file_manager_service/model"

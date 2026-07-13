@@ -1,3 +1,5 @@
+// Package helper provides small pure functions (sequence-number
+// formatting, tag-code generation) reused across services.
 package helper
 
 import (

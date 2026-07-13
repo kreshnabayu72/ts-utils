@@ -21,16 +21,4 @@ type QR struct {
 	CreatedAt time.Time `json:"createdAt" column:"qrs.created_at"`
 	UpdatedAt time.Time `json:"updatedAt" column:"qrs.updated_at"`
 }
-func (r *QR) GetColumns() []string {
-	return []string{
-		"id",
-		"code",
-		"short_code",
-		"status",
-		"last_scan_module",
-		"reported_by_id",
-		"reported_at",
-		"created_at",
-		"updated_at",
-	}
-}
+

@@ -11,13 +11,3 @@ type SupplyAssetGroup struct {
 	UpdatedAt time.Time  `json:"updatedAt" column:"supply_asset_groups.updated_at"`
 }
 
-func (r *SupplyAssetGroup) GetColumns() []string {
-	return []string{
-		"id",
-		"name",
-		"is_deleted",
-		"deleted_at",
-		"created_at",
-		"updated_at",
-	}
-}

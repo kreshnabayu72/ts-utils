@@ -16,18 +16,3 @@ type IAMCustomField struct {
 	UpdatedAt     time.Time  `json:"updatedAt"     column:"iam_custom_fields.updated_at"`
 }
 
-func (r *IAMCustomField) GetColumns() []string {
-	return []string{
-		"id",
-		"name",
-		"data_type",
-		"option_value",
-		"decimal_places",
-		"is_required",
-		"is_active",
-		"is_deleted",
-		"deleted_at",
-		"created_at",
-		"updated_at",
-	}
-}
