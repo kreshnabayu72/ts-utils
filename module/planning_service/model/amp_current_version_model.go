@@ -1,3 +1,4 @@
+// Package new_model defines the planning-service database row types.
 package new_model
 
 import (

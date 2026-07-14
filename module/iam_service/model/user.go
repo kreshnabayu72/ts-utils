@@ -47,51 +47,6 @@ type User struct {
 	UpdatedAt                  time.Time  `json:"updatedAt"                  column:"users.updated_at"`
 }
 
-func (r *User) GetColumns() []string {
-	return []string{
-		"id",
-		"is_active_global_settings",
-		"is_active_fixed_asset",
-		"is_active_supply_asset",
-		"is_active_admin_console",
-		"is_active_inventory",
-		"is_active",
-		"is_total_control_fixed_asset",
-		"is_read_only_fixed_asset",
-		"is_total_control_supply_asset",
-		"is_read_only_supply_asset",
-		"is_total_control_admin_console",
-		"is_read_only_admin_console",
-		"is_total_control_inventory",
-		"is_read_only_inventory",
-		"is_default",
-		"is_email_confirmed",
-		"is_sub_user",
-		"first_name",
-		"last_name",
-		"email",
-		"employee_id",
-		"full_name",
-		"profile_picture",
-		"fcm_token",
-		"position_id",
-		"division_id",
-		"pending_email_change",
-		"expiry_date",
-		"rfid_id",
-		"parent_id",
-		"parent_name",
-		"is_consented",
-		"consent_date",
-		"modified_by_id",
-		"access",
-		"is_deleted",
-		"deleted_at",
-		"created_at",
-		"updated_at",
-	}
-}
-
 type UserWithPosition struct {
 	ID                         int        `json:"_id"                        column:"users.id"`
 	IsActiveGlobalSettings     bool       `json:"isActiveGlobalSettings"     column:"users.is_active_global_settings"`
@@ -133,48 +88,4 @@ type UserWithPosition struct {
 	CreatedAt                  time.Time  `json:"createdAt"                  column:"users.created_at"`
 	UpdatedAt                  time.Time  `json:"updatedAt"                  column:"users.updated_at"`
 	PositionName               *string    `json:"positionName" column:"positions.name"`
-}
-func (r *UserWithPosition) GetColumns() []string {
-	return []string{
-		"id",
-		"is_active_global_settings",
-		"is_active_fixed_asset",
-		"is_active_supply_asset",
-		"is_active_admin_console",
-		"is_active_inventory",
-		"is_active",
-		"is_total_control_fixed_asset",
-		"is_read_only_fixed_asset",
-		"is_total_control_supply_asset",
-		"is_read_only_supply_asset",
-		"is_total_control_admin_console",
-		"is_read_only_admin_console",
-		"is_total_control_inventory",
-		"is_read_only_inventory",
-		"is_default",
-		"is_email_confirmed",
-		"is_sub_user",
-		"first_name",
-		"last_name",
-		"email",
-		"employee_id",
-		"full_name",
-		"profile_picture",
-		"fcm_token",
-		"position_id",
-		"division_id",
-		"pending_email_change",
-		"expiry_date",
-		"rfid_id",
-		"parent_id",
-		"parent_name",
-		"is_consented",
-		"consent_date",
-		"modified_by_id",
-		"access",
-		"is_deleted",
-		"created_at",
-		"updated_at",
-		"name",
-	}
 }

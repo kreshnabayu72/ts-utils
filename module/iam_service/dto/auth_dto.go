@@ -1,3 +1,4 @@
+// Package dto defines the iam-service cross-service activity parameters.
 package dto
 
 // DeleteAllUserAuthByClientIDActivityParam holds the client identifier to hard-delete.

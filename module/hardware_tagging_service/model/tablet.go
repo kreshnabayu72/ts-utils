@@ -15,18 +15,4 @@ type Tablet struct {
 	CreatedAt     time.Time  `json:"createdAt" column:"tablets.created_at"`
 	UpdatedAt     time.Time  `json:"updatedAt" column:"tablets.updated_at"`
 }
-func (r *Tablet) GetColumns() []string {
-	return []string{
-		"id",
-		"reader_id",
-		"alias_name",
-		"status",
-		"tablet_stock_id",
-		"reported_by_id",
-		"reported_at",
-		"is_deleted",
-		"deleted_at",
-		"created_at",
-		"updated_at",
-	}
-}
+

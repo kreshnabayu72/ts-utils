@@ -1,3 +1,4 @@
+// Package model defines the enterprise-management-service database row types.
 package model
 
 import (
@@ -7,6 +8,7 @@ import (
 // Client represents the 'clients' table in the enterprise management database.
 type Client struct {
 	ID                              int        `column:"id"                                  json:"id"`
+	Status                          string     `column:"status"                              json:"status"`
 	Prefix                          string     `column:"prefix"                              json:"prefix"`
 	Suffix                          string     `column:"suffix"                              json:"suffix"`
 	Name                            string     `column:"name"                                json:"name"`
@@ -61,53 +63,3 @@ type Client struct {
 	FileStorageDeleteCountdown      *int64     `column:"file_storage_delete_countdown"       json:"fileStorageDeleteCountdown"`
 }
 
-func (r *Client) GetColumns() []string {
-	return []string{
-		"id",
-		"prefix",
-		"suffix",
-		"name",
-		"client_id",
-		"partner_id",
-		"email",
-		"country",
-		"state",
-		"city",
-		"zip",
-		"phone_number",
-		"fax",
-		"address",
-		"group_id",
-		"image",
-		"contact_person_name",
-		"contact_person_email",
-		"contact_person_pending_email_change",
-		"login_session_minutes",
-		"pin_number",
-		"is_deleted",
-		"deleted_at",
-		"created_at",
-		"updated_at",
-		"is_email_confirmed",
-		"date_format",
-		"time_format",
-		"time_zone",
-		"geolocation",
-		"plan_fixed_asset",
-		"plan_supply_asset",
-		"plan_inventory_asset",
-		"plan_procurement_asset",
-		"currency_currency",
-		"currency_symbol",
-		"currency_locale",
-		"currency_label",
-		"file_storage_total_kb",
-		"file_storage_available_kb",
-		"file_storage_used_kb",
-		"file_storage_attachment_kb",
-		"file_storage_damage_kb",
-		"file_storage_disposal_kb",
-		"file_storage_repair_ticketing_kb",
-		"file_storage_routine_kb",
-	}
-}

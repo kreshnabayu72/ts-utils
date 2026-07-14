@@ -1,5 +1,0 @@
-{
-  "action": "string",
-  "approvalType": "string",
-  "approvalLevel": "number"
-}

@@ -1,3 +1,4 @@
+// Package dto defines the asset-transaction-service activity parameters.
 package dto
 
 type GetUsersAssignedAssetCountParam struct {

@@ -1,0 +1,163 @@
+package middleware
+
+import (
+	"context"
+	"encoding/json"
+	"errors"
+	"net/http/httptest"
+	"testing"
+
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/constant"
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/enum"
+	"gitea.tagsamurai.local/Wangsit-Developer/be-core-utils/service"
+	"github.com/gofiber/fiber/v2"
+)
+
+// fakeCache is a Valkey stand-in: it embeds the real interface (so it satisfies it) and overrides
+// only Get, the one method the middleware reads.
+type fakeCache struct {
+	service.ValkeyServiceInterface
+	get func(ctx context.Context, key string) (string, error)
+}
+
+func (f fakeCache) Get(ctx context.Context, key string) (string, error) { return f.get(ctx, key) }
+
+// missCache always misses, so the middleware falls through to the iam fetch.
+func missCache() fakeCache {
+	return fakeCache{get: func(context.Context, string) (string, error) {
+		return "", errors.New("cache miss")
+	}}
+}
+
+func newRolesFixture() UserAccessCache {
+	var r UserAccessCache
+	r.ID = 42
+	r.FullName = "Elaina"
+	r.ClientID = "acme"
+	r.ModuleAccess = map[enum.ModuleAccess]ModuleFlags{"fixedAsset": {IsTotalControl: true}}
+	return r
+}
+
+// captureRoles is a terminal handler that records what the middleware placed in Locals.
+func captureRoles(got *UserAccessCache, found *bool) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		r, ok := GetUserRoles(c)
+		*got, *found = r, ok
+		return c.SendStatus(fiber.StatusOK)
+	}
+}
+
+func TestLoadUserRoles_PutsSnapshotInLocals(t *testing.T) {
+	fixture := newRolesFixture()
+
+	var gotUserID, gotClientID string
+	fetch := func(_ context.Context, userID, clientID string) (UserAccessCache, error) {
+		gotUserID, gotClientID = userID, clientID
+		return fixture, nil
+	}
+
+	var got UserAccessCache
+	var found bool
+	app := fiber.New()
+	app.Use(loadUserRoles(missCache(), fetch))
+	app.Get("/", captureRoles(&got, &found))
+
+	req := httptest.NewRequest("GET", "/", nil)
+	req.Header.Set(constant.HEADER_USER_ID, "42")
+	req.Header.Set(constant.HEADER_CLIENT_ID, "acme")
+	resp, err := app.Test(req)
+	if err != nil {
+		t.Fatalf("app.Test: %v", err)
+	}
+	if resp.StatusCode != fiber.StatusOK {
+		t.Fatalf("status = %d, want 200", resp.StatusCode)
+	}
+	if gotUserID != "42" || gotClientID != "acme" {
+		t.Errorf("fetch called with %q/%q, want 42/acme", gotUserID, gotClientID)
+	}
+	if !found || got.ID != 42 || got.FullName != "Elaina" {
+		t.Errorf("Locals roles = %+v found=%v, want fixture", got, found)
+	}
+}
+
+func TestLoadUserRoles_CacheHitSkipsIAM(t *testing.T) {
+	fixture := newRolesFixture()
+	payload, _ := json.Marshal(fixture)
+
+	hit := fakeCache{get: func(_ context.Context, key string) (string, error) {
+		if key != UserRolesCacheKey("42") {
+			t.Errorf("cache key = %q, want %q", key, UserRolesCacheKey("42"))
+		}
+		return string(payload), nil
+	}}
+	fetch := func(context.Context, string, string) (UserAccessCache, error) {
+		t.Error("iam must not be called on a cache hit")
+		return UserAccessCache{}, nil
+	}
+
+	var got UserAccessCache
+	var found bool
+	app := fiber.New()
+	app.Use(loadUserRoles(hit, fetch))
+	app.Get("/", captureRoles(&got, &found))
+
+	req := httptest.NewRequest("GET", "/", nil)
+	req.Header.Set(constant.HEADER_USER_ID, "42")
+	req.Header.Set(constant.HEADER_CLIENT_ID, "acme")
+	resp, err := app.Test(req)
+	if err != nil {
+		t.Fatalf("app.Test: %v", err)
+	}
+	if resp.StatusCode != fiber.StatusOK {
+		t.Fatalf("status = %d, want 200", resp.StatusCode)
+	}
+	if !found || got.ID != 42 {
+		t.Errorf("Locals roles = %+v found=%v, want fixture from cache", got, found)
+	}
+}
+
+func TestLoadUserRoles_FailsClosedWhenIAMUnavailable(t *testing.T) {
+	fetch := func(context.Context, string, string) (UserAccessCache, error) {
+		return UserAccessCache{}, errors.New("connection refused")
+	}
+
+	reached := false
+	app := fiber.New()
+	app.Use(loadUserRoles(missCache(), fetch))
+	app.Get("/", func(c *fiber.Ctx) error {
+		reached = true
+		return c.SendStatus(fiber.StatusOK)
+	})
+
+	req := httptest.NewRequest("GET", "/", nil)
+	req.Header.Set(constant.HEADER_USER_ID, "42")
+	req.Header.Set(constant.HEADER_CLIENT_ID, "acme")
+	resp, err := app.Test(req)
+	if err != nil {
+		t.Fatalf("app.Test: %v", err)
+	}
+	if resp.StatusCode != fiber.StatusServiceUnavailable {
+		t.Fatalf("status = %d, want 503 (authorization must fail closed)", resp.StatusCode)
+	}
+	if reached {
+		t.Error("handler ran without an RBAC snapshot; the request must not get through unscoped")
+	}
+}
+
+func TestLoadUserRoles_MissingHeaders_Unauthorized(t *testing.T) {
+	fetch := func(context.Context, string, string) (UserAccessCache, error) {
+		t.Error("fetch must not be called without identity headers")
+		return UserAccessCache{}, nil
+	}
+	app := fiber.New()
+	app.Use(loadUserRoles(missCache(), fetch))
+	app.Get("/", func(c *fiber.Ctx) error { return c.SendStatus(fiber.StatusOK) })
+
+	resp, err := app.Test(httptest.NewRequest("GET", "/", nil)) // no headers
+	if err != nil {
+		t.Fatalf("app.Test: %v", err)
+	}
+	if resp.StatusCode != fiber.StatusUnauthorized {
+		t.Fatalf("status = %d, want 401", resp.StatusCode)
+	}
+}

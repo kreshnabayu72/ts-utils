@@ -18,20 +18,3 @@ type HandheldStock struct {
 	UpdatedAt          time.Time  `json:"updatedAt" column:"handheld_stocks.updated_at"`
 }
 
-func (r *HandheldStock) GetColumns() []string {
-	return []string{
-		"id",
-		"sku_id",
-		"serial_number",
-		"type",
-		"device_name_id",
-		"device_name_sequence",
-		"hardware_id",
-		"license_key",
-		"client_id",
-		"deleted_at",
-		"is_deleted",
-		"created_at",
-		"updated_at",
-	}
-}

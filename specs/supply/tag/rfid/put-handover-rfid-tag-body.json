@@ -1,4 +1,0 @@
-{
-  "holderId": "string,objectId",
-  "rfidTag": "string[]"
-}

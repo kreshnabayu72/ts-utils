@@ -18,16 +18,4 @@ type RFID struct {
 	CreatedAt           *time.Time             `json:"createdAt" column:"rfids.created_at"`
 	UpdatedAt           *time.Time             `json:"updatedAt" column:"rfids.updated_at"`
 }
-func (r *RFID) GetColumns() []string {
-	return []string{
-		"id",
-		"status",
-		"last_scan_module",
-		"to_be_returned_asset_id",
-		"to_be_returned_at",
-		"reported_by_id",
-		"reported_at",
-		"created_at",
-		"updated_at",
-	}
-}
+

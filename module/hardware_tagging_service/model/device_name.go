@@ -1,3 +1,4 @@
+// Package model defines the hardware-tagging-service database row types.
 package model
 
 import "time"
@@ -10,13 +11,4 @@ type DeviceName struct {
 	CreatedAt time.Time  `json:"createdAt" column:"device_names.created_at"`
 	UpdatedAt time.Time  `json:"updatedAt" column:"device_names.updated_at"`
 }
-func (r *DeviceName) GetColumns() []string {
-	return []string{
-		"id",
-		"name",
-		"is_deleted",
-		"deleted_at",
-		"created_at",
-		"updated_at",
-	}
-}
+

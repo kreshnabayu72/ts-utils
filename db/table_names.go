@@ -66,6 +66,7 @@ const (
 	FixedAssetDamageReportTableName        = "fixed_asset_damage_reports"
 	FixedAssetDamageReportHistoryTableName = "fixed_asset_damage_report_histories"
 	FixedAssetUserTransactionRoleTableName = "fixed_asset_user_transaction_roles"
+	FixedAssetUserSystemRoleTableName      = "fixed_asset_user_system_roles"
 	// DisposalRequestHistoryTableName           = "disposal_request_histories"
 	// DisposalTransactionHistoryTableName       = "disposal_transaction_histories"
 	FileManagerDataTableName = "file_manager_data"

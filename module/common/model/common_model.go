@@ -1,3 +1,5 @@
+// Package model defines shared embedded types (UserEmbedded, Tag, TimeRange)
+// reused across multiple services.
 package model
 
 import (

@@ -20,20 +20,4 @@ type Sku struct {
 	CreatedAt   time.Time  `json:"createdAt" column:"skus.created_at"`
 	UpdatedAt   time.Time  `json:"updatedAt" column:"skus.updated_at"`
 }
-func (r *Sku) GetColumns() []string {
-	return []string{
-		"id",
-		"device_name_id",
-		"name",
-		"code",
-		"first_image",
-		"second_image",
-		"set_default",
-		"image",
-		"total_ports",
-		"is_deleted",
-		"deleted_at",
-		"created_at",
-		"updated_at",
-	}
-}
+

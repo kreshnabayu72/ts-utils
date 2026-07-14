@@ -15,18 +15,4 @@ type FixedAssetUserSystemRole struct {
 	Name             enum.FixedAssetSystemRoleName `json:"name"             column:"fixed_asset_user_system_roles.name"`
 	Key              enum.FixedAssetSystemRoleKey  `json:"key"              column:"fixed_asset_user_system_roles.key"`
 }
-func (r *FixedAssetUserSystemRole) GetColumns() []string {
-	return []string{
-		"id",
-		"user_id",
-		"is_active",
-		"permission_view",
-		"permission_create",
-		"permission_update",
-		"permission_delete",
-		"group_id",
-		"category",
-		"name",
-		"key",
-	}
-}
+

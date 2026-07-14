@@ -7,12 +7,3 @@ type FixedAssetGroup struct {
 	Level    int    `json:"level"    column:"fixed_asset_groups.level"`
 	ParentId *int   `json:"parentId" column:"fixed_asset_groups.parent_id"`
 }
-func (r *FixedAssetGroup) GetColumns() []string {
-	return []string{
-		"id",
-		"name",
-		"code",
-		"level",
-		"parent_id",
-	}
-}

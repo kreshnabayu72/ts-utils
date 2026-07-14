@@ -1,9 +1,0 @@
-{
-  "stocks": [
-    {
-      "_id": "string,objectId",
-      "productionDate": "number,nullable",
-      "expiredDate": "number,nullable"
-    }
-  ]
-}

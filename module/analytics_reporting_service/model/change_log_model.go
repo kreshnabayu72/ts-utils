@@ -1,3 +1,4 @@
+// Package model defines the analytics-reporting-service database row types.
 package model
 
 import (

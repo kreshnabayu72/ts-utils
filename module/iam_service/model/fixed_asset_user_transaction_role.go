@@ -19,18 +19,4 @@ type FixedAssetUserTransactionRole struct {
 	CreatedAt      time.Time                                    `json:"createdAt"      column:"fixed_asset_user_transaction_roles.created_at"`
 	UpdatedAt      time.Time                                    `json:"updatedAt"      column:"fixed_asset_user_transaction_roles.updated_at"`
 }
-func (r *FixedAssetUserTransactionRole) GetColumns() []string {
-	return []string{
-		"id",
-		"user_id",
-		"is_active",
-		"type",
-		"transaction",
-		"transaction_key",
-		"group_id",
-		"approval_level",
-		"approval_type",
-		"created_at",
-		"updated_at",
-	}
-}
+

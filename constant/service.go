@@ -1,10 +1,6 @@
 package constant
 
 const (
-	DB_PROVIDER_NAME       = "DBProvider"
-	PASSWORD_PROVIDER_NAME = "PasswordProvider"
-	TEMPORAL_SERVICE_NAME  = "TemporalService"
-
 	API_GATEWAY_SERVICE_NAME           = "api-gateway-service"
 	ANALYTICS_REPORTING_SERVICE_NAME   = "analytics-reporting-service"
 	APPROVAL_SERVICE_NAME              = "approval-service"
@@ -80,10 +76,4 @@ const (
 
 	// Source Approval Service
 	ApprovalGetUsersPendingApprovalCountActivity = "GetUsersPendingApprovalCountActivity"
-)
-
-const (
-	// PeerDBKafkaPeerName is the name of the single shared Kafka peer in PeerDB.
-	// It is the fan-out destination peer for all CDC mirrors across all services.
-	PeerDBKafkaPeerName = "kafka_peer"
 )

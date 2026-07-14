@@ -1,9 +1,0 @@
-{
-  "stocks": [
-    {
-      "_id": "string,objectId",
-      "newExpiredDate": "number,epoch",
-      "note": "string"
-    }
-  ]
-}
