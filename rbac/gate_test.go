@@ -11,7 +11,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-const borrowTx = enum.FixedAssetTransactionRoleTransactionBorrowingAssignment
+const borrowTx = enum.FixedAssetTransactionRoleTransactionKeyBorrowAssignRole
 
 // runGate mounts the gate behind a stub that injects roles into Locals, and reports the status the
 // request ended with plus whether the handler was reached.
@@ -40,7 +40,7 @@ func runGate(t *testing.T, roles *middleware.UserAccessCache, rules ...Rule) (in
 
 func rolesWithTx(types map[enum.TransactionRolesType][]string) *middleware.UserAccessCache {
 	var r middleware.UserAccessCache
-	r.TransactionRole = map[enum.FixedAssetTransactionRoleTransaction]map[enum.TransactionRolesType][]string{
+	r.TransactionRole = map[enum.FixedAssetTransactionRoleTransactionKey]map[enum.TransactionRolesType][]string{
 		borrowTx: types,
 	}
 	return &r

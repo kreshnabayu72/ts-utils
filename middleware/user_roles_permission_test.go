@@ -144,9 +144,9 @@ func TestHasAnySystemPermission_GlobalOnly(t *testing.T) {
 }
 
 func TestTransactionRoleHelpers(t *testing.T) {
-	const tx = enum.FixedAssetTransactionRoleTransactionBorrowingAssignment
+	const tx = enum.FixedAssetTransactionRoleTransactionKeyBorrowAssignRole
 	var roles UserAccessCache
-	roles.TransactionRole = map[enum.FixedAssetTransactionRoleTransaction]map[enum.TransactionRolesType][]string{
+	roles.TransactionRole = map[enum.FixedAssetTransactionRoleTransactionKey]map[enum.TransactionRolesType][]string{
 		tx: {
 			enum.TransactionRolesTypeManager:    {"10"},
 			enum.TransactionRolesTypeMonitoring: {"20"},

@@ -25,7 +25,7 @@ type UserAccessCache struct {
 		GlobalRole map[enum.FixedAssetSystemRoleKey]Permissions[bool]     `json:"globalRole"`
 		GroupRoles map[enum.FixedAssetSystemRoleKey]Permissions[[]string] `json:"groupRoles"`
 	} `json:"systemRole"`
-	TransactionRole map[enum.FixedAssetTransactionRoleTransaction]map[enum.TransactionRolesType][]string `json:"transactionRole"`
+	TransactionRole map[enum.FixedAssetTransactionRoleTransactionKey]map[enum.TransactionRolesType][]string `json:"transactionRole"`
 }
 
 // ModuleFlags is the per-module top-level access (e.g. moduleAccess.fixedAsset).
@@ -160,6 +160,67 @@ func (r UserAccessCache) GroupIDsWithPermission(verb PermissionVerb, keys ...enu
 	return out
 }
 
+// PermissionEntry is the unit of lookup for GroupIDsFor: either a system-role permission or a
+// transaction role. Fields are unexported and the isTransaction discriminant is set only by the
+// two constructors below, so a caller cannot build one that names both or neither.
+type PermissionEntry struct {
+	isTransaction   bool
+	verb            PermissionVerb
+	systemRole      enum.FixedAssetSystemRoleKey
+	transactionRole enum.FixedAssetTransactionRoleTransactionKey
+	transactionType enum.TransactionRolesType
+}
+
+// ForSystemRole builds a PermissionEntry that looks up group ids by system-role permission.
+func ForSystemRole(verb PermissionVerb, key enum.FixedAssetSystemRoleKey) PermissionEntry {
+	return PermissionEntry{verb: verb, systemRole: key}
+}
+
+// ForTransactionRole builds a PermissionEntry that looks up group ids by transaction role.
+func ForTransactionRole(
+	transactionRole enum.FixedAssetTransactionRoleTransactionKey,
+	transactionType enum.TransactionRolesType,
+) PermissionEntry {
+	return PermissionEntry{isTransaction: true, transactionRole: transactionRole, transactionType: transactionType}
+}
+
+// GroupIDsFor returns the group ids where the user holds each entry — system-role permission or
+// transaction role — deduped across all entries.
+//
+//	roles.GroupIDsFor(
+//	    middleware.ForSystemRole(PermView, Assets),
+//	    middleware.ForTransactionRole(borrowTx, Manager),
+//	)
+func (r UserAccessCache) GroupIDsFor(entries ...PermissionEntry) []int64 {
+	seen := map[int64]bool{}
+	var out []int64
+	for _, e := range entries {
+		if e.isTransaction {
+			gids := r.GroupIDsWithTransactionRole(e.transactionRole, e.transactionType)
+			for _, id := range gids {
+				if !seen[id] {
+					seen[id] = true
+					out = append(out, id)
+				}
+			}
+			continue
+		}
+		g, ok := r.SystemRole.GroupRoles[e.systemRole]
+		if !ok {
+			continue
+		}
+		for _, raw := range pickPermission(g, e.verb) {
+			id, err := strconv.ParseInt(raw, 10, 64)
+			if err != nil || seen[id] {
+				continue
+			}
+			seen[id] = true
+			out = append(out, id)
+		}
+	}
+	return out
+}
+
 // HasAnySystemPermission reports whether the user holds `verb` GLOBALLY (tenant-wide, no group_id)
 // on any of `keys`. Unlike HasSystemPermission, this does NOT look at group-scoped grants — it
 // answers "does one of these keys, held globally, waive the group filter entirely", which is what a
@@ -180,7 +241,7 @@ func (r UserAccessCache) HasAnySystemPermission(verb PermissionVerb, keys ...enu
 // HasTransactionRole reports whether the user holds ANY of `types` on `transaction` in the
 // specific group `groupID`.
 func (r UserAccessCache) HasTransactionRole(
-	transaction enum.FixedAssetTransactionRoleTransaction,
+	transaction enum.FixedAssetTransactionRoleTransactionKey,
 	groupID int64,
 	types ...enum.TransactionRolesType,
 ) bool {
@@ -203,7 +264,7 @@ func (r UserAccessCache) HasTransactionRole(
 // GroupIDsWithTransactionRole returns the group ids where the user holds ANY of `types` on
 // `transaction` — union across all given types, deduped.
 func (r UserAccessCache) GroupIDsWithTransactionRole(
-	transaction enum.FixedAssetTransactionRoleTransaction,
+	transaction enum.FixedAssetTransactionRoleTransactionKey,
 	types ...enum.TransactionRolesType,
 ) []int64 {
 	byType, ok := r.TransactionRole[transaction]

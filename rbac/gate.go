@@ -77,7 +77,7 @@ func SystemRole(verb middleware.PermissionVerb, keys ...enum.FixedAssetSystemRol
 // (ADR 005), because approving is authorized by the approval ROW that names you, not by a role.
 // Gate approver routes with Assignment — that is what survives a role revocation.
 func TransactionRole(
-	transaction enum.FixedAssetTransactionRoleTransaction,
+	transaction enum.FixedAssetTransactionRoleTransactionKey,
 	types ...enum.TransactionRolesType,
 ) Rule {
 	return func(_ *fiber.Ctx, roles middleware.UserAccessCache) (bool, error) {
