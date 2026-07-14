@@ -96,7 +96,7 @@ func TestTransactionRole(t *testing.T) {
 func TestTransactionRole_TotalControlPasses(t *testing.T) {
 	var tc middleware.UserAccessCache
 	tc.ModuleAccess = map[enum.ModuleAccess]middleware.ModuleFlags{
-		enum.ModuleAccessKeyFixedAsset: {IsTotalControl: true},
+		enum.ModuleAccessFixedAsset: {IsTotalControl: true},
 	}
 	status, _ := runGate(t, &tc, TransactionRole(borrowTx, enum.TransactionRolesTypeManager))
 	if status != fiber.StatusOK {
@@ -109,7 +109,7 @@ func TestTransactionRole_TotalControlPasses(t *testing.T) {
 func TestSeeAll_ReadOnlyOnlyPassesWhenComposed(t *testing.T) {
 	var ro middleware.UserAccessCache
 	ro.ModuleAccess = map[enum.ModuleAccess]middleware.ModuleFlags{
-		enum.ModuleAccessKeyFixedAsset: {IsReadOnly: true},
+		enum.ModuleAccessFixedAsset: {IsReadOnly: true},
 	}
 
 	status, _ := runGate(t, &ro, TransactionRole(borrowTx, enum.TransactionRolesTypeManager))
@@ -166,9 +166,9 @@ func TestModuleAccess(t *testing.T) {
 	// User with total control on fixedAsset should pass ModuleAccess(fixedAsset).
 	var tc middleware.UserAccessCache
 	tc.ModuleAccess = map[enum.ModuleAccess]middleware.ModuleFlags{
-		enum.ModuleAccessKeyFixedAsset: {IsTotalControl: true},
+		enum.ModuleAccessFixedAsset: {IsTotalControl: true},
 	}
-	status, reached := runGate(t, &tc, ModuleAccess(enum.ModuleAccessKeyFixedAsset))
+	status, reached := runGate(t, &tc, ModuleAccess(enum.ModuleAccessFixedAsset))
 	if status != fiber.StatusOK || !reached {
 		t.Errorf("total control should pass ModuleAccess: status=%d reached=%v", status, reached)
 	}
@@ -176,16 +176,16 @@ func TestModuleAccess(t *testing.T) {
 	// User with read-only on fixedAsset should also pass ModuleAccess(fixedAsset).
 	var ro middleware.UserAccessCache
 	ro.ModuleAccess = map[enum.ModuleAccess]middleware.ModuleFlags{
-		enum.ModuleAccessKeyFixedAsset: {IsReadOnly: true},
+		enum.ModuleAccessFixedAsset: {IsReadOnly: true},
 	}
-	status, reached = runGate(t, &ro, ModuleAccess(enum.ModuleAccessKeyFixedAsset))
+	status, reached = runGate(t, &ro, ModuleAccess(enum.ModuleAccessFixedAsset))
 	if status != fiber.StatusOK || !reached {
 		t.Errorf("read-only should pass ModuleAccess: status=%d reached=%v", status, reached)
 	}
 
 	// User with no access to fixedAsset must not pass.
 	var empty middleware.UserAccessCache
-	status, reached = runGate(t, &empty, ModuleAccess(enum.ModuleAccessKeyFixedAsset))
+	status, reached = runGate(t, &empty, ModuleAccess(enum.ModuleAccessFixedAsset))
 	if status != fiber.StatusForbidden || reached {
 		t.Errorf("no module access must be refused: status=%d reached=%v", status, reached)
 	}
@@ -196,9 +196,9 @@ func TestModuleAccess(t *testing.T) {
 func TestModuleAccess_GlobalSettings(t *testing.T) {
 	var tc middleware.UserAccessCache
 	tc.ModuleAccess = map[enum.ModuleAccess]middleware.ModuleFlags{
-		enum.ModuleAccessKeyGlobalSettings: {IsTotalControl: true},
+		enum.ModuleAccessGlobalSettings: {IsTotalControl: true},
 	}
-	status, reached := runGate(t, &tc, ModuleAccess(enum.ModuleAccessKeyGlobalSettings))
+	status, reached := runGate(t, &tc, ModuleAccess(enum.ModuleAccessGlobalSettings))
 	if status != fiber.StatusOK || !reached {
 		t.Errorf("global-settings total control should pass: status=%d reached=%v", status, reached)
 	}
@@ -206,9 +206,9 @@ func TestModuleAccess_GlobalSettings(t *testing.T) {
 	// User without global-settings access must not pass.
 	var onlyFixed middleware.UserAccessCache
 	onlyFixed.ModuleAccess = map[enum.ModuleAccess]middleware.ModuleFlags{
-		enum.ModuleAccessKeyFixedAsset: {IsTotalControl: true},
+		enum.ModuleAccessFixedAsset: {IsTotalControl: true},
 	}
-	status, reached = runGate(t, &onlyFixed, ModuleAccess(enum.ModuleAccessKeyGlobalSettings))
+	status, reached = runGate(t, &onlyFixed, ModuleAccess(enum.ModuleAccessGlobalSettings))
 	if status != fiber.StatusForbidden || reached {
 		t.Errorf("fixed-asset access must not satisfy global-settings gate: status=%d reached=%v", status, reached)
 	}

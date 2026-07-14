@@ -60,13 +60,13 @@ func pickPermission[T any](p Permissions[T], verb PermissionVerb) T {
 // IsTotalControl reports whether the user is a total-control admin of the fixed-asset module —
 // the grant that covers every action, including managing users and roles.
 func (r UserAccessCache) IsTotalControl() bool {
-	m, ok := r.ModuleAccess[enum.ModuleAccessKeyFixedAsset]
+	m, ok := r.ModuleAccess[enum.ModuleAccessFixedAsset]
 	return ok && m.IsTotalControl
 }
 
 // IsReadOnly reports whether the user holds the read-only grant of the fixed-asset module.
 func (r UserAccessCache) IsReadOnly() bool {
-	m, ok := r.ModuleAccess[enum.ModuleAccessKeyFixedAsset]
+	m, ok := r.ModuleAccess[enum.ModuleAccessFixedAsset]
 	return ok && m.IsReadOnly
 }
 

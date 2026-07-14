@@ -34,7 +34,7 @@ func AuthUserRolesQueryBuilder(loggedInUserID string, clientID string) (string, 
 		SelectJSONAggregate(
 			"moduleAccess",
 			map[string]string{
-				enum.ModuleAccessKeyFixedAsset: "roles_cte.fixed_asset",
+				string(enum.ModuleAccessFixedAsset): "roles_cte.fixed_asset",
 			},
 			"",
 			false,
@@ -86,8 +86,11 @@ func authUserRolesTransactionRoleCTE(loggedInUserID string) sql_query.Selector {
 			"jsonb_agg(fatr.group_id::text) AS group_ids",
 		).
 		Where(sql_query.WhereQuery{
-			"fatr.user_id":   {Operator: sql_query.SQLOperatorEqual, Value: loggedInUserID},
-			"fatr.type":      {Operator: sql_query.SQLOperatorNotEqual, Value: string(enum.TransactionRolesTypeApprover)},
+			"fatr.user_id": {Operator: sql_query.SQLOperatorEqual, Value: loggedInUserID},
+			"fatr.type": {
+				Operator: sql_query.SQLOperatorNotEqual,
+				Value:    string(enum.TransactionRolesTypeApprover),
+			},
 			"fatr.is_active": {Operator: sql_query.SQLOperatorEqual, Value: true},
 		}).
 		GroupBy("fatr.transaction, fatr.type")
@@ -141,7 +144,10 @@ func authUserRolesMainCTE(loggedInUserID string, clientID string) sql_query.Sele
 			`COALESCE(jsonb_object_agg(transaction_role_cte.transaction, transaction_role_cte.types) FILTER (WHERE transaction_role_cte.transaction IS NOT NULL), '{}'::jsonb) AS transaction_role`,
 		).
 		LeftJoin(db.FixedAssetUserSystemRoleTableName+" fasr_global", "fasr_global.user_id = u.id", sql_query.WhereQuery{
-			"fasr_global.category":  {Operator: sql_query.SQLOperatorEqual, Value: string(enum.SystemRolesCategoryGlobal)},
+			"fasr_global.category": {
+				Operator: sql_query.SQLOperatorEqual,
+				Value:    string(enum.SystemRolesCategoryGlobal),
+			},
 			"fasr_global.is_active": {Operator: sql_query.SQLOperatorEqual, Value: true},
 		}).
 		LeftJoin("group_role_cte", "group_role_cte.key IS NOT NULL").
