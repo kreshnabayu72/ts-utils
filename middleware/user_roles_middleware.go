@@ -84,6 +84,9 @@ func loadUserRoles(cache service.ValkeyServiceInterface, fetch RolesFetcher) fib
 		roles, err := fetch(c.UserContext(), userID, clientID)
 		if err != nil {
 			slog.ErrorContext(c.UserContext(), "user_roles: fetch from iam failed", "userId", userID, "err", err)
+			if httpErr, ok := err.(*entity.HttpError); ok && httpErr.Code >= 400 && httpErr.Code < 500 {
+				return helper.SendResponse(c, fiber.StatusUnauthorized, nil, "You are not authenticated!", nil)
+			}
 			return helper.SendResponse(c, fiber.StatusServiceUnavailable, nil, "Authorization service unavailable", nil)
 		}
 
@@ -119,7 +122,7 @@ func fetchRolesFromIAM(client *http.Client, baseURL, serviceToken string) RolesF
 			return roles, err
 		}
 		if resp.StatusCode != http.StatusOK {
-			return roles, fmt.Errorf("iam returned %d: %s", resp.StatusCode, string(body))
+			return roles, &entity.HttpError{Code: resp.StatusCode, Message: fmt.Sprintf("iam returned %d: %s", resp.StatusCode, string(body))}
 		}
 
 		// iam wraps its payload in the standard { status, message, data } envelope.
