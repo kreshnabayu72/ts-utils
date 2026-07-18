@@ -21,6 +21,14 @@ const (
 	AssetStatusNotPairedYet       AssetStatus = "Not Paired Yet"
 )
 
+type ApprovalStatus string
+
+const (
+	ApprovalStatusPending          ApprovalStatus = "Pending"
+	ApprovalStatusNeedApproval     ApprovalStatus = "Need Approval"
+	ApprovalStatusFinishedApproval ApprovalStatus = "Finished Approval"
+)
+
 type CustomFieldType string
 
 const (
@@ -115,4 +123,32 @@ const (
 	FixedAssetTransactionRoleTransactionRepairTicketing     FixedAssetTransactionRoleTransaction = "Repair Ticketing"
 	FixedAssetTransactionRoleTransactionTracking            FixedAssetTransactionRoleTransaction = "Tracking"
 	FixedAssetTransactionRoleTransactionRegistration        FixedAssetTransactionRoleTransaction = "Registration"
+)
+
+// TransactionStatus tracks the transaction as a whole; RequestStatus tracks one asset line
+// within it. They move together, but a single line can be cancelled without ending the
+// transaction, so they are separate.
+type TransactionBorrowStatus string
+
+const (
+	TransactionBorrowStatusWaitingForApproval TransactionBorrowStatus = "Waiting for Approval"
+	TransactionBorrowStatusBorrowed           TransactionBorrowStatus = "Borrowed"
+	TransactionBorrowStatusRejected           TransactionBorrowStatus = "Rejected"
+	TransactionBorrowStatusReturned           TransactionBorrowStatus = "Returned"
+	TransactionBorrowStatusCanceled           TransactionBorrowStatus = "Canceled"
+	TransactionBorrowStatusRequestExtension   TransactionBorrowStatus = "Request Extension"
+	TransactionBorrowStatusExtendApproval     TransactionBorrowStatus = "Extend Approval"
+)
+
+type RequestBorrowStatus string
+
+const (
+	RequestBorrowStatusWaitingForApproval RequestBorrowStatus = "Waiting for Approval"
+	RequestBorrowStatusApproved           RequestBorrowStatus = "Approved"
+	RequestBorrowStatusBorrowed           RequestBorrowStatus = "Borrowed"
+	RequestBorrowStatusRejected           RequestBorrowStatus = "Rejected"
+	RequestBorrowStatusCanceled           RequestBorrowStatus = "Canceled"
+	RequestBorrowStatusReturned           RequestBorrowStatus = "Returned"
+	RequestBorrowStatusRequestExtension   RequestBorrowStatus = "Request Extension"
+	RequestBorrowStatusExtendApproval     RequestBorrowStatus = "Extend Approval"
 )

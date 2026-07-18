@@ -1,7 +1,6 @@
 package rbac
 
 import (
-	"errors"
 	"net/http/httptest"
 	"testing"
 
@@ -120,39 +119,6 @@ func TestSeeAll_ReadOnlyOnlyPassesWhenComposed(t *testing.T) {
 	status, _ = runGate(t, &ro, Any(SeeAll(), TransactionRole(borrowTx, enum.TransactionRolesTypeManager)))
 	if status != fiber.StatusOK {
 		t.Errorf("read-only should pass a read route composed with SeeAll: status=%d", status)
-	}
-}
-
-// The case that matters: a revoked approver still gets in, because the approval row names them.
-func TestAny_AssignmentSurvivesRoleRevocation(t *testing.T) {
-	var revoked middleware.UserAccessCache // no roles at all — Approver was revoked
-	named := Assignment(func(*fiber.Ctx) (bool, error) { return true, nil })
-
-	status, reached := runGate(t, &revoked,
-		Any(TransactionRole(borrowTx, enum.TransactionRolesTypeManager), named))
-	if status != fiber.StatusOK || !reached {
-		t.Errorf("a revoked approver named on the row must still pass: status=%d reached=%v", status, reached)
-	}
-
-	// ...and someone with neither the role nor the assignment does not.
-	notNamed := Assignment(func(*fiber.Ctx) (bool, error) { return false, nil })
-	status, reached = runGate(t, &revoked,
-		Any(TransactionRole(borrowTx, enum.TransactionRolesTypeManager), notNamed))
-	if status != fiber.StatusForbidden || reached {
-		t.Errorf("no role and no assignment must be refused: status=%d reached=%v", status, reached)
-	}
-}
-
-func TestAssignment_ErrorIsNotAPass(t *testing.T) {
-	var roles middleware.UserAccessCache
-	boom := Assignment(func(*fiber.Ctx) (bool, error) { return false, errors.New("db down") })
-
-	status, reached := runGate(t, &roles, boom)
-	if reached {
-		t.Error("a failing assignment check must not let the request through")
-	}
-	if status == fiber.StatusOK {
-		t.Errorf("status = %d, want a failure status", status)
 	}
 }
 

@@ -119,19 +119,6 @@ func TotalControl() Rule {
 	}
 }
 
-// Assignment passes when `check` says the caller is named on the underlying record — an approval
-// row, for instance.
-//
-// This is a DATA check, not a role check, and that is the point: an approver whose role was revoked
-// yesterday is still named on the approval already sitting on their desk, so they can still open it
-// and still answer it. Deriving that from a role strands the approval and breaks the flow in both
-// directions (ADR 006 §6).
-func Assignment(check func(c *fiber.Ctx) (bool, error)) Rule {
-	return func(c *fiber.Ctx, _ middleware.UserAccessCache) (bool, error) {
-		return check(c)
-	}
-}
-
 // ModuleAccess passes when the caller has any access (total control or read-only) to the given
 // module. Use it for module-level gates where the module itself must be reachable, regardless of
 // the specific permission level:
