@@ -132,6 +132,7 @@ type TransactionBorrowStatus string
 
 const (
 	TransactionBorrowStatusWaitingForApproval TransactionBorrowStatus = "Waiting for Approval"
+	TransactionBorrowStatusWaitingForHandover TransactionBorrowStatus = "Waiting for Handover"
 	TransactionBorrowStatusBorrowed           TransactionBorrowStatus = "Borrowed"
 	TransactionBorrowStatusRejected           TransactionBorrowStatus = "Rejected"
 	TransactionBorrowStatusReturned           TransactionBorrowStatus = "Returned"
@@ -144,6 +145,7 @@ type RequestBorrowStatus string
 
 const (
 	RequestBorrowStatusWaitingForApproval RequestBorrowStatus = "Waiting for Approval"
+	RequestBorrowStatusWaitingForHandover RequestBorrowStatus = "Waiting for Handover"
 	RequestBorrowStatusApproved           RequestBorrowStatus = "Approved"
 	RequestBorrowStatusBorrowed           RequestBorrowStatus = "Borrowed"
 	RequestBorrowStatusRejected           RequestBorrowStatus = "Rejected"
