@@ -15,6 +15,8 @@ import (
 //   - GroupRoles carry the list of group_ids the user may act on per permission (group-scoped).
 //   - GlobalRole carries booleans (tenant-wide, not group-scoped).
 //   - TransactionRole maps transaction -> role type -> group_ids.
+//
+// TODO: Handle multiple module (fixed asset + supply + admin). find optimal way between adding more attributes (FixedAssetSystemRole) or struct (FixedAssetUserAccessCache)
 type UserAccessCache struct {
 	ID           int                               `json:"_id"`
 	FullName     string                            `json:"fullName"`
