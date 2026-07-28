@@ -51,6 +51,7 @@ const (
 	UndoUpdateClientActivity = "UndoUpdateClientActivity"
 
 	// Source Analytics Reporting Service
+	AnalyticsReportingRecordChangeLogsWorkflow             = "RecordChangeLogsWorkflow"
 	AnalyticsReportingCreateChangeLogActivity              = "CreateChangeLogActivity"
 	AnalyticsReportingDeleteChangeLogActivity              = "DeleteChangeLogActivity"
 	AnalyticsReportingCreateSessionLogActivity             = "CreateSessionLogActivity"
