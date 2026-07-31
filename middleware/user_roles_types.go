@@ -32,8 +32,9 @@ type UserAccessCache struct {
 
 // ModuleFlags is the per-module top-level access (e.g. moduleAccess.fixedAsset).
 type ModuleFlags struct {
-	IsTotalControl bool `json:"isTotalControl"`
-	IsReadOnly     bool `json:"isReadOnly"`
+	IsTotalControl bool   `json:"isTotalControl"`
+	IsReadOnly     bool   `json:"isReadOnly"`
+	Plan           string `json:"plan"`
 }
 
 // PermissionVerb selects one column of a Permissions tuple.
