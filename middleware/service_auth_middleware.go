@@ -7,7 +7,7 @@ import (
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/constant"
 	"gitea.tagsamurai.local/Wangsit-Developer/be-core-utils/helper"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 )
 
 // RequireServiceToken authenticates a SERVICE, not a user. Mount it on every /internal route.
@@ -26,9 +26,9 @@ import (
 // Fails closed, and closed means closed: an unset secret refuses every request rather than waving
 // them all through. A misconfigured deployment must break loudly, not silently unlock the door.
 func RequireServiceToken(secret string) fiber.Handler {
-	return func(c *fiber.Ctx) error {
+	return func(c fiber.Ctx) error {
 		if secret == "" {
-			slog.ErrorContext(c.UserContext(),
+			slog.ErrorContext(c.Context(),
 				"service_auth: no service token configured; refusing internal request",
 				"path", c.Path())
 			return helper.SendResponse(c, fiber.StatusServiceUnavailable, nil, "Service unavailable", nil)
@@ -38,7 +38,7 @@ func RequireServiceToken(secret string) fiber.Handler {
 		// anyone willing to time the responses.
 		presented := c.Get(constant.HEADER_SERVICE_TOKEN)
 		if subtle.ConstantTimeCompare([]byte(presented), []byte(secret)) != 1 {
-			slog.WarnContext(c.UserContext(),
+			slog.WarnContext(c.Context(),
 				"service_auth: rejected internal request", "path", c.Path(), "ip", c.IP())
 			return helper.SendResponse(c, fiber.StatusUnauthorized, nil, "Unauthorized", nil)
 		}

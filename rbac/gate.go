@@ -9,18 +9,18 @@ import (
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/middleware"
 	"gitea.tagsamurai.local/Wangsit-Developer/be-core-utils/entity"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 )
 
 // Rule reports whether the caller may proceed. It gets the request (for path/body params) and the
 // caller's RBAC snapshot.
-type Rule func(c *fiber.Ctx, roles middleware.UserAccessCache) (bool, error)
+type Rule func(c fiber.Ctx, roles middleware.UserAccessCache) (bool, error)
 
 // Require gates a route on rules. ALL must pass (AND); use Any for OR.
 //
 //	borrowings.Post("/list", rbac.Require(rbac.TransactionRole(tx, Manager, Monitoring)), h.List)
 func Require(rules ...Rule) fiber.Handler {
-	return func(c *fiber.Ctx) error {
+	return func(c fiber.Ctx) error {
 		roles, ok := middleware.GetUserRoles(c)
 		if !ok {
 			return entity.Unauthorized("You are not authenticated!").SendResponse(c)
@@ -43,7 +43,7 @@ func Require(rules ...Rule) fiber.Handler {
 // The detail endpoint is what needs it: manager OR borrower OR named approver may open one
 // transaction, and no single rule expresses that.
 func Any(rules ...Rule) Rule {
-	return func(c *fiber.Ctx, roles middleware.UserAccessCache) (bool, error) {
+	return func(c fiber.Ctx, roles middleware.UserAccessCache) (bool, error) {
 		for _, rule := range rules {
 			passed, err := rule(c, roles)
 			if err != nil {
@@ -60,7 +60,7 @@ func Any(rules ...Rule) Rule {
 // SystemRole passes when the caller holds `verb` on ANY of `keys`. A route may name several — V1
 // took a slice of attributes for the same reason. Total control passes everything.
 func SystemRole(verb middleware.PermissionVerb, keys ...enum.FixedAssetSystemRoleKey) Rule {
-	return func(_ *fiber.Ctx, roles middleware.UserAccessCache) (bool, error) {
+	return func(_ fiber.Ctx, roles middleware.UserAccessCache) (bool, error) {
 		for _, key := range keys {
 			if roles.HasSystemPermission(key, verb) {
 				return true, nil
@@ -80,7 +80,7 @@ func TransactionRole(
 	transaction enum.FixedAssetTransactionRoleTransactionKey,
 	types ...enum.TransactionRolesType,
 ) Rule {
-	return func(_ *fiber.Ctx, roles middleware.UserAccessCache) (bool, error) {
+	return func(_ fiber.Ctx, roles middleware.UserAccessCache) (bool, error) {
 		if roles.IsTotalControl() {
 			return true, nil
 		}
@@ -106,7 +106,7 @@ func TransactionRole(
 // Deliberately separate from TransactionRole: read-only is not a licence to WRITE, so a write route
 // must not pick it up implicitly.
 func SeeAll() Rule {
-	return func(_ *fiber.Ctx, roles middleware.UserAccessCache) (bool, error) {
+	return func(_ fiber.Ctx, roles middleware.UserAccessCache) (bool, error) {
 		return roles.IsTotalControl() || roles.IsReadOnly(), nil
 	}
 }
@@ -114,7 +114,7 @@ func SeeAll() Rule {
 // TotalControl passes for a total-control admin only — stricter than SeeAll (which also admits
 // read-only). Use it where holding the grant, not just seeing everything, is the requirement.
 func TotalControl() Rule {
-	return func(_ *fiber.Ctx, roles middleware.UserAccessCache) (bool, error) {
+	return func(_ fiber.Ctx, roles middleware.UserAccessCache) (bool, error) {
 		return roles.IsTotalControl(), nil
 	}
 }
@@ -125,7 +125,7 @@ func TotalControl() Rule {
 //
 //	rbac.Require(rbac.ModuleAccess(enum.ModuleAccessGlobalSettings))
 func ModuleAccess(moduleKey enum.ModuleAccess) Rule {
-	return func(_ *fiber.Ctx, roles middleware.UserAccessCache) (bool, error) {
+	return func(_ fiber.Ctx, roles middleware.UserAccessCache) (bool, error) {
 		_, ok := roles.ModuleAccess[moduleKey]
 		return ok, nil
 	}

@@ -17,7 +17,7 @@ import (
 	"gitea.tagsamurai.local/Wangsit-Developer/be-core-utils/helper"
 	"gitea.tagsamurai.local/Wangsit-Developer/be-core-utils/service"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 )
 
 // RolesFetcher resolves the caller's RBAC snapshot on a cache miss. Injectable so the middleware
@@ -56,7 +56,7 @@ func LoadUserRolesFrom(fetch RolesFetcher, valkeyOptions ...db.ValkeyServiceOpti
 }
 
 func loadUserRoles(cache service.ValkeyServiceInterface, fetch RolesFetcher) fiber.Handler {
-	return func(c *fiber.Ctx) error {
+	return func(c fiber.Ctx) error {
 		userID := c.Get(constant.HEADER_USER_ID)
 		clientID := c.Get(constant.HEADER_CLIENT_ID)
 		if userID == "" || clientID == "" {
@@ -64,7 +64,7 @@ func loadUserRoles(cache service.ValkeyServiceInterface, fetch RolesFetcher) fib
 		}
 
 		// Hot path: read the shared cache directly. On a hit the consumer never touches iam.
-		if raw, err := cache.Get(c.UserContext(), UserRolesCacheKey(userID)); err == nil {
+		if raw, err := cache.Get(c.Context(), UserRolesCacheKey(userID)); err == nil {
 			var roles UserAccessCache
 			if jsonErr := json.Unmarshal([]byte(raw), &roles); jsonErr == nil {
 				c.Locals(UserRolesKey, roles)
@@ -72,7 +72,7 @@ func loadUserRoles(cache service.ValkeyServiceInterface, fetch RolesFetcher) fib
 			}
 			// A corrupt entry is treated as a miss and refetched below, not served.
 			slog.WarnContext(
-				c.UserContext(),
+				c.Context(),
 				"user_roles: cache entry unparseable, refetching from iam",
 				"userId",
 				userID,
@@ -81,9 +81,9 @@ func loadUserRoles(cache service.ValkeyServiceInterface, fetch RolesFetcher) fib
 
 		// Miss, corrupt entry, or Valkey unreachable: ask iam, which rebuilds from its DB and SETs
 		// the cache for next time. Fail closed if it cannot answer — authorization needs the snapshot.
-		roles, err := fetch(c.UserContext(), userID, clientID)
+		roles, err := fetch(c.Context(), userID, clientID)
 		if err != nil {
-			slog.ErrorContext(c.UserContext(), "user_roles: fetch from iam failed", "userId", userID, "err", err)
+			slog.ErrorContext(c.Context(), "user_roles: fetch from iam failed", "userId", userID, "err", err)
 			if httpErr, ok := err.(*entity.HttpError); ok && httpErr.Code >= 400 && httpErr.Code < 500 {
 				return helper.SendResponse(c, fiber.StatusUnauthorized, nil, "You are not authenticated!", nil)
 			}
@@ -145,7 +145,7 @@ var validClientID = regexp.MustCompile(`^[a-zA-Z0-9_]{1,50}$`)
 // It is the ONE place a service decides which tenant it is serving. Never take the tenant from a
 // query param or a body field: that lets a caller point a request at somebody else's schema and
 // read data from a tenant they have nothing to do with. Header only, validated, fails closed.
-func ClientID(c *fiber.Ctx) (string, error) {
+func ClientID(c fiber.Ctx) (string, error) {
 	id := c.Get(constant.HEADER_CLIENT_ID)
 	if !validClientID.MatchString(id) {
 		return "", entity.BadRequest("Invalid client id")
@@ -159,7 +159,7 @@ func ClientID(c *fiber.Ctx) (string, error) {
 // It is the ONE place a service reads the caller's identity. Never take it from a body field or a
 // path parameter: whose request this is decides what they may do, and letting the caller name
 // themselves lets anyone act as anyone. Fails closed — no usable header means not authenticated.
-func CallerID(c *fiber.Ctx) (int64, error) {
+func CallerID(c fiber.Ctx) (int64, error) {
 	id, err := strconv.ParseInt(c.Get(constant.HEADER_USER_ID), 10, 64)
 	if err != nil {
 		return 0, entity.Unauthorized("You are not authenticated!")
@@ -168,7 +168,7 @@ func CallerID(c *fiber.Ctx) (int64, error) {
 }
 
 // GetUserRoles returns the RBAC snapshot placed in Locals by LoadUserRoles.
-func GetUserRoles(c *fiber.Ctx) (UserAccessCache, bool) {
+func GetUserRoles(c fiber.Ctx) (UserAccessCache, bool) {
 	roles, ok := c.Locals(UserRolesKey).(UserAccessCache)
 	return roles, ok
 }
@@ -185,7 +185,7 @@ func GetUserRoles(c *fiber.Ctx) (UserAccessCache, bool) {
 // Use it only where the handler actually needs all three; a handler that needs just the tenant, or
 // is gated by role middleware without touching the caller's own id, should keep calling ClientID /
 // CallerID / GetUserRoles directly rather than over-fetch.
-func RequestIdentity(c *fiber.Ctx) (clientID string, roles UserAccessCache, callerID int64, err error) {
+func RequestIdentity(c fiber.Ctx) (clientID string, roles UserAccessCache, callerID int64, err error) {
 	clientID, err = ClientID(c)
 	if err != nil {
 		return "", UserAccessCache{}, 0, err
