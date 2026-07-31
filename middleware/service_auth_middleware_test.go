@@ -6,7 +6,7 @@ import (
 
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/constant"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 )
 
 func runServiceAuth(t *testing.T, secret, presented string) (int, bool) {
@@ -14,7 +14,7 @@ func runServiceAuth(t *testing.T, secret, presented string) (int, bool) {
 
 	reached := false
 	app := fiber.New()
-	app.Get("/internal/x", RequireServiceToken(secret), func(c *fiber.Ctx) error {
+	app.Get("/internal/x", RequireServiceToken(secret), func(c fiber.Ctx) error {
 		reached = true
 		return c.SendStatus(fiber.StatusOK)
 	})

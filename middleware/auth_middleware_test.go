@@ -7,7 +7,7 @@ import (
     "net/http/httptest"
     "testing"
 
-    "github.com/gofiber/fiber/v2"
+    "github.com/gofiber/fiber/v3"
     "github.com/stretchr/testify/assert"
     "github.com/stretchr/testify/require"
 
@@ -20,7 +20,7 @@ func strPtr(s string) *string { return &s }
 
 func newApp() *fiber.App {
     app := fiber.New()
-    app.Get("/test", middleware.AuthMiddleware(), func(c *fiber.Ctx) error {
+    app.Get("/test", middleware.AuthMiddleware(), func(c fiber.Ctx) error {
         return c.SendStatus(fiber.StatusOK)
     })
     return app
@@ -94,7 +94,7 @@ func TestAuthMiddleware(t *testing.T) {
                 req.Header.Set(constant.HEADER_CLIENT_ID, *tc.clientID)
             }
 
-            resp, err := newApp().Test(req, -1)
+            resp, err := newApp().Test(req)
             require.NoError(t, err)
             defer resp.Body.Close()
 

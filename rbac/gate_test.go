@@ -7,7 +7,7 @@ import (
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/enum"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/middleware"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 )
 
 const borrowTx = enum.FixedAssetTransactionRoleTransactionKeyBorrowAssignRole
@@ -19,13 +19,13 @@ func runGate(t *testing.T, roles *middleware.UserAccessCache, rules ...Rule) (in
 
 	reached := false
 	app := fiber.New()
-	app.Use(func(c *fiber.Ctx) error {
+	app.Use(func(c fiber.Ctx) error {
 		if roles != nil {
 			c.Locals(middleware.UserRolesKey, *roles)
 		}
 		return c.Next()
 	})
-	app.Get("/", Require(rules...), func(c *fiber.Ctx) error {
+	app.Get("/", Require(rules...), func(c fiber.Ctx) error {
 		reached = true
 		return c.SendStatus(fiber.StatusOK)
 	})

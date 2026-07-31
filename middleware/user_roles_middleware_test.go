@@ -10,7 +10,7 @@ import (
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/constant"
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/enum"
 	"gitea.tagsamurai.local/Wangsit-Developer/be-core-utils/service"
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 )
 
 // fakeCache is a Valkey stand-in: it embeds the real interface (so it satisfies it) and overrides
@@ -40,7 +40,7 @@ func newRolesFixture() UserAccessCache {
 
 // captureRoles is a terminal handler that records what the middleware placed in Locals.
 func captureRoles(got *UserAccessCache, found *bool) fiber.Handler {
-	return func(c *fiber.Ctx) error {
+	return func(c fiber.Ctx) error {
 		r, ok := GetUserRoles(c)
 		*got, *found = r, ok
 		return c.SendStatus(fiber.StatusOK)
@@ -124,7 +124,7 @@ func TestLoadUserRoles_FailsClosedWhenIAMUnavailable(t *testing.T) {
 	reached := false
 	app := fiber.New()
 	app.Use(loadUserRoles(missCache(), fetch))
-	app.Get("/", func(c *fiber.Ctx) error {
+	app.Get("/", func(c fiber.Ctx) error {
 		reached = true
 		return c.SendStatus(fiber.StatusOK)
 	})
@@ -151,7 +151,7 @@ func TestLoadUserRoles_MissingHeaders_Unauthorized(t *testing.T) {
 	}
 	app := fiber.New()
 	app.Use(loadUserRoles(missCache(), fetch))
-	app.Get("/", func(c *fiber.Ctx) error { return c.SendStatus(fiber.StatusOK) })
+	app.Get("/", func(c fiber.Ctx) error { return c.SendStatus(fiber.StatusOK) })
 
 	resp, err := app.Test(httptest.NewRequest("GET", "/", nil)) // no headers
 	if err != nil {

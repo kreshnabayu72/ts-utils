@@ -3,7 +3,7 @@ package tenant
 import (
 	"context"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 	"log/slog"
 	"sync"
 	"time"
@@ -52,7 +52,7 @@ func (s *Status) set(r result) {
 // 503 when degraded, and that is the point: a service that cannot see the tenant list, or has
 // tenants it could not migrate, is NOT healthy. Saying so is what stops the failure from surfacing
 // later, to a user, as a missing table.
-func (s *Status) Health(c *fiber.Ctx) error {
+func (s *Status) Health(c fiber.Ctx) error {
 	degraded, reason, since := s.snapshot()
 	if !degraded {
 		return c.JSON(fiber.Map{"status": "ok"})
