@@ -39,8 +39,8 @@ type Changelog struct {
 	EntityType EntityType `json:"entityType" bson:"entityType"`
 
 	// Product disambiguates rows written by GS vs AC into this shared collection
-	// (nil = GS, same convention as SessionLog.Product). Without it, an AC row
-	// ("entity_type='admin_console'" in the AC PRD) and a GS row using EntityType
+	// Without it, an AC row ("entity_type='admin_console'" in the AC PRD)
+	// and a GS row using EntityType
 	// for the tenant would be indistinguishable by that field alone.
 	Product *Product `json:"product" bson:"product"`
 
