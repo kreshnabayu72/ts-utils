@@ -57,20 +57,25 @@ func AuthUserRolesQueryBuilder(loggedInUserID string, clientID string) (string, 
 
 // authUserRolesGroupRoleCTE aggregates, per system-role key, the group_ids the user is
 // allowed to act on for each CRUD permission (category = 'Group').
+//
+// user_system_roles is shared by every product, so the product filter is not optional:
+// role keys collide across products (importData, tag, userAndRole), and without it a
+// Global Settings grant would be read as the fixed-asset permission of the same name.
 func authUserRolesGroupRoleCTE(loggedInUserID string) sql_query.Selector {
-	return sql_query.NewSQLSelectBuilder[any](db.FixedAssetUserSystemRoleTableName, "fasr").
+	return sql_query.NewSQLSelectBuilder[any](db.UserSystemRoleTableName, "fasr").
 		Select(
 			"fasr.key",
 			`jsonb_build_object(
-				'create', COALESCE(jsonb_agg(fasr.group_id::text) FILTER (WHERE fasr.permission_create), '[]'::jsonb),
-				'view',   COALESCE(jsonb_agg(fasr.group_id::text) FILTER (WHERE fasr.permission_view),   '[]'::jsonb),
-				'edit',   COALESCE(jsonb_agg(fasr.group_id::text) FILTER (WHERE fasr.permission_update), '[]'::jsonb),
-				'delete', COALESCE(jsonb_agg(fasr.group_id::text) FILTER (WHERE fasr.permission_delete), '[]'::jsonb)
+				'create', COALESCE(jsonb_agg(fasr.fixed_asset_group_id::text) FILTER (WHERE fasr.permission_create), '[]'::jsonb),
+				'view',   COALESCE(jsonb_agg(fasr.fixed_asset_group_id::text) FILTER (WHERE fasr.permission_view),   '[]'::jsonb),
+				'edit',   COALESCE(jsonb_agg(fasr.fixed_asset_group_id::text) FILTER (WHERE fasr.permission_update), '[]'::jsonb),
+				'delete', COALESCE(jsonb_agg(fasr.fixed_asset_group_id::text) FILTER (WHERE fasr.permission_delete), '[]'::jsonb)
 			) AS permissions`,
 		).
 		Where(sql_query.WhereQuery{
 			"fasr.user_id":   {Operator: sql_query.SQLOperatorEqual, Value: loggedInUserID},
 			"fasr.is_active": {Operator: sql_query.SQLOperatorEqual, Value: true},
+			"fasr.product":   {Operator: sql_query.SQLOperatorEqual, Value: string(enum.ModuleAccessFixedAsset)},
 			"fasr.category":  {Operator: sql_query.SQLOperatorEqual, Value: string(enum.SystemRolesCategoryGroup)},
 		}).
 		GroupBy("fasr.key")
@@ -143,10 +148,16 @@ func authUserRolesMainCTE(loggedInUserID string, clientID string) sql_query.Sele
 			`COALESCE(jsonb_object_agg(group_role_cte.key, group_role_cte.permissions) FILTER (WHERE group_role_cte.key IS NOT NULL), '{}'::jsonb) AS group_role`,
 			`COALESCE(jsonb_object_agg(transaction_role_cte.transaction, transaction_role_cte.types) FILTER (WHERE transaction_role_cte.transaction IS NOT NULL), '{}'::jsonb) AS transaction_role`,
 		).
-		LeftJoin(db.FixedAssetUserSystemRoleTableName+" fasr_global", "fasr_global.user_id = u.id", sql_query.WhereQuery{
+		LeftJoin(db.UserSystemRoleTableName+" fasr_global", "fasr_global.user_id = u.id", sql_query.WhereQuery{
 			"fasr_global.category": {
 				Operator: sql_query.SQLOperatorEqual,
 				Value:    string(enum.SystemRolesCategoryGlobal),
+			},
+			// Same reason as the group CTE: without the product filter, a Global
+			// Settings grant lands in the fixed-asset globalRole map.
+			"fasr_global.product": {
+				Operator: sql_query.SQLOperatorEqual,
+				Value:    string(enum.ModuleAccessFixedAsset),
 			},
 			"fasr_global.is_active": {Operator: sql_query.SQLOperatorEqual, Value: true},
 		}).

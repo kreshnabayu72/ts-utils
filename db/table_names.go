@@ -66,7 +66,6 @@ const (
 	FixedAssetDamageReportTableName        = "fixed_asset_damage_reports"
 	FixedAssetDamageReportHistoryTableName = "fixed_asset_damage_report_histories"
 	FixedAssetUserTransactionRoleTableName = "fixed_asset_user_transaction_roles"
-	FixedAssetUserSystemRoleTableName      = "fixed_asset_user_system_roles"
 	// DisposalRequestHistoryTableName           = "disposal_request_histories"
 	// DisposalTransactionHistoryTableName       = "disposal_transaction_histories"
 	FileManagerDataTableName = "file_manager_data"
@@ -165,11 +164,15 @@ const (
 	// TransferTransactionTableName              = "transfer_transactions"
 	// TransferRequestHistoryTableName           = "transfer_request_histories"
 	// TransferTransactionHistoryTableName       = "transfer_transaction_histories"
+	UserAccessLevelTableName = "user_access_levels"
 	UserAuthTableName        = "user_auths"
 	UserCustomFieldTableName = "user_custom_fields"
 	UserTableName            = "users"
 
-	// UserSystemRoleTableName                   = "user_system_roles"
+	// UserSystemRoleTableName holds every product's system-role grants, discriminated
+	// by its `product` column. Never query it without a product filter.
+	UserSystemRoleTableName = "user_system_roles"
+
 	// UserAssignmentLogTableName                = "user_assignment_logs"
 	// UserBorrowingLogTableName                 = "user_borrowing_logs"
 	// UserTokenTableName                        = "user_tokens"

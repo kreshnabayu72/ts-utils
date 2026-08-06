@@ -59,7 +59,10 @@ const (
 	CustomFieldDataTypeDocument      = CustomFieldDataType("Document")
 )
 
-type FixedAssetSystemRoleKey string
+// Aliases, not distinct types: the merged user_system_roles table stores every
+// module's keys in one column, so these must be assignable to enum.SystemRoleKey.
+// The prefix survives only to namespace the constant names below.
+type FixedAssetSystemRoleKey = SystemRoleKey
 
 const (
 	FixedAssetSystemRoleKeyImportData          FixedAssetSystemRoleKey = "importData"
@@ -79,7 +82,7 @@ const (
 	FixedAssetSystemRoleKeyTag                 FixedAssetSystemRoleKey = "tag"
 )
 
-type FixedAssetSystemRoleName string
+type FixedAssetSystemRoleName = SystemRoleName
 
 const (
 	FixedAssetSystemRoleNameImportData                FixedAssetSystemRoleName = "Import data"

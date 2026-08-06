@@ -1,6 +1,8 @@
 package enum
 
-type GlobalSettingsSystemRoleKey string
+// Aliases of the shared key/name types — see FixedAssetSystemRoleKey. Global Settings
+// grants are always category Global: the module has no groups, so no scope FK applies.
+type GlobalSettingsSystemRoleKey = SystemRoleKey
 
 const (
 	GlobalSettingsSystemRoleKeyManageUserAndRole     GlobalSettingsSystemRoleKey = "userAndRole"
@@ -11,7 +13,7 @@ const (
 	GlobalSettingsSystemRoleKeyManageTAG             GlobalSettingsSystemRoleKey = "tag"
 )
 
-type GlobalSettingsSystemRoleName string
+type GlobalSettingsSystemRoleName = SystemRoleName
 
 const (
 	GlobalSettingsSystemRoleNameManageUserAndRole     GlobalSettingsSystemRoleName = "Manage user and role"
