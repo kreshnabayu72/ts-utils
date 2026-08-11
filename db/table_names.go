@@ -15,6 +15,7 @@ const (
 	UserAccessLevelTableName             = "user_access_levels"
 	UserCredentialTableName              = "user_credentials"
 	UserCustomFieldTableName             = "user_custom_fields"
+	UserModuleStatusTableName            = "user_module_status"
 	UserPrivacyConsentTableName          = "user_privacy_consent"
 	UserSystemRoleTableName              = "user_system_roles"
 	UserTableName                        = "users"
