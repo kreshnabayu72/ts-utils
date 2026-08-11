@@ -52,6 +52,7 @@ const (
 
 	// Source Analytics Reporting Service
 	AnalyticsReportingRecordChangeLogsWorkflow             = "RecordChangeLogsWorkflow"
+	AnalyticsReportingRecordSessionLogsWorkflow            = "RecordSessionLogsWorkflow"
 	AnalyticsReportingCreateChangeLogActivity              = "CreateChangeLogActivity"
 	AnalyticsReportingDeleteChangeLogActivity              = "DeleteChangeLogActivity"
 	AnalyticsReportingCreateSessionLogActivity             = "CreateSessionLogActivity"
