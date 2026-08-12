@@ -36,12 +36,20 @@ func NewNotificationClient(baseURL, serviceToken string) *NotificationClient {
 //
 // A nil receiver is a no-op, so a consumer that was constructed without a client
 // (tests, or a service where notifications are optional) can call this unguarded.
-func (c *NotificationClient) SendSSE(ctx context.Context, clientID, targetUserID, message, reason string) error {
+//
+// reason is optional and variadic only to keep it so; extra values are ignored. It
+// is omitted from the body when empty.
+func (c *NotificationClient) SendSSE(ctx context.Context, clientID, targetUserID, message string, reason ...string) error {
 	if c == nil {
 		return nil
 	}
 
-	body, err := json.Marshal(map[string]string{"message": message, "reason": reason})
+	payload := map[string]string{"message": message}
+	if len(reason) > 0 && reason[0] != "" {
+		payload["reason"] = reason[0]
+	}
+
+	body, err := json.Marshal(payload)
 	if err != nil {
 		return err
 	}
