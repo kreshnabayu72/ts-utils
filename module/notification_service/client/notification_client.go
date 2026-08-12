@@ -33,7 +33,14 @@ func NewNotificationClient(baseURL, serviceToken string) *NotificationClient {
 // SendSSE pushes one {message, reason} event to a target user's active SSE sessions
 // (POST /internal/sse/send). The target user is named by X-User-ID, per that route's
 // contract — it is the push's target, not the caller's own identity.
+//
+// A nil receiver is a no-op, so a consumer that was constructed without a client
+// (tests, or a service where notifications are optional) can call this unguarded.
 func (c *NotificationClient) SendSSE(ctx context.Context, clientID, targetUserID, message, reason string) error {
+	if c == nil {
+		return nil
+	}
+
 	body, err := json.Marshal(map[string]string{"message": message, "reason": reason})
 	if err != nil {
 		return err
