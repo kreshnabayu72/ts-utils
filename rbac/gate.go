@@ -59,7 +59,7 @@ func Any(rules ...Rule) Rule {
 
 // SystemRole passes when the caller holds `verb` on ANY of `keys`. A route may name several — V1
 // took a slice of attributes for the same reason. Total control passes everything.
-func SystemRole(verb middleware.PermissionVerb, keys ...enum.FixedAssetSystemRoleKey) Rule {
+func SystemRole(verb middleware.PermissionVerb, keys ...enum.SystemRoleKey) Rule {
 	return func(_ fiber.Ctx, roles middleware.UserAccessCache) (bool, error) {
 		for _, key := range keys {
 			if roles.HasSystemPermission(key, verb) {

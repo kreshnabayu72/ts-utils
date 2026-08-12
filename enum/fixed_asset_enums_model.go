@@ -59,48 +59,7 @@ const (
 	CustomFieldDataTypeDocument      = CustomFieldDataType("Document")
 )
 
-// Aliases, not distinct types: the merged user_system_roles table stores every
-// module's keys in one column, so these must be assignable to enum.SystemRoleKey.
-// The prefix survives only to namespace the constant names below.
-type FixedAssetSystemRoleKey = SystemRoleKey
 
-const (
-	FixedAssetSystemRoleKeyImportData          FixedAssetSystemRoleKey = "importData"
-	FixedAssetSystemRoleKeyAssetMasterData     FixedAssetSystemRoleKey = "assetMasterData"
-	FixedAssetSystemRoleKeyDepreciationGroup   FixedAssetSystemRoleKey = "depreciationGroup"
-	FixedAssetSystemRoleKeyDepreciationMethod  FixedAssetSystemRoleKey = "depreciationMethod"
-	FixedAssetSystemRoleKeyAssetPolicies       FixedAssetSystemRoleKey = "assetPolicies"
-	FixedAssetSystemRoleKeyAssets              FixedAssetSystemRoleKey = "assets"
-	FixedAssetSystemRoleKeyFileManager         FixedAssetSystemRoleKey = "fileManager"
-	FixedAssetSystemRoleKeyGroup               FixedAssetSystemRoleKey = "group"
-	FixedAssetSystemRoleKeyUserAndRole         FixedAssetSystemRoleKey = "userAndRole"
-	FixedAssetSystemRoleKeyIotReader           FixedAssetSystemRoleKey = "iotReader"
-	FixedAssetSystemRoleKeyLicense             FixedAssetSystemRoleKey = "license"
-	FixedAssetSystemRoleKeyPlanningStrategy    FixedAssetSystemRoleKey = "planningStrategy"
-	FixedAssetSystemRoleKeyPurchaseDocument    FixedAssetSystemRoleKey = "purchaseDocument"
-	FixedAssetSystemRoleKeyPurchaseInformation FixedAssetSystemRoleKey = "purchaseInformation"
-	FixedAssetSystemRoleKeyTag                 FixedAssetSystemRoleKey = "tag"
-)
-
-type FixedAssetSystemRoleName = SystemRoleName
-
-const (
-	FixedAssetSystemRoleNameImportData                FixedAssetSystemRoleName = "Import data"
-	FixedAssetSystemRoleNameManageAssetMasterData     FixedAssetSystemRoleName = "Manage asset master data"
-	FixedAssetSystemRoleNameManageDepreciationGroup   FixedAssetSystemRoleName = "Manage depreciation group"
-	FixedAssetSystemRoleNameManageDepreciationMethod  FixedAssetSystemRoleName = "Manage depreciation method"
-	FixedAssetSystemRoleNameManageAssetPolicy         FixedAssetSystemRoleName = "Manage asset policy"
-	FixedAssetSystemRoleNameManageAssets              FixedAssetSystemRoleName = "Manage assets"
-	FixedAssetSystemRoleNameFileManager               FixedAssetSystemRoleName = "File Manager"
-	FixedAssetSystemRoleNameManageGroup               FixedAssetSystemRoleName = "Manage group"
-	FixedAssetSystemRoleNameManageUserAndRole         FixedAssetSystemRoleName = "Manage user and role"
-	FixedAssetSystemRoleNameManageIOTAndReader        FixedAssetSystemRoleName = "Manage IOT and reader"
-	FixedAssetSystemRoleNameManageLicense             FixedAssetSystemRoleName = "Manage license"
-	FixedAssetSystemRoleNameManagePlanningAndStrategy FixedAssetSystemRoleName = "Manage planning & strategy"
-	FixedAssetSystemRoleNameManagePurchaseDocument    FixedAssetSystemRoleName = "Manage purchase document"
-	FixedAssetSystemRoleNameManagePurchaseInformation FixedAssetSystemRoleName = "Manage purchase information"
-	FixedAssetSystemRoleNameManageTAG                 FixedAssetSystemRoleName = "Manage TAG"
-)
 
 type FixedAssetTransactionRoleTransactionKey string
 

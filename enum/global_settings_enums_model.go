@@ -1,6 +1,6 @@
 package enum
 
-// Aliases of the shared key/name types — see FixedAssetSystemRoleKey. Global Settings
+// Aliases of the shared key/name types — see system_roles_category.go. Global Settings
 // grants are always category Global: the module has no groups, so no scope FK applies.
 type GlobalSettingsSystemRoleKey = SystemRoleKey
 

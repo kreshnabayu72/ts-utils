@@ -24,8 +24,8 @@ type UserAccessCache struct {
 	ClientID     string                            `json:"clientId"`
 	ModuleAccess map[enum.ModuleAccess]ModuleFlags `json:"moduleAccess"`
 	SystemRole   struct {
-		GlobalRole map[enum.FixedAssetSystemRoleKey]Permissions[bool]     `json:"globalRole"`
-		GroupRoles map[enum.FixedAssetSystemRoleKey]Permissions[[]string] `json:"groupRoles"`
+		GlobalRole map[enum.SystemRoleKey]Permissions[bool]     `json:"globalRole"`
+		GroupRoles map[enum.SystemRoleKey]Permissions[[]string] `json:"groupRoles"`
 	} `json:"systemRole"`
 	TransactionRole map[enum.FixedAssetTransactionRoleTransactionKey]map[enum.TransactionRolesType][]string `json:"transactionRole"`
 }
@@ -80,7 +80,7 @@ func (r UserAccessCache) IsReadOnly() bool {
 // answer is already in the cached snapshot iam served, so no query runs. Gating logic lives here,
 // on the shared contract type, so iam (which builds the snapshot itself) and every consumer (which
 // fetches it via LoadUserRoles) ask the same question the same way.
-func (r UserAccessCache) HasSystemPermission(key enum.FixedAssetSystemRoleKey, verb PermissionVerb) bool {
+func (r UserAccessCache) HasSystemPermission(key enum.SystemRoleKey, verb PermissionVerb) bool {
 	if r.IsTotalControl() {
 		return true
 	}
@@ -101,7 +101,7 @@ func (r UserAccessCache) HasSystemPermission(key enum.FixedAssetSystemRoleKey, v
 // 7"): HasSystemPermission("do you hold this anywhere") would wrongly admit someone who holds it in
 // a DIFFERENT group.
 func (r UserAccessCache) HasGroupPermission(
-	key enum.FixedAssetSystemRoleKey,
+	key enum.SystemRoleKey,
 	groupID int64,
 	verb PermissionVerb,
 ) bool {
@@ -121,7 +121,7 @@ func (r UserAccessCache) HasGroupPermission(
 func (r UserAccessCache) HasAnyGroupPermission(
 	groupID int64,
 	verb PermissionVerb,
-	keys ...enum.FixedAssetSystemRoleKey,
+	keys ...enum.SystemRoleKey,
 ) bool {
 	if r.IsTotalControl() {
 		return true
@@ -143,7 +143,7 @@ func (r UserAccessCache) HasAnyGroupPermission(
 // Total control is NOT expanded into "every group id" here — there is no group list to enumerate
 // for a tenant-wide grant. Callers needing a see-all shortcut check IsTotalControl/IsReadOnly (or
 // HasAnySystemPermission for a global key) separately, and skip the group filter entirely.
-func (r UserAccessCache) GroupIDsWithPermission(verb PermissionVerb, keys ...enum.FixedAssetSystemRoleKey) []int64 {
+func (r UserAccessCache) GroupIDsWithPermission(verb PermissionVerb, keys ...enum.SystemRoleKey) []int64 {
 	seen := map[int64]bool{}
 	var out []int64
 	for _, key := range keys {
@@ -169,13 +169,13 @@ func (r UserAccessCache) GroupIDsWithPermission(verb PermissionVerb, keys ...enu
 type PermissionEntry struct {
 	isTransaction   bool
 	verb            PermissionVerb
-	systemRole      enum.FixedAssetSystemRoleKey
+	systemRole      enum.SystemRoleKey
 	transactionRole enum.FixedAssetTransactionRoleTransactionKey
 	transactionType enum.TransactionRolesType
 }
 
 // ForSystemRole builds a PermissionEntry that looks up group ids by system-role permission.
-func ForSystemRole(verb PermissionVerb, key enum.FixedAssetSystemRoleKey) PermissionEntry {
+func ForSystemRole(verb PermissionVerb, key enum.SystemRoleKey) PermissionEntry {
 	return PermissionEntry{verb: verb, systemRole: key}
 }
 
@@ -229,7 +229,7 @@ func (r UserAccessCache) GroupIDsFor(entries ...PermissionEntry) []int64 {
 // answers "does one of these keys, held globally, waive the group filter entirely", which is what a
 // global key means: it has no group_id to filter by, so holding it covers every row (V1's
 // depreciationGroup/depreciationMethod, joined with no group condition at all).
-func (r UserAccessCache) HasAnySystemPermission(verb PermissionVerb, keys ...enum.FixedAssetSystemRoleKey) bool {
+func (r UserAccessCache) HasAnySystemPermission(verb PermissionVerb, keys ...enum.SystemRoleKey) bool {
 	if r.IsTotalControl() {
 		return true
 	}

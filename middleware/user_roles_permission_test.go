@@ -6,13 +6,13 @@ import (
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/enum"
 )
 
-const userAndRole = enum.FixedAssetSystemRoleKeyUserAndRole
+const userAndRole = enum.SystemRoleKeyManageUserAndRole
 
 // rolesWith builds a snapshot with a single system-role grant, nothing else.
 func rolesWith(global *Permissions[bool], group *Permissions[[]string]) UserAccessCache {
 	var r UserAccessCache
-	r.SystemRole.GlobalRole = map[enum.FixedAssetSystemRoleKey]Permissions[bool]{}
-	r.SystemRole.GroupRoles = map[enum.FixedAssetSystemRoleKey]Permissions[[]string]{}
+	r.SystemRole.GlobalRole = map[enum.SystemRoleKey]Permissions[bool]{}
+	r.SystemRole.GroupRoles = map[enum.SystemRoleKey]Permissions[[]string]{}
 	if global != nil {
 		r.SystemRole.GlobalRole[userAndRole] = *global
 	}
@@ -106,17 +106,17 @@ func TestHasGroupPermission(t *testing.T) {
 
 func TestGroupIDsWithPermission_UnionsAcrossKeys(t *testing.T) {
 	var roles UserAccessCache
-	roles.SystemRole.GroupRoles = map[enum.FixedAssetSystemRoleKey]Permissions[[]string]{
-		enum.FixedAssetSystemRoleKeyAssets:              {View: []string{"1", "2"}},
-		enum.FixedAssetSystemRoleKeyTag:                 {View: []string{"2", "3"}}, // 2 overlaps — must dedupe
-		enum.FixedAssetSystemRoleKeyPurchaseInformation: {Edit: []string{"4"}},      // wrong verb, must not appear
+	roles.SystemRole.GroupRoles = map[enum.SystemRoleKey]Permissions[[]string]{
+		enum.SystemRoleKeyManageUserAndRole:     {View: []string{"1", "2"}},
+		enum.SystemRoleKeyManageMasterReference: {View: []string{"2", "3"}}, // 2 overlaps — must dedupe
+		enum.SystemRoleKeyImportData:            {Edit: []string{"4"}},      // wrong verb, must not appear
 	}
 
 	got := roles.GroupIDsWithPermission(
 		PermView,
-		enum.FixedAssetSystemRoleKeyAssets,
-		enum.FixedAssetSystemRoleKeyTag,
-		enum.FixedAssetSystemRoleKeyPurchaseInformation,
+		enum.SystemRoleKeyManageUserAndRole,
+		enum.SystemRoleKeyManageMasterReference,
+		enum.SystemRoleKeyImportData,
 	)
 
 	want := map[int64]bool{1: true, 2: true, 3: true}
