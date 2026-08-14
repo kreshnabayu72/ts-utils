@@ -22,10 +22,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/constant"
+	"io"
 	"log/slog"
 	"net/http"
 	"time"
+
+	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/constant"
 )
 
 // Migrator is the service's own tenant-provisioning activity — the SAME object it registers
@@ -234,6 +236,12 @@ func fetchClients(ctx context.Context, baseURL, serviceToken string) ([]string, 
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
+		responseBody, _ := io.ReadAll(resp.Body)
+		slog.ErrorContext(ctx, "tenant: unexpected response status",
+			"status", resp.StatusCode,
+			"body", string(responseBody),
+		)
+
 		return nil, fmt.Errorf("unexpected status %d", resp.StatusCode)
 	}
 
