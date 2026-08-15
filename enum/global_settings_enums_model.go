@@ -5,10 +5,10 @@ package enum
 type GlobalSettingsSystemRoleKey = SystemRoleKey
 
 const (
-	GlobalSettingsSystemRoleKeyManageUserAndRole     GlobalSettingsSystemRoleKey = "userAndRole"
-	GlobalSettingsSystemRoleKeyManageMasterReference GlobalSettingsSystemRoleKey = "masterReference"
+	GlobalSettingsSystemRoleKeyManageUserAndRole     GlobalSettingsSystemRoleKey = "user_and_role"
+	GlobalSettingsSystemRoleKeyManageMasterReference GlobalSettingsSystemRoleKey = "master_reference"
 	GlobalSettingsSystemRoleKeyManageHardware        GlobalSettingsSystemRoleKey = "hardware"
-	GlobalSettingsSystemRoleKeyImportData            GlobalSettingsSystemRoleKey = "importData"
+	GlobalSettingsSystemRoleKeyImportData            GlobalSettingsSystemRoleKey = "import_data"
 	GlobalSettingsSystemRoleKeyManageFiles           GlobalSettingsSystemRoleKey = "files"
 	GlobalSettingsSystemRoleKeyManageTAG             GlobalSettingsSystemRoleKey = "tag"
 )

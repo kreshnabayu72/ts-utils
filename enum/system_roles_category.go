@@ -9,23 +9,23 @@ package enum
 type SystemRoleKey string
 
 const (
-	SystemRoleKeyManageUserAndRole     SystemRoleKey = "manageUserAndRole"
-	SystemRoleKeyManageMasterReference SystemRoleKey = "manageMasterReference"
-	SystemRoleKeyManageHardware        SystemRoleKey = "manageHardware"
-	SystemRoleKeyImportData            SystemRoleKey = "importData"
-	SystemRoleKeyManageFiles           SystemRoleKey = "manageFiles"
-	SystemRoleKeyManageTAG             SystemRoleKey = "manageTAG"
+	SystemRoleKeyManageUserAndRole     SystemRoleKey = "manage_user_and_role"
+	SystemRoleKeyManageMasterReference SystemRoleKey = "manage_master_reference"
+	SystemRoleKeyManageHardware        SystemRoleKey = "manage_hardware"
+	SystemRoleKeyImportData            SystemRoleKey = "import_data"
+	SystemRoleKeyManageFiles           SystemRoleKey = "manage_files"
+	SystemRoleKeyManageTAG             SystemRoleKey = "manage_tag"
 )
 
 type SystemRoleName string
 
 const (
-	SystemRoleNameManageUserAndRole      SystemRoleName = "Manage user and role"
-	SystemRoleNameManageMasterReference  SystemRoleName = "Manage master reference"
-	SystemRoleNameManageHardware         SystemRoleName = "Manage hardware"
-	SystemRoleNameImportData             SystemRoleName = "Import data"
-	SystemRoleNameManageFiles            SystemRoleName = "Manage files"
-	SystemRoleNameManageTAG              SystemRoleName = "Manage TAG"
+	SystemRoleNameManageUserAndRole     SystemRoleName = "Manage user and role"
+	SystemRoleNameManageMasterReference SystemRoleName = "Manage master reference"
+	SystemRoleNameManageHardware        SystemRoleName = "Manage hardware"
+	SystemRoleNameImportData            SystemRoleName = "Import data"
+	SystemRoleNameManageFiles           SystemRoleName = "Manage files"
+	SystemRoleNameManageTAG             SystemRoleName = "Manage TAG"
 )
 
 // SystemRolesCategory reports which arm of the scope arc a grant uses: Group means a
@@ -34,6 +34,6 @@ const (
 type SystemRolesCategory string
 
 const (
-	SystemRolesCategoryGroup  SystemRolesCategory = "Group"
-	SystemRolesCategoryGlobal SystemRolesCategory = "Global"
+	SystemRolesCategoryGroup  SystemRolesCategory = "group"
+	SystemRolesCategoryGlobal SystemRolesCategory = "global"
 )

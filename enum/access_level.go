@@ -8,6 +8,6 @@ package enum
 type AccessLevel string
 
 const (
-	AccessLevelTotalControl AccessLevel = "Total Control"
-	AccessLevelReadOnly     AccessLevel = "Read Only"
+	AccessLevelTotalControl AccessLevel = "total_control"
+	AccessLevelReadOnly     AccessLevel = "read_only"
 )
