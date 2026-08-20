@@ -39,7 +39,7 @@ func runGate(t *testing.T, roles *middleware.UserAccessCache, rules ...Rule) (in
 
 func rolesWithTx(types map[enum.TransactionRolesType][]string) *middleware.UserAccessCache {
 	var r middleware.UserAccessCache
-	r.TransactionRole = map[enum.FixedAssetTransactionRoleTransactionKey]map[enum.TransactionRolesType][]string{
+	r.FixedAssetTransactionRole = map[enum.FixedAssetTransactionRoleTransactionKey]map[enum.TransactionRolesType][]string{
 		borrowTx: types,
 	}
 	return &r
@@ -47,7 +47,7 @@ func rolesWithTx(types map[enum.TransactionRolesType][]string) *middleware.UserA
 
 func TestRequire_FailsClosedWithoutSnapshot(t *testing.T) {
 	// LoadUserRoles not mounted / iam unreachable: no snapshot in Locals.
-	status, reached := runGate(t, nil, TransactionRole(borrowTx, enum.TransactionRolesTypeManager))
+	status, reached := runGate(t, nil, FixedAssetTransactionRole(borrowTx, enum.TransactionRolesTypeManager))
 	if status != fiber.StatusUnauthorized {
 		t.Errorf("status = %d, want 401 — a gate with no snapshot must fail closed", status)
 	}
@@ -56,11 +56,11 @@ func TestRequire_FailsClosedWithoutSnapshot(t *testing.T) {
 	}
 }
 
-func TestTransactionRole(t *testing.T) {
+func TestFixedAssetTransactionRole(t *testing.T) {
 	manager := rolesWithTx(map[enum.TransactionRolesType][]string{
 		enum.TransactionRolesTypeManager: {"7"},
 	})
-	status, reached := runGate(t, manager, TransactionRole(borrowTx, enum.TransactionRolesTypeManager))
+	status, reached := runGate(t, manager, FixedAssetTransactionRole(borrowTx, enum.TransactionRolesTypeManager))
 	if status != fiber.StatusOK || !reached {
 		t.Errorf("manager should pass: status=%d reached=%v", status, reached)
 	}
@@ -70,14 +70,14 @@ func TestTransactionRole(t *testing.T) {
 		enum.TransactionRolesTypeMonitoring: {"7"},
 	})
 	status, reached = runGate(t, monitoring,
-		TransactionRole(borrowTx, enum.TransactionRolesTypeManager, enum.TransactionRolesTypeStaff))
+		FixedAssetTransactionRole(borrowTx, enum.TransactionRolesTypeManager, enum.TransactionRolesTypeStaff))
 	if status != fiber.StatusForbidden || reached {
 		t.Errorf("monitoring must not pass a Manager/Staff gate: status=%d reached=%v", status, reached)
 	}
 
 	// The route accepting several types accepts Monitoring too.
 	status, _ = runGate(t, monitoring,
-		TransactionRole(borrowTx, enum.TransactionRolesTypeManager, enum.TransactionRolesTypeMonitoring))
+		FixedAssetTransactionRole(borrowTx, enum.TransactionRolesTypeManager, enum.TransactionRolesTypeMonitoring))
 	if status != fiber.StatusOK {
 		t.Errorf("multi-type gate should accept monitoring: status=%d", status)
 	}
@@ -86,7 +86,7 @@ func TestTransactionRole(t *testing.T) {
 	empty := rolesWithTx(map[enum.TransactionRolesType][]string{
 		enum.TransactionRolesTypeManager: {},
 	})
-	status, _ = runGate(t, empty, TransactionRole(borrowTx, enum.TransactionRolesTypeManager))
+	status, _ = runGate(t, empty, FixedAssetTransactionRole(borrowTx, enum.TransactionRolesTypeManager))
 	if status != fiber.StatusForbidden {
 		t.Errorf("empty group list must not grant: status=%d", status)
 	}
@@ -97,7 +97,7 @@ func TestTransactionRole_TotalControlPasses(t *testing.T) {
 	tc.ModuleAccess = map[enum.ModuleAccess]middleware.ModuleFlags{
 		enum.ModuleAccessFixedAsset: {IsTotalControl: true},
 	}
-	status, _ := runGate(t, &tc, TransactionRole(borrowTx, enum.TransactionRolesTypeManager))
+	status, _ := runGate(t, &tc, FixedAssetTransactionRole(borrowTx, enum.TransactionRolesTypeManager))
 	if status != fiber.StatusOK {
 		t.Errorf("total control should pass any transaction gate: status=%d", status)
 	}
@@ -111,12 +111,12 @@ func TestSeeAll_ReadOnlyOnlyPassesWhenComposed(t *testing.T) {
 		enum.ModuleAccessFixedAsset: {IsReadOnly: true},
 	}
 
-	status, _ := runGate(t, &ro, TransactionRole(borrowTx, enum.TransactionRolesTypeManager))
+	status, _ := runGate(t, &ro, FixedAssetTransactionRole(borrowTx, enum.TransactionRolesTypeManager))
 	if status != fiber.StatusForbidden {
 		t.Errorf("read-only must not pass a bare transaction gate: status=%d", status)
 	}
 
-	status, _ = runGate(t, &ro, Any(SeeAll(), TransactionRole(borrowTx, enum.TransactionRolesTypeManager)))
+	status, _ = runGate(t, &ro, Any(FixedAssetSeeAll(), FixedAssetTransactionRole(borrowTx, enum.TransactionRolesTypeManager)))
 	if status != fiber.StatusOK {
 		t.Errorf("read-only should pass a read route composed with SeeAll: status=%d", status)
 	}

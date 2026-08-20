@@ -18,7 +18,7 @@ type Rule func(c fiber.Ctx, roles middleware.UserAccessCache) (bool, error)
 
 // Require gates a route on rules. ALL must pass (AND); use Any for OR.
 //
-//	borrowings.Post("/list", rbac.Require(rbac.TransactionRole(tx, Manager, Monitoring)), h.List)
+//	borrowings.Post("/list", rbac.Require(rbac.FixedAssetTransactionRole(tx, Manager, Monitoring)), h.List)
 func Require(rules ...Rule) fiber.Handler {
 	return func(c fiber.Ctx) error {
 		roles, ok := middleware.GetUserRoles(c)
@@ -57,12 +57,13 @@ func Any(rules ...Rule) Rule {
 	}
 }
 
-// SystemRole passes when the caller holds `verb` on ANY of `keys`. A route may name several — V1
-// took a slice of attributes for the same reason. Total control passes everything.
-func SystemRole(verb middleware.PermissionVerb, keys ...enum.SystemRoleKey) Rule {
+// FixedAssetSystemRole passes when the caller holds `verb` on ANY of `keys` — either globally or
+// in at least one group. A route may name several — V1 took a slice of attributes for the same
+// reason. Total control passes everything.
+func FixedAssetSystemRole(verb middleware.PermissionVerb, keys ...enum.SystemRoleKey) Rule {
 	return func(_ fiber.Ctx, roles middleware.UserAccessCache) (bool, error) {
 		for _, key := range keys {
-			if roles.HasSystemPermission(key, verb) {
+			if roles.HasSystemPermissionFixedAsset(key, verb) {
 				return true, nil
 			}
 		}
@@ -70,21 +71,36 @@ func SystemRole(verb middleware.PermissionVerb, keys ...enum.SystemRoleKey) Rule
 	}
 }
 
-// TransactionRole passes when the caller holds ANY of `types` on `transaction` in at least one
+// GlobalSettingsSystemRole passes when the caller holds `verb` on ANY of `keys` in the
+// global-settings module. A route may name several. Unlike FixedAssetSystemRole, this reads
+// GlobalSettingsSystemRole, not FixedAssetSystemRole. Global-settings total control passes
+// everything.
+func GlobalSettingsSystemRole(verb middleware.PermissionVerb, keys ...enum.SystemRoleKey) Rule {
+	return func(_ fiber.Ctx, roles middleware.UserAccessCache) (bool, error) {
+		for _, key := range keys {
+			if roles.HasGlobalSettingsPermission(key, verb) {
+				return true, nil
+			}
+		}
+		return false, nil
+	}
+}
+
+// FixedAssetTransactionRole passes when the caller holds ANY of `types` on `transaction` in at least one
 // group (Manager / Monitoring / Staff — a route may accept several). Total control passes.
 //
 // Approver is deliberately NOT satisfiable here: it is absent from the snapshot on purpose
 // (ADR 005), because approving is authorized by the approval ROW that names you, not by a role.
 // Gate approver routes with Assignment — that is what survives a role revocation.
-func TransactionRole(
+func FixedAssetTransactionRole(
 	transaction enum.FixedAssetTransactionRoleTransactionKey,
 	types ...enum.TransactionRolesType,
 ) Rule {
 	return func(_ fiber.Ctx, roles middleware.UserAccessCache) (bool, error) {
-		if roles.IsTotalControl() {
+		if roles.IsTotalControl(enum.ModuleAccessFixedAsset) {
 			return true, nil
 		}
-		byType, held := roles.TransactionRole[transaction]
+		byType, held := roles.FixedAssetTransactionRole[transaction]
 		if !held {
 			return false, nil
 		}
@@ -97,25 +113,41 @@ func TransactionRole(
 	}
 }
 
-// SeeAll passes for a total-control or read-only caller — the shortcut that lets someone see every
+// FixedAssetSeeAll passes for a total-control or read-only caller — the shortcut that lets someone see every
 // group without holding a per-group role. Compose it with Any when a READ route must stay open to
 // read-only users:
 //
-//	rbac.Require(rbac.Any(rbac.SeeAll(), rbac.TransactionRole(tx, Manager, Monitoring)))
+//	rbac.Require(rbac.Any(rbac.FixedAssetSeeAll(), rbac.FixedAssetTransactionRole(tx, Manager, Monitoring)))
 //
-// Deliberately separate from TransactionRole: read-only is not a licence to WRITE, so a write route
+// Deliberately separate from FixedAssetTransactionRole: read-only is not a licence to WRITE, so a write route
 // must not pick it up implicitly.
-func SeeAll() Rule {
+func FixedAssetSeeAll() Rule {
 	return func(_ fiber.Ctx, roles middleware.UserAccessCache) (bool, error) {
-		return roles.IsTotalControl() || roles.IsReadOnly(), nil
+		return roles.IsTotalControl(enum.ModuleAccessFixedAsset) || roles.IsReadOnly(enum.ModuleAccessFixedAsset), nil
 	}
 }
 
-// TotalControl passes for a total-control admin only — stricter than SeeAll (which also admits
-// read-only). Use it where holding the grant, not just seeing everything, is the requirement.
-func TotalControl() Rule {
+// FixedAssetTotalControl passes for a total-control admin only — stricter than FixedAssetSeeAll
+// (which also admits read-only). Use it where holding the grant, not just seeing everything, is the requirement.
+func FixedAssetTotalControl() Rule {
 	return func(_ fiber.Ctx, roles middleware.UserAccessCache) (bool, error) {
-		return roles.IsTotalControl(), nil
+		return roles.IsTotalControl(enum.ModuleAccessFixedAsset), nil
+	}
+}
+
+// GlobalSettingsSeeAll passes for a total-control or read-only caller of the global-settings
+// module — the read-side counterpart to FixedAssetSeeAll.
+func GlobalSettingsSeeAll() Rule {
+	return func(_ fiber.Ctx, roles middleware.UserAccessCache) (bool, error) {
+		return roles.IsTotalControl(enum.ModuleAccessGlobalSettings) || roles.IsReadOnly(enum.ModuleAccessGlobalSettings), nil
+	}
+}
+
+// GlobalSettingsTotalControl passes for a global-settings total-control admin only — stricter than
+// GlobalSettingsSeeAll, which also admits read-only.
+func GlobalSettingsTotalControl() Rule {
+	return func(_ fiber.Ctx, roles middleware.UserAccessCache) (bool, error) {
+		return roles.IsTotalControl(enum.ModuleAccessGlobalSettings), nil
 	}
 }
 

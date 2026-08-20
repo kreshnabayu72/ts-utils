@@ -15,19 +15,23 @@ import (
 //   - GroupRoles carry the list of group_ids the user may act on per permission (group-scoped).
 //   - GlobalRole carries booleans (tenant-wide, not group-scoped).
 //   - TransactionRole maps transaction -> role type -> group_ids.
-//
-// TODO: Handle multiple module (fixed asset + supply + admin). find optimal way between adding more attributes (FixedAssetSystemRole) or struct (FixedAssetUserAccessCache)
 type UserAccessCache struct {
-	ID           int                               `json:"_id"`
-	FullName     string                            `json:"fullName"`
-	Email        string                            `json:"email"`
-	ClientID     string                            `json:"clientId"`
-	ModuleAccess map[enum.ModuleAccess]ModuleFlags `json:"moduleAccess"`
-	SystemRole   struct {
+	ID                   int                               `json:"_id"`
+	FullName             string                            `json:"fullName"`
+	Email                string                            `json:"email"`
+	ClientID             string                            `json:"clientId"`
+	ModuleAccess         map[enum.ModuleAccess]ModuleFlags `json:"moduleAccess"`
+	FixedAssetSystemRole struct {
 		GlobalRole map[enum.SystemRoleKey]Permissions[bool]     `json:"globalRole"`
 		GroupRoles map[enum.SystemRoleKey]Permissions[[]string] `json:"groupRoles"`
-	} `json:"systemRole"`
-	TransactionRole map[enum.FixedAssetTransactionRoleTransactionKey]map[enum.TransactionRolesType][]string `json:"transactionRole"`
+	} `json:"fixedAssetSystemRole"`
+	GlobalSettingsSystemRole struct {
+		GlobalRole map[enum.SystemRoleKey]Permissions[bool] `json:"globalRole"`
+	} `json:"globalSettingsSystemRole"`
+	AdminConsoleSystemRole struct {
+		GlobalRole map[enum.SystemRoleKey]Permissions[bool] `json:"globalRole"`
+	} `json:"adminConsoleSystemRole"`
+	FixedAssetTransactionRole map[enum.FixedAssetTransactionRoleTransactionKey]map[enum.TransactionRolesType][]string `json:"fixedAssetTransactionRole"`
 }
 
 // ModuleFlags is the per-module top-level access (e.g. moduleAccess.fixedAsset).
@@ -60,75 +64,75 @@ func pickPermission[T any](p Permissions[T], verb PermissionVerb) T {
 	}
 }
 
-// IsTotalControl reports whether the user is a total-control admin of the fixed-asset module —
-// the grant that covers every action, including managing users and roles.
-func (r UserAccessCache) IsTotalControl() bool {
-	m, ok := r.ModuleAccess[enum.ModuleAccessFixedAsset]
+// IsTotalControl reports whether the user is a total-control admin of `product` — the grant that
+// covers every action in that module, including managing users and roles.
+func (r UserAccessCache) IsTotalControl(product enum.ModuleAccess) bool {
+	m, ok := r.ModuleAccess[product]
 	return ok && m.IsTotalControl
 }
 
-// IsReadOnly reports whether the user holds the read-only grant of the fixed-asset module.
-func (r UserAccessCache) IsReadOnly() bool {
-	m, ok := r.ModuleAccess[enum.ModuleAccessFixedAsset]
+// IsReadOnly reports whether the user holds the read-only grant of `product`.
+func (r UserAccessCache) IsReadOnly(product enum.ModuleAccess) bool {
+	m, ok := r.ModuleAccess[product]
 	return ok && m.IsReadOnly
 }
 
-// HasSystemPermission reports whether the user holds `verb` on system role `key` ANYWHERE — either
+// HasSystemPermissionFixedAsset reports whether the user holds `verb` on system role `key` ANYWHERE — either
 // tenant-wide (global) or in at least one group. Total control covers everything.
 //
 // This is the snapshot equivalent of BETS-V1's GlobalSystemRoleRestrictionSQL, minus the SQL: the
 // answer is already in the cached snapshot iam served, so no query runs. Gating logic lives here,
 // on the shared contract type, so iam (which builds the snapshot itself) and every consumer (which
 // fetches it via LoadUserRoles) ask the same question the same way.
-func (r UserAccessCache) HasSystemPermission(key enum.SystemRoleKey, verb PermissionVerb) bool {
-	if r.IsTotalControl() {
+func (r UserAccessCache) HasSystemPermissionFixedAsset(key enum.SystemRoleKey, verb PermissionVerb) bool {
+	if r.IsTotalControl(enum.ModuleAccessFixedAsset) {
 		return true
 	}
-	if g, ok := r.SystemRole.GlobalRole[key]; ok && pickPermission(g, verb) {
+	if g, ok := r.FixedAssetSystemRole.GlobalRole[key]; ok && pickPermission(g, verb) {
 		return true
 	}
-	if g, ok := r.SystemRole.GroupRoles[key]; ok && len(pickPermission(g, verb)) > 0 {
+	if g, ok := r.FixedAssetSystemRole.GroupRoles[key]; ok && len(pickPermission(g, verb)) > 0 {
 		return true
 	}
 	return false
 }
 
-// HasGroupPermission reports whether the user holds `verb` on system role `key` in the SPECIFIC
-// group `groupID` — unlike HasSystemPermission's "anywhere" answer, this checks membership in one
+// HasGroupPermissionFixedAsset reports whether the user holds `verb` on system role `key` in the SPECIFIC
+// group `groupID` — unlike HasSystemPermissionFixedAsset's "anywhere" answer, this checks membership in one
 // named group. Total control still covers everything.
 //
 // This is the check a per-row write decision needs (e.g. "may I edit this asset, which is in group
-// 7"): HasSystemPermission("do you hold this anywhere") would wrongly admit someone who holds it in
+// 7"): HasSystemPermissionFixedAsset("do you hold this anywhere") would wrongly admit someone who holds it in
 // a DIFFERENT group.
-func (r UserAccessCache) HasGroupPermission(
+func (r UserAccessCache) HasGroupPermissionFixedAsset(
 	key enum.SystemRoleKey,
 	groupID int64,
 	verb PermissionVerb,
 ) bool {
-	if r.IsTotalControl() {
+	if r.IsTotalControl(enum.ModuleAccessFixedAsset) {
 		return true
 	}
-	g, ok := r.SystemRole.GroupRoles[key]
+	g, ok := r.FixedAssetSystemRole.GroupRoles[key]
 	if !ok {
 		return false
 	}
 	return slices.Contains(pickPermission(g, verb), strconv.FormatInt(groupID, 10))
 }
 
-// HasAnyGroupPermission reports whether the user holds `verb` on the SPECIFIC group `groupID`, via
-// ANY of `keys`. Variadic sibling of HasGroupPermission for a caller ORing several system-role keys
+// HasAnyGroupPermissionFixedAsset reports whether the user holds `verb` on the SPECIFIC group `groupID`, via
+// ANY of `keys`. Variadic sibling of HasGroupPermissionFixedAsset for a caller ORing several system-role keys
 // (V1's available-asset-list breadth) against one group, without materializing a full id list first.
-func (r UserAccessCache) HasAnyGroupPermission(
+func (r UserAccessCache) HasAnyGroupPermissionFixedAsset(
 	groupID int64,
 	verb PermissionVerb,
 	keys ...enum.SystemRoleKey,
 ) bool {
-	if r.IsTotalControl() {
+	if r.IsTotalControl(enum.ModuleAccessFixedAsset) {
 		return true
 	}
 	gid := strconv.FormatInt(groupID, 10)
 	for _, key := range keys {
-		if g, ok := r.SystemRole.GroupRoles[key]; ok && slices.Contains(pickPermission(g, verb), gid) {
+		if g, ok := r.FixedAssetSystemRole.GroupRoles[key]; ok && slices.Contains(pickPermission(g, verb), gid) {
 			return true
 		}
 	}
@@ -142,12 +146,12 @@ func (r UserAccessCache) HasAnyGroupPermission(
 //
 // Total control is NOT expanded into "every group id" here — there is no group list to enumerate
 // for a tenant-wide grant. Callers needing a see-all shortcut check IsTotalControl/IsReadOnly (or
-// HasAnySystemPermission for a global key) separately, and skip the group filter entirely.
+// HasAnySystemPermissionFixedAsset for a global key) separately, and skip the group filter entirely.
 func (r UserAccessCache) GroupIDsWithPermission(verb PermissionVerb, keys ...enum.SystemRoleKey) []int64 {
 	seen := map[int64]bool{}
 	var out []int64
 	for _, key := range keys {
-		g, ok := r.SystemRole.GroupRoles[key]
+		g, ok := r.FixedAssetSystemRole.GroupRoles[key]
 		if !ok {
 			continue
 		}
@@ -208,7 +212,7 @@ func (r UserAccessCache) GroupIDsFor(entries ...PermissionEntry) []int64 {
 			}
 			continue
 		}
-		g, ok := r.SystemRole.GroupRoles[e.systemRole]
+		g, ok := r.FixedAssetSystemRole.GroupRoles[e.systemRole]
 		if !ok {
 			continue
 		}
@@ -224,34 +228,63 @@ func (r UserAccessCache) GroupIDsFor(entries ...PermissionEntry) []int64 {
 	return out
 }
 
-// HasAnySystemPermission reports whether the user holds `verb` GLOBALLY (tenant-wide, no group_id)
-// on any of `keys`. Unlike HasSystemPermission, this does NOT look at group-scoped grants — it
-// answers "does one of these keys, held globally, waive the group filter entirely", which is what a
-// global key means: it has no group_id to filter by, so holding it covers every row (V1's
-// depreciationGroup/depreciationMethod, joined with no group condition at all).
-func (r UserAccessCache) HasAnySystemPermission(verb PermissionVerb, keys ...enum.SystemRoleKey) bool {
-	if r.IsTotalControl() {
+// HasAnySystemPermissionFixedAsset reports whether the user holds `verb` GLOBALLY (tenant-wide, no group_id)
+// on any of `keys` in the fixed-asset module. Unlike HasSystemPermissionFixedAsset, this does NOT look at
+// group-scoped grants — it answers "does one of these keys, held globally, waive the group filter
+// entirely", which is what a global key means: it has no group_id to filter by, so holding it
+// covers every row (V1's depreciationGroup/depreciationMethod, joined with no group condition at
+// all).
+func (r UserAccessCache) HasAnySystemPermissionFixedAsset(verb PermissionVerb, keys ...enum.SystemRoleKey) bool {
+	if r.IsTotalControl(enum.ModuleAccessFixedAsset) {
 		return true
 	}
 	for _, key := range keys {
-		if g, ok := r.SystemRole.GlobalRole[key]; ok && pickPermission(g, verb) {
+		if g, ok := r.FixedAssetSystemRole.GlobalRole[key]; ok && pickPermission(g, verb) {
 			return true
 		}
 	}
 	return false
 }
 
-// HasTransactionRole reports whether the user holds ANY of `types` on `transaction` in the
+// HasGlobalSettingsPermission reports whether the user holds `verb` on system role `key` in the
+// global-settings module. Unlike HasSystemPermissionFixedAsset, this reads GlobalSettingsSystemRole,
+// not FixedAssetSystemRole, so a fixed-asset grant cannot accidentally satisfy a global-settings
+// gate. Global-settings total control passes everything.
+func (r UserAccessCache) HasGlobalSettingsPermission(key enum.SystemRoleKey, verb PermissionVerb) bool {
+	if r.IsTotalControl(enum.ModuleAccessGlobalSettings) {
+		return true
+	}
+	if g, ok := r.GlobalSettingsSystemRole.GlobalRole[key]; ok && pickPermission(g, verb) {
+		return true
+	}
+	return false
+}
+
+// HasAdminConsolePermission reports whether the user holds `verb` on system role `key` in the
+// admin-console module. Unlike HasSystemPermissionFixedAsset, this reads AdminConsoleSystemRole,
+// not FixedAssetSystemRole, so a fixed-asset grant cannot accidentally satisfy an admin-console
+// gate. Admin-console total control passes everything.
+func (r UserAccessCache) HasAdminConsolePermission(key enum.SystemRoleKey, verb PermissionVerb) bool {
+	if r.IsTotalControl(enum.ModuleAccessAdminConsole) {
+		return true
+	}
+	if g, ok := r.AdminConsoleSystemRole.GlobalRole[key]; ok && pickPermission(g, verb) {
+		return true
+	}
+	return false
+}
+
+// HasTransactionRoleFixedAsset reports whether the user holds ANY of `types` on `transaction` in the
 // specific group `groupID`.
-func (r UserAccessCache) HasTransactionRole(
+func (r UserAccessCache) HasTransactionRoleFixedAsset(
 	transaction enum.FixedAssetTransactionRoleTransactionKey,
 	groupID int64,
 	types ...enum.TransactionRolesType,
 ) bool {
-	if r.IsTotalControl() {
+	if r.IsTotalControl(enum.ModuleAccessFixedAsset) {
 		return true
 	}
-	byType, ok := r.TransactionRole[transaction]
+	byType, ok := r.FixedAssetTransactionRole[transaction]
 	if !ok {
 		return false
 	}
@@ -270,7 +303,7 @@ func (r UserAccessCache) GroupIDsWithTransactionRole(
 	transaction enum.FixedAssetTransactionRoleTransactionKey,
 	types ...enum.TransactionRolesType,
 ) []int64 {
-	byType, ok := r.TransactionRole[transaction]
+	byType, ok := r.FixedAssetTransactionRole[transaction]
 	if !ok {
 		return nil
 	}

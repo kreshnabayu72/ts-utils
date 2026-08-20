@@ -176,7 +176,7 @@ func GetUserRoles(c fiber.Ctx) (UserAccessCache, bool) {
 // RequestIdentity bundles the three request-scoped facts a handler most often needs together:
 // which tenant, whose RBAC snapshot, and who is calling — the snapshot LoadUserRoles placed in
 // Locals, plus X-Client-ID and X-User-ID. It returns the raw snapshot, not a derived scope —
-// decisions are asked directly of it (HasGroupPermission, GroupIDsWithTransactionRole, ...), so
+// decisions are asked directly of it (HasGroupPermissionFixedAsset, GroupIDsWithTransactionRole, ...), so
 // nothing gets lost in a reduction step.
 //
 // Fails closed — no snapshot (middleware not mounted, or iam unreachable), no usable X-User-ID, or
