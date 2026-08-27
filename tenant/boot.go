@@ -147,7 +147,8 @@ func catchUp(ctx context.Context, m Migrator, cfg config) (result, error) {
 			"tenant list unavailable: enterprise-management (%s) unreachable for %s. "+
 				"Serving existing tenants only — clients created since the last successful start have no schema here, "+
 				"and anything requiring enterprise-management (licensing, client lookup) will fail: %v",
-			cfg.EMSBaseURL, cfg.GiveUpAfter, err)
+			cfg.EMSBaseURL, cfg.GiveUpAfter, err,
+		)
 
 		slog.ErrorContext(ctx, "tenant: DEGRADED — starting without the tenant list", "reason", reason)
 
@@ -237,13 +238,17 @@ func fetchClients(ctx context.Context, baseURL, serviceToken string) ([]string, 
 
 	if resp.StatusCode != http.StatusOK {
 		responseBody, _ := io.ReadAll(resp.Body)
-		slog.ErrorContext(ctx, "tenant: unexpected response status",
+		slog.ErrorContext(
+			ctx, "tenant: unexpected response status",
 			"status", resp.StatusCode,
 			"body", string(responseBody),
 		)
 
 		return nil, fmt.Errorf("unexpected status %d", resp.StatusCode)
 	}
+
+	responseBody, _ := io.ReadAll(resp.Body)
+	slog.Info("fetchClients: response body", string(responseBody))
 
 	var body struct {
 		Data struct {
@@ -253,6 +258,7 @@ func fetchClients(ctx context.Context, baseURL, serviceToken string) ([]string, 
 	if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
 		return nil, fmt.Errorf("decode: %w", err)
 	}
+	slog.Info("result client IDs", body.Data.ClientIDs)
 	return body.Data.ClientIDs, nil
 }
 
