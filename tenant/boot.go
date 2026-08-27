@@ -25,6 +25,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"strings"
 	"time"
 
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/constant"
@@ -258,7 +259,7 @@ func fetchClients(ctx context.Context, baseURL, serviceToken string) ([]string, 
 	if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
 		return nil, fmt.Errorf("decode: %w", err)
 	}
-	slog.Info("result client IDs", body.Data.ClientIDs)
+	slog.Info("result client IDs", strings.Join(body.Data.ClientIDs, ", "))
 	return body.Data.ClientIDs, nil
 }
 
