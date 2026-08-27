@@ -5,6 +5,7 @@ package constant
 const (
 	HEADER_USER_ID   = "X-User-ID"
 	HEADER_CLIENT_ID = "X-Client-ID"
+	HEADER_ENTITY_ID = "X-Entity-ID"
 	HEADER_MODULE    = "X-Module"
 
 	// HEADER_SERVICE_TOKEN carries the shared secret that authenticates one SERVICE to another on
