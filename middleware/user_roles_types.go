@@ -29,7 +29,8 @@ type UserAccessCache struct {
 		GlobalRole map[enum.SystemRoleKey]Permissions[bool] `json:"globalRole"`
 	} `json:"globalSettingsSystemRole"`
 	AdminConsoleSystemRole struct {
-		GlobalRole map[enum.SystemRoleKey]Permissions[bool] `json:"globalRole"`
+		GlobalRole map[enum.SystemRoleKey]Permissions[bool]     `json:"globalRole"`
+		GroupRoles map[enum.SystemRoleKey]Permissions[[]string] `json:"groupRoles"`
 	} `json:"adminConsoleSystemRole"`
 	FixedAssetTransactionRole map[enum.FixedAssetTransactionRoleTransactionKey]map[enum.TransactionRolesType][]string `json:"fixedAssetTransactionRole"`
 }
