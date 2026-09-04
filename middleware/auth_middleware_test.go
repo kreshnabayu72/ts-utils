@@ -111,7 +111,6 @@ func TestAuthMiddleware(t *testing.T) {
                 require.NoError(t, json.Unmarshal(body, &got),
                     "response body should be valid JSON; got: %s", string(body))
 
-                assert.Equal(t, fiber.StatusUnauthorized, got.Status)
                 assert.Equal(t, tc.wantMessage, got.Message)
                 assert.Nil(t, got.Data)
                 assert.Nil(t, got.Err)

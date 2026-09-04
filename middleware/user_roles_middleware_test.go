@@ -161,3 +161,107 @@ func TestLoadUserRoles_MissingHeaders_Unauthorized(t *testing.T) {
 		t.Fatalf("status = %d, want 401", resp.StatusCode)
 	}
 }
+
+func TestClientID(t *testing.T) {
+	cases := []struct {
+		name    string
+		header  string
+		wantID  string
+		wantErr bool
+	}{
+		{name: "valid simple", header: "acme", wantID: "acme"},
+		{name: "valid alphanumeric with underscore", header: "tenant_123", wantID: "tenant_123"},
+		{name: "empty header", header: "", wantErr: true},
+		{name: "invalid characters with hyphen", header: "acme-corp", wantErr: true},
+		{name: "invalid characters with space", header: "acme corp", wantErr: true},
+		{name: "exceeds length limit", header: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", wantErr: true},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			app := fiber.New()
+			var gotID string
+			var gotErr error
+			app.Get("/test", func(c fiber.Ctx) error {
+				gotID, gotErr = ClientID(c)
+				return c.SendStatus(fiber.StatusOK)
+			})
+
+			req := httptest.NewRequest("GET", "/test", nil)
+			if tc.header != "" {
+				req.Header.Set(constant.HEADER_CLIENT_ID, tc.header)
+			}
+
+			resp, err := app.Test(req)
+			if err != nil {
+				t.Fatalf("app.Test: %v", err)
+			}
+			defer resp.Body.Close()
+
+			if tc.wantErr {
+				if gotErr == nil {
+					t.Fatalf("ClientID() expected error, got id %q", gotID)
+				}
+				return
+			}
+			if gotErr != nil {
+				t.Fatalf("ClientID() unexpected error: %v", gotErr)
+			}
+			if gotID != tc.wantID {
+				t.Errorf("ClientID() = %q, want %q", gotID, tc.wantID)
+			}
+		})
+	}
+}
+
+func TestEntityID(t *testing.T) {
+	cases := []struct {
+		name    string
+		header  string
+		wantID  string
+		wantErr bool
+	}{
+		{name: "valid simple", header: "acme", wantID: "acme"},
+		{name: "valid alphanumeric with underscore", header: "entity_123", wantID: "entity_123"},
+		{name: "empty header", header: "", wantErr: true},
+		{name: "invalid characters with hyphen", header: "entity-corp", wantErr: true},
+		{name: "invalid characters with special char", header: "entity@123", wantErr: true},
+		{name: "exceeds length limit", header: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", wantErr: true},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			app := fiber.New()
+			var gotID string
+			var gotErr error
+			app.Get("/test", func(c fiber.Ctx) error {
+				gotID, gotErr = EntityID(c)
+				return c.SendStatus(fiber.StatusOK)
+			})
+
+			req := httptest.NewRequest("GET", "/test", nil)
+			if tc.header != "" {
+				req.Header.Set(constant.HEADER_ENTITY_ID, tc.header)
+			}
+
+			resp, err := app.Test(req)
+			if err != nil {
+				t.Fatalf("app.Test: %v", err)
+			}
+			defer resp.Body.Close()
+
+			if tc.wantErr {
+				if gotErr == nil {
+					t.Fatalf("EntityID() expected error, got id %q", gotID)
+				}
+				return
+			}
+			if gotErr != nil {
+				t.Fatalf("EntityID() unexpected error: %v", gotErr)
+			}
+			if gotID != tc.wantID {
+				t.Errorf("EntityID() = %q, want %q", gotID, tc.wantID)
+			}
+		})
+	}
+}

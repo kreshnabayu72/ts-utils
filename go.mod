@@ -56,9 +56,6 @@ require (
 	github.com/xuri/excelize/v2 v2.9.0 // indirect
 	github.com/xuri/nfp v0.0.0-20240318013403-ab9948c2c4a7 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 // indirect
-	go.opentelemetry.io/otel/metric v1.44.0 // indirect
-	go.opentelemetry.io/otel/sdk v1.43.0 // indirect
-	go.opentelemetry.io/otel/trace v1.44.0 // indirect
 	go.temporal.io/api v1.54.0 // indirect
 	go.temporal.io/sdk v1.38.0 // indirect
 	golang.org/x/crypto v0.53.0 // indirect
