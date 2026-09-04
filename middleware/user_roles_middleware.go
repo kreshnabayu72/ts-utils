@@ -153,6 +153,21 @@ func ClientID(c fiber.Ctx) (string, error) {
 	return id, nil
 }
 
+// validEntityID locks the entity charset.
+var validEntityID = regexp.MustCompile(`^[a-zA-Z0-9_]{1,50}$`)
+
+// EntityID is the entity, taken from the X-Entity-ID header the gateway sets.
+//
+// It is the ONE place a service reads the entity identity it is operating under.
+// Header only, validated, fails closed.
+func EntityID(c fiber.Ctx) (string, error) {
+	id := c.Get(constant.HEADER_ENTITY_ID)
+	if !validEntityID.MatchString(id) {
+		return "", entity.BadRequest("Invalid entity id")
+	}
+	return id, nil
+}
+
 // CallerID is the authenticated caller's user id, taken from the X-User-ID header the gateway
 // sets and a client cannot forge.
 //
