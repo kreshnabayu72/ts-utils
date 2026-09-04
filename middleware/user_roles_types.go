@@ -261,16 +261,55 @@ func (r UserAccessCache) HasGlobalSettingsPermission(key enum.SystemRoleKey, ver
 	return false
 }
 
-// HasAdminConsolePermission reports whether the user holds `verb` on system role `key` in the
-// admin-console module. Unlike HasSystemPermissionFixedAsset, this reads AdminConsoleSystemRole,
-// not FixedAssetSystemRole, so a fixed-asset grant cannot accidentally satisfy an admin-console
-// gate. Admin-console total control passes everything.
-func (r UserAccessCache) HasAdminConsolePermission(key enum.SystemRoleKey, verb PermissionVerb) bool {
+// HasSystemPermissionAdminConsole reports whether the user holds `verb` on system role `key` ANYWHERE — either
+// tenant-wide (global) or in at least one group. Total control covers everything.
+func (r UserAccessCache) HasSystemPermissionAdminConsole(key enum.SystemRoleKey, verb PermissionVerb) bool {
 	if r.IsTotalControl(enum.ModuleAccessAdminConsole) {
 		return true
 	}
 	if g, ok := r.AdminConsoleSystemRole.GlobalRole[key]; ok && pickPermission(g, verb) {
 		return true
+	}
+	if g, ok := r.AdminConsoleSystemRole.GroupRoles[key]; ok && len(pickPermission(g, verb)) > 0 {
+		return true
+	}
+	return false
+}
+
+// HasGroupPermissionAdminConsole reports whether the user holds `verb` on system role `key` in the SPECIFIC
+// group `groupID` — unlike HasSystemPermissionAdminConsole's "anywhere" answer, this checks membership in one
+// named group. Total control still covers everything.
+func (r UserAccessCache) HasGroupPermissionAdminConsole(
+	key enum.SystemRoleKey,
+	groupID int64,
+	verb PermissionVerb,
+) bool {
+	if r.IsTotalControl(enum.ModuleAccessAdminConsole) {
+		return true
+	}
+	g, ok := r.AdminConsoleSystemRole.GroupRoles[key]
+	if !ok {
+		return false
+	}
+	return slices.Contains(pickPermission(g, verb), strconv.FormatInt(groupID, 10))
+}
+
+// HasAnyGroupPermissionAdminConsole reports whether the user holds `verb` on the SPECIFIC group `groupID`, via
+// ANY of `keys`. Variadic sibling of HasGroupPermissionAdminConsole for a caller ORing several system-role keys
+// against one group, without materializing a full id list first.
+func (r UserAccessCache) HasAnyGroupPermissionAdminConsole(
+	groupID int64,
+	verb PermissionVerb,
+	keys ...enum.SystemRoleKey,
+) bool {
+	if r.IsTotalControl(enum.ModuleAccessAdminConsole) {
+		return true
+	}
+	gid := strconv.FormatInt(groupID, 10)
+	for _, key := range keys {
+		if g, ok := r.AdminConsoleSystemRole.GroupRoles[key]; ok && slices.Contains(pickPermission(g, verb), gid) {
+			return true
+		}
 	}
 	return false
 }
