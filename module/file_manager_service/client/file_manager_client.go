@@ -38,7 +38,7 @@ func NewFileManagerClient(baseURL, serviceToken string) *FileManagerClient {
 }
 
 // Upload stores one file and creates its file_manager_data row in the caller's tenant
-// (POST /internal/file-manager/upload). filename becomes the row's file_name and the base of the
+// (POST /internal/files/upload). filename becomes the row's file_name and the base of the
 // object key; contentType is stored on the object and echoed back when the file is read.
 //
 // Metadata parts are written before the file part by construction: a streamed reader yields the
