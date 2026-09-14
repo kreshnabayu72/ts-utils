@@ -25,7 +25,7 @@ type UploadParams struct {
 
 // UploadFileResponse is the created file_manager_data row. ID is the Snowflake as a string (see
 // UploadParams). PublicPath is the AES-GCM storage token — opaque to callers, and the only value
-// GET /file-manager/:token accepts.
+// GET /files/:token accepts.
 type UploadFileResponse struct {
 	ID         string  `json:"_id"`
 	PublicPath string  `json:"publicPath"`
