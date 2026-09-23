@@ -13,6 +13,7 @@ type SessionLog struct {
 	UserNameSnapshot      string             `json:"userNameSnapshot" bson:"userNameSnapshot"`
 	EmployeeIDSnapshot    *string            `json:"employeeIdSnapshot" bson:"employeeIdSnapshot"`
 	PositionSnapshot      *string            `json:"positionSnapshot" bson:"positionSnapshot"`
+	DivisionSnapshot      *string            `json:"divisionSnapshot,omitempty" bson:"divisionSnapshot,omitempty"`
 	Activity              SessionLogActivity `json:"activity" bson:"activity"`
 	Status                SessionLogStatus   `json:"status" bson:"status"`
 	Note                  SessionLogNote     `json:"note" bson:"note"`
