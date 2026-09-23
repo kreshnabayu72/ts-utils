@@ -60,7 +60,7 @@ func (c *FileManagerClient) Upload(
 		{"platform", params.Platform},
 		{"assetId", params.AssetID},
 		{"userId", params.UserID},
-		{"modifiedById", params.ModifiedByID},
+		{"uploadedById", params.UploadedByID},
 	}
 	for _, field := range fields {
 		if field.value == "" {

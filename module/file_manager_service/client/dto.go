@@ -10,9 +10,9 @@ const maxErrorBodyBytes = 4 << 10
 // (name, path, format, size) are produced by the server, and the tenant and actor travel in
 // headers, so neither appears here.
 //
-// AssetID, UserID and ModifiedByID are strings on the wire for the reason every id in this
+// AssetID, UserID and UploadedByID are strings on the wire for the reason every id in this
 // codebase is: a Snowflake decoded into an `any` becomes a float64 and silently rounds. Leaving
-// UserID or ModifiedByID empty lets the server default them to the X-User-ID actor.
+// UserID or UploadedByID empty lets the server default them to the X-User-ID actor.
 type UploadParams struct {
 	FolderName   string
 	Type         string
@@ -20,17 +20,17 @@ type UploadParams struct {
 	Platform     string
 	AssetID      string
 	UserID       string
-	ModifiedByID string
+	UploadedByID string
 }
 
 // UploadFileResponse is the created file_manager_data row. ID is the Snowflake as a string (see
 // UploadParams). PublicPath is the AES-GCM storage token — opaque to callers, and the only value
 // GET /files/:token accepts.
 type UploadFileResponse struct {
-	ID         string  `json:"_id"`
-	PublicPath string  `json:"publicPath"`
-	FileName   string  `json:"fileName"`
-	FileFormat string  `json:"fileFormat"`
-	FileSize   string  `json:"fileSize"`
-	FileSizeKb float64 `json:"fileSizeKb"`
+	ID            string `json:"_id"`
+	PublicPath    string `json:"publicPath"`
+	FileName      string `json:"fileName"`
+	FileFormat    string `json:"fileFormat"`
+	FileSize      string `json:"fileSize"`
+	FileSizeBytes int64  `json:"fileSizeBytes"`
 }
