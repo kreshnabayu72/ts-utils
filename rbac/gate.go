@@ -31,7 +31,7 @@ func Require(rules ...Rule) fiber.Handler {
 				return entity.ToHttpError(err).SendResponse(c)
 			}
 			if !passed {
-				return entity.Forbidden("You do not have permission to do this").SendResponse(c)
+				return entity.Forbidden("Forbidden").SendResponse(c)
 			}
 		}
 		return c.Next()
