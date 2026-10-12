@@ -23,7 +23,7 @@ func Require(rules ...Rule) fiber.Handler {
 	return func(c fiber.Ctx) error {
 		roles, ok := middleware.GetUserRoles(c)
 		if !ok {
-			return entity.Unauthorized("You are not authenticated!").SendResponse(c)
+			return entity.Unauthorized("Unauthorized").SendResponse(c)
 		}
 		for _, rule := range rules {
 			passed, err := rule(c, roles)

@@ -16,7 +16,7 @@ func AuthMiddleware() fiber.Handler {
 		clientID := c.Get(constant.HEADER_CLIENT_ID)
 
 		if userID == "" || clientID == "" {
-			return helper.SendResponse(c, fiber.StatusUnauthorized, nil, "You are not authenticated!", nil)
+			return helper.SendResponse(c, fiber.StatusUnauthorized, nil, "Unauthorized", nil)
 		}
 
 		return c.Next()

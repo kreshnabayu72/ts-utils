@@ -60,7 +60,7 @@ func loadUserRoles(cache service.ValkeyServiceInterface, fetch RolesFetcher) fib
 		userID := c.Get(constant.HEADER_USER_ID)
 		clientID := c.Get(constant.HEADER_CLIENT_ID)
 		if userID == "" || clientID == "" {
-			return helper.SendResponse(c, fiber.StatusUnauthorized, nil, "You are not authenticated!", nil)
+			return helper.SendResponse(c, fiber.StatusUnauthorized, nil, "Unauthorized", nil)
 		}
 
 		// Hot path: read the shared cache directly. On a hit the consumer never touches iam.
@@ -85,7 +85,7 @@ func loadUserRoles(cache service.ValkeyServiceInterface, fetch RolesFetcher) fib
 		if err != nil {
 			slog.ErrorContext(c.Context(), "user_roles: fetch from iam failed", "userId", userID, "err", err)
 			if httpErr, ok := err.(*entity.HttpError); ok && httpErr.Code >= 400 && httpErr.Code < 500 {
-				return helper.SendResponse(c, fiber.StatusUnauthorized, nil, "You are not authenticated!", nil)
+				return helper.SendResponse(c, fiber.StatusUnauthorized, nil, "Unauthorized", nil)
 			}
 			return helper.SendResponse(c, fiber.StatusServiceUnavailable, nil, "Authorization service unavailable", nil)
 		}
@@ -177,7 +177,7 @@ func EntityID(c fiber.Ctx) (string, error) {
 func CallerID(c fiber.Ctx) (int64, error) {
 	id, err := strconv.ParseInt(c.Get(constant.HEADER_USER_ID), 10, 64)
 	if err != nil {
-		return 0, entity.Unauthorized("You are not authenticated!")
+		return 0, entity.Unauthorized("Unauthorized")
 	}
 	return id, nil
 }
@@ -207,7 +207,7 @@ func RequestIdentity(c fiber.Ctx) (clientID string, roles UserAccessCache, calle
 	}
 	roles, ok := GetUserRoles(c)
 	if !ok {
-		return "", UserAccessCache{}, 0, entity.Unauthorized("You are not authenticated!")
+		return "", UserAccessCache{}, 0, entity.Unauthorized("Unauthorized")
 	}
 	callerID, err = CallerID(c)
 	if err != nil {
