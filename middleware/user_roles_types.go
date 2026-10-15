@@ -18,6 +18,8 @@ import (
 type UserAccessCache struct {
 	ID                   int                               `json:"_id"`
 	FullName             string                            `json:"fullName"`
+	FirstName            string                            `json:"firstName"`
+	LastName             string                            `json:"lastName"`
 	Email                string                            `json:"email"`
 	ClientID             string                            `json:"clientId"`
 	ModuleAccess         map[enum.ModuleAccess]ModuleFlags `json:"moduleAccess"`

@@ -33,6 +33,8 @@ func newRolesFixture() UserAccessCache {
 	var r UserAccessCache
 	r.ID = 42
 	r.FullName = "Elaina"
+	r.FirstName = "Elaina"
+	r.LastName = "Vance"
 	r.ClientID = "acme"
 	r.ModuleAccess = map[enum.ModuleAccess]ModuleFlags{"fixedAsset": {IsTotalControl: true}}
 	return r
@@ -75,7 +77,7 @@ func TestLoadUserRoles_PutsSnapshotInLocals(t *testing.T) {
 	if gotUserID != "42" || gotClientID != "acme" {
 		t.Errorf("fetch called with %q/%q, want 42/acme", gotUserID, gotClientID)
 	}
-	if !found || got.ID != 42 || got.FullName != "Elaina" {
+	if !found || got.ID != 42 || got.FullName != "Elaina" || got.FirstName != "Elaina" || got.LastName != "Vance" {
 		t.Errorf("Locals roles = %+v found=%v, want fixture", got, found)
 	}
 }
@@ -111,7 +113,7 @@ func TestLoadUserRoles_CacheHitSkipsIAM(t *testing.T) {
 	if resp.StatusCode != fiber.StatusOK {
 		t.Fatalf("status = %d, want 200", resp.StatusCode)
 	}
-	if !found || got.ID != 42 {
+	if !found || got.ID != 42 || got.FirstName != "Elaina" || got.LastName != "Vance" {
 		t.Errorf("Locals roles = %+v found=%v, want fixture from cache", got, found)
 	}
 }
