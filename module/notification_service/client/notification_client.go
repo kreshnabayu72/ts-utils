@@ -33,10 +33,17 @@ func NewNotificationClient(baseURL, serviceToken string) *NotificationClient {
 // sendSSERequest is the body of POST /internal/sse/send. The tenant is not in here:
 // it travels in X-Client-ID, so a service token alone can never aim a push at another
 // tenant's sessions.
+//
+// Message is the legacy free-text/name field; Event is the machine event name the newer
+// consumers key on. Data carries arbitrary JSON (arrays and numbers included), which is what
+// file-manager needs for {ids, purgedBy, cascadeReason, timestamp}.
 type sendSSERequest struct {
-	Message string   `json:"message"`
-	Reason  string   `json:"reason,omitempty"`
-	UserIDs []string `json:"userIds,omitempty"`
+	Message    string         `json:"message,omitempty"`
+	Event      string         `json:"event,omitempty"`
+	Reason     string         `json:"reason,omitempty"`
+	Data       map[string]any `json:"data,omitempty"`
+	UserIDs    []string       `json:"userIds,omitempty"`
+	SessionIDs []string       `json:"sessionIds,omitempty"`
 }
 
 // SendSSE pushes one {message, reason} event to active SSE sessions in the caller's
@@ -58,7 +65,41 @@ func (c *NotificationClient) SendSSE(ctx context.Context, clientID string, userI
 	if len(reason) > 0 {
 		payload.Reason = reason[0]
 	}
+	return c.send(ctx, clientID, payload)
+}
 
+// SendSSEWithData pushes one structured event to active SSE sessions in the caller's tenant.
+// event is the machine name (e.g. "file.purged"); a Message alias with the same value is sent
+// alongside it so consumers that still key on message keep working during the transition.
+// data carries arbitrary JSON values, including arrays and numbers.
+//
+// userIDs behaves exactly as in SendSSE. A nil receiver is a no-op.
+func (c *NotificationClient) SendSSEWithData(
+	ctx context.Context,
+	clientID string,
+	userIDs []string,
+	event string,
+	data map[string]any,
+	reason ...string,
+) error {
+	if c == nil {
+		return nil
+	}
+
+	payload := sendSSERequest{
+		Message: event,
+		Event:   event,
+		Data:    data,
+		UserIDs: userIDs,
+	}
+	if len(reason) > 0 {
+		payload.Reason = reason[0]
+	}
+	return c.send(ctx, clientID, payload)
+}
+
+// send marshals and posts one event body.
+func (c *NotificationClient) send(ctx context.Context, clientID string, payload sendSSERequest) error {
 	body, err := json.Marshal(payload)
 	if err != nil {
 		return err

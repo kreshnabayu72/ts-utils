@@ -21,6 +21,10 @@ type UploadParams struct {
 	AssetID      string
 	UserID       string
 	UploadedByID string
+	// UserName is the owner display snapshot; UploadedByName is the actor snapshot. Both are
+	// optional and become the row's user_name / uploaded_by_name.
+	UserName       string
+	UploadedByName string
 }
 
 // UploadFileResponse is the created file_manager_data row. ID is the Snowflake as a string (see
