@@ -45,10 +45,11 @@ type Changelog struct {
 	Product *Product `json:"product" bson:"product"`
 
 	// changelog's referenced object
-	Object     string      `json:"object" bson:"object"`         // shown on FE
-	ObjectType *ObjectType `json:"objectType" bson:"objectType"` // AC's target_entity_type; nil for GS rows, which don't scope by it
-	ObjectId   *string     `json:"objectId" bson:"objectId"`     // for filtering
-	ObjectName *string     `json:"objectName" bson:"objectName"` // nil for settings-level rows (no named entity) — prd-conventions.md §9.10
+	Object             string      `json:"object" bson:"object"`                         // shown on FE
+	ObjectType         *ObjectType `json:"objectType" bson:"objectType"`                 // AC's target_entity_type; nil for GS rows, which don't scope by it
+	ObjectId           *string     `json:"objectId" bson:"objectId"`                     // for filtering
+	ObjectName         *string     `json:"objectName" bson:"objectName"`                 // nil for settings-level rows (no named entity) — prd-conventions.md §9.10
+	ObjectNameFullPath *string     `json:"objectNameFullPath" bson:"objectNameFullPath"` // breadcrumb snapshot used by hover/export
 
 	FileManagerType string `json:"fileManagerType"  bson:"fileManagerType"`
 
