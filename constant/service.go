@@ -76,6 +76,15 @@ const (
 	AnalyticsReportingCreateTagEventLogAuditActivity           = "CreateTagEventLogAuditActivity"
 	AnalyticsReportingDeleteTagEventLogAuditActivity           = "DeleteTagEventLogAuditActivity"
 
+	AnalyticsReportingRecordTagLogsWorkflow         = "RecordTagLogsWorkflow"
+	AnalyticsReportingDeleteTagLogsWorkflow         = "DeleteTagLogsWorkflow"
+	AnalyticsReportingRecordTagActivateLogsWorkflow = "RecordTagActivateLogsWorkflow"
+	AnalyticsReportingRecordTagAuditLogsWorkflow    = "RecordTagAuditLogsWorkflow"
+	AnalyticsReportingCreateTagLogActivity          = "CreateTagLogActivity"
+	AnalyticsReportingDeleteTagLogActivity          = "DeleteTagLogActivity"
+	AnalyticsReportingUpsertTagActivateLogActivity  = "UpsertTagActivateLogActivity"
+	AnalyticsReportingUpsertTagAuditLogActivity     = "UpsertTagAuditLogActivity"
+
 	// Source Asset Transaction Service
 	AssetTransactionGetUsersBorrowedAssetCountActivity = "GetUsersBorrowedAssetCountActivity"
 	AssetTransactionGetUsersAssignedAssetCountActivity = "GetUsersAssignedAssetCountActivity"
