@@ -141,4 +141,10 @@ const (
 	ChangeLogActionUpgrade               ChangeLogAction = "Upgrade"
 	ChangeLogActionDowngrade             ChangeLogAction = "Downgrade"
 	ChangeLogActionRenew                 ChangeLogAction = "Renew"
+
+	// TAG module canonical Activity Log actions (PRD §8.1).
+	ChangeLogActionActivateTAG        ChangeLogAction = "Activate TAG"
+	ChangeLogActionAuditTAG           ChangeLogAction = "Audit TAG"
+	ChangeLogActionDeleteTAG          ChangeLogAction = "Delete TAG"
+	ChangeLogActionUpdateTAGCondition ChangeLogAction = "Update TAG Condition"
 )

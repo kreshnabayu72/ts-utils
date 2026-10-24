@@ -45,6 +45,11 @@ const (
 	GetClientWorkflow  = "GetClientWorkflow"
 	GetClientsWorkflow = "GetClientsWorkflow"
 
+	EnterpriseManagementCreateActivationCollisionsWorkflow = "CreateActivationCollisionsWorkflow"
+	EnterpriseManagementCancelActivationCollisionsWorkflow = "CancelActivationCollisionsWorkflow"
+	EnterpriseManagementCreateActivationCollisionActivity  = "CreateActivationCollisionActivity"
+	EnterpriseManagementCancelActivationCollisionActivity  = "CancelActivationCollisionActivity"
+
 	GetClientActivity        = "GetClientActivity"
 	GetClientsActivity       = "GetClientsActivity"
 	UpdateClientActivity     = "UpdateClientActivity"
