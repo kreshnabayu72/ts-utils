@@ -36,6 +36,20 @@ const (
 	SystemRoleKeyManageArchivedClient    SystemRoleKey = "manage_archived_client"
 	SystemRoleKeyManageAllocation        SystemRoleKey = "manage_allocation"
 	SystemRoleKeyManageWalletAndPricing  SystemRoleKey = "manage_wallet_and_pricing"
+
+	//Fixed asset
+	SystemRoleKeyManageAssetMasterData          SystemRoleKey = "manage_asset_master_data"
+	SystemRoleKeyManageAssetTransactionalPolicy SystemRoleKey = "manage_asset_transactional_policy"
+	SystemRoleKeyManageAccounting               SystemRoleKey = "manage_accounting"
+	SystemRoleKeyManageTransactionSettings      SystemRoleKey = "manage_transaction_settings"
+	SystemRoleKeyManageOpenAPI                  SystemRoleKey = "manage_open_api"
+	SystemRoleKeyManageAssetIDConfiguration     SystemRoleKey = "manage_asset_id_configuration"
+	SystemRoleKeyManageGlobalLicense            SystemRoleKey = "manage_global_license"
+	SystemRoleKeyManageGlobalUserAndRole        SystemRoleKey = "manage_global_user_and_role"
+	SystemRoleKeyManageAssetAndTAG              SystemRoleKey = "manage_asset_and_tag"
+	SystemRoleKeyManageAssetLicense             SystemRoleKey = "manage_asset_license"
+	SystemRoleKeyManagePurchase                 SystemRoleKey = "manage_purchase"
+	SystemRoleKeyViewAssetValue                 SystemRoleKey = "view_asset_value"
 )
 
 type SystemRoleName string
@@ -67,4 +81,18 @@ const (
 	SystemRoleNameManageArchivedClient    SystemRoleName = "Manage archived client"
 	SystemRoleNameManageAllocation        SystemRoleName = "Manage allocation"
 	SystemRoleNameManageWalletAndPricing  SystemRoleName = "Manage wallet & pricing"
+
+	//Fixed asset
+	SystemRoleNameManageAssetMasterData          SystemRoleName = "Manage asset master data"
+	SystemRoleNameManageAssetTransactionalPolicy SystemRoleName = "Manage asset transactional policy"
+	SystemRoleNameManageAccounting               SystemRoleName = "Manage accounting"
+	SystemRoleNameManageTransactionSettings      SystemRoleName = "Manage transaction settings"
+	SystemRoleNameManageOpenAPI                  SystemRoleName = "Manage Open API"
+	SystemRoleNameManageAssetIDConfiguration     SystemRoleName = "Manage asset ID configuration"
+	SystemRoleNameManageGlobalLicense            SystemRoleName = "Manage global license"
+	SystemRoleNameManageGlobalUserAndRole        SystemRoleName = "Manage global user & role"
+	SystemRoleNameManageAssetAndTAG              SystemRoleName = "Manage asset & TAG"
+	SystemRoleNameManageAssetLicense             SystemRoleName = "Manage asset license"
+	SystemRoleNameManagePurchase                 SystemRoleName = "Manage purchase"
+	SystemRoleNameViewAssetValue                 SystemRoleName = "View asset value"
 )
