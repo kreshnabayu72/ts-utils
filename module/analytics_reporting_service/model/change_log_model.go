@@ -148,4 +148,8 @@ const (
 	ChangeLogActionAuditTAG           ChangeLogAction = "Audit TAG"
 	ChangeLogActionDeleteTAG          ChangeLogAction = "Delete TAG"
 	ChangeLogActionUpdateTAGCondition ChangeLogAction = "Update TAG Condition"
+
+	// Fixed Asset > Settings > Categories canonical actions (settings-categories PRD §8.1).
+	ChangeLogActionMarkedAsExcess     ChangeLogAction = "Marked as Excess (Category Consolidation)"
+	ChangeLogActionRestoredFromExcess ChangeLogAction = "Restored from Excess (Category Consolidation)"
 )
