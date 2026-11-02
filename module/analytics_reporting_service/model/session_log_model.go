@@ -61,8 +61,8 @@ const (
 type Product string
 
 const (
-	ProductFixedAsset     Product = "fixed_asset"
-	ProductSupplyAsset    Product = "supply_asset"
+	ProductFAMS           Product = "fixed_asset"
+	ProductSAMS           Product = "supply_asset"
 	ProductSIEM           Product = "siem"
 	ProductAdminConsole   Product = "admin_console"
 	ProductGlobalSettings Product = "global_settings"

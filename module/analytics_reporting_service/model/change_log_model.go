@@ -53,7 +53,8 @@ type Changelog struct {
 
 	FileManagerType string `json:"fileManagerType"  bson:"fileManagerType"`
 
-	GroupId string `json:"groupId" bson:"groupId"` // for role filtering
+	// Group scop
+	ScopeGroupIDs []string `json:"scopeGroupIds" bson:"scopeGroupIds"`
 
 	CreatedAt time.Time `json:"createdAt" bson:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt" bson:"updatedAt"`
