@@ -66,6 +66,8 @@ func RequireActiveEntityFrom(fetch EntityStatusFetcher, valkeyOptions ...db.Valk
 const (
 	// ErrCodeEntityInactive: the tenant is Suspended or Expired (entity-isolation §18.8 toast).
 	ErrCodeEntityInactive = "ENTITY_INACTIVE"
+	// ReasonEntityInactive is data.reason of that 403, the value the apps key the lockdown toast on.
+	ReasonEntityInactive = "client_suspended_or_expired"
 	// ErrCodeEntityUnknown: the tenant lookup refused the client ID.
 	ErrCodeEntityUnknown = "ENTITY_UNKNOWN"
 	// ErrCodePermissionDenied: the user's roles do not allow the action.
@@ -92,7 +94,9 @@ func requireActiveEntity(cache service.ValkeyServiceInterface, fetch EntityStatu
 
 		// Expired is a status value the fetcher reports (EMS derives it from subscription state).
 		if strings.EqualFold(status, entityStatusSuspended) || strings.EqualFold(status, entityStatusExpired) {
-			return helper.SendResponse(c, fiber.StatusForbidden, nil, "Forbidden", ErrCodeEntityInactive)
+			// data.reason is what the apps read for the suspended/expired lockdown toast (the same reason iam's
+			// own module gates answer, LLD §2 / PRD EC-27); the error code stays for callers that switch on it.
+			return helper.SendResponse(c, fiber.StatusForbidden, map[string]string{"reason": ReasonEntityInactive}, "Forbidden", ErrCodeEntityInactive)
 		}
 
 		return c.Next()
@@ -133,8 +137,13 @@ func InvalidateEntityStatus(ctx context.Context, cache service.ValkeyServiceInte
 	if cache == nil || clientID == "" {
 		return nil
 	}
-	return cache.Del(ctx, EntityStatusCacheKey(clientID))
+	// iam caches GET /v2/me/entity (clientStatus included) under me-entity:<tenantCode> in the same
+	// Valkey; without this a status change kept answering the old clientStatus for up to a day.
+	return cache.Del(ctx, EntityStatusCacheKey(clientID), MeEntityCacheKey(clientID))
 }
+
+// MeEntityCacheKey is iam's cache key for a tenant's GET /v2/me/entity answer.
+func MeEntityCacheKey(clientID string) string { return "me-entity:" + clientID }
 
 // fetchEntityStatusFromEMS calls EMS's internal client endpoint. The route is service-authenticated
 // and keys the tenant off X-Client-ID, the same header every other internal read uses.
