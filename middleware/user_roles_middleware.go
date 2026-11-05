@@ -39,7 +39,26 @@ type RolesFetcher func(ctx context.Context, userID, clientID string) (UserAccess
 func LoadUserRoles(iamBaseURL, serviceToken string, valkeyOptions ...db.ValkeyServiceOptions) fiber.Handler {
 	client := &http.Client{Timeout: 5 * time.Second}
 	cache := service.MakeValkeyService(valkeyOptions...)
-	return loadUserRoles(cache, fetchRolesFromIAM(client, iamBaseURL, serviceToken))
+	next := loadUserRoles(cache, fetchRolesFromIAM(client, iamBaseURL, serviceToken))
+	endpoint := IAMEndpoint{Client: client, BaseURL: iamBaseURL, ServiceToken: serviceToken}
+	return func(c fiber.Ctx) error {
+		c.Locals(IAMEndpointKey, endpoint)
+		return next(c)
+	}
+}
+
+// IAMEndpoint is the iam address, token and client LoadUserRoles was configured with. It is put in
+// Locals so rbac rules that must ask iam live (e.g. approver pools) reuse the same config.
+type IAMEndpoint struct {
+	Client       *http.Client
+	BaseURL      string
+	ServiceToken string
+}
+
+// GetIAMEndpoint returns the IAMEndpoint placed in Locals by LoadUserRoles.
+func GetIAMEndpoint(c fiber.Ctx) (IAMEndpoint, bool) {
+	e, ok := c.Locals(IAMEndpointKey).(IAMEndpoint)
+	return e, ok
 }
 
 // LoadUserRolesFrom is LoadUserRoles for the one service that owns the role tables: iam. Same

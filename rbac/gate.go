@@ -108,6 +108,7 @@ func GlobalSettingsSystemRole(verb middleware.PermissionVerb, keys ...enum.Syste
 // Approver is deliberately NOT satisfiable here: it is absent from the snapshot on purpose
 // (ADR 005), because approving is authorized by the approval ROW that names you, not by a role.
 // Gate approver routes with Assignment — that is what survives a role revocation.
+// For pool-based approvals (approver pool resolved live from IAM, not from the snapshot) see AdminConsoleApprover.
 func FixedAssetTransactionRole(
 	transaction enum.FixedAssetTransactionRoleTransactionKey,
 	types ...enum.TransactionRolesType,

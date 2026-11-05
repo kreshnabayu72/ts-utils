@@ -13,4 +13,5 @@ const (
 	SupplyPlanKey     ContextKey = "supplyPlan"
 	UserRolesKey      ContextKey = "userFixedAssetRoles"
 	EntitySettingsKey ContextKey = "entityAndSettings"
+	IAMEndpointKey    ContextKey = "iamEndpoint"
 )
