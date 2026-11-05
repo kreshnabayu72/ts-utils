@@ -62,6 +62,16 @@ func RequireActiveEntityFrom(fetch EntityStatusFetcher, valkeyOptions ...db.Valk
 	return requireActiveEntity(cache, fetch)
 }
 
+// Error codes sent in the "error" field of a 403, so the app can tell the cases apart.
+const (
+	// ErrCodeEntityInactive: the tenant is Suspended or Expired (entity-isolation §18.8 toast).
+	ErrCodeEntityInactive = "ENTITY_INACTIVE"
+	// ErrCodeEntityUnknown: the tenant lookup refused the client ID.
+	ErrCodeEntityUnknown = "ENTITY_UNKNOWN"
+	// ErrCodePermissionDenied: the user's roles do not allow the action.
+	ErrCodePermissionDenied = "PERMISSION_DENIED"
+)
+
 func requireActiveEntity(cache service.ValkeyServiceInterface, fetch EntityStatusFetcher) fiber.Handler {
 	return func(c fiber.Ctx) error {
 		clientID, err := ClientID(c)
@@ -75,14 +85,14 @@ func requireActiveEntity(cache service.ValkeyServiceInterface, fetch EntityStatu
 			// A tenant whose state cannot be established is not a tenant we write for. A 4xx from
 			// the fetcher means the tenant itself is unknown, which is a refusal, not an outage.
 			if httpErr, ok := err.(*entity.HttpError); ok && httpErr.Code >= 400 && httpErr.Code < 500 {
-				return helper.SendResponse(c, fiber.StatusForbidden, nil, "Forbidden", nil)
+				return helper.SendResponse(c, fiber.StatusForbidden, nil, "Forbidden", ErrCodeEntityUnknown)
 			}
 			return helper.SendResponse(c, fiber.StatusServiceUnavailable, nil, "Authorization service unavailable", nil)
 		}
 
 		// Expired is a status value the fetcher reports (EMS derives it from subscription state).
 		if strings.EqualFold(status, entityStatusSuspended) || strings.EqualFold(status, entityStatusExpired) {
-			return helper.SendResponse(c, fiber.StatusForbidden, nil, "Forbidden", nil)
+			return helper.SendResponse(c, fiber.StatusForbidden, nil, "Forbidden", ErrCodeEntityInactive)
 		}
 
 		return c.Next()

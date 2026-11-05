@@ -31,7 +31,9 @@ func Require(rules ...Rule) fiber.Handler {
 				return entity.ToHttpError(err).SendResponse(c)
 			}
 			if !passed {
-				return entity.Forbidden("Forbidden").SendResponse(c)
+				denied := entity.Forbidden("Forbidden")
+				denied.Err = middleware.ErrCodePermissionDenied
+				return denied.SendResponse(c)
 			}
 		}
 		return c.Next()

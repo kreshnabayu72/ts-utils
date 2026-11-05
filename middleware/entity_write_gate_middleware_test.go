@@ -55,6 +55,11 @@ func gateApp(cache service.ValkeyServiceInterface, fetch EntityStatusFetcher) *f
 }
 
 func gateRequest(t *testing.T, app *fiber.App) (int, string) {
+	code, message, _ := gateRequestErr(t, app)
+	return code, message
+}
+
+func gateRequestErr(t *testing.T, app *fiber.App) (int, string, string) {
 	t.Helper()
 	req := httptest.NewRequest(fiber.MethodPut, "/", nil)
 	req.Header.Set(constant.HEADER_CLIENT_ID, "acme")
@@ -70,13 +75,14 @@ func gateRequest(t *testing.T, app *fiber.App) (int, string) {
 	}
 	var body struct {
 		Message string `json:"message"`
+		Error   string `json:"error"`
 	}
 	if len(raw) > 0 && raw[0] == '{' {
 		if err := json.Unmarshal(raw, &body); err != nil {
 			t.Fatalf("decode body %q: %v", raw, err)
 		}
 	}
-	return resp.StatusCode, body.Message
+	return resp.StatusCode, body.Message, body.Error
 }
 
 func TestRequireActiveEntity_ActiveWritePasses(t *testing.T) {
@@ -107,12 +113,12 @@ func TestRequireActiveEntity_StatusBlocksWrite(t *testing.T) {
 				return status, nil
 			})
 
-			code, message := gateRequest(t, app)
+			code, message, errCode := gateRequestErr(t, app)
 			if code != fiber.StatusForbidden {
 				t.Fatalf("status = %d, want 403", code)
 			}
-			if message != "Forbidden" {
-				t.Errorf("message = %q, want Forbidden", message)
+			if message != "Forbidden" || errCode != ErrCodeEntityInactive {
+				t.Errorf("body = %q/%q, want Forbidden/%s", message, errCode, ErrCodeEntityInactive)
 			}
 		})
 	}

@@ -1,6 +1,7 @@
 package rbac
 
 import (
+	"encoding/json"
 	"net/http/httptest"
 	"testing"
 
@@ -177,5 +178,33 @@ func TestModuleAccess_GlobalSettings(t *testing.T) {
 	status, reached = runGate(t, &onlyFixed, ModuleAccess(enum.ModuleAccessGlobalSettings))
 	if status != fiber.StatusForbidden || reached {
 		t.Errorf("fixed-asset access must not satisfy global-settings gate: status=%d reached=%v", status, reached)
+	}
+}
+
+func TestRequire_DeniedBodyCarriesPermissionCode(t *testing.T) {
+	roles := rolesWithTx(map[enum.TransactionRolesType][]string{enum.TransactionRolesTypeMonitoring: {"7"}})
+	app := fiber.New()
+	app.Use(func(c fiber.Ctx) error {
+		c.Locals(middleware.UserRolesKey, *roles)
+		return c.Next()
+	})
+	app.Get("/", Require(FixedAssetTransactionRole(borrowTx, enum.TransactionRolesTypeManager)), func(c fiber.Ctx) error {
+		return c.SendStatus(fiber.StatusOK)
+	})
+
+	resp, err := app.Test(httptest.NewRequest("GET", "/", nil))
+	if err != nil {
+		t.Fatalf("app.Test: %v", err)
+	}
+	defer resp.Body.Close()
+	var body struct {
+		Message string `json:"message"`
+		Error   string `json:"error"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
+		t.Fatalf("decode: %v", err)
+	}
+	if resp.StatusCode != fiber.StatusForbidden || body.Message != "Forbidden" || body.Error != middleware.ErrCodePermissionDenied {
+		t.Errorf("got %d %q/%q, want 403 Forbidden/%s", resp.StatusCode, body.Message, body.Error, middleware.ErrCodePermissionDenied)
 	}
 }

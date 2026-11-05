@@ -101,7 +101,7 @@ func LoadEntityAndSettingsFrom(fetch EntityAndSettingsFetcher) fiber.Handler {
 		if err != nil {
 			slog.ErrorContext(c.Context(), "entity_settings: fetch failed", "clientId", clientID, "err", err)
 			if httpErr, ok := err.(*entity.HttpError); ok && httpErr.Code >= 400 && httpErr.Code < 500 {
-				return helper.SendResponse(c, fiber.StatusForbidden, nil, "Forbidden", nil)
+				return helper.SendResponse(c, fiber.StatusForbidden, nil, "Forbidden", ErrCodeEntityUnknown)
 			}
 			return helper.SendResponse(c, fiber.StatusServiceUnavailable, nil, "Settings service unavailable", nil)
 		}
