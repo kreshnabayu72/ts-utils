@@ -66,12 +66,13 @@ func RequireActiveEntityFrom(fetch EntityStatusFetcher, valkeyOptions ...db.Valk
 const (
 	// ErrCodeEntityInactive: the tenant is Suspended or Expired (entity-isolation §18.8 toast).
 	ErrCodeEntityInactive = "ENTITY_INACTIVE"
-	// ReasonEntityInactive is data.reason of that 403, the value the apps key the lockdown toast on.
-	ReasonEntityInactive = "client_suspended_or_expired"
 	// ErrCodeEntityUnknown: the tenant lookup refused the client ID.
 	ErrCodeEntityUnknown = "ENTITY_UNKNOWN"
 	// ErrCodePermissionDenied: the user's roles do not allow the action.
 	ErrCodePermissionDenied = "PERMISSION_DENIED"
+
+	// ReasonEntityInactive is data.reason of that 403, the value the apps key the lockdown toast on.
+	ReasonEntityInactive = "CLIENT_SUSPENDED_OR_EXPIRED"
 )
 
 func requireActiveEntity(cache service.ValkeyServiceInterface, fetch EntityStatusFetcher) fiber.Handler {
