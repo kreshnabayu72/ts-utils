@@ -90,6 +90,27 @@ const (
 	AnalyticsReportingUpsertTagActivateLogActivity  = "UpsertTagActivateLogActivity"
 	AnalyticsReportingUpsertTagAuditLogActivity     = "UpsertTagAuditLogActivity"
 
+	// Source Admin Console Hardware Stock
+	AnalyticsReportingRecordHardwareLogsWorkflow           = "RecordHardwareLogsWorkflow"
+	AnalyticsReportingDeleteHardwareLogsWorkflow           = "DeleteHardwareLogsWorkflow"
+	AnalyticsReportingRecordHardwareStockEventLogsWorkflow = "RecordHardwareStockEventLogsWorkflow"
+	AnalyticsReportingCreateHardwareLogActivity            = "CreateHardwareLogActivity"
+	AnalyticsReportingDeleteHardwareLogsActivity           = "DeleteHardwareLogsActivity"
+	AnalyticsReportingCreateHardwareStockEventLogActivity  = "CreateHardwareStockEventLogActivity"
+
+	HardwareTaggingCreateHardwareStockReceiptActivity     = "CreateHardwareStockReceiptActivity"
+	HardwareTaggingCompensateHardwareStockReceiptActivity = "CompensateHardwareStockReceiptActivity"
+	HardwareTaggingDeleteHardwareUnitActivity             = "DeleteHardwareUnitActivity"
+	HardwareTaggingApplyHardwareUnitDecisionActivity      = "ApplyHardwareUnitDecisionActivity"
+	HardwareTaggingDeleteHardwareUnitWorkflow             = "HardwareUnitDeleteWorkflow"
+
+	EnterpriseManagementHardwareStockReceiptWorkflow          = "HardwareStockReceiptWorkflow"
+	EnterpriseManagementHardwareStockApprovalDecisionWorkflow = "HardwareStockApprovalDecisionWorkflow"
+	EnterpriseManagementCreditHardwareStockActivity           = "CreditHardwareStockActivity"
+	EnterpriseManagementCreateHardwareStockApprovalsActivity  = "CreateHardwareStockApprovalsActivity"
+	EnterpriseManagementUpsertHardwareStockCountActivity      = "UpsertHardwareStockCountActivity"
+	EnterpriseManagementDecrementHardwareStockCountActivity   = "DecrementHardwareStockCountActivity"
+
 	// Source Asset Transaction Service
 	AssetTransactionGetUsersBorrowedAssetCountActivity = "GetUsersBorrowedAssetCountActivity"
 	AssetTransactionGetUsersAssignedAssetCountActivity = "GetUsersAssignedAssetCountActivity"
