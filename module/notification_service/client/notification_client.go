@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/constant"
+	commonDto "gitea.tagsamurai.local/BETS-V2/ts-utils/v2/module/common/dto"
 )
 
 // NotificationClient pushes events through notification-service, which owns the live SSE
@@ -96,6 +97,38 @@ func (c *NotificationClient) SendSSEWithData(
 		payload.Reason = reason[0]
 	}
 	return c.send(ctx, clientID, payload)
+}
+
+// CreateNotification creates one persisted notification for a user in the caller's
+// tenant through notification-service (POST /internal/). A nil receiver is a no-op.
+func (c *NotificationClient) CreateNotification(ctx context.Context, clientID string, req commonDto.CreateNotificationRequest) error {
+	if c == nil {
+		return nil
+	}
+
+	body, err := json.Marshal(req)
+	if err != nil {
+		return err
+	}
+
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, c.baseURL+"/internal/", bytes.NewReader(body))
+	if err != nil {
+		return err
+	}
+	httpReq.Header.Set("Content-Type", "application/json")
+	httpReq.Header.Set(constant.HEADER_CLIENT_ID, clientID)
+	httpReq.Header.Set(constant.HEADER_SERVICE_TOKEN, c.serviceToken)
+
+	resp, err := c.http.Do(httpReq)
+	if err != nil {
+		return fmt.Errorf("notification.CreateNotification: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+		return fmt.Errorf("notification.CreateNotification: unexpected status %d", resp.StatusCode)
+	}
+	return nil
 }
 
 // send marshals and posts one event body.
