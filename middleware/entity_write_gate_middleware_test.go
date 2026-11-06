@@ -193,8 +193,8 @@ func TestInvalidateEntityStatus_DropsCachedStatus(t *testing.T) {
 	if err := InvalidateEntityStatus(context.Background(), cache, "acme"); err != nil {
 		t.Fatalf("InvalidateEntityStatus: %v", err)
 	}
-	if len(cache.delCalls) != 1 || cache.delCalls[0] != EntityStatusCacheKey("acme") {
-		t.Fatalf("deleted keys = %v, want [%q]", cache.delCalls, EntityStatusCacheKey("acme"))
+	if len(cache.delCalls) != 2 || cache.delCalls[0] != EntityStatusCacheKey("acme") || cache.delCalls[1] != MeEntityCacheKey("acme") {
+		t.Fatalf("deleted keys = %v, want [%q %q]", cache.delCalls, EntityStatusCacheKey("acme"), MeEntityCacheKey("acme"))
 	}
 
 	code, _ := gateRequest(t, app)
@@ -203,5 +203,32 @@ func TestInvalidateEntityStatus_DropsCachedStatus(t *testing.T) {
 	}
 	if !fetchActive {
 		t.Error("fetch did not run after invalidation")
+	}
+}
+
+// The 403 for a Suspended or Expired tenant carries data.reason, the value the apps key the
+// lockdown toast on, next to the error code.
+func TestRequireActiveEntity_InactiveCarriesReason(t *testing.T) {
+	cache := &statusCacheFake{getErr: errors.New("miss")}
+	app := gateApp(cache, func(context.Context, string) (string, error) { return "Suspended", nil })
+
+	req := httptest.NewRequest(fiber.MethodPut, "/", nil)
+	req.Header.Set(constant.HEADER_CLIENT_ID, "acme")
+	resp, err := app.Test(req)
+	if err != nil {
+		t.Fatalf("app.Test: %v", err)
+	}
+	defer resp.Body.Close()
+	var body struct {
+		Error string `json:"error"`
+		Data  struct {
+			Reason string `json:"reason"`
+		} `json:"data"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
+		t.Fatalf("decode: %v", err)
+	}
+	if body.Data.Reason != ReasonEntityInactive || body.Error != ErrCodeEntityInactive {
+		t.Errorf("body = %+v, want data.reason %q and error %q", body, ReasonEntityInactive, ErrCodeEntityInactive)
 	}
 }
