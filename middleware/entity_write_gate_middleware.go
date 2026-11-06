@@ -72,7 +72,7 @@ const (
 	ErrCodePermissionDenied = "PERMISSION_DENIED"
 
 	// ReasonEntityInactive is data.reason of that 403, the value the apps key the lockdown toast on.
-	ReasonEntityInactive = "CLIENT_SUSPENDED_OR_EXPIRED"
+	ReasonEntityInactive = "client_suspended_or_expired"
 )
 
 func requireActiveEntity(cache service.ValkeyServiceInterface, fetch EntityStatusFetcher) fiber.Handler {
