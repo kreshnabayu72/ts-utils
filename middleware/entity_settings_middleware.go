@@ -28,7 +28,7 @@ type EntityAndSettings struct {
 }
 
 type EntityInfo struct {
-	ID           int64  `json:"_id"`
+	ID           string `json:"_id"`
 	Name         string `json:"name"`
 	Code         string `json:"code"`
 	ClientStatus string `json:"clientStatus"`
@@ -128,7 +128,7 @@ func fetchEntityAndSettingsFromEMS(client *http.Client, baseURL, serviceToken st
 		var (
 			out       EntityAndSettings
 			clientRow struct {
-				ID          int64  `json:"_id"`
+				ID          string `json:"_id"`
 				CompanyName string `json:"companyName"`
 				ClientCode  string `json:"clientCode"`
 				Status      string `json:"status"`
