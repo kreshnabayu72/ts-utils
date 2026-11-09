@@ -174,7 +174,8 @@ func TestClientID(t *testing.T) {
 		{name: "valid simple", header: "acme", wantID: "acme"},
 		{name: "valid alphanumeric with underscore", header: "tenant_123", wantID: "tenant_123"},
 		{name: "empty header", header: "", wantErr: true},
-		{name: "invalid characters with hyphen", header: "acme-corp", wantErr: true},
+		{name: "valid CLT client code with hyphen", header: "CLT-HQ57K4YY", wantID: "CLT-HQ57K4YY"},
+		{name: "invalid characters with quote", header: `acme"corp`, wantErr: true},
 		{name: "invalid characters with space", header: "acme corp", wantErr: true},
 		{name: "exceeds length limit", header: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", wantErr: true},
 	}

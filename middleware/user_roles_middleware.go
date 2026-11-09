@@ -157,7 +157,8 @@ func fetchRolesFromIAM(client *http.Client, baseURL, serviceToken string) RolesF
 
 // validClientID locks the tenant charset. The client id becomes a PostgreSQL SCHEMA NAME
 // (interpolated into SET LOCAL search_path), so it must be pinned before it leaves the handler.
-var validClientID = regexp.MustCompile(`^[a-zA-Z0-9_]{1,50}$`)
+// Hyphen is allowed for the CLT-XXXXXXXX client code; consumers must double-quote it as an identifier.
+var validClientID = regexp.MustCompile(`^[a-zA-Z0-9_-]{1,50}$`)
 
 // ClientID is the tenant, taken from the X-Client-ID header the gateway sets.
 //
