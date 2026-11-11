@@ -127,7 +127,7 @@ func TestFetchEntityAndSettingsFromEMS(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got.Entity.ID != 7 || got.Entity.Name != "Acme" || got.Entity.ClientStatus != "Active" ||
+	if got.Entity.ID != "7" || got.Entity.Name != "Acme" || got.Entity.ClientStatus != "Active" ||
 		len(got.ActiveProducts) != 1 || got.GeneralSettings.DateFormat != "dd MMM yy" || got.SystemLimits.SelectionLimit != 100 {
 		t.Errorf("unexpected aggregate: %+v", got)
 	}
