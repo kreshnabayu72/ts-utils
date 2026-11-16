@@ -77,31 +77,48 @@ const (
 
 func requireActiveEntity(cache service.ValkeyServiceInterface, fetch EntityStatusFetcher) fiber.Handler {
 	return func(c fiber.Ctx) error {
-		clientID, err := ClientID(c)
-		if err != nil {
-			return helper.SendResponse(c, fiber.StatusUnauthorized, nil, "Unauthorized", nil)
+		if handled, err := checkActiveEntity(c, cache, fetch); handled {
+			return err
 		}
-
-		status, err := cachedEntityStatus(c.Context(), cache, fetch, clientID)
-		if err != nil {
-			slog.ErrorContext(c.Context(), "entity_write_gate: status lookup failed", "clientId", clientID, "err", err)
-			// A tenant whose state cannot be established is not a tenant we write for. A 4xx from
-			// the fetcher means the tenant itself is unknown, which is a refusal, not an outage.
-			if httpErr, ok := err.(*entity.HttpError); ok && httpErr.Code >= 400 && httpErr.Code < 500 {
-				return helper.SendResponse(c, fiber.StatusForbidden, nil, "Forbidden", ErrCodeEntityUnknown)
-			}
-			return helper.SendResponse(c, fiber.StatusServiceUnavailable, nil, "Authorization service unavailable", nil)
-		}
-
-		// Expired is a status value the fetcher reports (EMS derives it from subscription state).
-		if strings.EqualFold(status, entityStatusSuspended) || strings.EqualFold(status, entityStatusExpired) {
-			// data.reason is what the apps read for the suspended/expired lockdown toast (the same reason iam's
-			// own module gates answer, LLD §2 / PRD EC-27); the error code stays for callers that switch on it.
-			return helper.SendResponse(c, fiber.StatusForbidden, map[string]string{"reason": ReasonEntityInactive}, "Forbidden", ErrCodeEntityInactive)
-		}
-
 		return c.Next()
 	}
+}
+
+// checkActiveEntity runs the client-level check. handled is true when a response (401/403/503) was
+// written, in which case the caller returns err instead of calling c.Next().
+func checkActiveEntity(c fiber.Ctx, cache service.ValkeyServiceInterface, fetch EntityStatusFetcher) (handled bool, err error) {
+	clientID, err := ClientID(c)
+	if err != nil {
+		return true, helper.SendResponse(c, fiber.StatusUnauthorized, nil, "Unauthorized", nil)
+	}
+
+	status, err := cachedEntityStatus(c.Context(), cache, fetch, clientID)
+	if err != nil {
+		slog.ErrorContext(c.Context(), "entity_write_gate: status lookup failed", "clientId", clientID, "err", err)
+		return true, sendLookupFailure(c, err)
+	}
+
+	// Expired is a status value the fetcher reports (EMS derives it from subscription state).
+	if strings.EqualFold(status, entityStatusSuspended) || strings.EqualFold(status, entityStatusExpired) {
+		return true, sendEntityInactive(c)
+	}
+	return false, nil
+}
+
+// sendLookupFailure fails closed: a tenant whose state cannot be established is not a tenant we write
+// for. A 4xx from the fetcher means the tenant itself is unknown, which is a refusal, not an outage.
+func sendLookupFailure(c fiber.Ctx, err error) error {
+	if httpErr, ok := err.(*entity.HttpError); ok && httpErr.Code >= 400 && httpErr.Code < 500 {
+		return helper.SendResponse(c, fiber.StatusForbidden, nil, "Forbidden", ErrCodeEntityUnknown)
+	}
+	return helper.SendResponse(c, fiber.StatusServiceUnavailable, nil, "Authorization service unavailable", nil)
+}
+
+// sendEntityInactive answers the entity-isolation §18.8 refusal. data.reason is what the apps read for
+// the suspended/expired lockdown toast (the same reason iam's own module gates answer, LLD §2 / PRD
+// EC-27); the error code stays for callers that switch on it.
+func sendEntityInactive(c fiber.Ctx) error {
+	return helper.SendResponse(c, fiber.StatusForbidden, map[string]string{"reason": ReasonEntityInactive}, "Forbidden", ErrCodeEntityInactive)
 }
 
 // cachedEntityStatus reads the shared cache first and falls back to fetch on any miss or transport
