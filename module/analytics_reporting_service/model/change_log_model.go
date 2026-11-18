@@ -50,6 +50,7 @@ type Changelog struct {
 	ObjectId           *string     `json:"objectId" bson:"objectId"`                     // for filtering
 	ObjectName         *string     `json:"objectName" bson:"objectName"`                 // nil for settings-level rows (no named entity) — prd-conventions.md §9.10
 	ObjectNameFullPath *string     `json:"objectNameFullPath" bson:"objectNameFullPath"` // breadcrumb snapshot used by hover/export
+	RoleName           *string     `json:"roleName" bson:"roleName"`                     // system role display name; nil when the row is not about a role
 
 	FileManagerType string `json:"fileManagerType"  bson:"fileManagerType"`
 
