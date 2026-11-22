@@ -11,7 +11,7 @@ import (
 	"github.com/gofiber/fiber/v3"
 )
 
-const borrowTx = enum.FixedAssetTransactionRoleTransactionKeyBorrowAssignRole
+const borrowTx = enum.FixedAssetTransactionRoleTransactionKeyBorrowRole
 
 // runGate mounts the gate behind a stub that injects roles into Locals, and reports the status the
 // request ended with plus whether the handler was reached.

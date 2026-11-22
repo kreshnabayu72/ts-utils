@@ -51,6 +51,9 @@ type Changelog struct {
 	ObjectName         *string     `json:"objectName" bson:"objectName"`                 // nil for settings-level rows (no named entity) — prd-conventions.md §9.10
 	ObjectNameFullPath *string     `json:"objectNameFullPath" bson:"objectNameFullPath"` // breadcrumb snapshot used by hover/export
 
+	// RoleName is the system role (capability) a role-assignment row refers to; nil otherwise.
+	RoleName *string `json:"roleName,omitempty" bson:"roleName,omitempty"`
+
 	FileManagerType string `json:"fileManagerType"  bson:"fileManagerType"`
 
 	// Group scop

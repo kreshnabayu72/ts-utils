@@ -64,7 +64,8 @@ const (
 type FixedAssetTransactionRoleTransactionKey string
 
 const (
-	FixedAssetTransactionRoleTransactionKeyBorrowAssignRole       FixedAssetTransactionRoleTransactionKey = "borrowAssignRole"
+	FixedAssetTransactionRoleTransactionKeyBorrowRole             FixedAssetTransactionRoleTransactionKey = "borrowRole"
+	FixedAssetTransactionRoleTransactionKeyAssignmentRole         FixedAssetTransactionRoleTransactionKey = "assignmentRole"
 	FixedAssetTransactionRoleTransactionKeyTransferRole           FixedAssetTransactionRoleTransactionKey = "transferRole"
 	FixedAssetTransactionRoleTransactionKeyDisposalRole           FixedAssetTransactionRoleTransactionKey = "disposalRole"
 	FixedAssetTransactionRoleTransactionKeyAuditRole              FixedAssetTransactionRoleTransactionKey = "auditRole"
@@ -77,14 +78,15 @@ const (
 type FixedAssetTransactionRoleTransaction string
 
 const (
-	FixedAssetTransactionRoleTransactionBorrowingAssignment FixedAssetTransactionRoleTransaction = "Borrowing/Assignment"
-	FixedAssetTransactionRoleTransactionTransfer            FixedAssetTransactionRoleTransaction = "Transfer"
-	FixedAssetTransactionRoleTransactionDisposal            FixedAssetTransactionRoleTransaction = "Disposal"
-	FixedAssetTransactionRoleTransactionAudit               FixedAssetTransactionRoleTransaction = "Audit"
-	FixedAssetTransactionRoleTransactionMaintenanceRoutine  FixedAssetTransactionRoleTransaction = "Maintenance Routine"
-	FixedAssetTransactionRoleTransactionRepairTicketing     FixedAssetTransactionRoleTransaction = "Repair Ticketing"
-	FixedAssetTransactionRoleTransactionTracking            FixedAssetTransactionRoleTransaction = "Tracking"
-	FixedAssetTransactionRoleTransactionRegistration        FixedAssetTransactionRoleTransaction = "Registration"
+	FixedAssetTransactionRoleTransactionBorrow             FixedAssetTransactionRoleTransaction = "Borrow"
+	FixedAssetTransactionRoleTransactionAssignment         FixedAssetTransactionRoleTransaction = "Assignment"
+	FixedAssetTransactionRoleTransactionTransfer           FixedAssetTransactionRoleTransaction = "Transfer"
+	FixedAssetTransactionRoleTransactionDisposal           FixedAssetTransactionRoleTransaction = "Disposal"
+	FixedAssetTransactionRoleTransactionAudit              FixedAssetTransactionRoleTransaction = "Audit"
+	FixedAssetTransactionRoleTransactionMaintenanceRoutine FixedAssetTransactionRoleTransaction = "Maintenance Routine"
+	FixedAssetTransactionRoleTransactionRepairTicketing    FixedAssetTransactionRoleTransaction = "Repair Ticketing"
+	FixedAssetTransactionRoleTransactionTracking           FixedAssetTransactionRoleTransaction = "Tracking"
+	FixedAssetTransactionRoleTransactionRegistration       FixedAssetTransactionRoleTransaction = "Registration"
 )
 
 // TransactionStatus tracks the transaction as a whole; RequestStatus tracks one asset line
