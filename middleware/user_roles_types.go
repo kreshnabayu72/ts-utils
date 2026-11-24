@@ -35,6 +35,8 @@ type UserAccessCache struct {
 		GroupRoles map[enum.SystemRoleKey]Permissions[[]string] `json:"groupRoles"`
 	} `json:"adminConsoleSystemRole"`
 	FixedAssetTransactionRole map[enum.FixedAssetTransactionRoleTransactionKey]map[enum.TransactionRolesType][]string `json:"fixedAssetTransactionRole"`
+	// GroupManagerGroupIDs are the Admin Console group ids the caller manages (iam approver-scope groupManagerGroupIds).
+	GroupManagerGroupIDs []string `json:"groupManagerGroupIds"`
 }
 
 // ModuleFlags is the per-module top-level access (e.g. moduleAccess.fixedAsset).

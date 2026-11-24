@@ -4,7 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 
 	"gitea.tagsamurai.local/BETS-V2/ts-utils/v2/constant"
@@ -266,5 +268,52 @@ func TestEntityID(t *testing.T) {
 				t.Errorf("EntityID() = %q, want %q", gotID, tc.wantID)
 			}
 		})
+	}
+}
+
+func TestLoadUserRoles_CacheHitDecodesGroupManagerGroupIDs(t *testing.T) {
+	fixture := newRolesFixture()
+	fixture.GroupManagerGroupIDs = []string{"7", "9"}
+	payload, _ := json.Marshal(fixture)
+
+	hit := fakeCache{get: func(context.Context, string) (string, error) { return string(payload), nil }}
+	fetch := func(context.Context, string, string) (UserAccessCache, error) {
+		t.Error("iam must not be called on a cache hit")
+		return UserAccessCache{}, nil
+	}
+
+	var got UserAccessCache
+	var found bool
+	app := fiber.New()
+	app.Use(loadUserRoles(hit, fetch))
+	app.Get("/", captureRoles(&got, &found))
+
+	req := httptest.NewRequest("GET", "/", nil)
+	req.Header.Set(constant.HEADER_USER_ID, "42")
+	req.Header.Set(constant.HEADER_CLIENT_ID, "acme")
+	resp, err := app.Test(req)
+	if err != nil {
+		t.Fatalf("app.Test: %v", err)
+	}
+	if resp.StatusCode != fiber.StatusOK || !found {
+		t.Fatalf("status = %d found=%v, want 200 with the cached roles", resp.StatusCode, found)
+	}
+	if want := []string{"7", "9"}; !reflect.DeepEqual(got.GroupManagerGroupIDs, want) {
+		t.Errorf("GroupManagerGroupIDs = %v, want %v", got.GroupManagerGroupIDs, want)
+	}
+}
+
+func TestFetchRolesFromIAM_DecodesGroupManagerGroupIDs(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		_, _ = w.Write([]byte(`{"data":{"groupManagerGroupIds":["7","9"]}}`))
+	}))
+	defer srv.Close()
+
+	roles, err := fetchRolesFromIAM(srv.Client(), srv.URL, "token")(context.Background(), "42", "acme")
+	if err != nil {
+		t.Fatalf("fetch: %v", err)
+	}
+	if want := []string{"7", "9"}; !reflect.DeepEqual(roles.GroupManagerGroupIDs, want) {
+		t.Errorf("GroupManagerGroupIDs = %v, want %v", roles.GroupManagerGroupIDs, want)
 	}
 }
